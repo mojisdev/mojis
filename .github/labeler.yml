@@ -1,0 +1,13 @@
+# See https://github.com/actions/labeler
+
+"pkg: adapters":
+  - changed-files:
+      - any-glob-to-any-file: packages/adapters/**
+
+"pkg: internal-utils":
+  - changed-files:
+      - any-glob-to-any-file: packages/internal-utils/**
+
+"pkg: cli":
+  - changed-files:
+      - any-glob-to-any-file: packages/cli/**
