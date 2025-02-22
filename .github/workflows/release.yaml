@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+
+      - name: setup node
+        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
+        with:
+          node-version: lts/*
+
+      - name: install dependencies
+        run: pnpm install
+
+      - name: check packages for common errors
+        run: pnpm turbo --filter "./packages/**" build lint test typecheck
+
+      - name: create release
+        id: changeset
+        uses: changesets/action@c8bada60c408975afd1a20b3db81d6eee6789308 # v1.4.9
+        with:
+          commit: "chore(release): 📦 version packages"
+          title: "chore(release): 📦  version packages"
+          publish: pnpm exec changeset publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
+
+      # changeset has some issues with pnpm so we sync it up manually
+      - name: sync lockfile if necessary
+        if: steps.changeset.outputs.hasChangesets == 'true'
+        run: |
+          git checkout changeset-release/main
+          pnpm install --no-frozen-lockfile
+          git add .
+          git commit -m "chore(release): 📦 sync lockfile"
+          git push origin changeset-release/main
