@@ -27,6 +27,9 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@mojis/internal-utils": "workspace:*"
+  },
   "devDependencies": {
     "@luxass/eslint-config": "^4.15.0",
     "eslint": "^9.21.0",

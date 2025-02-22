@@ -34,6 +34,10 @@ importers:
         version: 0.4.3(vitest@3.0.6(@types/debug@4.1.12)(@types/node@22.13.5)(msw@2.7.1(@types/node@22.13.5)(typescript@5.7.3))(yaml@2.7.0))
 
   packages/adapters:
+    dependencies:
+      '@mojis/internal-utils':
+        specifier: workspace:*
+        version: link:../internal-utils
     devDependencies:
       '@luxass/eslint-config':
         specifier: ^4.15.0
