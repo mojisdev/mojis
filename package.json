@@ -28,5 +28,10 @@
     "typescript": "^5.7.3",
     "vitest": "^3.0.6",
     "vitest-fetch-mock": "^0.4.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

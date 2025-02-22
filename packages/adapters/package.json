@@ -24,6 +24,7 @@
   "scripts": {
     "build": "tsup --tsconfig tsconfig.build.json",
     "dev": "tsup --tsconfig tsconfig.build.json --watch",
+    "clean": "git clean -xdf dist node_modules",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },

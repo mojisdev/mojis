@@ -28,6 +28,7 @@
   "scripts": {
     "build": "tsup --tsconfig tsconfig.build.json",
     "dev": "tsx ./src/cli.ts",
+    "clean": "git clean -xdf dist node_modules",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
