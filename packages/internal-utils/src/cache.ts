@@ -2,7 +2,9 @@ import path from "node:path";
 import process from "node:process";
 import fs from "fs-extra";
 
-const CACHE_FOLDER = path.resolve(process.cwd(), ".cache");
+function getCacheFolder(): string {
+  return path.resolve(process.env.CACHE_DIR ?? process.cwd(), ".cache");
+}
 
 const LOCAL_CACHE: Record<string, unknown> = {};
 
@@ -15,7 +17,8 @@ const LOCAL_CACHE: Record<string, unknown> = {};
  * @returns {Promise<T>} A promise that resolves with the cached data
  */
 export async function writeCache<T>(name: string, data: T): Promise<T> {
-  const filePath = path.join(CACHE_FOLDER, name);
+  const filePath = path.join(getCacheFolder(), name);
+
   // create directory if it doesn't exist
   await fs.ensureDir(path.dirname(filePath));
 
@@ -32,7 +35,7 @@ export async function writeCache<T>(name: string, data: T): Promise<T> {
  * @returns {Promise<T>} A promise that resolves to the parsed cache data of type T, or undefined if the file doesn't exist
  */
 export async function readCache<T>(name: string): Promise<T | undefined> {
-  const filePath = path.join(CACHE_FOLDER, name);
+  const filePath = path.join(getCacheFolder(), name);
 
   if (!(await fs.pathExists(filePath))) {
     return undefined;

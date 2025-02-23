@@ -47,7 +47,8 @@
     "@types/semver": "^7.5.8",
     "eslint": "^9.21.0",
     "tsup": "^8.3.6",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest-testdirs": "^2.1.1"
   },
   "publishConfig": {
     "access": "public"
