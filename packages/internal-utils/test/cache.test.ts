@@ -1,9 +1,11 @@
 import fs from "fs-extra";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { testdir } from "vitest-testdirs";
-import { readCache, writeCache } from "../src/cache";
+import { fetchCache, readCache, writeCache } from "../src/cache";
 
-vi.mock("fs-extra");
+vi.mock("fs-extra", {
+  spy: true,
+});
 
 beforeEach(() => {
   vi.unstubAllEnvs();
@@ -49,20 +51,107 @@ describe("write cache", () => {
 });
 
 describe("read cache", () => {
-  it("should return undefined if file does not exist", async () => {
-    vi.mocked(fs.pathExists).mockResolvedValue(false);
-    const result = await readCache("nonexistent.json");
+  it("should read data from cache file", async () => {
+    const testdirPath = await testdir({});
+    vi.stubEnv("CACHE_DIR", testdirPath);
 
-    expect(result).toBeUndefined();
-    expect(fs.readFile).not.toHaveBeenCalled();
+    const testData = { foo: "bar" };
+    const cacheName = "test-cache.json";
+
+    await writeCache(cacheName, testData);
+    const result = await readCache(cacheName);
+
+    expect(result).toEqual(testData);
   });
 
-  it("should read and parse JSON data from file", async () => {
-    const testData = { test: "data" };
-    vi.mocked(fs.pathExists).mockResolvedValue(true);
-    vi.mocked(fs.readFile).mockResolvedValue(JSON.stringify(testData));
+  it("should return undefined for non-existent cache", async () => {
+    const result = await readCache("non-existent.json");
 
-    const result = await readCache("test.json");
+    expect(fs.pathExists).toHaveBeenCalled();
+    expect(result).toBeUndefined();
+  });
+
+  it("should properly parse JSON data", async () => {
+    const testdirPath = await testdir({});
+    vi.stubEnv("CACHE_DIR", testdirPath);
+
+    const complexData = {
+      nested: { foo: "bar" },
+      array: [1, 2, 3],
+      string: "test",
+    };
+
+    await writeCache("complex.json", complexData);
+    const result = await readCache("complex.json");
+
+    expect(result).toEqual(complexData);
+  });
+});
+
+describe("fetchCache", () => {
+  it("should return cached data if available and bypass not set", async () => {
+    const testData = { foo: "bar" };
+    const options = {
+      cacheKey: "test-cache",
+      parser: JSON.parse,
+    };
+
+    vi.mocked(fs.readFile).mockResolvedValueOnce(JSON.stringify(testData));
+    vi.mocked(fs.pathExists).mockResolvedValueOnce(true);
+
+    const result = await fetchCache("https://mojis.dev", options);
+
     expect(result).toEqual(testData);
+
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("should fetch and cache new data when bypass is true", async () => {
+    const rawData = "{\"foo\":\"bar\"}";
+    const parsedData = { foo: "bar" };
+
+    const options = {
+      cacheKey: "test-cache.json",
+      parser: JSON.parse,
+      bypassCache: true,
+    };
+
+    fetchMock.mockResponse(rawData);
+
+    const result = await fetchCache("https://mojis.dev", options);
+
+    expect(result).toEqual(parsedData);
+    expect(fetch).toHaveBeenCalledWith("https://mojis.dev", undefined);
+    expect(fs.writeFile).toHaveBeenCalled();
+  });
+
+  it("should throw error on failed fetch", async () => {
+    const options = {
+      cacheKey: "test-cache",
+      parser: JSON.parse,
+      bypassCache: true,
+    };
+
+    fetchMock.mockResponse("Not Found", { status: 404 });
+
+    await expect(fetchCache("https://mojis.dev", options))
+      .rejects
+      .toThrow("failed to fetch https://mojis.dev");
+  });
+
+  it("should use custom parser function", async () => {
+    const rawData = "test,data";
+    const parsedData = ["test", "data"];
+    const options = {
+      cacheKey: "csv-cache",
+      parser: (data: string) => data.split(","),
+      bypassCache: true,
+    };
+
+    fetchMock.mockResponse(rawData);
+
+    const result = await fetchCache("https://mojis.dev", options);
+
+    expect(result).toEqual(parsedData);
   });
 });

@@ -87,7 +87,6 @@ export async function fetchCache<TData = unknown>(
   options: FetchCacheOptions<TData>,
 ): Promise<TData> {
   const { cacheKey, parser, bypassCache, options: fetchOptions } = options;
-
   const cache = LOCAL_CACHE[cacheKey] || await readCache<TData>(cacheKey);
 
   if (!bypassCache && cache != null) {
