@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { describe, expect, it } from "vitest";
-import { extractEmojiVersion, extractVersionFromReadme, getCurrentDraftVersion } from "../src/versions";
+import { extractEmojiVersion, extractVersionFromReadme, getCurrentDraftVersion, mapEmojiVersionToUnicodeVersion } from "../src/versions";
 
 describe("get draft version", () => {
   it("returns draft versions when fetches succeed and versions match", async () => {
@@ -97,16 +97,13 @@ describe("extract version", () => {
   });
 });
 
-// describe("get all emoji versions", () => {
-//   it("should return all emoji versions", async () => {
-//     fetchMock
-//       .mockResponseOnceIf("https://unicode.org/Public/", "Version 15.1.0 of the Unicode Standard")
-//       .mockResponseOnceIf("https://unicode.org/Public/emoji/", "Unicode Emoji, Version 15.1");
-
-//     const result = await getCurrentDraftVersion();
-//     expect(result).toEqual({
-//       emoji_version: "15.1",
-//       unicode_version: "15.1.0",
-//     });
-//   });
-// });
+describe("map emoji version to unicode version", () => {
+  it.each([
+    { input: "1.0", expected: "8.0" },
+    { input: "15.0", expected: "15.0" },
+    { input: "15.1", expected: "15.1" },
+    { input: "13.1", expected: "13.0" },
+  ])("should map emoji version to unicode version (input: $input, expected: $expected)", ({ input, expected }) => {
+    expect(mapEmojiVersionToUnicodeVersion(input)).toBe(expected);
+  });
+});

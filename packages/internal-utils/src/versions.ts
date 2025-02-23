@@ -2,6 +2,17 @@ import type { z } from "zod";
 import type { EMOJI_VERSION_SCHEMA } from "./schemas";
 import semver from "semver";
 
+export const MAPPED_EMOJI_VERSIONS: Record<string, string> = {
+  "1.0": "8.0",
+  "2.0": "8.0",
+  "3.0": "9.0",
+  "4.0": "9.0",
+  "5.0": "10.0",
+
+  // There doesn't seem to be a Unicode 13.1, so we'll map it to 13.0
+  "13.1": "13.0",
+};
+
 // TODO: find a better name for this type, when the schema has been changed
 export type EmojiVersion = z.infer<typeof EMOJI_VERSION_SCHEMA>;
 
@@ -364,4 +375,20 @@ export async function isEmojiVersionValid(version: string): Promise<boolean> {
   }
 
   return true;
+}
+
+/**
+ * Maps an emoji version to its corresponding Unicode version.
+ *
+ * @param {string} emojiVersion - The emoji version to map to a Unicode version
+ * @returns {string} The corresponding Unicode version if found, otherwise returns the input version
+ */
+export function mapEmojiVersionToUnicodeVersion(emojiVersion: string): string {
+  const mapped = MAPPED_EMOJI_VERSIONS[emojiVersion];
+
+  if (mapped != null) {
+    return mapped;
+  }
+
+  return emojiVersion;
 }

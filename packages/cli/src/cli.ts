@@ -1,5 +1,7 @@
+import type { SHORTCODE_PROVIDERS_SCHEMA } from "@mojis/internal-utils/schemas";
+import type { z } from "zod";
 import process from "node:process";
-import { getAllEmojiVersions } from "@mojis/internal-utils";
+import { getAllEmojiVersions, mapEmojiVersionToUnicodeVersion } from "@mojis/internal-utils";
 import { red, yellow } from "farver/fast";
 import semver from "semver";
 import yargs, { type Argv } from "yargs";
@@ -29,38 +31,44 @@ cli.command(
       description: "generators to use",
       default: ["metadata", "sequences", "variations", "emojis", "shortcodes"],
     })
-    // .option("shortcode-providers", {
-    //   type: "array",
-    //   description: "shortcode providers to use",
-    //   default: ["github"] satisfies InferInput<typeof SHORTCODE_PROVIDERS_SCHEMA>,
-    // })
+    .option("shortcode-providers", {
+      type: "array",
+      description: "shortcode providers to use",
+      // eslint-disable-next-line ts/no-unsafe-assignment
+      default: ["github"] satisfies z.infer<typeof SHORTCODE_PROVIDERS_SCHEMA>,
+    })
     .strict().help(),
   async (args) => {
-    const _force = args.force ?? false;
-    const _versions = Array.isArray(args.versions) ? args.versions : [args.versions];
-    const _generators = Array.isArray(args.generators) ? args.generators : [args.generators];
+    const force = args.force ?? false;
+    const providedVersions = Array.isArray(args.versions) ? args.versions : [args.versions];
+    const generators = Array.isArray(args.generators) ? args.generators : [args.generators];
 
-    // const lockfile = await readLockfile();
+    const lockfile = await readLockfile();
 
-    // if (lockfile == null) {
-    //   consola.error("no lockfile found, run `mojis versions --write-lockfile` to generate one");
-    //   process.exit(1);
-    // }
+    if (lockfile == null) {
+      console.error("no lockfile found, run `mojis versions --write-lockfile` to generate one");
+      process.exit(1);
+    }
 
-    // function isGeneratorEnabled(generator: string) {
-    //   return generators.includes(generator);
-    // }
+    function isGeneratorEnabled(generator: string) {
+      return generators.includes(generator);
+    }
 
-    // const unsupported = versions.filter((v) => !SUPPORTED_EMOJI_VERSIONS.includes(v));
+    const versions = providedVersions.map((v) => ({
+      emoji_version: v,
+      unicode_version: mapEmojiVersionToUnicodeVersion(v),
+    }));
 
-    // // require that all versions are supported, otherwise exit
-    // if (unsupported.length > 0) {
-    //   consola.error(`version(s) ${unsupported.map((v) => yellow(v)).join(", ")} is not supported`);
-    //   process.exit(1);
-    // }
+    const unsupported = versions.filter((v) => !SUPPORTED_EMOJI_VERSIONS.includes(v));
 
-    // consola.info("generating emoji data for versions", versions.map((v) => yellow(v)).join(", "));
-    // consola.info(`using the following generators ${args.generators.map((g) => yellow(g)).join(", ")}`);
+    // require that all versions are supported, otherwise exit
+    if (unsupported.length > 0) {
+      console.error(`version(s) ${unsupported.map((v) => yellow(v)).join(", ")} is not supported`);
+      process.exit(1);
+    }
+
+    console.info("generating emoji data for versions", versions.map((v) => yellow(v)).join(", "));
+    console.info(`using the following generators ${args.generators.map((g) => yellow(g)).join(", ")}`);
 
     // const promises = versions.map(async (version) => {
     //   const coerced = semver.coerce(version);
