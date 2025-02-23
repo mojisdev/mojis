@@ -322,31 +322,6 @@ export async function getAllEmojiVersions(): Promise<EmojiVersion[]> {
   return versions.sort((a, b) => semver.compare(`${b.emoji_version}.0`, `${a.emoji_version}.0`));
 }
 
-export function getUnicodeVersionByEmojiVersion(emojiVersion: string): string {
-  const coercedEmojiVersion = semver.coerce(emojiVersion);
-
-  if (coercedEmojiVersion == null) {
-    throw new Error(`invalid emoji version: ${emojiVersion}`);
-  }
-
-  if (semver.gte(coercedEmojiVersion, "11.0.0")) {
-    return emojiVersion;
-  }
-
-  switch (emojiVersion) {
-    case "1.0":
-    case "2.0":
-      return "8.0";
-    case "3.0":
-    case "4.0":
-      return "9.0";
-    case "5.0":
-      return "10.0";
-    default:
-      throw new Error(`invalid emoji version: ${emojiVersion}`);
-  }
-}
-
 /**
  * Checks if the given emoji version is valid according to Unicode Consortium standards.
  *
