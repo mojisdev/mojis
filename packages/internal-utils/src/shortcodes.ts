@@ -30,7 +30,7 @@ export interface ShortcodeOptions {
   /**
    * Emojis database.
    */
-  emojis: any;
+  emojis: Map<string, string>;
 }
 
 /**
@@ -51,19 +51,25 @@ export interface ShortcodeOptions {
 export async function generateGitHubShortcodes(options: ShortcodeOptions): Promise<EmojiShortcode[]> {
   const { emojis, force } = options;
 
-  const githubEmojis = await fetchCache<Record<string, string>>("https://api.github.com/emojis", {
-    cacheKey: `github-emojis.json`,
-    bypassCache: force,
-    parser(data) {
-      return JSON.parse(data);
-    },
-    options: {
-      headers: {
-        "Accept": "application/vnd.github.v3+json",
-        "User-Agent": "mojis.dev",
+  let githubEmojis: Record<string, string> = {};
+
+  try {
+    githubEmojis = await fetchCache<Record<string, string>>("https://api.github.com/emojis", {
+      cacheKey: `github-emojis.json`,
+      bypassCache: force,
+      parser(data) {
+        return JSON.parse(data);
       },
-    },
-  });
+      options: {
+        headers: {
+          "Accept": "application/vnd.github.v3+json",
+          "User-Agent": "mojis.dev",
+        },
+      },
+    });
+  } catch (err) {
+    console.error("failed to fetch GitHub emojis", err);
+  }
 
   const shortcodes: EmojiShortcode[] = [];
 
