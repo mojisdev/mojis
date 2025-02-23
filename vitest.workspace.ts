@@ -1,5 +1,5 @@
 import { existsSync, readdirSync } from "node:fs";
-import { defineWorkspace, mergeConfig, type ViteUserConfig } from "vitest/config";
+import { defineWorkspace } from "vitest/config";
 
 const pkgRoot = (pkg: string) =>
   new URL(`./packages/${pkg}`, import.meta.url).pathname;
@@ -14,29 +14,20 @@ const aliases = readdirSync(new URL("./packages", import.meta.url).pathname)
     },
     {});
 
-const baseConfig: ViteUserConfig = {
-  test: {
-    mockReset: true,
-    coverage: {
-      provider: "v8",
-      include: ["**/src/**"],
-    },
-    setupFiles: [
-      "./test/setup/fetch-mock.ts",
-    ]
-  },
-  esbuild: { target: "es2020" },
-  resolve: { alias: aliases },
-};
-
 export default defineWorkspace([
-  mergeConfig(baseConfig, {
+  {
     test: {
+      name: "unit",
       include: [
         "**/*.test.{ts,tsx}",
       ],
-      name: "unit",
       environment: "node",
+      mockReset: true,
+      setupFiles: [
+        "./test/setup/fetch-mock.ts",
+      ]
     },
-  } satisfies ViteUserConfig),
+    esbuild: { target: "es2020" },
+    resolve: { alias: aliases },
+  },
 ]);
