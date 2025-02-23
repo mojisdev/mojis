@@ -1,20 +1,8 @@
+import type { z } from "zod";
+import type { EMOJI_VERSION_SCHEMA } from "./schemas";
 import semver from "semver";
 
-interface EmojiVersion {
-  emoji_version: string;
-  unicode_version: string;
-  draft: boolean;
-  generated: boolean;
-  metadata: {
-    emojis: string | null;
-    sequences: string | null;
-    variations: string | null;
-    metadata: string | null;
-    shortcodes: string | null;
-    zwj: string | null;
-    unicodeNames: string | null;
-  } | null;
-}
+export type EmojiVersion = z.infer<typeof EMOJI_VERSION_SCHEMA>;
 
 export interface DraftVersion {
   emoji_version: string;
@@ -255,8 +243,6 @@ export async function getAllEmojiVersions(): Promise<EmojiVersion[]> {
       emoji_version: version,
       unicode_version: version,
       draft: version === draft.unicode_version || version === draft.emoji_version,
-      metadata: null,
-      generated: false,
     });
   }
 
@@ -310,8 +296,6 @@ export async function getAllEmojiVersions(): Promise<EmojiVersion[]> {
       emoji_version: match[1],
       unicode_version: unicode_version || match[1],
       draft: version === draft.unicode_version || version === draft.emoji_version,
-      metadata: null,
-      generated: false,
     });
   }
 
