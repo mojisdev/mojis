@@ -1,7 +1,7 @@
 import type { SHORTCODE_PROVIDERS_SCHEMA } from "@mojis/internal-utils/schemas";
 import type { z } from "zod";
 import process from "node:process";
-import { getAllEmojiVersions, mapEmojiVersionToUnicodeVersion } from "@mojis/internal-utils";
+import { getAllEmojiVersions, getLatestEmojiVersion, mapEmojiVersionToUnicodeVersion } from "@mojis/internal-utils";
 import { red, yellow } from "farver/fast";
 import semver from "semver";
 import yargs, { type Argv } from "yargs";
@@ -34,13 +34,15 @@ cli.command(
     .option("shortcode-providers", {
       type: "array",
       description: "shortcode providers to use",
-      // eslint-disable-next-line ts/no-unsafe-assignment
       default: ["github"] satisfies z.infer<typeof SHORTCODE_PROVIDERS_SCHEMA>,
     })
     .strict().help(),
   async (args) => {
-    const force = args.force ?? false;
-    const providedVersions = Array.isArray(args.versions) ? args.versions : [args.versions];
+    const _force = args.force ?? false;
+    const existingEmojiVersions = await getAllEmojiVersions();
+
+    let providedVersions = (Array.isArray(args.versions) ? args.versions : [args.versions]) as string[];
+
     const generators = Array.isArray(args.generators) ? args.generators : [args.generators];
 
     const lockfile = await readLockfile();
@@ -50,24 +52,92 @@ cli.command(
       process.exit(1);
     }
 
-    function isGeneratorEnabled(generator: string) {
+    function _isGeneratorEnabled(generator: string) {
       return generators.includes(generator);
+    }
+
+    // If provided versions contains any of the non existing versions, filter them out.
+    // if they are the only versions provided, exit with an error.
+    if (providedVersions.some((v) => !existingEmojiVersions.some((ev) => ev.emoji_version === v))) {
+      const unsupported = providedVersions.filter((v) => !existingEmojiVersions.some((ev) => ev.emoji_version === v));
+
+      if (unsupported.length === providedVersions.length) {
+        console.error(`version(s) ${unsupported.map((v) => yellow(v)).join(", ")} is not supported, since they don't exist.`);
+        // TODO: add a note about why.
+        process.exit(1);
+      }
+
+      providedVersions = providedVersions.filter((v) => !unsupported.includes(v));
     }
 
     const versions = providedVersions.map((v) => ({
       emoji_version: v,
       unicode_version: mapEmojiVersionToUnicodeVersion(v),
+      fallback: null as string | null,
     }));
 
-    const unsupported = versions.filter((v) => !SUPPORTED_EMOJI_VERSIONS.includes(v));
+    // print out the versions that we don't officially support,
+    // which will fallback to using a different version adapter.
 
-    // require that all versions are supported, otherwise exit
-    if (unsupported.length > 0) {
-      console.error(`version(s) ${unsupported.map((v) => yellow(v)).join(", ")} is not supported`);
-      process.exit(1);
+    // TODO: probably move this to a different location.
+    const OFFICIAL_SUPPORTED_VERSIONS = [
+      "1.0",
+      "2.0",
+      "3.0",
+      "4.0",
+      "5.0",
+      "11.0",
+      "12.0",
+      "12.1",
+      "13.0",
+      "13.1",
+      "14.0",
+      "15.0",
+      "15.1",
+      "16.0",
+    ];
+
+    // TODO: prevent issues where the fallback is pointing to a version that doesn't exist.
+
+    const notOfficialSupported = versions.filter((v) => !OFFICIAL_SUPPORTED_VERSIONS.includes(v.emoji_version));
+
+    // warn about using a not officially supported version
+    if (notOfficialSupported.length > 0) {
+      console.warn(`version(s) ${notOfficialSupported.map((v) => yellow(v.emoji_version)).join(", ")} is not officially supported`);
+
+      // set the fallback for each of the versions that are not officially supported
+      for (const version of notOfficialSupported) {
+        // get the version that comes right before the version that is not officially supported
+        const previousVersion = existingEmojiVersions.find((v) => semver.lt(`${v.emoji_version}.0`, `${version.emoji_version}.0`));
+
+        // set the fallback to the previous version if it exists, otherwise use the latest supported version.
+        const found = versions.find((v) => v.emoji_version === version.emoji_version);
+
+        if (found == null) {
+          throw new Error(`version ${version.emoji_version} not found`);
+        }
+
+        if (previousVersion != null && previousVersion.emoji_version != null) {
+          found.fallback = previousVersion.emoji_version;
+        } else {
+          const latest = getLatestEmojiVersion(existingEmojiVersions);
+
+          if (latest == null) {
+            throw new Error("no latest version found");
+          }
+
+          found.fallback = latest.emoji_version;
+        }
+      }
+
+      // eslint-disable-next-line ts/restrict-template-expressions
+      console.warn(`will use the following fallbacks: ${notOfficialSupported.map((v) => `${yellow(v.emoji_version)} -> ${yellow(v.fallback)}`).join(", ")}`);
     }
 
-    console.info("generating emoji data for versions", versions.map((v) => yellow(v)).join(", "));
+    console.log("versions", versions);
+    console.log("existingEmojiVersions", existingEmojiVersions);
+
+    console.info("generating emoji data for versions", versions.map((v) => yellow(v.emoji_version)).join(", "));
     console.info(`using the following generators ${args.generators.map((g) => yellow(g)).join(", ")}`);
 
     // const promises = versions.map(async (version) => {

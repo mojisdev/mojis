@@ -13,6 +13,14 @@ export const MAPPED_EMOJI_VERSIONS: Record<string, string> = {
   "13.1": "13.0",
 };
 
+/**
+ * These versions don't exist in the Unicode Consortium's emoji versioning scheme.
+ * This is because they aligned the emoji version with the Unicode version starting from v11.
+ *
+ * So actually, the emoji version v11.0 is v6.0
+ */
+export const NON_EXISTING_VERSIONS = ["6.x", "7.x", "8.x", "9.x", "10.x"];
+
 // TODO: find a better name for this type, when the schema has been changed
 export type EmojiVersion = z.infer<typeof EMOJI_VERSION_SCHEMA>;
 
@@ -339,8 +347,6 @@ export function getUnicodeVersionByEmojiVersion(emojiVersion: string): string {
   }
 }
 
-const NO_EMOJI_VERSIONS = ["6.x", "7.x", "8.x", "9.x", "10.x"];
-
 /**
  * Checks if the given emoji version is valid according to Unicode Consortium standards.
  *
@@ -362,7 +368,7 @@ export async function isEmojiVersionValid(version: string): Promise<boolean> {
   // unicode consortium made a huge change in v11, because that is actually the version
   // right after v5. They decided to align the unicode version with the emoji version in 2017.
   // So, no emoji version 6, 7, 8, 9, or 10.
-  const isVersionInNoEmojiVersions = NO_EMOJI_VERSIONS.find((v) => semver.satisfies(version, v));
+  const isVersionInNoEmojiVersions = NON_EXISTING_VERSIONS.find((v) => semver.satisfies(version, v));
   if (isVersionInNoEmojiVersions) {
     return false;
   }
@@ -391,4 +397,32 @@ export function mapEmojiVersionToUnicodeVersion(emojiVersion: string): string {
   }
 
   return emojiVersion;
+}
+
+/**
+ * Gets the latest non-draft emoji version from an array of emoji versions.
+ *
+ * @param {EmojiVersion[]} versions - An array of emoji versions to search through
+ * @returns {EmojiVersion | null} The latest non-draft emoji version, or null if no valid versions found
+ *
+ * @example
+ * ```ts
+ * const versions = [
+ *   { emoji_version: "15.1", draft: false },
+ *   { emoji_version: "15.0", draft: false },
+ *   { emoji_version: "15.2", draft: true }
+ * ];
+ * const latest = getLatestEmojiVersion(versions);
+ * // Returns: { emoji_version: "15.1", draft: false }
+ * ```
+ */
+export function getLatestEmojiVersion(versions: EmojiVersion[]): EmojiVersion | null {
+  // filter draft versions out, and sort by using semver.
+  const filtered = versions.filter((v) => !v.draft).sort((a, b) => semver.compare(`${b.emoji_version}.0`, `${a.emoji_version}.0`));
+
+  if (!filtered.length || filtered[0] == null) {
+    return null;
+  }
+
+  return filtered[0];
 }
