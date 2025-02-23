@@ -33,6 +33,21 @@ export interface ShortcodeOptions {
   emojis: any;
 }
 
+/**
+ * Generates GitHub emoji shortcodes by fetching from GitHub's emoji API.
+ *
+ * @param {ShortcodeOptions} options - Configuration options for shortcode generation
+ *
+ * @returns {EmojiShortcode[]} Promise that resolves to an array of emoji shortcodes with GitHub-specific data
+ *
+ * @example
+ * ```ts
+ * const shortcodes = await generateGitHubShortcodes({
+ *   emojis: emojiMap,
+ *   force: false
+ * });
+ * ```
+ */
 export async function generateGitHubShortcodes(options: ShortcodeOptions): Promise<EmojiShortcode[]> {
   const { emojis, force } = options;
 
