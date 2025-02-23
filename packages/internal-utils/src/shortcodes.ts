@@ -57,9 +57,7 @@ export async function generateGitHubShortcodes(options: ShortcodeOptions): Promi
     githubEmojis = await fetchCache<Record<string, string>>("https://api.github.com/emojis", {
       cacheKey: `github-emojis.json`,
       bypassCache: force,
-      parser(data) {
-        return JSON.parse(data);
-      },
+      parser: (data) => JSON.parse(data) as Record<string, string>,
       options: {
         headers: {
           "Accept": "application/vnd.github.v3+json",
@@ -76,8 +74,9 @@ export async function generateGitHubShortcodes(options: ShortcodeOptions): Promi
   for (const [shortcode, url] of Object.entries(githubEmojis)) {
     const match = url.match(/emoji\/unicode\/([\da-z-]+)\.png/i);
 
-    // github has some standard emojis that don't have a unicode representation
-    if (!match || !match[1]) {
+    // github has some standard emojis that don't have
+    // a unicode representation which we should skip
+    if (match == null || match[1] == null) {
       continue;
     }
 

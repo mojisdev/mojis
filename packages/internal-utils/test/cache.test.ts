@@ -99,7 +99,7 @@ describe("fetchCache", () => {
     vi.mocked(fs.readFile).mockReturnValue(JSON.stringify(testData) as never);
     vi.mocked(fs.pathExists).mockResolvedValue(true as never);
 
-    const result = await fetchCache("https://mojis.dev", options);
+    const result = await fetchCache<Record<string, string>>("https://mojis.dev", options);
 
     expect(result).toEqual(testData);
 
@@ -118,7 +118,7 @@ describe("fetchCache", () => {
 
     fetchMock.mockResponse(rawData);
 
-    const result = await fetchCache("https://mojis.dev", options);
+    const result = await fetchCache<Record<string, string>>("https://mojis.dev", options);
 
     expect(result).toEqual(parsedData);
     expect(fetch).toHaveBeenCalledWith("https://mojis.dev", undefined);
