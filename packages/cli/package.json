@@ -19,7 +19,7 @@
     "url": "https://github.com/mojisdev/mojis/issues"
   },
   "bin": {
-    "mojis": "bin/mojis.mjs"
+    "mojis": "bin/mojis.js"
   },
   "files": [
     "bin",

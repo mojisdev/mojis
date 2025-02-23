@@ -1,5 +1,5 @@
 import process from "node:process";
-import { getAllEmojiVersions } from "@mojis/internal-utils/versions";
+import { getAllEmojiVersions } from "@mojis/internal-utils";
 import { red, yellow } from "farver/fast";
 import semver from "semver";
 import yargs, { type Argv } from "yargs";
