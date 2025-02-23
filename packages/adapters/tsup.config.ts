@@ -7,9 +7,4 @@ export default defineConfig({
   dts: true,
   treeshake: true,
   bundle: true,
-  outExtension(ctx) {
-    return {
-      js: ctx.format === "cjs" ? ".cjs" : ".mjs",
-    };
-  },
 });
