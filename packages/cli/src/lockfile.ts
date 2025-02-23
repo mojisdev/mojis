@@ -28,7 +28,7 @@ const DEFAULT_LOCKFILE = {
  * @throws {Error} If the lockfile exists but contains invalid data
  */
 export async function readLockfile(cwd: string = process.cwd()): Promise<EmojiLockfile> {
-  // eslint-disable-next-line ts/no-unsafe-assignment, ts/no-unsafe-call, ts/no-unsafe-member-access
+  // eslint-disable-next-line ts/no-unsafe-assignment
   const json = await fs.readJSON(path.join(cwd, "emojis.lock")).catch(() => DEFAULT_LOCKFILE);
 
   return LOCKFILE_SCHEMA.parseAsync(json);
@@ -52,7 +52,6 @@ export async function writeLockfile(lockfile: EmojiLockfile, cwd: string = proce
     throw new Error("invalid lockfile");
   }
 
-  // eslint-disable-next-line ts/no-unsafe-call, ts/no-unsafe-member-access
   await fs.writeJSON(path.join(cwd, "emojis.lock"), result.data, { spaces: 2 });
 }
 
@@ -65,6 +64,5 @@ export async function writeLockfile(lockfile: EmojiLockfile, cwd: string = proce
  * @returns {Promise<boolean>} A promise that resolves to true if the lockfile exists, false otherwise
  */
 export async function hasLockfile(cwd: string = process.cwd()): Promise<boolean> {
-  // eslint-disable-next-line ts/no-unsafe-return, ts/no-unsafe-call, ts/no-unsafe-member-access
-  return await fs.exists(path.join(cwd, "emojis.lock"));
+  return fs.exists(path.join(cwd, "emojis.lock"));
 }
