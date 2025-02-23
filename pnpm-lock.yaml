@@ -57,6 +57,9 @@ importers:
 
   packages/cli:
     dependencies:
+      '@mojis/adapters':
+        specifier: workspace:*
+        version: link:../adapters
       '@mojis/internal-utils':
         specifier: workspace:*
         version: link:../internal-utils

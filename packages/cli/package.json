@@ -33,6 +33,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@mojis/adapters": "workspace:*",
     "@mojis/internal-utils": "workspace:*",
     "farver": "^0.4.0",
     "fs-extra": "^11.3.0",
