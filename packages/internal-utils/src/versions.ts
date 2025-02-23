@@ -2,6 +2,7 @@ import type { z } from "zod";
 import type { EMOJI_VERSION_SCHEMA } from "./schemas";
 import semver from "semver";
 
+// TODO: find a better name for this type, when the schema has been changed
 export type EmojiVersion = z.infer<typeof EMOJI_VERSION_SCHEMA>;
 
 export interface DraftVersion {
