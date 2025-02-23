@@ -96,8 +96,8 @@ describe("fetchCache", () => {
       parser: JSON.parse,
     };
 
-    vi.mocked(fs.readFile).mockResolvedValueOnce(JSON.stringify(testData));
-    vi.mocked(fs.pathExists).mockResolvedValueOnce(true);
+    vi.mocked(fs.readFile).mockReturnValue(JSON.stringify(testData) as never);
+    vi.mocked(fs.pathExists).mockResolvedValue(true as never);
 
     const result = await fetchCache("https://mojis.dev", options);
 
