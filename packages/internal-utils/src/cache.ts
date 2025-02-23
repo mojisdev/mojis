@@ -47,12 +47,41 @@ export async function readCache<T>(name: string): Promise<T | undefined> {
 }
 
 export interface FetchCacheOptions<TData = unknown> {
+  /**
+   * Unique key to identify the cache entry
+   */
   cacheKey: string;
+
+  /**
+   * Parser function to parse the fetched data
+   * @param {string} data - The fetched data to parse
+   * @template TData
+   * @returns {TData} The parsed data
+   */
   parser: (data: string) => TData;
+
+  /**
+   * Options to pass to the fetch request
+   */
   options?: RequestInit;
+
+  /**
+   * Bypass the cache and fetch fresh data
+   */
   bypassCache?: boolean;
 }
 
+/**
+ * Fetches data from a URL with caching support.
+ *
+ * @param {string} url - The URL to fetch data from
+ * @param {FetchCacheOptions} options - Configuration options for the fetch request and caching
+ * @template TData - The type of data returned after parsing
+ *
+ * @returns {Promise<TData>} Promise that resolves with the parsed data (either from cache or freshly fetched)
+ *
+ * @throws {Error} When the fetch request fails
+ */
 export async function fetchCache<TData = unknown>(
   url: string,
   options: FetchCacheOptions<TData>,
