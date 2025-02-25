@@ -3,12 +3,14 @@ import type { z } from "zod";
 import process from "node:process";
 import { resolveAdapter } from "@mojis/adapters";
 import {
+  type EmojiVersion,
   getAllEmojiVersions,
   getLatestEmojiVersion,
   mapEmojiVersionToUnicodeVersion,
   MojisNotImplemented,
 } from "@mojis/internal-utils";
 import { green, red, yellow } from "farver/fast";
+import fs from "fs-extra";
 import semver from "semver";
 import yargs, { type Argv } from "yargs";
 import pkg from "../package.json" with { type: "json" };
@@ -44,7 +46,7 @@ cli.command(
     })
     .strict().help(),
   async (args) => {
-    const _force = args.force ?? false;
+    const force = args.force ?? false;
     const existingEmojiVersions = await getAllEmojiVersions();
 
     let providedVersions = (Array.isArray(args.versions) ? args.versions : [args.versions]) as string[];
@@ -58,7 +60,7 @@ cli.command(
       process.exit(1);
     }
 
-    function _isGeneratorEnabled(generator: string) {
+    function isGeneratorEnabled(generator: string) {
       return generators.includes(generator);
     }
 
@@ -79,8 +81,9 @@ cli.command(
     const versions = providedVersions.map((v) => ({
       emoji_version: v,
       unicode_version: mapEmojiVersionToUnicodeVersion(v),
+      draft: existingEmojiVersions.find((ev) => ev.emoji_version === v)?.draft ?? false,
       fallback: null as string | null,
-    }));
+    })) satisfies EmojiVersion[];
 
     // print out the versions that we don't officially support,
     // which will fallback to using a different version adapter.
@@ -136,7 +139,6 @@ cli.command(
         }
       }
 
-      // eslint-disable-next-line ts/restrict-template-expressions
       console.warn(`will use the following fallbacks: ${notOfficialSupported.map((v) => `${yellow(v.emoji_version)} -> ${yellow(v.fallback)}`).join(", ")}`);
     }
 
@@ -146,50 +148,38 @@ cli.command(
     console.info("generating emoji data for versions", versions.map((v) => yellow(v.emoji_version)).join(", "));
     console.info(`using the following generators ${args.generators.map((g) => yellow(g)).join(", ")}`);
 
-    const promises = versions.map(async (_version) => {
-      console.log(_version);
-      const adapter = resolveAdapter(coerced.version);
+    const promises = versions.map(async (version) => {
+      const adapter = resolveAdapter(version);
 
-      //   if (adapter == null) {
-      //     throw new Error(`no adapter found for version ${version}`);
-      //   }
+      if (adapter == null) {
+        throw new Error(`no adapter found for version ${version.emoji_version}`);
+      }
 
-      //   const lockfileMetadata = lockfile.versions.find((v) => v.emoji_version === version)?.metadata ?? {
-      //     emojis: null,
-      //     metadata: null,
-      //     sequences: null,
-      //     shortcodes: null,
-      //     unicodeNames: null,
-      //     variations: null,
-      //     zwj: null,
-      //   };
+      if (isGeneratorEnabled("metadata")) {
+        if (adapter.metadata == null) {
+          throw new MojisNotImplemented("metadata");
+        }
 
-      //   if (isGeneratorEnabled("metadata")) {
-      //     if (adapter.metadata == null) {
-      //       throw new MojisNotImplemented("metadata");
-      //     }
+        const { groups, emojiMetadata } = await adapter.metadata({
+          force,
+          emojiVersion: version.emoji_version,
+          unicodeVersion: version.unicode_version,
+        });
 
-      //     const { groups, emojiMetadata } = await adapter.metadata({
-      //       emojiVersion: version,
-      //       force,
-      //       unicodeVersion: getUnicodeVersionByEmojiVersion(version)!,
-      //       lockfileMetadata,
-      //     });
+        await fs.ensureDir(`./data/v${version.emoji_version}/metadata`);
 
-      //     await fs.ensureDir(`./data/v${version}/metadata`);
+        await fs.writeFile(
+          `./data/v${version.emoji_version}/groups.json`,
+          JSON.stringify(groups, null, 2),
+          "utf-8",
+        );
 
-      //     await fs.writeFile(
-      //       `./data/v${version}/groups.json`,
-      //       JSON.stringify(groups, null, 2),
-      //       "utf-8",
-      //     );
-
-      //     await Promise.all(Object.entries(emojiMetadata).map(([group, metadata]) => fs.writeFile(
-      //       `./data/v${version}/metadata/${group}.json`,
-      //       JSON.stringify(metadata, null, 2),
-      //       "utf-8",
-      //     )));
-      //   }
+        await Promise.all(Object.entries(emojiMetadata).map(async ([group, metadata]) => fs.writeFile(
+          `./data/v${version.emoji_version}/metadata/${group}.json`,
+          JSON.stringify(metadata, null, 2),
+          "utf-8",
+        )));
+      }
 
       //   if (isGeneratorEnabled("sequences")) {
       //     if (adapter.sequences == null) {
@@ -340,7 +330,6 @@ cli.command(
     const versions = await getAllEmojiVersions();
 
     console.log("all available versions:");
-    // eslint-disable-next-line ts/restrict-template-expressions
     console.log(versions.map((v) => `${yellow(v.emoji_version)}${v.draft ? ` ${red("(draft)")}` : ""}`).join(", "));
 
     if (args.writeLockfile) {
@@ -359,13 +348,12 @@ cli.command(
       lockfile.latest_version = latestVersion;
 
       await writeLockfile(lockfile);
-      // eslint-disable-next-line ts/restrict-template-expressions
       console.log(`updated ${yellow("emojis.lock")}`);
     }
   },
 );
 
-void cli.help().parse();
+cli.help().parse();
 
 function commonOptions(args: Argv<object>): Argv<object & { force: boolean }> {
   return args.option("force", {

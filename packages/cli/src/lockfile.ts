@@ -28,7 +28,6 @@ const DEFAULT_LOCKFILE = {
  * @throws {Error} If the lockfile exists but contains invalid data
  */
 export async function readLockfile(cwd: string = process.cwd()): Promise<EmojiLockfile> {
-  // eslint-disable-next-line ts/no-unsafe-assignment
   const json = await fs.readJSON(path.join(cwd, "emojis.lock")).catch(() => DEFAULT_LOCKFILE);
 
   return LOCKFILE_SCHEMA.parseAsync(json);

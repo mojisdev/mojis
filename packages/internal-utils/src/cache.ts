@@ -22,7 +22,13 @@ export async function writeCache<T>(name: string, data: T): Promise<T> {
   // create directory if it doesn't exist
   await fs.ensureDir(path.dirname(filePath));
 
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+  await fs.writeFile(filePath, JSON.stringify(data, (key, value) => {
+    if (value instanceof Map) {
+      return Object.fromEntries(value);
+    }
+
+    return value;
+  }, 2), "utf-8");
 
   return data;
 }

@@ -5,6 +5,7 @@ export const EMOJI_VERSION_SCHEMA = z.object({
   emoji_version: z.string(),
   unicode_version: z.string(),
   draft: z.boolean(),
+  fallback: z.string().optional().nullable(),
 });
 
 export const SHORTCODE_PROVIDER_SCHEMA = z.union([
