@@ -33,50 +33,32 @@ export function resolveAdapter(emojiVersion: EmojiVersion): MojiAdapter | null {
       const currentLower = semver.minVersion(current.range);
 
       if (!selectedLower || !currentLower) {
-        if (selected.extend == null) {
-          return selected;
-        }
-
-        const parent = ADAPTERS.get(selected.extend);
-
-        if (parent == null) {
-          throw new Error(`adapter ${selected.name} extends ${selected.extend}, but ${selected.extend} is not registered`);
-        }
-
-        return Object.assign({}, parent, selected);
+        return extendAdapter(selected);
       }
 
       const adapter = semver.gt(currentLower, selectedLower) ? current : selected;
 
-      if (adapter.extend == null) {
-        return adapter;
-      }
-
-      const parent = ADAPTERS.get(adapter.extend);
-
-      if (parent == null) {
-        throw new Error(`adapter ${adapter.name} extends ${adapter.extend}, but ${adapter.extend} is not registered`);
-      }
-
-      return Object.assign({}, parent, adapter);
+      return extendAdapter(adapter);
     });
   }
 
   if (matchingAdapters.length === 1 && matchingAdapters[0] != null) {
-    const adapter = matchingAdapters[0];
-
-    if (adapter.extend == null) {
-      return adapter;
-    }
-
-    const parent = ADAPTERS.get(adapter.extend);
-
-    if (parent == null) {
-      throw new Error(`adapter ${adapter.name} extends ${adapter.extend}, but ${adapter.extend} is not registered`);
-    }
-
-    return Object.assign({}, parent, adapter);
+    return extendAdapter(matchingAdapters[0]);
   }
 
   return null;
+}
+
+function extendAdapter(adapter: MojiAdapter): MojiAdapter {
+  if (adapter.extend == null) {
+    return adapter;
+  }
+
+  const parent = ADAPTERS.get(adapter.extend);
+
+  if (parent == null) {
+    throw new Error(`adapter ${adapter.name} extends ${adapter.extend}, but ${adapter.extend} is not registered`);
+  }
+
+  return Object.assign({}, parent, adapter);
 }
