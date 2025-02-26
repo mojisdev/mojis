@@ -15,15 +15,6 @@ export interface EmojiMetadata {
   hexcodes: string[];
 }
 
-export type EmojiGroupWithMetadata = Omit<EmojiGroup, "subgroups"> & {
-  subgroups: EmojiSubgroupWithMetadata[];
-};
-
-export interface EmojiSubgroupWithMetadata {
-  name: string;
-  emojis: EmojiMetadata[];
-}
-
 export interface EmojiSequence {
   property: string;
   hex: string;

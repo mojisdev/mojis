@@ -35,7 +35,10 @@ export const baseAdapter = defineMojiAdapter({
   }) => {
     if (versions.emoji_version === "1.0" || versions.emoji_version === "2.0" || versions.emoji_version === "3.0") {
       console.warn(`skipping metadata for emoji version ${versions.emoji_version}, as it's not supported.`);
-      return [];
+      return {
+        groups: [],
+        emojis: {},
+      };
     }
 
     return fetchCache(`https://unicode.org/Public/emoji/${versions.emoji_version}/emoji-test.txt`, {
@@ -47,7 +50,7 @@ export const baseAdapter = defineMojiAdapter({
         const groups: EmojiGroup[] = [];
 
         // [group-subgroup][hexcode] = metadata
-        const emojiMetadata: Record<string, Record<string, EmojiMetadata>> = {};
+        const emojis: Record<string, Record<string, EmojiMetadata>> = {};
 
         for (const line of lines) {
           if (line.trim() === "") {
@@ -105,11 +108,11 @@ export const baseAdapter = defineMojiAdapter({
 
           const metadataGroup = `${groupName}-${subgroupName}`;
 
-          if (emojiMetadata[metadataGroup] == null) {
-            emojiMetadata[metadataGroup] = {};
+          if (emojis[metadataGroup] == null) {
+            emojis[metadataGroup] = {};
           }
 
-          emojiMetadata[metadataGroup][hexcode] = {
+          emojis[metadataGroup][hexcode] = {
             group: groupName,
             subgroup: subgroupName,
             qualifier,
@@ -121,7 +124,10 @@ export const baseAdapter = defineMojiAdapter({
           };
         }
 
-        return [];
+        return {
+          emojis,
+          groups,
+        };
       },
       bypassCache: force,
     });

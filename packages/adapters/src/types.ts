@@ -1,8 +1,15 @@
 import type {
-  EmojiGroupWithMetadata,
+  EmojiGroup,
+  EmojiMetadata,
   EmojiSequence,
   EmojiVersion,
 } from "@mojis/internal-utils";
+
+// TODO: find a better name
+interface EmojiDataStructure {
+  groups: EmojiGroup[];
+  emojis: Record<string, Record<string, EmojiMetadata>>;
+}
 
 export interface MojiAdapter {
   /**
@@ -28,9 +35,9 @@ export interface MojiAdapter {
   /**
    * A function to get the emoji group metadata.
    * @param {BaseAdapterContext} ctx The adapter context.
-   * @returns {Promise<EmojiGroupWithMetadata[]>} The emoji group metadata.
+   * @returns {Promise<EmojiDataStructure>} The emoji group metadata.
    */
-  metadata?: (ctx: BaseAdapterContext) => Promise<EmojiGroupWithMetadata[]>;
+  metadata?: (ctx: BaseAdapterContext) => Promise<EmojiDataStructure>;
 
   /**
    * A function to generate the emoji sequences for the specified version
