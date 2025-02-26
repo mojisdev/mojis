@@ -54,8 +54,8 @@ export function defineMojiAdapter(adapter: MojiAdapter): MojiAdapter {
       "shortcodes",
     ] satisfies NonNullable<MojiAdapterFunctionNames<MojiAdapter>>[];
 
-    if (REQUIRED_FUNCTIONS.some((fn) => adapter[fn] == null)) {
-      const missingFunctions = REQUIRED_FUNCTIONS.filter((fn) => adapter[fn] == null);
+    const missingFunctions = REQUIRED_FUNCTIONS.filter((fn) => adapter[fn] == null);
+    if (missingFunctions.length > 0) {
       throw new Error(`adapter ${adapter.name} is missing required functions: ${missingFunctions.join(", ")}`);
     }
   }
