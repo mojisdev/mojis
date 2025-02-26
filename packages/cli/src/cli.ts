@@ -160,25 +160,26 @@ cli.command(
           throw new MojisNotImplemented("metadata");
         }
 
-        const { groups, emojiMetadata } = await adapter.metadata({
+        const metadataResult = await adapter.metadata({
           force,
-          emojiVersion: version.emoji_version,
-          unicodeVersion: version.unicode_version,
+          versions: version,
         });
 
         await fs.ensureDir(`./data/v${version.emoji_version}/metadata`);
 
-        await fs.writeFile(
-          `./data/v${version.emoji_version}/groups.json`,
-          JSON.stringify(groups, null, 2),
-          "utf-8",
-        );
+        console.log("metadataResult", metadataResult);
 
-        await Promise.all(Object.entries(emojiMetadata).map(async ([group, metadata]) => fs.writeFile(
-          `./data/v${version.emoji_version}/metadata/${group}.json`,
-          JSON.stringify(metadata, null, 2),
-          "utf-8",
-        )));
+        // await fs.writeFile(
+        //   `./data/v${version.emoji_version}/groups.json`,
+        //   JSON.stringify(groups, null, 2),
+        //   "utf-8",
+        // );
+
+        // await Promise.all(Object.entries(emojiMetadata).map(async ([group, metadata]) => fs.writeFile(
+        //   `./data/v${version.emoji_version}/metadata/${group}.json`,
+        //   JSON.stringify(metadata, null, 2),
+        //   "utf-8",
+        // )));
       }
 
       //   if (isGeneratorEnabled("sequences")) {

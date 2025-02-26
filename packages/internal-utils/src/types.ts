@@ -14,3 +14,19 @@ export interface EmojiMetadata {
   emoji: string | null;
   hexcodes: string[];
 }
+
+export type EmojiGroupWithMetadata = Omit<EmojiGroup, "subgroups"> & {
+  subgroups: EmojiSubgroupWithMetadata[];
+};
+
+export interface EmojiSubgroupWithMetadata {
+  name: string;
+  emojis: EmojiMetadata[];
+}
+
+export interface EmojiSequence {
+  property: string;
+  hex: string;
+  description: string;
+  gender: string | null;
+}

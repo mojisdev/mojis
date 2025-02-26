@@ -1,47 +1,20 @@
-import type { EmojiGroup, EmojiMetadata, EmojiVersion } from "@mojis/internal-utils";
+import type { EmojiVersion } from "@mojis/internal-utils";
+import type { MojiAdapter } from "./types";
 import semver from "semver";
 
-export interface MojiAdapter {
-  /**
-   * The name of the adapter.
-   */
-  name: string;
+import { baseAdapter } from "./adapters/_base/adapter";
+import { modernAdapter } from "./adapters/modern/adapter";
+import { preAlignmentAdapter } from "./adapters/pre-alignment/adapter";
 
-  /**
-   * A description of the adapter.
-   */
-  description: string;
+const ADAPTERS = new Map<string, MojiAdapter>([
+  ["base", baseAdapter],
+  ["modern", modernAdapter],
+  ["pre-alignment", preAlignmentAdapter],
+]);
 
-  /**
-   * A valid semver range for the emoji version this adapter supports.
-   */
-  range: string;
-
-  /**
-   * The name of the adapter to extend from.
-   */
-  extend?: string;
-
-  // /**
-  //  * A function to generate the emoji sequences for the specified version
-  //  */
-  // sequences?: SequenceFn;
-
-  metadata?: MetadataFn;
-}
-
-export interface BaseAdapterContext {
-  force: boolean;
-  emojiVersion: string;
-  unicodeVersion: string;
-}
-
-export type MetadataFn = (ctx: BaseAdapterContext) => Promise<{
-  groups: EmojiGroup[];
-  emojiMetadata: Record<string, Record<string, EmojiMetadata>>;
-}>;
-
-export const ADAPTERS = new Map<string, MojiAdapter>();
+type MojiAdapterFunctionNames<T> = {
+  [K in keyof T]: NonNullable<T[K]> extends (...args: any[]) => any ? K : never;
+}[keyof T];
 
 export function defineMojiAdapter(adapter: MojiAdapter): MojiAdapter {
   // validate the adapter has name, description, range.
@@ -59,17 +32,24 @@ export function defineMojiAdapter(adapter: MojiAdapter): MojiAdapter {
 
   // verify the adapter.range is a valid semver range.
   if (semver.validRange(adapter.range) === null) {
-    throw new Error(`adapter.range is not a valid semver range`);
+    throw new Error(`adapter.range is not a valid semver range ${adapter.range}`);
   }
 
   if (adapter.extend == null) {
-    // TODO: ensure the adapter has the required functions, when not extending.
-  }
+    // verify the adapter has the required functions.
 
-  ADAPTERS.set(adapter.name, adapter);
+    const REQUIRED_FUNCTIONS = [
+      "sequences",
+    ] satisfies NonNullable<MojiAdapterFunctionNames<MojiAdapter>>[];
+
+    if (REQUIRED_FUNCTIONS.some((fn) => adapter[fn] == null)) {
+      throw new Error(`adapter ${adapter.name} is missing required functions: ${REQUIRED_FUNCTIONS.join(", ")}`);
+    }
+  }
 
   return adapter;
 }
+
 export function resolveAdapter(emojiVersion: EmojiVersion): MojiAdapter | null {
   const version = semver.coerce(emojiVersion.emoji_version);
 

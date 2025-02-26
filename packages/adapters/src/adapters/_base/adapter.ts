@@ -1,5 +1,12 @@
-import { type EmojiGroup, type EmojiMetadata, extractEmojiVersion, extractUnicodeVersion, fetchCache, MojisNotImplemented } from "@mojis/internal-utils";
-import { defineMojiAdapter } from "../adapter";
+import {
+  type EmojiGroup,
+  type EmojiMetadata,
+  extractEmojiVersion,
+  extractUnicodeVersion,
+  fetchCache,
+  MojisNotImplemented,
+} from "@mojis/internal-utils";
+import { defineMojiAdapter } from "../../adapter";
 
 function slugify(val: string): string {
   return val.normalize("NFD")
@@ -18,25 +25,21 @@ function notImplemented(adapterFn: string) {
   };
 }
 
-export default defineMojiAdapter({
+export const baseAdapter = defineMojiAdapter({
   name: "base",
   description: "base adapter",
   range: "*",
   metadata: async ({
-    unicodeVersion,
-    emojiVersion,
+    versions,
     force,
   }) => {
-    if (emojiVersion === "1.0" || emojiVersion === "2.0" || emojiVersion === "3.0") {
-      console.warn(`skipping metadata for emoji version ${emojiVersion}, as it's not supported.`);
-      return {
-        groups: [],
-        emojiMetadata: {},
-      };
+    if (versions.emoji_version === "1.0" || versions.emoji_version === "2.0" || versions.emoji_version === "3.0") {
+      console.warn(`skipping metadata for emoji version ${versions.emoji_version}, as it's not supported.`);
+      return [];
     }
 
-    return fetchCache(`https://unicode.org/Public/emoji/${emojiVersion}/emoji-test.txt`, {
-      cacheKey: `v${emojiVersion}/metadata.json`,
+    return fetchCache(`https://unicode.org/Public/emoji/${versions.emoji_version}/emoji-test.txt`, {
+      cacheKey: `v${versions.emoji_version}/metadata.json`,
       parser(data) {
         const lines = data.split("\n");
         let currentGroup: EmojiGroup | undefined;
@@ -111,22 +114,19 @@ export default defineMojiAdapter({
             subgroup: subgroupName,
             qualifier,
             emojiVersion: emojiVersion || null,
-            unicodeVersion: extractUnicodeVersion(emojiVersion, unicodeVersion),
+            unicodeVersion: extractUnicodeVersion(emojiVersion, versions.unicode_version),
             description: trimmedComment || "",
             emoji: emoji || null,
             hexcodes: hexcode.split("-"),
           };
         }
 
-        return {
-          groups,
-          emojiMetadata,
-        };
+        return [];
       },
       bypassCache: force,
     });
   },
-  // sequences: notImplemented("sequences"),
+  sequences: notImplemented("sequences"),
   // emojis: notImplemented("emojis"),
   // variations: notImplemented("variations"),
   // unicodeNames: async ({ }) => {
