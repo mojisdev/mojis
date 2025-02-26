@@ -43,10 +43,7 @@ export function resolveAdapter(emojiVersion: EmojiVersion): MojiAdapter | null {
           throw new Error(`adapter ${selected.name} extends ${selected.extend}, but ${selected.extend} is not registered`);
         }
 
-        return {
-          ...parent,
-          ...selected,
-        };
+        return Object.assign({}, parent, selected);
       }
 
       const adapter = semver.gt(currentLower, selectedLower) ? current : selected;
@@ -61,10 +58,7 @@ export function resolveAdapter(emojiVersion: EmojiVersion): MojiAdapter | null {
         throw new Error(`adapter ${adapter.name} extends ${adapter.extend}, but ${adapter.extend} is not registered`);
       }
 
-      return {
-        ...parent,
-        ...adapter,
-      };
+      return Object.assign({}, parent, adapter);
     });
   }
 
@@ -81,10 +75,7 @@ export function resolveAdapter(emojiVersion: EmojiVersion): MojiAdapter | null {
       throw new Error(`adapter ${adapter.name} extends ${adapter.extend}, but ${adapter.extend} is not registered`);
     }
 
-    return {
-      ...parent,
-      ...adapter,
-    };
+    return Object.assign({}, parent, adapter);
   }
 
   return null;
