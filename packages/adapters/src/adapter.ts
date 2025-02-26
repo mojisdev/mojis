@@ -12,44 +12,6 @@ const ADAPTERS = new Map<string, MojiAdapter>([
   ["pre-alignment", preAlignmentAdapter],
 ]);
 
-type MojiAdapterFunctionNames<T> = {
-  [K in keyof T]: NonNullable<T[K]> extends (...args: any[]) => any ? K : never;
-}[keyof T];
-
-export function defineMojiAdapter(adapter: MojiAdapter): MojiAdapter {
-  // validate the adapter has name, description, range.
-  if (!adapter.name) {
-    throw new Error(`adapter.name is required`);
-  }
-
-  if (!adapter.description) {
-    throw new Error(`adapter.description is required`);
-  }
-
-  if (!adapter.range) {
-    throw new Error(`adapter.range is required`);
-  }
-
-  // verify the adapter.range is a valid semver range.
-  if (semver.validRange(adapter.range) === null) {
-    throw new Error(`adapter.range is not a valid semver range ${adapter.range}`);
-  }
-
-  if (adapter.extend == null) {
-    // verify the adapter has the required functions.
-
-    const REQUIRED_FUNCTIONS = [
-      "sequences",
-    ] satisfies NonNullable<MojiAdapterFunctionNames<MojiAdapter>>[];
-
-    if (REQUIRED_FUNCTIONS.some((fn) => adapter[fn] == null)) {
-      throw new Error(`adapter ${adapter.name} is missing required functions: ${REQUIRED_FUNCTIONS.join(", ")}`);
-    }
-  }
-
-  return adapter;
-}
-
 export function resolveAdapter(emojiVersion: EmojiVersion): MojiAdapter | null {
   const version = semver.coerce(emojiVersion.emoji_version);
 

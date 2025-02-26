@@ -6,7 +6,7 @@ import {
   fetchCache,
   MojisNotImplemented,
 } from "@mojis/internal-utils";
-import { defineMojiAdapter } from "../../adapter";
+import { defineMojiAdapter } from "../../define-adapter";
 
 function slugify(val: string): string {
   return val.normalize("NFD")

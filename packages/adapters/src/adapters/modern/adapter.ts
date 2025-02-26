@@ -1,4 +1,4 @@
-import { defineMojiAdapter } from "../../adapter";
+import { defineMojiAdapter } from "../../define-adapter";
 
 export const modernAdapter = defineMojiAdapter({
   name: "modern",
