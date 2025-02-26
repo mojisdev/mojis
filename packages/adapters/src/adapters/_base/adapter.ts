@@ -1,11 +1,14 @@
 import {
   type EmojiGroup,
   type EmojiMetadata,
+  type EmojiShortcode,
   extractEmojiVersion,
   extractUnicodeVersion,
   fetchCache,
   MojisNotImplemented,
+  type ShortcodeProvider,
 } from "@mojis/internal-utils";
+import { generateGitHubShortcodes } from "@mojis/internal-utils/shortcodes";
 import { defineMojiAdapter } from "../../define-adapter";
 
 function slugify(val: string): string {
@@ -161,41 +164,40 @@ export const baseAdapter = defineMojiAdapter({
   //     bypassCache: ctx.force,
   //   });
   // },
-  // async shortcodes(ctx) {
-  //   const providers = ctx.providers;
+  async shortcodes({
+    force,
+    providers,
+    // versions,
+  }) {
+    if (providers.length === 0) {
+      throw new Error("no shortcode providers specified");
+    }
 
-  //   if (providers.length === 0) {
-  //     throw new Error("no shortcode providers specified");
-  //   }
+    const shortcodes: Partial<Record<ShortcodeProvider, EmojiShortcode[]>> = {};
 
-  //   const shortcodes: Partial<Record<ShortcodeProvider, EmojiShortcode[]>> = {};
+    // if (this.emojis == null) {
+    //   throw new MojisNotImplemented("emojis");
+    // }
 
-  //   if (this.emojis == null) {
-  //     throw new MojisNotImplemented("emojis");
-  //   }
+    // const { emojis } = await this.emojis(ctx);
 
-  //   const { emojis } = await this.emojis(ctx);
+    // const flattenedEmojis = Object.values(emojis).reduce((acc, subgroup) => {
+    //   for (const hexcodes of Object.values(subgroup)) {
+    //     for (const [hexcode, emoji] of Object.entries(hexcodes)) {
+    //       acc[hexcode] = emoji;
+    //     }
+    //   }
 
-  //   const flattenedEmojis = Object.values(emojis).reduce((acc, subgroup) => {
-  //     for (const hexcodes of Object.values(subgroup)) {
-  //       for (const [hexcode, emoji] of Object.entries(hexcodes)) {
-  //         acc[hexcode] = emoji;
-  //       }
-  //     }
+    //   return acc;
+    // }, {} as Record<string, Emoji>);
 
-  //     return acc;
-  //   }, {} as Record<string, Emoji>);
+    if (providers.includes("github")) {
+      shortcodes.github = await generateGitHubShortcodes({
+        emojis: new Map(),
+        force,
+      });
+    }
 
-  //   if (providers.includes("github")) {
-  //     const githubShortcodesFn = await import("../shortcode/github").then((m) => m.generateGitHubShortcodes);
-
-  //     shortcodes.github = await githubShortcodesFn({
-  //       emojis: flattenedEmojis,
-  //       force: ctx.force,
-  //       version: ctx.emojiVersion,
-  //     });
-  //   }
-
-  //   return shortcodes;
-  // },
+    return shortcodes;
+  },
 });

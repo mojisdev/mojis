@@ -2,7 +2,9 @@ import type {
   EmojiGroup,
   EmojiMetadata,
   EmojiSequence,
+  EmojiShortcode,
   EmojiVersion,
+  ShortcodeProvider,
 } from "@mojis/internal-utils";
 
 // TODO: find a better name
@@ -45,6 +47,11 @@ export interface MojiAdapter {
    * @returns {Promise<{ zwj: EmojiSequence[]; sequences: EmojiSequence[] }>} The emoji sequences.
    */
   sequences?: (ctx: BaseAdapterContext) => Promise<{ zwj: EmojiSequence[]; sequences: EmojiSequence[] }>;
+
+  shortcodes?: (ctx: BaseAdapterContext & {
+    providers: ShortcodeProvider[];
+  }) => Promise<Partial<Record<ShortcodeProvider, EmojiShortcode[]>>>;
+
 }
 
 export interface BaseAdapterContext {

@@ -1,3 +1,6 @@
+import type { z } from "zod";
+import type { SHORTCODE_PROVIDER_SCHEMA } from "./schemas";
+
 export interface EmojiGroup {
   name: string;
   slug: string;
@@ -21,3 +24,5 @@ export interface EmojiSequence {
   description: string;
   gender: string | null;
 }
+
+export type ShortcodeProvider = z.infer<typeof SHORTCODE_PROVIDER_SCHEMA>;

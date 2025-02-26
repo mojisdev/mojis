@@ -47,8 +47,11 @@ export function defineMojiAdapter(adapter: MojiAdapter): MojiAdapter {
   if (adapter.extend == null) {
     // verify the adapter has the required functions.
 
+    // TODO: figure out how we can make it throw type error if the adapter is missing a required function
     const REQUIRED_FUNCTIONS = [
       "sequences",
+      "metadata",
+      "shortcodes",
     ] satisfies NonNullable<MojiAdapterFunctionNames<MojiAdapter>>[];
 
     if (REQUIRED_FUNCTIONS.some((fn) => adapter[fn] == null)) {

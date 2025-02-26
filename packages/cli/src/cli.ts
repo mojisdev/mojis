@@ -1,5 +1,3 @@
-import type { SHORTCODE_PROVIDERS_SCHEMA } from "@mojis/internal-utils/schemas";
-import type { z } from "zod";
 import process from "node:process";
 import { resolveAdapter } from "@mojis/adapters";
 import {
@@ -8,7 +6,9 @@ import {
   getLatestEmojiVersion,
   mapEmojiVersionToUnicodeVersion,
   MojisNotImplemented,
+  type ShortcodeProvider,
 } from "@mojis/internal-utils";
+import { SHORTCODE_PROVIDERS_SCHEMA } from "@mojis/internal-utils/schemas";
 import { green, red, yellow } from "farver/fast";
 import fs from "fs-extra";
 import semver from "semver";
@@ -42,7 +42,7 @@ cli.command(
     .option("shortcode-providers", {
       type: "array",
       description: "shortcode providers to use",
-      default: ["github"] satisfies z.infer<typeof SHORTCODE_PROVIDERS_SCHEMA>,
+      default: ["github"] satisfies ShortcodeProvider[],
     })
     .strict().help(),
   async (args) => {
@@ -180,124 +180,120 @@ cli.command(
         )));
       }
 
-      //   if (isGeneratorEnabled("sequences")) {
-      //     if (adapter.sequences == null) {
-      //       throw new MojisNotImplemented("sequences");
-      //     }
+      if (isGeneratorEnabled("sequences")) {
+        if (adapter.sequences == null) {
+          throw new MojisNotImplemented("sequences");
+        }
 
-      //     const { sequences, zwj } = await adapter.sequences({
-      //       emojiVersion: version,
-      //       force,
-      //       unicodeVersion: getUnicodeVersionByEmojiVersion(version)!,
-      //       lockfileMetadata,
-      //     });
+        const { sequences, zwj } = await adapter.sequences({
+          versions: version,
+          force,
+        });
 
-      //     await fs.ensureDir(`./data/v${version}`);
+        await fs.ensureDir(`./data/v${version}`);
 
-      //     await fs.writeFile(
-      //       `./data/v${version}/zwj-sequences.json`,
-      //       JSON.stringify(zwj, null, 2),
-      //       "utf-8",
-      //     );
+        await fs.writeFile(
+          `./data/v${version}/zwj-sequences.json`,
+          JSON.stringify(zwj, null, 2),
+          "utf-8",
+        );
 
-      //     await fs.writeFile(
-      //       `./data/v${version}/sequences.json`,
-      //       JSON.stringify(sequences, null, 2),
-      //       "utf-8",
-      //     );
+        await fs.writeFile(
+          `./data/v${version}/sequences.json`,
+          JSON.stringify(sequences, null, 2),
+          "utf-8",
+        );
+      }
+
+      // if (isGeneratorEnabled("variations")) {
+      //   if (adapter.variations == null) {
+      //     throw new MojisNotImplemented("variations");
       //   }
 
-      //   if (isGeneratorEnabled("variations")) {
-      //     if (adapter.variations == null) {
-      //       throw new MojisNotImplemented("variations");
-      //     }
+      //   const variations = await adapter.variations({
+      //     emojiVersion: version,
+      //     force,
+      //     unicodeVersion: getUnicodeVersionByEmojiVersion(version)!,
+      //     lockfileMetadata,
+      //   });
 
-      //     const variations = await adapter.variations({
-      //       emojiVersion: version,
-      //       force,
-      //       unicodeVersion: getUnicodeVersionByEmojiVersion(version)!,
-      //       lockfileMetadata,
-      //     });
+      //   await fs.ensureDir(`./data/v${version}`);
+      //   await fs.writeFile(
+      //     `./data/v${version}/variations.json`,
+      //     JSON.stringify(variations, null, 2),
+      //     "utf-8",
+      //   );
+      // }
 
-      //     await fs.ensureDir(`./data/v${version}`);
-      //     await fs.writeFile(
-      //       `./data/v${version}/variations.json`,
-      //       JSON.stringify(variations, null, 2),
-      //       "utf-8",
-      //     );
+      // if (isGeneratorEnabled("emojis")) {
+      //   if (adapter.emojis == null) {
+      //     throw new MojisNotImplemented("emojis");
       //   }
 
-      //   if (isGeneratorEnabled("emojis")) {
-      //     if (adapter.emojis == null) {
-      //       throw new MojisNotImplemented("emojis");
-      //     }
+      //   const { emojiData, emojis } = await adapter.emojis({
+      //     emojiVersion: version,
+      //     force,
+      //     unicodeVersion: getUnicodeVersionByEmojiVersion(version)!,
+      //     lockfileMetadata,
+      //   });
 
-      //     const { emojiData, emojis } = await adapter.emojis({
-      //       emojiVersion: version,
-      //       force,
-      //       unicodeVersion: getUnicodeVersionByEmojiVersion(version)!,
-      //       lockfileMetadata,
-      //     });
+      //   await fs.ensureDir(`./data/v${version}`);
 
-      //     await fs.ensureDir(`./data/v${version}`);
+      //   await fs.writeFile(
+      //     `./data/v${version}/emoji-data.json`,
+      //     JSON.stringify(emojiData, null, 2),
+      //     "utf-8",
+      //   );
 
-      //     await fs.writeFile(
-      //       `./data/v${version}/emoji-data.json`,
-      //       JSON.stringify(emojiData, null, 2),
-      //       "utf-8",
-      //     );
+      //   for (const [group, subgroup] of Object.entries(emojis)) {
+      //     await fs.ensureDir(`./data/v${version}/emojis/${group}`);
 
-      //     for (const [group, subgroup] of Object.entries(emojis)) {
-      //       await fs.ensureDir(`./data/v${version}/emojis/${group}`);
+      //     for (const hexcodes of Object.values(subgroup)) {
+      //       await fs.ensureDir(`./data/v${version}/emojis/${group}/${subgroup}`);
 
-      //       for (const hexcodes of Object.values(subgroup)) {
-      //         await fs.ensureDir(`./data/v${version}/emojis/${group}/${subgroup}`);
-
-      //         for (const [hexcode, emoji] of Object.entries(hexcodes)) {
-      //           await fs.writeFile(
-      //             `./data/v${version}/emojis/${group}/${subgroup}/${hexcode}.json`,
-      //             JSON.stringify(emoji, null, 2),
-      //             "utf-8",
-      //           );
-      //         }
+      //       for (const [hexcode, emoji] of Object.entries(hexcodes)) {
+      //         await fs.writeFile(
+      //           `./data/v${version}/emojis/${group}/${subgroup}/${hexcode}.json`,
+      //           JSON.stringify(emoji, null, 2),
+      //           "utf-8",
+      //         );
       //       }
       //     }
       //   }
+      // }
 
-      //   if (isGeneratorEnabled("shortcodes")) {
-      //     const providers = await parseAsync(SHORTCODE_PROVIDERS_SCHEMA, args["shortcode-providers"]);
+      if (isGeneratorEnabled("shortcodes")) {
+        const providers = await SHORTCODE_PROVIDERS_SCHEMA.parseAsync(args["shortcode-providers"]);
 
-      //     if (providers.length === 0) {
-      //       throw new Error("no shortcode providers specified");
-      //     }
+        if (providers.length === 0) {
+          throw new Error("no shortcode providers specified");
+        }
 
-      //     if (adapter.shortcodes == null) {
-      //       throw new MojisNotImplemented("shortcodes");
-      //     }
+        if (adapter.shortcodes == null) {
+          throw new MojisNotImplemented("shortcodes");
+        }
 
-      //     const shortcodes = await adapter.shortcodes({
-      //       emojiVersion: version,
-      //       force,
-      //       unicodeVersion: getUnicodeVersionByEmojiVersion(version)!,
-      //       providers,
-      //       lockfileMetadata,
-      //     });
+        const shortcodes = await adapter.shortcodes({
+          versions: version,
+          force,
+          providers,
+        });
 
-      //     await fs.ensureDir(`./data/v${version}/shortcodes`);
+        await fs.ensureDir(`./data/v${version}/shortcodes`);
 
-      //     for (const provider of providers) {
-      //       if (shortcodes[provider] == null) {
-      //         consola.warn(`no shortcodes found for provider ${provider}`);
-      //         continue;
-      //       }
+        for (const provider of providers) {
+          if (shortcodes[provider] == null) {
+            console.warn(`no shortcodes found for provider ${provider}`);
+            continue;
+          }
 
-      //       await fs.writeFile(
-      //         `./data/v${version}/shortcodes/${provider}.json`,
-      //         JSON.stringify(shortcodes[provider], null, 2),
-      //         "utf-8",
-      //       );
-      //     }
-      //   }
+          await fs.writeFile(
+            `./data/v${version}/shortcodes/${provider}.json`,
+            JSON.stringify(shortcodes[provider], null, 2),
+            "utf-8",
+          );
+        }
+      }
     });
 
     const results = await Promise.allSettled(promises);
