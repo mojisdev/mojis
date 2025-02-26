@@ -6,7 +6,7 @@ function getCacheFolder(): string {
   return path.resolve(process.env.CACHE_DIR ?? process.cwd(), ".cache");
 }
 
-const LOCAL_CACHE: Record<string, unknown> = {};
+const LOCAL_CACHE = new Map<string, unknown>();
 
 /**
  * Writes data to a cache file.
@@ -22,7 +22,13 @@ export async function writeCache<T>(name: string, data: T): Promise<T> {
   // create directory if it doesn't exist
   await fs.ensureDir(path.dirname(filePath));
 
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+  await fs.writeFile(filePath, JSON.stringify(data, (key, value) => {
+    if (value instanceof Map) {
+      return Object.fromEntries(value);
+    }
+
+    return value;
+  }, 2), "utf-8");
 
   return data;
 }
@@ -43,7 +49,7 @@ export async function readCache<T>(name: string): Promise<T | undefined> {
 
   const data = await fs.readFile(filePath, "utf-8");
 
-  return JSON.parse(data);
+  return JSON.parse(data) as T;
 }
 
 export interface FetchCacheOptions<TData = unknown> {
@@ -87,12 +93,12 @@ export async function fetchCache<TData = unknown>(
   options: FetchCacheOptions<TData>,
 ): Promise<TData> {
   const { cacheKey, parser, bypassCache, options: fetchOptions } = options;
-  const cache = LOCAL_CACHE[cacheKey] || await readCache<TData>(cacheKey);
+  const cache = LOCAL_CACHE.get(cacheKey) ?? await readCache<TData>(cacheKey);
 
   if (!bypassCache && cache != null) {
     // eslint-disable-next-line no-console
     console.debug(`cache hit: ${cacheKey}`);
-    LOCAL_CACHE[cacheKey] = cache;
+    LOCAL_CACHE.set(cacheKey, cache);
 
     return cache as TData;
   }
@@ -107,7 +113,7 @@ export async function fetchCache<TData = unknown>(
 
   const parsedData = parser(data);
 
-  LOCAL_CACHE[cacheKey] = parsedData;
+  LOCAL_CACHE.set(cacheKey, parsedData);
   await writeCache(cacheKey, parsedData);
 
   return parsedData;

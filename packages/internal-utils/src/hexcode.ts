@@ -64,5 +64,5 @@ export function expandHexRange(hex: string): string[] {
  * @returns {string} The hex string with variation selectors removed
  */
 export function stripHex(hex: string): string {
-  return hex.replace(/(-| )?(200D|FE0E|FE0F)/g, "");
+  return hex.replace(/[-\s]?(?:200D|FE0E|FE0F)/g, "");
 }

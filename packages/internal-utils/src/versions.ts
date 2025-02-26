@@ -2,6 +2,25 @@ import type { z } from "zod";
 import type { EMOJI_VERSION_SCHEMA } from "./schemas";
 import semver from "semver";
 
+export const MAPPED_EMOJI_VERSIONS: Record<string, string> = {
+  "1.0": "8.0",
+  "2.0": "8.0",
+  "3.0": "9.0",
+  "4.0": "9.0",
+  "5.0": "10.0",
+
+  // There doesn't seem to be a Unicode 13.1, so we'll map it to 13.0
+  "13.1": "13.0",
+};
+
+/**
+ * These versions don't exist in the Unicode Consortium's emoji versioning scheme.
+ * This is because they aligned the emoji version with the Unicode version starting from v11.
+ *
+ * So actually, the emoji version v11.0 is v6.0
+ */
+export const NON_EXISTING_VERSIONS = ["6.x", "7.x", "8.x", "9.x", "10.x"];
+
 // TODO: find a better name for this type, when the schema has been changed
 export type EmojiVersion = z.infer<typeof EMOJI_VERSION_SCHEMA>;
 
@@ -303,33 +322,6 @@ export async function getAllEmojiVersions(): Promise<EmojiVersion[]> {
   return versions.sort((a, b) => semver.compare(`${b.emoji_version}.0`, `${a.emoji_version}.0`));
 }
 
-export function getUnicodeVersionByEmojiVersion(emojiVersion: string): string {
-  const coercedEmojiVersion = semver.coerce(emojiVersion);
-
-  if (coercedEmojiVersion == null) {
-    throw new Error(`invalid emoji version: ${emojiVersion}`);
-  }
-
-  if (semver.gte(coercedEmojiVersion, "11.0.0")) {
-    return emojiVersion;
-  }
-
-  switch (emojiVersion) {
-    case "1.0":
-    case "2.0":
-      return "8.0";
-    case "3.0":
-    case "4.0":
-      return "9.0";
-    case "5.0":
-      return "10.0";
-    default:
-      throw new Error(`invalid emoji version: ${emojiVersion}`);
-  }
-}
-
-const NO_EMOJI_VERSIONS = ["6.x", "7.x", "8.x", "9.x", "10.x"];
-
 /**
  * Checks if the given emoji version is valid according to Unicode Consortium standards.
  *
@@ -351,7 +343,7 @@ export async function isEmojiVersionValid(version: string): Promise<boolean> {
   // unicode consortium made a huge change in v11, because that is actually the version
   // right after v5. They decided to align the unicode version with the emoji version in 2017.
   // So, no emoji version 6, 7, 8, 9, or 10.
-  const isVersionInNoEmojiVersions = NO_EMOJI_VERSIONS.find((v) => semver.satisfies(version, v));
+  const isVersionInNoEmojiVersions = NON_EXISTING_VERSIONS.find((v) => semver.satisfies(version, v));
   if (isVersionInNoEmojiVersions) {
     return false;
   }
@@ -364,4 +356,48 @@ export async function isEmojiVersionValid(version: string): Promise<boolean> {
   }
 
   return true;
+}
+
+/**
+ * Maps an emoji version to its corresponding Unicode version.
+ *
+ * @param {string} emojiVersion - The emoji version to map to a Unicode version
+ * @returns {string} The corresponding Unicode version if found, otherwise returns the input version
+ */
+export function mapEmojiVersionToUnicodeVersion(emojiVersion: string): string {
+  const mapped = MAPPED_EMOJI_VERSIONS[emojiVersion];
+
+  if (mapped != null) {
+    return mapped;
+  }
+
+  return emojiVersion;
+}
+
+/**
+ * Gets the latest non-draft emoji version from an array of emoji versions.
+ *
+ * @param {EmojiVersion[]} versions - An array of emoji versions to search through
+ * @returns {EmojiVersion | null} The latest non-draft emoji version, or null if no valid versions found
+ *
+ * @example
+ * ```ts
+ * const versions = [
+ *   { emoji_version: "15.1", draft: false },
+ *   { emoji_version: "15.0", draft: false },
+ *   { emoji_version: "15.2", draft: true }
+ * ];
+ * const latest = getLatestEmojiVersion(versions);
+ * // Returns: { emoji_version: "15.1", draft: false }
+ * ```
+ */
+export function getLatestEmojiVersion(versions: EmojiVersion[]): EmojiVersion | null {
+  // filter draft versions out, and sort by using semver.
+  const filtered = versions.filter((v) => !v.draft).sort((a, b) => semver.compare(`${b.emoji_version}.0`, `${a.emoji_version}.0`));
+
+  if (!filtered.length || filtered[0] == null) {
+    return null;
+  }
+
+  return filtered[0];
 }

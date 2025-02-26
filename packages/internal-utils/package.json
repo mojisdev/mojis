@@ -21,6 +21,8 @@
   "exports": {
     ".": "./dist/index.js",
     "./schemas": "./dist/schemas.js",
+    "./shortcodes": "./dist/shortcodes.js",
+    "./constants": "./dist/constants.js",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
