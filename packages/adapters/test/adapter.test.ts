@@ -6,13 +6,17 @@ function screwAdapterTypes<T extends Partial<Record<keyof MojiAdapter, unknown>>
   return adapter as unknown as MojiAdapter;
 }
 
+function noop() {}
+
 describe("define moji adapters", () => {
   it("should validate a valid adapter", () => {
     const adapter = screwAdapterTypes({
       name: "test",
       description: "Test adapter",
       range: ">=1.0.0",
-      sequences: () => [],
+      sequences: noop,
+      metadata: noop,
+      shortcodes: noop,
     });
     expect(() => defineMojiAdapter(adapter)).not.toThrow();
   });
