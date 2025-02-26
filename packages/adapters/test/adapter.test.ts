@@ -2,7 +2,7 @@ import type { MojiAdapter } from "../src/types";
 import { describe, expect, it } from "vitest";
 import { defineMojiAdapter } from "../src/define-adapter";
 
-function screwAdapterTypes<T extends Partial<Record<keyof MojiAdapter, unknown>>>(adapter: T): MojiAdapter {
+function castToMojiAdapter<T extends Partial<Record<keyof MojiAdapter, unknown>>>(adapter: T): MojiAdapter {
   return adapter as unknown as MojiAdapter;
 }
 
@@ -10,7 +10,7 @@ function noop() {}
 
 describe("define moji adapters", () => {
   it("should validate a valid adapter", () => {
-    const adapter = screwAdapterTypes({
+    const adapter = castToMojiAdapter({
       name: "test",
       description: "Test adapter",
       range: ">=1.0.0",
@@ -22,7 +22,7 @@ describe("define moji adapters", () => {
   });
 
   it("should throw if name is missing", () => {
-    const adapter = screwAdapterTypes({
+    const adapter = castToMojiAdapter({
       description: "Test adapter",
       range: ">=1.0.0",
       sequences: () => [],
@@ -31,7 +31,7 @@ describe("define moji adapters", () => {
   });
 
   it("should throw if description is missing", () => {
-    const adapter = screwAdapterTypes({
+    const adapter = castToMojiAdapter({
       name: "test",
       range: ">=1.0.0",
       sequences: () => [],
@@ -41,7 +41,7 @@ describe("define moji adapters", () => {
   });
 
   it("should throw if range is missing", () => {
-    const adapter = screwAdapterTypes({
+    const adapter = castToMojiAdapter({
       name: "test",
       description: "Test adapter",
       sequences: () => [],
@@ -51,7 +51,7 @@ describe("define moji adapters", () => {
   });
 
   it("should throw if range is invalid", () => {
-    const adapter = screwAdapterTypes({
+    const adapter = castToMojiAdapter({
       name: "test",
       description: "Test adapter",
       range: "invalid",
@@ -62,7 +62,7 @@ describe("define moji adapters", () => {
   });
 
   it("should throw if required functions are missing without extend", () => {
-    const adapter = screwAdapterTypes({
+    const adapter = castToMojiAdapter({
       name: "test",
       description: "Test adapter",
       range: ">=1.0.0",
@@ -72,7 +72,7 @@ describe("define moji adapters", () => {
   });
 
   it("should not validate required functions if extend is provided", () => {
-    const adapter = screwAdapterTypes({
+    const adapter = castToMojiAdapter({
       name: "test",
       description: "Test adapter",
       range: ">=1.0.0",
