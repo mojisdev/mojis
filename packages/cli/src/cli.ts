@@ -8,6 +8,7 @@ import {
   MojisNotImplemented,
   type ShortcodeProvider,
 } from "@mojis/internal-utils";
+import { OFFICIAL_SUPPORTED_VERSIONS } from "@mojis/internal-utils/constants";
 import { SHORTCODE_PROVIDERS_SCHEMA } from "@mojis/internal-utils/schemas";
 import { green, red, yellow } from "farver/fast";
 import fs from "fs-extra";
@@ -87,24 +88,6 @@ cli.command(
 
     // print out the versions that we don't officially support,
     // which will fallback to using a different version adapter.
-
-    // TODO: probably move this to a different location.
-    const OFFICIAL_SUPPORTED_VERSIONS = [
-      "1.0",
-      "2.0",
-      "3.0",
-      "4.0",
-      "5.0",
-      "11.0",
-      "12.0",
-      "12.1",
-      "13.0",
-      "13.1",
-      "14.0",
-      "15.0",
-      "15.1",
-      "16.0",
-    ];
 
     // TODO: prevent issues where the fallback is pointing to a version that doesn't exist.
 

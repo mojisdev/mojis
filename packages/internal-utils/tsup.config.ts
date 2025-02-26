@@ -5,6 +5,7 @@ export default defineConfig({
     "./src/index.ts",
     "./src/schemas.ts",
     "./src/shortcodes.ts",
+    "./src/constants.ts",
   ],
   format: ["esm"],
   clean: true,
