@@ -48,6 +48,11 @@ export interface MojiAdapter {
    */
   sequences?: (ctx: BaseAdapterContext) => Promise<{ zwj: EmojiSequence[]; sequences: EmojiSequence[] }>;
 
+  /**
+   * A function to generate shortcodes for emojis based on provided shortcode providers.
+   * @param {BaseAdapterContext & { providers: ShortcodeProvider[] }} ctx The adapter context with shortcode providers.
+   * @returns {Promise<Partial<Record<ShortcodeProvider, EmojiShortcode[]>>>} The generated shortcodes mapped by provider.
+   */
   shortcodes?: (ctx: BaseAdapterContext & {
     providers: ShortcodeProvider[];
   }) => Promise<Partial<Record<ShortcodeProvider, EmojiShortcode[]>>>;
