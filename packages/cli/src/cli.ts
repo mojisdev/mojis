@@ -99,8 +99,11 @@ cli.command(
 
       // set the fallback for each of the versions that are not officially supported
       for (const version of notOfficialSupported) {
-        // get the version that comes right before the version that is not officially supported
-        const previousVersion = existingEmojiVersions.find((v) => semver.lt(`${v.emoji_version}.0`, `${version.emoji_version}.0`));
+        const sortedVersions = [...existingEmojiVersions]
+          .filter((v) => semver.lt(`${v.emoji_version}.0`, `${version.emoji_version}.0`))
+          .sort((a, b) => semver.compare(`${b.emoji_version}.0`, `${a.emoji_version}.0`));
+
+        const previousVersion = sortedVersions[0];
 
         // set the fallback to the previous version if it exists, otherwise use the latest supported version.
         const found = versions.find((v) => v.emoji_version === version.emoji_version);
