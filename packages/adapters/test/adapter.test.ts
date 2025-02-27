@@ -17,6 +17,8 @@ describe("define moji adapters", () => {
       sequences: noop,
       metadata: noop,
       shortcodes: noop,
+      emojis: noop,
+      variations: noop,
     });
     expect(() => defineMojiAdapter(adapter)).not.toThrow();
   });
