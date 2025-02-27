@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import process from "node:process";
 import { resolveAdapter } from "@mojis/adapters";
 import {
@@ -141,6 +142,10 @@ cli.command(
         throw new Error(`no adapter found for version ${version.emoji_version}`);
       }
 
+      const baseDir = `./data/v${version.emoji_version}`;
+
+      await fs.ensureDir(baseDir);
+
       if (isGeneratorEnabled("metadata")) {
         if (adapter.metadata == null) {
           throw new MojisNotImplemented("metadata");
@@ -151,16 +156,16 @@ cli.command(
           versions: version,
         });
 
-        await fs.ensureDir(`./data/v${version.emoji_version}/metadata`);
+        await fs.ensureDir(join(baseDir, "metadata"));
 
         await fs.writeFile(
-          `./data/v${version.emoji_version}/groups.json`,
+          join(baseDir, "groups.json"),
           JSON.stringify(groups, null, 2),
           "utf-8",
         );
 
         await Promise.all(Object.entries(emojis).map(async ([group, metadata]) => fs.writeFile(
-          `./data/v${version.emoji_version}/metadata/${group}.json`,
+          join(baseDir, "metadata", `${group}.json`),
           JSON.stringify(metadata, null, 2),
           "utf-8",
         )));
@@ -176,16 +181,14 @@ cli.command(
           force,
         });
 
-        await fs.ensureDir(`./data/v${version}`);
-
         await fs.writeFile(
-          `./data/v${version}/zwj-sequences.json`,
+          join(baseDir, "zwj-sequences.json"),
           JSON.stringify(zwj, null, 2),
           "utf-8",
         );
 
         await fs.writeFile(
-          `./data/v${version}/sequences.json`,
+          join(baseDir, "sequences.json"),
           JSON.stringify(sequences, null, 2),
           "utf-8",
         );
@@ -265,7 +268,7 @@ cli.command(
           providers,
         });
 
-        await fs.ensureDir(`./data/v${version}/shortcodes`);
+        await fs.ensureDir(join(baseDir, "shortcodes"));
 
         for (const provider of providers) {
           if (shortcodes[provider] == null) {
@@ -274,7 +277,7 @@ cli.command(
           }
 
           await fs.writeFile(
-            `./data/v${version}/shortcodes/${provider}.json`,
+            join(baseDir, "shortcodes", `${provider}.json`),
             JSON.stringify(shortcodes[provider], null, 2),
             "utf-8",
           );

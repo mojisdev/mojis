@@ -66,7 +66,7 @@ export async function generateGitHubShortcodes(options: ShortcodeOptions): Promi
       },
     });
   } catch (err) {
-    console.error("failed to fetch GitHub emojis", err);
+    console.error("failed to fetch github emojis", err);
   }
 
   const shortcodes: EmojiShortcode[] = [];

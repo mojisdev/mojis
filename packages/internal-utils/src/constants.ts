@@ -14,3 +14,6 @@ export const OFFICIAL_SUPPORTED_VERSIONS = [
   "15.1",
   "16.0",
 ];
+
+export const FEMALE_SIGN = "2640"; // FEMALE SIGN
+export const MALE_SIGN = "2642"; // MALE SIGN
