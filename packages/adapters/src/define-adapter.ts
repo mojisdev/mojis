@@ -52,6 +52,8 @@ export function defineMojiAdapter(adapter: MojiAdapter): MojiAdapter {
       "sequences",
       "metadata",
       "shortcodes",
+      "variations",
+      "emojis",
     ] satisfies NonNullable<MojiAdapterFunctionNames<MojiAdapter>>[];
 
     const missingFunctions = REQUIRED_FUNCTIONS.filter((fn) => adapter[fn] == null);

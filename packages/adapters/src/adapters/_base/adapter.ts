@@ -137,7 +137,7 @@ export const baseAdapter = defineMojiAdapter({
   },
   sequences: notImplemented("sequences"),
   // emojis: notImplemented("emojis"),
-  // variations: notImplemented("variations"),
+  variations: notImplemented("variations"),
   // unicodeNames: async ({ }) => {
   //   return fetchCache(`https://unicode.org/Public/${ctx.emojiVersion === "13.1" ? "13.0" : ctx.emojiVersion}.0/ucd/UnicodeData.txt`, {
   //     cacheKey: `v${ctx.emojiVersion}/unicode-names.json`,

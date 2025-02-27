@@ -3,6 +3,7 @@ import type {
   EmojiMetadata,
   EmojiSequence,
   EmojiShortcode,
+  EmojiVariation,
   EmojiVersion,
   ShortcodeProvider,
 } from "@mojis/internal-utils";
@@ -57,6 +58,19 @@ export interface MojiAdapter {
     providers: ShortcodeProvider[];
   }) => Promise<Partial<Record<ShortcodeProvider, EmojiShortcode[]>>>;
 
+  /**
+   * A function to get the emoji variations.
+   * @param {BaseAdapterContext} ctx The adapter context
+   * @returns {Promise<EmojiVariation[]>} The emoji variation.
+   */
+  variations?: (ctx: BaseAdapterContext) => Promise<EmojiVariation[]>;
+
+  /**
+   * A function to get the emojis.
+   * @param {BaseAdapterContext} ctx The adapter context.
+   * @returns {Promise<Record<string, string>>} The emojis.
+   */
+  emojis?: (ctx: BaseAdapterContext) => Promise<Record<string, string>>;
 }
 
 export interface BaseAdapterContext {
