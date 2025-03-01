@@ -19,32 +19,34 @@ afterEach(() => {
 describe("write cache", () => {
   it("should write data to cache", async () => {
     const testdirPath = await testdir({});
-    vi.stubEnv("CACHE_DIR", testdirPath);
 
     const testData = { foo: "bar" };
-    const cacheName = "test-cache.json";
+    const cacheName = "test-cache";
 
-    await writeCache(cacheName, testData);
+    await writeCache(cacheName, JSON.stringify(testData), {
+      cacheFolder: testdirPath,
+    });
 
-    expect(fs.ensureDir).toHaveBeenCalledWith(`${testdirPath}/.cache`);
+    expect(fs.ensureDir).toHaveBeenCalledWith(testdirPath);
     expect(fs.writeFile).toHaveBeenCalledWith(
-      `${testdirPath}/.cache/${cacheName}`,
-      JSON.stringify(testData, null, 2),
+      `${testdirPath}/${cacheName}`,
+      JSON.stringify(testData),
       "utf-8",
     );
   });
 
   it("should return the data that was written", async () => {
-    const testData = { test: "data" };
-    const result = await writeCache("test.json", testData);
+    const testData = "{\"test\":\"data\"}";
+    const result = await writeCache("test", testData);
+
     expect(result).toEqual(testData);
   });
 
   it("should handle nested cache paths", async () => {
     const testData = { foo: "bar" };
-    const cachePath = "nested/path/test.json";
+    const cacheKey = "nested/path/test";
 
-    await writeCache(cachePath, testData);
+    await writeCache(cacheKey, JSON.stringify(testData));
 
     expect(fs.ensureDir).toHaveBeenCalledWith(expect.stringContaining("nested/path"));
   });
@@ -52,20 +54,22 @@ describe("write cache", () => {
 
 describe("read cache", () => {
   it("should read data from cache file", async () => {
-    const testdirPath = await testdir({});
-    vi.stubEnv("CACHE_DIR", testdirPath);
+    const testdirPath = await testdir({
+    });
 
     const testData = { foo: "bar" };
-    const cacheName = "test-cache.json";
+    const cacheName = "test-cache";
 
-    await writeCache(cacheName, testData);
-    const result = await readCache(cacheName);
+    await writeCache(cacheName, JSON.stringify(testData), {
+      cacheFolder: testdirPath,
+    });
+    const result = await readCache(cacheName, JSON.parse, testdirPath);
 
     expect(result).toEqual(testData);
   });
 
   it("should return undefined for non-existent cache", async () => {
-    const result = await readCache("non-existent.json");
+    const result = await readCache("non-existent");
 
     expect(fs.pathExists).toHaveBeenCalled();
     expect(result).toBeUndefined();
@@ -73,7 +77,6 @@ describe("read cache", () => {
 
   it("should properly parse JSON data", async () => {
     const testdirPath = await testdir({});
-    vi.stubEnv("CACHE_DIR", testdirPath);
 
     const complexData = {
       nested: { foo: "bar" },
@@ -81,8 +84,11 @@ describe("read cache", () => {
       string: "test",
     };
 
-    await writeCache("complex.json", complexData);
-    const result = await readCache("complex.json");
+    await writeCache("complex", JSON.stringify(complexData), {
+      cacheFolder: testdirPath,
+    });
+
+    const result = await readCache("complex", JSON.parse, testdirPath);
 
     expect(result).toEqual(complexData);
   });
@@ -136,7 +142,7 @@ describe("fetchCache", () => {
 
     await expect(fetchCache("https://mojis.dev", options))
       .rejects
-      .toThrow("failed to fetch https://mojis.dev");
+      .toThrow("failed to fetch: url=(https://mojis.dev) status=(404)");
   });
 
   it("should use custom parser function", async () => {

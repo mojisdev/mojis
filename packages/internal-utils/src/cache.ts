@@ -66,7 +66,7 @@ export async function writeCache<TData extends string | Uint8Array>(cacheKey: st
     ttl = date.getTime();
   }
 
-  await fs.writeFile(path.join(filePath, ".meta"), JSON.stringify({
+  await fs.writeFile(`${filePath}.meta`, JSON.stringify({
     encoding,
     ttl,
   } satisfies CacheMeta), "utf-8");
@@ -83,7 +83,7 @@ export async function writeCache<TData extends string | Uint8Array>(cacheKey: st
  * @throws {Error} If the metadata file exists but cannot be read or parsed
  */
 export async function readCacheMeta(cacheKey: string, cacheFolder: string = CACHE_DIR): Promise<CacheMeta | undefined> {
-  const filePath = path.join(cacheFolder, cacheKey, ".meta");
+  const filePath = path.join(cacheFolder, `${cacheKey}.meta`);
 
   if (!(await fs.pathExists(filePath))) {
     return undefined;
@@ -179,7 +179,7 @@ export async function fetchCache<TData>(url: string, options: FetchCacheOptions<
   const response = await fetch(url, fetchOptions);
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`failed to fetch: url=(${url}) status=(${response.status})`);
   }
 
   const data = await response.text();
