@@ -5,7 +5,6 @@ import fs from "fs-extra";
 import z from "zod";
 
 const LOCKFILE_SCHEMA = z.object({
-  updated_at: z.number().optional().default(new Date().getTime()),
   latest_version: z.string().nullable().optional(),
   versions: z.array(EMOJI_VERSION_SCHEMA),
 });
@@ -13,7 +12,6 @@ const LOCKFILE_SCHEMA = z.object({
 export type EmojiLockfile = z.infer<typeof LOCKFILE_SCHEMA>;
 
 const DEFAULT_LOCKFILE = {
-  updated_at: new Date().getTime(),
   versions: [],
   latest_version: null,
 } satisfies EmojiLockfile;
