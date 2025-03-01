@@ -1,5 +1,11 @@
 # @mojis/adapters
 
+## 0.0.2
+
+### Patch Changes
+
+- [`ee2c7c0`](https://github.com/mojisdev/mojis/commit/ee2c7c0a7fcb9d9dd5aeaa05449ec4a0c39cefe3) Thanks [@luxass](https://github.com/luxass)! - fix: set base adapter to use noop
+
 ## 0.0.1
 
 ### Patch Changes
