@@ -19,7 +19,6 @@ afterEach(() => {
 describe("write cache", () => {
   it("should write data to cache", async () => {
     const testdirPath = await testdir({});
-
     const testData = { foo: "bar" };
     const cacheName = "test-cache";
 
@@ -33,12 +32,16 @@ describe("write cache", () => {
       JSON.stringify(testData),
       "utf-8",
     );
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      `${testdirPath}/${cacheName}.meta`,
+      JSON.stringify({ encoding: "utf-8", ttl: -1 }),
+      "utf-8",
+    );
   });
 
   it("should return the data that was written", async () => {
     const testData = "{\"test\":\"data\"}";
     const result = await writeCache("test", testData);
-
     expect(result).toEqual(testData);
   });
 
@@ -49,6 +52,101 @@ describe("write cache", () => {
     await writeCache(cacheKey, JSON.stringify(testData));
 
     expect(fs.ensureDir).toHaveBeenCalledWith(expect.stringContaining("nested/path"));
+  });
+
+  it("should write Uint8Array data", async () => {
+    const testdirPath = await testdir({}, {
+      cleanup: false,
+    });
+    const testData = new Uint8Array([1, 2, 3]);
+    const cacheName = "binary-cache";
+
+    await writeCache(cacheName, testData, { cacheFolder: testdirPath });
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      `${testdirPath}/${cacheName}`,
+      testData,
+      undefined, // No encoding for Uint8Array
+    );
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      `${testdirPath}/${cacheName}.meta`,
+      JSON.stringify({ encoding: "utf-8", ttl: -1 }),
+      "utf-8",
+    );
+  });
+
+  it("should use a custom encoding", async () => {
+    const testdirPath = await testdir({});
+    const testData = "test data";
+    const encoding = "base64";
+    // eslint-disable-next-line node/prefer-global/buffer
+    const encodedData = Buffer.from(testData).toString(encoding);
+
+    await writeCache("encoded", testData, {
+      cacheFolder: testdirPath,
+      encoding,
+    });
+
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      expect.stringContaining("encoded"),
+      encodedData,
+      encoding,
+    );
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      expect.stringContaining(".meta"),
+      JSON.stringify({ encoding, ttl: -1 }),
+      "utf-8",
+    );
+  });
+
+  it("should apply a transform function", async () => {
+    const testdirPath = await testdir({});
+    const testData = "test data";
+    const transform = (data: string) => data.toUpperCase();
+    const transformedData = transform(testData);
+
+    await writeCache("transformed", testData, {
+      cacheFolder: testdirPath,
+      transform,
+    });
+
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      expect.stringContaining("transformed"),
+      transformedData,
+      "utf-8",
+    );
+  });
+
+  it("should write metadata with a TTL", async () => {
+    const testdirPath = await testdir({});
+    const ttl = 1; // 1 second
+    const now = new Date();
+    const expectedTtl = new Date(now.getTime() + ttl * 1000).getTime();
+
+    await writeCache("ttl", "test", { cacheFolder: testdirPath, ttl });
+
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      expect.stringContaining(".meta"),
+      expect.stringContaining("\"ttl\":"),
+      "utf-8",
+    );
+
+    const metaFileWrite = vi.mocked(fs.writeFile).mock.calls.find((call) => call[0].toString().endsWith(".meta"));
+    if (metaFileWrite) {
+      const metaObject = JSON.parse(metaFileWrite[1].toString());
+      expect(metaObject.ttl).toBeGreaterThanOrEqual(expectedTtl - 100);
+      expect(metaObject.ttl).toBeLessThanOrEqual(expectedTtl + 100);
+    }
+  });
+
+  it("should handle special character cache keys", async () => {
+    const testdirPath = await testdir({});
+    const specialKey = "some/special/key/with:colon*asterisk?question";
+    await writeCache(specialKey, "test", { cacheFolder: testdirPath });
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      expect.stringContaining(specialKey),
+      "test",
+      "utf-8",
+    );
   });
 });
 
