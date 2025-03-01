@@ -1,26 +1,40 @@
-# @mojis/cli
+<p align="center">
+<a href="https://mojis.dev">
+<img src="https://api.mojis.dev/random-emoji.png" height="150">
+</a>
+</p>
 
-[![npm version][npm-version-src]][npm-version-href]
-[![npm downloads][npm-downloads-src]][npm-downloads-href]
+<h1 align="center">
+mojis
+</h1>
+<p align="center">
+A world of emojis at your fingertips
+<p>
 
-Mojis CLI is a command-line interface for working with emojis.
+<p align="center">
+ <a href="https://docs.mojis.dev">Documentation</a>
+</p>
+<h4 align="center">
 
-> [!NOTE]
-> This package can be used by others, but it is not intended to be used directly by end-users.
+</h4>
+<br>
+<br>
 
-## 📦 Installation
+## Contributing
 
-```bash
-npm install @mojis/cli
-```
+All Mojis Projects are open source and we welcome contributions from the
+community.
+
+1. Fork and clone the repository
+2. Ensure you have the LTS version of Node.js installed, as well as the latest
+   version of [pnpm](https://pnpm.io).
+3. Install the project dependencies by running `pnpm install`.
+4. Implement your changes, as well as any documentation or tests that are
+   required.
+5. Create a changeset for your changes by running `pnpm changeset`.
+6. Open a pull request with your changes and changeset.
 
 ## 📄 License
 
 Published under [MIT License](./LICENSE).
 
-<!-- Badges -->
-
-[npm-version-src]: https://img.shields.io/npm/v/@mojis/cli?style=flat&colorA=18181B&colorB=4169E1
-[npm-version-href]: https://npmjs.com/package/@mojis/cli
-[npm-downloads-src]: https://img.shields.io/npm/dm/@mojis/cli?style=flat&colorA=18181B&colorB=4169E1
-[npm-downloads-href]: https://npmjs.com/package/@mojis/cli
