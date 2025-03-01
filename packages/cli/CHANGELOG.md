@@ -1,5 +1,13 @@
 # @mojis/cli
 
+## 0.0.7
+
+### Patch Changes
+
+- [`1eeabb9`](https://github.com/mojisdev/mojis/commit/1eeabb9eb1c5013b8a4e5b6ef0865d0d57fbd320) Thanks [@luxass](https://github.com/luxass)! - chore: add debug to cli
+
+- [`1967b29`](https://github.com/mojisdev/mojis/commit/1967b292b8751e06948e76dca0187031ba653fe8) Thanks [@luxass](https://github.com/luxass)! - refactor: remove updated_at from lockfile
+
 ## 0.0.6
 
 ### Patch Changes
