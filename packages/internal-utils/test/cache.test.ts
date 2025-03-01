@@ -1,3 +1,4 @@
+import path from "node:path";
 import fs from "fs-extra";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { testdir } from "vitest-testdirs";
@@ -55,21 +56,34 @@ describe("write cache", () => {
   });
 
   it("should write Uint8Array data", async () => {
-    const testdirPath = await testdir({}, {
-      cleanup: false,
-    });
-    const testData = new Uint8Array([1, 2, 3]);
+    const testdirPath = await testdir({});
+    const testData = new Uint8Array([
+      72,
+      101,
+      108,
+      108,
+      111,
+      44,
+      32,
+      119,
+      111,
+      114,
+      108,
+      100,
+    ]);
+
     const cacheName = "binary-cache";
 
-    await writeCache(cacheName, testData, { cacheFolder: testdirPath });
+    await writeCache(cacheName, testData, { cacheFolder: testdirPath, encoding: null });
+
     expect(fs.writeFile).toHaveBeenCalledWith(
       `${testdirPath}/${cacheName}`,
       testData,
-      undefined, // No encoding for Uint8Array
+      undefined,
     );
     expect(fs.writeFile).toHaveBeenCalledWith(
       `${testdirPath}/${cacheName}.meta`,
-      JSON.stringify({ encoding: "utf-8", ttl: -1 }),
+      JSON.stringify({ encoding: undefined, ttl: -1 }),
       "utf-8",
     );
   });
@@ -78,8 +92,6 @@ describe("write cache", () => {
     const testdirPath = await testdir({});
     const testData = "test data";
     const encoding = "base64";
-    // eslint-disable-next-line node/prefer-global/buffer
-    const encodedData = Buffer.from(testData).toString(encoding);
 
     await writeCache("encoded", testData, {
       cacheFolder: testdirPath,
@@ -87,12 +99,12 @@ describe("write cache", () => {
     });
 
     expect(fs.writeFile).toHaveBeenCalledWith(
-      expect.stringContaining("encoded"),
-      encodedData,
+      `${testdirPath}/encoded`,
+      testData,
       encoding,
     );
     expect(fs.writeFile).toHaveBeenCalledWith(
-      expect.stringContaining(".meta"),
+      `${testdirPath}/encoded.meta`,
       JSON.stringify({ encoding, ttl: -1 }),
       "utf-8",
     );
@@ -142,6 +154,7 @@ describe("write cache", () => {
     const testdirPath = await testdir({});
     const specialKey = "some/special/key/with:colon*asterisk?question";
     await writeCache(specialKey, "test", { cacheFolder: testdirPath });
+
     expect(fs.writeFile).toHaveBeenCalledWith(
       expect.stringContaining(specialKey),
       "test",

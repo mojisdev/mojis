@@ -5,7 +5,7 @@ import fs from "fs-extra";
 const CACHE_DIR = path.resolve(process.cwd(), ".cache");
 
 export interface CacheMeta {
-  encoding: BufferEncoding | null;
+  encoding?: BufferEncoding | null;
   ttl: number;
 }
 
@@ -50,11 +50,11 @@ export async function writeCache<TData extends string | Uint8Array>(cacheKey: st
 
   await fs.ensureDir(path.dirname(filePath));
 
-  const encoding = options?.encoding ?? "utf-8";
-
   if (options?.transform) {
     data = options.transform(data);
   }
+
+  const encoding = options?.encoding === null ? undefined : options?.encoding ?? "utf-8";
 
   await fs.writeFile(filePath, data, encoding);
 
