@@ -1,5 +1,12 @@
 # @mojis/cli
 
+## 0.0.6
+
+### Patch Changes
+
+- Updated dependencies [[`ee2c7c0`](https://github.com/mojisdev/mojis/commit/ee2c7c0a7fcb9d9dd5aeaa05449ec4a0c39cefe3)]:
+  - @mojis/adapters@0.0.2
+
 ## 0.0.5
 
 ### Patch Changes
