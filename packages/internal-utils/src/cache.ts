@@ -119,7 +119,10 @@ export async function readCache<TData extends string | Uint8Array>(name: string,
 
   if (meta.ttl !== -1 && Date.now() > meta.ttl) {
     // delete cache if expired
-    await fs.remove(filePath);
+    await Promise.all([
+      fs.remove(filePath),
+      fs.remove(`${filePath}.meta`),
+    ]);
     return undefined;
   }
 
