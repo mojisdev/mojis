@@ -14,9 +14,6 @@ A world of emojis at your fingertips
 <p align="center">
  <a href="https://docs.mojis.dev">Documentation</a>
 </p>
-<h4 align="center">
-
-</h4>
 <br>
 <br>
 
