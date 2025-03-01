@@ -51,6 +51,8 @@ cli.command(
     const force = args.force ?? false;
     const existingEmojiVersions = await getAllEmojiVersions();
 
+    console.debug("existing emoji versions", existingEmojiVersions);
+
     let providedVersions = (Array.isArray(args.versions) ? args.versions : [args.versions]) as string[];
 
     const generators = Array.isArray(args.generators) ? args.generators : [args.generators];
