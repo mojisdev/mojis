@@ -33,7 +33,7 @@ describe("generateGitHubShortcodes", () => {
     ]);
 
     expect(cache.fetchCache).toHaveBeenCalledWith(
-      "https://github-emojis.luxass.dev/api/v1/emojis",
+      "https://api.mojis.dev/api/gateway/github/emojis",
       expect.objectContaining({
         cacheKey: "github-emojis.json",
         bypassCache: false,

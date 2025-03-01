@@ -54,7 +54,7 @@ export async function generateGitHubShortcodes(options: ShortcodeOptions): Promi
   let githubEmojis: Record<string, string> = {};
 
   try {
-    githubEmojis = await fetchCache<Record<string, string>>("https://github-emojis.luxass.dev/api/v1/emojis", {
+    githubEmojis = await fetchCache<Record<string, string>>("https://api.mojis.dev/api/gateway/github/emojis", {
       cacheKey: `github-emojis.json`,
       bypassCache: force,
       parser: (data) => JSON.parse(data) as Record<string, string>,
