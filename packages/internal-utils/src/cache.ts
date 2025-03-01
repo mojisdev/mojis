@@ -97,21 +97,21 @@ export async function readCacheMeta(cacheKey: string, cacheFolder: string = CACH
 /**
  * Reads and parses JSON data from a cache file.
  *
- * @param {string} name - The name of the cache file to read
+ * @param {string} cacheKey - The name of the cache file to read
  * @param {(data: TData) => TData} transform - A function to transform the cache data before returning it
  * @param {string?} cacheFolder - The directory where cache data is stored (defaults to CACHE_DIR)
  * @template TData - The type of data stored in the cache file
  * @returns {Promise<T>} A promise that resolves to the parsed cache data of type T, or undefined if the file doesn't exist
  */
-export async function readCache<TData extends string | Uint8Array>(name: string, transform?: (data: TData) => TData, cacheFolder: string = CACHE_DIR): Promise<TData | undefined> {
-  const filePath = path.join(cacheFolder, name);
+export async function readCache<TData extends string | Uint8Array>(cacheKey: string, transform?: (data: TData) => TData, cacheFolder: string = CACHE_DIR): Promise<TData | undefined> {
+  const filePath = path.join(cacheFolder, cacheKey);
 
   if (!(await fs.pathExists(filePath))) {
     return undefined;
   }
 
   // read metadata
-  const meta = await readCacheMeta(name, cacheFolder);
+  const meta = await readCacheMeta(cacheKey, cacheFolder);
 
   if (!meta) {
     return undefined;
