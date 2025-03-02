@@ -1,5 +1,7 @@
 import type { z } from "zod";
-import type { SHORTCODE_PROVIDER_SCHEMA } from "./schemas";
+import type { EMOJI_SPEC_RECORD_SCHEMA, SHORTCODE_PROVIDER_SCHEMA } from "./schemas";
+
+export type EmojiSpecRecord = z.infer<typeof EMOJI_SPEC_RECORD_SCHEMA>;
 
 export interface EmojiGroup {
   name: string;
