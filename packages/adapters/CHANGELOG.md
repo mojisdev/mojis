@@ -1,5 +1,18 @@
 # @mojis/adapters
 
+## 0.0.4
+
+### Patch Changes
+
+- [#18](https://github.com/mojisdev/mojis/pull/18) [`432e602`](https://github.com/mojisdev/mojis/commit/432e6022ab834c045db5e233545f2bd72096f0d1) Thanks [@luxass](https://github.com/luxass)! - feat(adapters): add basic pre alignment adapter
+
+- [#20](https://github.com/mojisdev/mojis/pull/20) [`0a142e3`](https://github.com/mojisdev/mojis/commit/0a142e37870a6c4f1fb75f595ecc0c3aec207a8b) Thanks [@luxass](https://github.com/luxass)! - chore: improve dx
+
+- [#25](https://github.com/mojisdev/mojis/pull/25) [`66909c4`](https://github.com/mojisdev/mojis/commit/66909c4e2e1f8f36a2c226ba86a61929e2b23c2c) Thanks [@luxass](https://github.com/luxass)! - refactor: rename `EmojiVersion` to `EmojiSpecRecord`
+
+- Updated dependencies [[`0a142e3`](https://github.com/mojisdev/mojis/commit/0a142e37870a6c4f1fb75f595ecc0c3aec207a8b), [`66909c4`](https://github.com/mojisdev/mojis/commit/66909c4e2e1f8f36a2c226ba86a61929e2b23c2c)]:
+  - @mojis/internal-utils@0.0.3
+
 ## 0.0.3
 
 ### Patch Changes
