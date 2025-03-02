@@ -6,7 +6,7 @@ import type {
   ExtractDataTypeFromUrls,
   MojiAdapter,
 } from "./types";
-import { createCacheKeyFromUrl, type EmojiVersion, fetchCache } from "@mojis/internal-utils";
+import { createCacheKeyFromUrl, type EmojiSpecRecord, fetchCache } from "@mojis/internal-utils";
 import { defu } from "defu";
 import semver from "semver";
 import { baseAdapter } from "./adapters/base/adapter";
@@ -37,7 +37,7 @@ type ExtractAdapterType<T> = T extends MojiAdapter<
     Variations
   > : never;
 
-export function resolveAdapter<T extends EmojiVersion>(
+export function resolveAdapter<T extends EmojiSpecRecord>(
   emojiVersion: T,
 ): ExtractAdapterType<typeof baseAdapter> | ExtractAdapterType<typeof modernAdapter> | null {
   const version = semver.coerce(emojiVersion.emoji_version);
