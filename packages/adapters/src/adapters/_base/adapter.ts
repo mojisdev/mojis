@@ -33,7 +33,7 @@ export const baseAdapter = defineMojiAdapter({
 
       return {
         url: `https://unicode.org/Public/emoji/${ctx.emoji_version}/emoji-test.txt`,
-        cacheKey: `v${ctx.emoji_version}/metadata.json`,
+        cacheKey: `v${ctx.emoji_version}/metadata`,
       };
     },
     transform(ctx, data) {

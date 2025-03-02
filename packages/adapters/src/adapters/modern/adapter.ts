@@ -12,12 +12,12 @@ export const modernAdapter = defineMojiAdapter({
         {
           key: "sequences",
           url: `https://unicode.org/Public/emoji/${ctx.emoji_version}/emoji-sequences.txt`,
-          cacheKey: `v${ctx.emoji_version}/sequences.json`,
+          cacheKey: `v${ctx.emoji_version}/sequences`,
         },
         {
           key: "zwj",
           url: `https://unicode.org/Public/emoji/${ctx.emoji_version}/emoji-zwj-sequences.txt`,
-          cacheKey: `v${ctx.emoji_version}/zwj-sequences.json`,
+          cacheKey: `v${ctx.emoji_version}/zwj-sequences`,
         },
       ];
     },
