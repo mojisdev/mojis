@@ -1,3 +1,4 @@
+import { type EmojiSequence, expandHexRange, FEMALE_SIGN, MALE_SIGN } from "@mojis/internal-utils";
 import { defineMojiAdapter } from "../../define";
 
 export const modernAdapter = defineMojiAdapter({
@@ -9,16 +10,18 @@ export const modernAdapter = defineMojiAdapter({
     urls(ctx) {
       return [
         {
+          key: "sequences",
           url: `https://unicode.org/Public/emoji/${ctx.emoji_version}/emoji-sequences.txt`,
           cacheKey: `v${ctx.emoji_version}/sequences.json`,
         },
         {
-          url: `https://unicode.org/Public/emoji/${ctx.emoji_version}/emoji-zwj-sequences`,
+          key: "zwj",
+          url: `https://unicode.org/Public/emoji/${ctx.emoji_version}/emoji-zwj-sequences.txt`,
           cacheKey: `v${ctx.emoji_version}/zwj-sequences.json`,
         },
       ];
     },
-    transform(ctx, data) {
+    transform(_, data) {
       if (data == null) {
         return {
           sequences: [],
@@ -26,53 +29,55 @@ export const modernAdapter = defineMojiAdapter({
         };
       }
 
-      // const sequences: EmojiSequence[] = [];
+      const sequences: EmojiSequence[] = [];
+      const zwj: EmojiSequence[] = [];
 
-      // for (const _data of data) {
-      //   if (_data == null) {
-      //     throw new Error("invalid data");
-      //   }
+      for (const __data of data) {
+        if (__data == null) {
+          throw new Error("invalid data");
+        }
 
-      //   const lines = data.split("\n");
+        const { key, data: _data } = __data;
 
-      //   const sequences: EmojiSequence[] = [];
+        const lines = _data.split("\n");
 
-      //   for (let line of lines) {
-      //     // skip empty line & comments
-      //     if (line.trim() === "" || line.startsWith("#")) {
-      //       continue;
-      //     }
+        const isZwj = key === "zwj";
+        const internal = isZwj ? zwj : sequences;
 
-      //     // remove line comment
-      //     const commentIndex = line.indexOf("#");
-      //     if (commentIndex !== -1) {
-      //       line = line.slice(0, commentIndex).trim();
-      //     }
+        for (let line of lines) {
+          // skip empty line & comments
+          if (line.trim() === "" || line.startsWith("#")) {
+            continue;
+          }
 
-      //     const [hex, property, description] = line.split(";").map((col) => col.trim()).slice(0, 4);
+          // remove line comment
+          const commentIndex = line.indexOf("#");
+          if (commentIndex !== -1) {
+            line = line.slice(0, commentIndex).trim();
+          }
 
-      //     if (hex == null || property == null || description == null) {
-      //       throw new Error(`invalid line: ${line}`);
-      //     }
+          const [hex, property, description] = line.split(";").map((col) => col.trim()).slice(0, 4);
 
-      //     const expandedHex = expandHexRange(hex);
+          if (hex == null || property == null || description == null) {
+            throw new Error(`invalid line: ${line}`);
+          }
 
-      //     for (const hex of expandedHex) {
-      //       sequences.push({
-      //         hex: hex.replace(/\s+/g, "-"),
-      //         property,
-      //         description,
-      //         gender: hex.includes(FEMALE_SIGN) ? "female" : hex.includes(MALE_SIGN) ? "male" : null,
-      //       });
-      //     }
-      //   }
+          const expandedHex = expandHexRange(hex);
 
-      //   return sequences;
-      // }
+          for (const hex of expandedHex) {
+            internal.push({
+              hex: hex.replace(/\s+/g, "-"),
+              property,
+              description,
+              gender: hex.includes(FEMALE_SIGN) ? "female" : hex.includes(MALE_SIGN) ? "male" : null,
+            });
+          }
+        }
+      }
 
       return {
-        sequences: [],
-        zwj: [],
+        sequences,
+        zwj,
       };
     },
   },

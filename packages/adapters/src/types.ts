@@ -61,19 +61,23 @@ export interface UrlWithCacheKey {
   cacheKey: string;
 }
 
-export type UrlWithCacheKeyReturnType = UrlWithCacheKey | UrlWithCacheKey[] | undefined;
+export interface UrlWithCacheKeyAndKey extends UrlWithCacheKey {
+  key: string;
+}
+
+export type UrlWithCacheKeyReturnType = UrlWithCacheKey | UrlWithCacheKeyAndKey[] | undefined;
 
 export type ExtractDataTypeFromUrls<T extends UrlWithCacheKeyReturnType> =
 T extends undefined ? undefined :
   T extends UrlWithCacheKey ? string :
-    T extends UrlWithCacheKey[] ? string[] :
+    T extends UrlWithCacheKey[] ? { key: string; data: string }[] :
       never;
 
 export interface AdapterHandler<
   TUrlsReturn extends UrlWithCacheKeyReturnType,
   TOutput,
 > {
-  urls?: (ctx: AdapterContext) => Promise<TUrlsReturn> | TUrlsReturn;
+  urls: (ctx: AdapterContext) => Promise<TUrlsReturn> | TUrlsReturn;
   fetchOptions?: RequestInit;
   cacheOptions?: Omit<WriteCacheOptions<any>, "transform">;
   transform: (ctx: AdapterContext, data: ExtractDataTypeFromUrls<TUrlsReturn>) => TOutput;

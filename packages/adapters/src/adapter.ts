@@ -150,9 +150,12 @@ export async function runAdapterHandler<
         bypassCache: ctx.force,
       }),
     );
-
     const dataArray = await Promise.all(dataPromises);
-    return handler.transform(ctx, dataArray as ExtractDataTypeFromUrls<TUrlReturn>);
+
+    return handler.transform(ctx, dataArray.map((data, index) => ({
+      key: urlsResult[index]!.key,
+      data,
+    })) as ExtractDataTypeFromUrls<TUrlReturn>);
   } else {
     const data = await fetchCache(urlsResult.url, {
       cacheKey: urlsResult.cacheKey,
