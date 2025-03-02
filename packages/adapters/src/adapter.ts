@@ -199,6 +199,10 @@ export async function runAdapterHandler<
     throw new Error(`Handler ${String(handlerName)} in adapter ${adapter.name} does not have an aggregate function`);
   }
 
+  if (results.length === 0) {
+    throw new Error(`Handler ${String(handlerName)} in adapter ${adapter.name} returned an empty array.`);
+  }
+
   return handler.aggregate(ctx, [results[0]!, ...results.slice(1)]);
 }
 
