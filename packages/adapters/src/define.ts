@@ -1,4 +1,4 @@
-import type { AdapterHandler, MojiAdapter, CacheableUrlRequestReturnType } from "./types";
+import type { CacheableUrlRequestReturnType, MojiAdapter } from "./types";
 import semver from "semver";
 
 /**

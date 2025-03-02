@@ -3,8 +3,8 @@ import type {
   EmojiMetadata,
   EmojiSequence,
   EmojiVariation,
+  WriteCacheOptions,
 } from "@mojis/internal-utils";
-import type { WriteCacheOptions } from "packages/internal-utils/dist";
 
 export interface MojiAdapter<
   TMetadataUrlReturn extends CacheableUrlRequestReturnType,

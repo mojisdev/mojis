@@ -10,7 +10,6 @@ import {
   type ShortcodeProvider,
 } from "@mojis/internal-utils";
 import { OFFICIAL_SUPPORTED_VERSIONS } from "@mojis/internal-utils/constants";
-import { SHORTCODE_PROVIDERS_SCHEMA } from "@mojis/internal-utils/schemas";
 import { green, red, yellow } from "farver/fast";
 import fs from "fs-extra";
 import semver from "semver";
