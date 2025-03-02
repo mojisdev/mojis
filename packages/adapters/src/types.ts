@@ -132,12 +132,9 @@ export interface AdapterHandler<
   TOutput = TTransformOutput,
 > {
   urls: (ctx: AdapterContext) => Promise<TUrlsReturn> | TUrlsReturn;
-
   fetchOptions?: RequestInit;
-  cacheOptions?: Omit<WriteCacheOptions<any>, "transform">;
-
+  cacheOptions?: Omit<WriteCacheOptions<unknown>, "transform">;
   transform: (ctx: AdapterContext & TExtraContext, data: ExtractDataTypeFromUrls<TUrlsReturn>) => TTransformOutput;
-
   aggregate?: (ctx: AdapterContext, data: [TTransformOutput, ...TTransformOutput[]]) => TOutput;
 }
 
