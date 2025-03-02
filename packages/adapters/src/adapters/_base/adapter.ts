@@ -32,16 +32,11 @@ export const baseAdapter = defineMojiAdapter({
       }
 
       return {
-        extraContext: {
-          foo: "bar",
-        },
         url: `https://unicode.org/Public/emoji/${ctx.emoji_version}/emoji-test.txt`,
         cacheKey: `v${ctx.emoji_version}/metadata`,
       };
     },
     transform(ctx, data) {
-      console.warn("foo", ctx.foo);
-
       if (data == null) {
         return {
           emojis: {},

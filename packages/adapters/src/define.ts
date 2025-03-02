@@ -52,27 +52,21 @@ export function defineMojiAdapter<
     throw new Error(`adapter.range is not a valid semver range ${adapter.range}`);
   }
 
-  // if (adapter.extend == null) {
-  //   // verify the adapter has the required functions.
+  if (adapter.extend == null) {
+    // verify the adapter has the required functions.
 
-  //   // TODO: figure out how we can make it throw type error if the adapter is missing a required function
-  //   const REQUIRED_FUNCTIONS = [
-  //     "sequences",
-  //     "metadata",
-  //     "shortcodes",
-  //     "variations",
-  //     "emojis",
-  //   ] satisfies NonNullable<MojiAdapterFunctionNames<MojiAdapter>>[];
+    // TODO: figure out how we can make it throw type error if the adapter is missing a required function
+    // const REQUIRED_FUNCTIONS = [
+    //   "sequences",
+    //   "metadata",
+    //   "variations",
+    // ] satisfies NonNullable<MojiAdapterFunctionNames<MojiAdapter>>[];
 
-  //   const missingFunctions = REQUIRED_FUNCTIONS.filter((fn) => adapter[fn] == null);
-  //   if (missingFunctions.length > 0) {
-  //     throw new Error(`adapter ${adapter.name} is missing required functions: ${missingFunctions.join(", ")}`);
-  //   }
-  // }
+    // const missingFunctions = REQUIRED_FUNCTIONS.filter((fn) => adapter[fn] == null);
+    // if (missingFunctions.length > 0) {
+    //   throw new Error(`adapter ${adapter.name} is missing required functions: ${missingFunctions.join(", ")}`);
+    // }
+  }
 
   return adapter;
 }
-
-// export function defineAdapterGroupFn<THandler extends AdapterHandler, TKey extends keyof TGroup>(fn: TGroup[TKey]): TGroup[TKey] {
-//   return fn;
-// }
