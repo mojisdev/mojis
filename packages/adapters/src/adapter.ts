@@ -152,7 +152,7 @@ export async function runAdapterHandler<
       emoji_version: ctx.emoji_version,
       force: ctx.force,
       unicode_version: ctx.unicode_version,
-    } as AdapterContext & TExtraContext;
+    } as unknown as AdapterContext & TExtraContext;
 
     const data = await fetchCache(urlsResult.url, {
       cacheKey: urlsResult.cacheKey,
@@ -164,7 +164,7 @@ export async function runAdapterHandler<
       bypassCache: ctx.force,
     });
 
-    return handler.transform(newCtx, data as ExtractDataTypeFromUrls<TUrlReturn>);
+    return handler.transform(newCtx, data as unknown as ExtractDataTypeFromUrls<TUrlReturn>) as unknown as TOutput;
   }
 
   const promises = urlsResult.map(async (item) => {
@@ -188,7 +188,7 @@ export async function runAdapterHandler<
       emoji_version: ctx.emoji_version,
       force: ctx.force,
       unicode_version: ctx.unicode_version,
-    } as AdapterContext & TExtraContext;
+    } as unknown as AdapterContext & TExtraContext;
 
     return handler.transform(newCtx, data as ExtractDataTypeFromUrls<TUrlReturn>);
   });
@@ -199,7 +199,7 @@ export async function runAdapterHandler<
     throw new Error(`Handler ${String(handlerName)} in adapter ${adapter.name} does not have an aggregate function`);
   }
 
-  return handler.aggregate(ctx, results);
+  return handler.aggregate(ctx, [results[0]!, ...results.slice(1)]);
 }
 
 function createKeyFromUrl(url: string): string {
