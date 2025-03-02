@@ -9,7 +9,7 @@ import type {
 import { createCacheKeyFromUrl, type EmojiVersion, fetchCache } from "@mojis/internal-utils";
 import { defu } from "defu";
 import semver from "semver";
-import { baseAdapter } from "./adapters/_base/adapter";
+import { baseAdapter } from "./adapters/base/adapter";
 import { modernAdapter } from "./adapters/modern/adapter";
 import { preAlignmentAdapter } from "./adapters/pre-alignment/adapter";
 
