@@ -55,7 +55,11 @@ export interface MojiAdapter<
 
 type ExtraContext<T> = {
   key: string;
-} & (T extends CacheableUrlRequest ? T["extraContext"] : never);
+} & (T extends CacheableUrlRequest
+  ? T["extraContext"] extends Record<string, unknown>
+    ? T["extraContext"]
+    : Record<string, never>
+  : Record<string, never>);
 
 export interface CacheableUrlRequest {
   /**

@@ -109,6 +109,7 @@ export async function runAdapterHandler<
   THandler extends AdapterHandlers<TAdapter>,
   THandlerFn extends NonNullable<TAdapter[THandler]>,
   TUrlReturn extends CacheableUrlRequestReturnType = THandlerFn extends AdapterHandler<infer U, any, any> ? U : never,
+  TCtx extends Record<string, unknown> = THandlerFn extends AdapterHandler<any, infer E, any> ? E : never,
   TOutput = THandlerFn extends AdapterHandler<any, any, infer V> ? V : never,
 >(
   adapter: TAdapter,
@@ -116,7 +117,7 @@ export async function runAdapterHandler<
   ctx: AdapterContext,
 ): Promise<TOutput> {
   // we know this is an AdapterHandler because of the constraint on THandler
-  const handler = adapter[handlerName] as unknown as AdapterHandler<TUrlReturn, any, TOutput>;
+  const handler = adapter[handlerName] as unknown as AdapterHandler<TUrlReturn, AdapterContext & TCtx, TOutput>;
 
   if (!handler) {
     throw new Error(`Handler ${String(handlerName)} not found in adapter ${adapter.name}`);
@@ -148,7 +149,7 @@ export async function runAdapterHandler<
       bypassCache: ctx.force,
     });
 
-    return handler.transform(ctx, data as ExtractDataTypeFromUrls<TUrlReturn>);
+    return handler.transform(ctx as AdapterContext & TCtx, data as ExtractDataTypeFromUrls<TUrlReturn>);
   }
 
   const promises = urlsResult.map(async (item) => {
@@ -162,7 +163,7 @@ export async function runAdapterHandler<
       bypassCache: ctx.force,
     });
 
-    return handler.transform(ctx, data as ExtractDataTypeFromUrls<TUrlReturn>);
+    return handler.transform(ctx as AdapterContext & TCtx, data as ExtractDataTypeFromUrls<TUrlReturn>);
   });
 
   const results = await Promise.all(promises);
