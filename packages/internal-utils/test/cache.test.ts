@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { testdir } from "vitest-testdirs";
-import { fetchCache, readCache, writeCache } from "../src/cache";
+import { createCacheKeyFromUrl, fetchCache, readCache, writeCache } from "../src/cache";
 
 vi.mock("fs-extra", {
   spy: true,
@@ -269,5 +269,54 @@ describe("fetchCache", () => {
     const result = await fetchCache("https://mojis.dev", options);
 
     expect(result).toEqual(parsedData);
+  });
+});
+
+describe("create cache keys from url", () => {
+  it.each([
+    {
+      url: "https://mojis.dev",
+      expected: "mojis_dev",
+    },
+    {
+      url: "https://example.com",
+      expected: "example_com",
+    },
+    {
+      url: "https://mojis.dev/emojis",
+      expected: "mojis_dev_emojis",
+    },
+    {
+      url: "https://example.com/path/to/resource",
+      expected: "example_com_path_to_resource",
+    },
+    {
+      url: "https://test.com/path-with-hyphens",
+      expected: "test_com_path_with_hyphens",
+    },
+
+    // should strip query, hash and port from url
+    {
+      url: "http://localhost:3000/api",
+      expected: "localhost_api",
+    },
+    {
+      url: "https://example.com:8080/path",
+      expected: "example_com_path",
+    },
+    {
+      url: "https://mojis.dev/search?q=smile&sort=asc",
+      expected: "mojis_dev_search",
+    },
+    {
+      url: "https://api.example.com/v1/data?id=123",
+      expected: "api_example_com_v1_data",
+    },
+    {
+      url: "https://mojis.dev/page#section",
+      expected: "mojis_dev_page",
+    },
+  ])("should convert %s to %s", ({ url, expected }) => {
+    expect(createCacheKeyFromUrl(url)).toBe(expected);
   });
 });

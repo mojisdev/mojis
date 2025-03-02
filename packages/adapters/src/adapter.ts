@@ -6,7 +6,7 @@ import type {
   ExtractDataTypeFromUrls,
   MojiAdapter,
 } from "./types";
-import { type EmojiVersion, fetchCache } from "@mojis/internal-utils";
+import { createCacheKeyFromUrl, type EmojiVersion, fetchCache } from "@mojis/internal-utils";
 import { defu } from "defu";
 import semver from "semver";
 import { baseAdapter } from "./adapters/_base/adapter";
@@ -144,7 +144,7 @@ export async function runAdapterHandler<
   if (!Array.isArray(urlsResult)) {
     const cacheOptions = defu(urlsResult.cacheOptions || {}, handler.cacheOptions || {});
     const fetchOptions = defu(urlsResult.fetchOptions || {}, handler.fetchOptions || {});
-    const key = urlsResult.key ?? createKeyFromUrl(urlsResult.url);
+    const key = urlsResult.key ?? createCacheKeyFromUrl(urlsResult.url);
 
     const newCtx = {
       ...urlsResult.extraContext,
@@ -155,7 +155,7 @@ export async function runAdapterHandler<
     } as unknown as AdapterContext & TExtraContext;
 
     const data = await fetchCache(urlsResult.url, {
-      cacheKey: urlsResult.cacheKey ?? `v${ctx.emoji_version}/${createKeyFromUrl(urlsResult.url)}`,
+      cacheKey: urlsResult.cacheKey ?? `v${ctx.emoji_version}/${createCacheKeyFromUrl(urlsResult.url)}`,
       parser: (data) => data,
       options: fetchOptions,
       cacheFolder: cacheOptions.cacheFolder,
@@ -168,12 +168,12 @@ export async function runAdapterHandler<
   }
 
   const promises = urlsResult.map(async (item) => {
-    const key = item.key ?? createKeyFromUrl(item.url);
+    const key = item.key ?? createCacheKeyFromUrl(item.url);
     const cacheOptions = defu(item.cacheOptions || {}, handler.cacheOptions || {});
     const fetchOptions = defu(item.fetchOptions || {}, handler.fetchOptions || {});
 
     const data = await fetchCache(item.url, {
-      cacheKey: item.cacheKey ?? `v${ctx.emoji_version}/${createKeyFromUrl(item.url)}`,
+      cacheKey: item.cacheKey ?? `v${ctx.emoji_version}/${createCacheKeyFromUrl(item.url)}`,
       parser: (data) => data,
       options: fetchOptions,
       cacheFolder: cacheOptions.cacheFolder,
@@ -204,10 +204,4 @@ export async function runAdapterHandler<
   }
 
   return handler.aggregate(ctx, [results[0]!, ...results.slice(1)]);
-}
-
-function createKeyFromUrl(url: string): string {
-  // replace all file system unfriendly characters with _
-  // so #, ?, &, etc. are all replaced with _
-  return url.replace(/[^a-z0-9]/gi, "_");
 }
