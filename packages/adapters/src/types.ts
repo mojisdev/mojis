@@ -10,6 +10,8 @@ import type {
 
 export interface MojiAdapter<
   TMetadataUrlReturn extends UrlWithCacheKeyReturnType,
+  TSequencesUrlReturn extends UrlWithCacheKeyReturnType,
+  TVariationsUrlReturn extends UrlWithCacheKeyReturnType,
 > {
   /**
    * The name of the adapter.
@@ -38,6 +40,19 @@ export interface MojiAdapter<
     groups: EmojiGroup[];
     emojis: Record<string, Record<string, EmojiMetadata>>;
   }>;
+
+  /**
+   * The sequences handler for the adapter.
+   */
+  sequences?: AdapterHandler<TSequencesUrlReturn, {
+    sequences: EmojiSequence[];
+    zwj: EmojiSequence[];
+  }>;
+
+  /**
+   * The variations handler for the adapter.
+   */
+  variations?: AdapterHandler<TVariationsUrlReturn, EmojiVariation[]>;
 }
 
 export interface UrlWithCacheKey {
@@ -61,7 +76,7 @@ export interface AdapterHandler<
   transform: (ctx: AdapterContext, data: ExtractDataTypeFromUrls<TUrlsReturn>) => TOutput;
 }
 
-export type AdapterHandlers<TAdapter = MojiAdapter<any>> = {
+export type AdapterHandlers<TAdapter = MojiAdapter<any, any, any>> = {
   [K in keyof TAdapter]: NonNullable<TAdapter[K]> extends AdapterHandler<any, any> ? K : never;
 }[keyof TAdapter];
 

@@ -23,7 +23,17 @@ import semver from "semver";
  */
 export function defineMojiAdapter<
   TMetadataUrlReturn extends UrlWithCacheKeyReturnType,
->(adapter: MojiAdapter<TMetadataUrlReturn>): MojiAdapter<TMetadataUrlReturn> {
+  TSequencesUrlReturn extends UrlWithCacheKeyReturnType,
+  TVariationsUrlReturn extends UrlWithCacheKeyReturnType,
+>(adapter: MojiAdapter<
+  TMetadataUrlReturn,
+  TSequencesUrlReturn,
+  TVariationsUrlReturn
+>): MojiAdapter<
+    TMetadataUrlReturn,
+    TSequencesUrlReturn,
+    TVariationsUrlReturn
+  > {
   // validate the adapter has name, description, range.
   if (!adapter.name) {
     throw new Error(`adapter.name is required`);

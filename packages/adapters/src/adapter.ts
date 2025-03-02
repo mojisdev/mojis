@@ -13,7 +13,7 @@ import { baseAdapter } from "./adapters/_base/adapter";
 import { modernAdapter } from "./adapters/modern/adapter";
 
 interface AdapterRegistry {
-  [key: string]: MojiAdapter<any>;
+  [key: string]: MojiAdapter<any, any, any>;
 }
 
 const ADAPTERS: AdapterRegistry = {
@@ -21,7 +21,15 @@ const ADAPTERS: AdapterRegistry = {
   modern: modernAdapter,
 };
 
-type ExtractAdapterType<T> = T extends MojiAdapter<infer U> ? MojiAdapter<U> : never;
+type ExtractAdapterType<T> = T extends MojiAdapter<
+  infer Metadata,
+  infer Sequences,
+  infer Variations
+> ? MojiAdapter<
+    Metadata,
+    Sequences,
+    Variations
+  > : never;
 
 export function resolveAdapter<T extends EmojiVersion>(
   emojiVersion: T,
@@ -62,9 +70,21 @@ export function resolveAdapter<T extends EmojiVersion>(
   return null;
 }
 
-function extendAdapter<T extends UrlWithCacheKeyReturnType>(
-  adapter: MojiAdapter<T>,
-): MojiAdapter<T> {
+function extendAdapter<
+  TMetadataUrlReturn extends UrlWithCacheKeyReturnType,
+  TSequencesUrlReturn extends UrlWithCacheKeyReturnType,
+  TVariationsUrlReturn extends UrlWithCacheKeyReturnType,
+>(
+  adapter: MojiAdapter<
+    TMetadataUrlReturn,
+    TSequencesUrlReturn,
+    TVariationsUrlReturn
+  >,
+): MojiAdapter<
+    TMetadataUrlReturn,
+    TSequencesUrlReturn,
+    TVariationsUrlReturn
+  > {
   if (adapter.extend == null) {
     return adapter;
   }
@@ -77,11 +97,15 @@ function extendAdapter<T extends UrlWithCacheKeyReturnType>(
     );
   }
 
-  return Object.assign({}, parent, adapter) as MojiAdapter<T>;
+  return Object.assign({}, parent, adapter) as MojiAdapter<
+    TMetadataUrlReturn,
+    TSequencesUrlReturn,
+    TVariationsUrlReturn
+  >;
 }
 
 export async function runAdapterHandler<
-  TAdapter extends MojiAdapter<any>,
+  TAdapter extends MojiAdapter<any, any, any>,
   THandler extends AdapterHandlers<TAdapter>,
   THandlerFn extends NonNullable<TAdapter[THandler]>,
   TUrlReturn extends UrlWithCacheKeyReturnType = THandlerFn extends AdapterHandler<infer U, any> ? U : never,
