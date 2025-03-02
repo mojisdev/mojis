@@ -169,48 +169,48 @@ cli.command(
         )));
       }
 
-      if (isGeneratorEnabled("sequences")) {
-        if (adapter.sequences == null) {
-          throw new MojisNotImplemented("sequences");
-        }
+      // if (isGeneratorEnabled("sequences")) {
+      //   if (adapter.sequences == null) {
+      //     throw new MojisNotImplemented("sequences");
+      //   }
 
-        const { sequences, zwj } = await runAdapterHandler(adapter, "sequences", {
-          force,
-          emoji_version: version.emoji_version,
-          unicode_version: version.unicode_version,
-        });
+      //   const { sequences, zwj } = await runAdapterHandler(adapter, "sequences", {
+      //     force,
+      //     emoji_version: version.emoji_version,
+      //     unicode_version: version.unicode_version,
+      //   });
 
-        await fs.writeFile(
-          join(baseDir, "zwj-sequences.json"),
-          JSON.stringify(zwj, null, 2),
-          "utf-8",
-        );
+      //   await fs.writeFile(
+      //     join(baseDir, "zwj-sequences.json"),
+      //     JSON.stringify(zwj, null, 2),
+      //     "utf-8",
+      //   );
 
-        await fs.writeFile(
-          join(baseDir, "sequences.json"),
-          JSON.stringify(sequences, null, 2),
-          "utf-8",
-        );
-      }
+      //   await fs.writeFile(
+      //     join(baseDir, "sequences.json"),
+      //     JSON.stringify(sequences, null, 2),
+      //     "utf-8",
+      //   );
+      // }
 
-      if (isGeneratorEnabled("variations")) {
-        if (adapter.variations == null) {
-          throw new MojisNotImplemented("variations");
-        }
+      // if (isGeneratorEnabled("variations")) {
+      //   if (adapter.variations == null) {
+      //     throw new MojisNotImplemented("variations");
+      //   }
 
-        const variations = await runAdapterHandler(adapter, "variations", {
-          force,
-          emoji_version: version.emoji_version,
-          unicode_version: version.unicode_version,
-        });
+      //   const variations = await runAdapterHandler(adapter, "variations", {
+      //     force,
+      //     emoji_version: version.emoji_version,
+      //     unicode_version: version.unicode_version,
+      //   });
 
-        await fs.ensureDir(`./data/v${version}`);
-        await fs.writeFile(
-          `./data/v${version}/variations.json`,
-          JSON.stringify(variations, null, 2),
-          "utf-8",
-        );
-      }
+      //   await fs.ensureDir(`./data/v${version}`);
+      //   await fs.writeFile(
+      //     `./data/v${version}/variations.json`,
+      //     JSON.stringify(variations, null, 2),
+      //     "utf-8",
+      //   );
+      // }
 
       // if (isGeneratorEnabled("emojis")) {
       //   if (adapter.emojis == null) {
