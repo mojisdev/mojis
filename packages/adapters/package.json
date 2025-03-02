@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "@mojis/internal-utils": "workspace:*",
+    "defu": "^6.1.4",
     "semver": "^7.7.1"
   },
   "devDependencies": {

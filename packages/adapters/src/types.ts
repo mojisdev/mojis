@@ -2,19 +2,15 @@ import type {
   EmojiGroup,
   EmojiMetadata,
   EmojiSequence,
-  EmojiShortcode,
   EmojiVariation,
-  EmojiVersion,
-  ShortcodeProvider,
+  WriteCacheOptions,
 } from "@mojis/internal-utils";
 
-// TODO: find a better name
-interface EmojiDataStructure {
-  groups: EmojiGroup[];
-  emojis: Record<string, Record<string, EmojiMetadata>>;
-}
-
-export interface MojiAdapter {
+export interface MojiAdapter<
+  TMetadataUrlReturn extends CacheableUrlRequestReturnType,
+  TSequencesUrlReturn extends CacheableUrlRequestReturnType,
+  TVariationsUrlReturn extends CacheableUrlRequestReturnType,
+> {
   /**
    * The name of the adapter.
    */
@@ -36,44 +32,121 @@ export interface MojiAdapter {
   extend?: string;
 
   /**
-   * A function to get the emoji group metadata.
-   * @param {BaseAdapterContext} ctx The adapter context.
-   * @returns {Promise<EmojiDataStructure>} The emoji group metadata.
+   * The metadata handler for the adapter.
    */
-  metadata?: (ctx: BaseAdapterContext) => Promise<EmojiDataStructure>;
+  metadata?: AdapterHandler<
+    TMetadataUrlReturn,
+    ExtraContext<TMetadataUrlReturn>,
+    {
+      groups: EmojiGroup[];
+      emojis: Record<string, Record<string, EmojiMetadata>>;
+    },
+    any
+  >;
 
   /**
-   * A function to generate the emoji sequences for the specified version
-   * @param {BaseAdapterContext} ctx The adapter context.
-   * @returns {Promise<{ zwj: EmojiSequence[]; sequences: EmojiSequence[] }>} The emoji sequences.
+   * The sequences handler for the adapter.
    */
-  sequences?: (ctx: BaseAdapterContext) => Promise<{ zwj: EmojiSequence[]; sequences: EmojiSequence[] }>;
+  sequences?: AdapterHandler<
+    TSequencesUrlReturn,
+    ExtraContext<TSequencesUrlReturn>,
+    EmojiSequence[],
+    any
+  >;
 
   /**
-   * A function to generate shortcodes for emojis based on provided shortcode providers.
-   * @param {BaseAdapterContext & { providers: ShortcodeProvider[] }} ctx The adapter context with shortcode providers.
-   * @returns {Promise<Partial<Record<ShortcodeProvider, EmojiShortcode[]>>>} The generated shortcodes mapped by provider.
+   * The variations handler for the adapter.
    */
-  shortcodes?: (ctx: BaseAdapterContext & {
-    providers: ShortcodeProvider[];
-  }) => Promise<Partial<Record<ShortcodeProvider, EmojiShortcode[]>>>;
-
-  /**
-   * A function to get the emoji variations.
-   * @param {BaseAdapterContext} ctx The adapter context
-   * @returns {Promise<EmojiVariation[]>} The emoji variation.
-   */
-  variations?: (ctx: BaseAdapterContext) => Promise<EmojiVariation[]>;
-
-  /**
-   * A function to get the emojis.
-   * @param {BaseAdapterContext} ctx The adapter context.
-   * @returns {Promise<Record<string, string>>} The emojis.
-   */
-  emojis?: (ctx: BaseAdapterContext) => Promise<Record<string, string>>;
+  variations?: AdapterHandler<
+    TVariationsUrlReturn,
+    ExtraContext<TVariationsUrlReturn>,
+    EmojiVariation[],
+    any
+  >;
 }
 
-export interface BaseAdapterContext {
+type ExtraContext<T> = {
+  key: string;
+} & (T extends CacheableUrlRequest
+  ? T["extraContext"] extends Record<string, unknown>
+    ? T["extraContext"]
+    : Record<string, never>
+  : Record<string, never>);
+
+export interface CacheableUrlRequest {
+  /**
+   * The key for the data.
+   * If not provided, a key will be generated based on the url.
+   */
+  key?: string;
+
+  /**
+   * The url to fetch the data
+   * @example "https://example.com/data.json"
+   */
+  url: string;
+
+  /**
+   * The cache key for the data.
+   * If not provided, a key will be generated based on the url.
+   */
+  cacheKey?: string;
+
+  /**
+   * Extra data to be passed to the handler.
+   * @default {}
+   */
+  extraContext?: Record<string, unknown>;
+
+  /**
+   * The fetch options for the request.
+   * @default {}
+   *
+   * NOTE:
+   * This will be merged together with the `fetchOptions` of the handler.
+   */
+  fetchOptions?: RequestInit;
+
+  /**
+   * The cache options for the data.
+   * @default {}
+   *
+   * NOTE:
+   * This will be merged together with the `cacheOptions` of the handler.
+   */
+  cacheOptions?: Omit<WriteCacheOptions<any>, "transform">;
+}
+
+export type CacheableUrlRequestReturnType = CacheableUrlRequest | CacheableUrlRequest[] | undefined;
+
+export type ExtractDataTypeFromUrls<T extends CacheableUrlRequestReturnType> =
+T extends undefined ? undefined :
+  T extends CacheableUrlRequest ? string :
+    T extends CacheableUrlRequest[] ? string :
+      never;
+
+export interface AdapterHandler<
+  TUrlsReturn extends CacheableUrlRequestReturnType,
+  TExtraContext extends Record<string, unknown>,
+  TTransformOutput,
+  TOutput = TTransformOutput,
+> {
+  urls: (ctx: AdapterContext) => Promise<TUrlsReturn> | TUrlsReturn;
+
+  fetchOptions?: RequestInit;
+  cacheOptions?: Omit<WriteCacheOptions<any>, "transform">;
+
+  transform: (ctx: AdapterContext & TExtraContext, data: ExtractDataTypeFromUrls<TUrlsReturn>) => TTransformOutput;
+
+  aggregate?: (ctx: AdapterContext, data: [TTransformOutput, ...TTransformOutput[]]) => TOutput;
+}
+
+export type AdapterHandlers<TAdapter = MojiAdapter<any, any, any>> = {
+  [K in keyof TAdapter]: NonNullable<TAdapter[K]> extends AdapterHandler<any, any, any, any> ? K : never;
+}[keyof TAdapter];
+
+export interface AdapterContext {
   force: boolean;
-  versions: EmojiVersion;
+  emoji_version: string;
+  unicode_version: string;
 }

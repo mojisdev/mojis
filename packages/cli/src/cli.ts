@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import process from "node:process";
-import { resolveAdapter } from "@mojis/adapters";
+import { resolveAdapter, runAdapterHandler } from "@mojis/adapters";
 import {
   type EmojiVersion,
   getAllEmojiVersions,
@@ -10,7 +10,6 @@ import {
   type ShortcodeProvider,
 } from "@mojis/internal-utils";
 import { OFFICIAL_SUPPORTED_VERSIONS } from "@mojis/internal-utils/constants";
-import { SHORTCODE_PROVIDERS_SCHEMA } from "@mojis/internal-utils/schemas";
 import { green, red, yellow } from "farver/fast";
 import fs from "fs-extra";
 import semver from "semver";
@@ -51,8 +50,6 @@ cli.command(
     const force = args.force ?? false;
     const existingEmojiVersions = await getAllEmojiVersions();
 
-    console.debug("existing emoji versions", existingEmojiVersions);
-
     let providedVersions = (Array.isArray(args.versions) ? args.versions : [args.versions]) as string[];
 
     const generators = Array.isArray(args.generators) ? args.generators : [args.generators];
@@ -64,7 +61,7 @@ cli.command(
       process.exit(1);
     }
 
-    function isGeneratorEnabled(generator: string) {
+    function isGeneratorEnabled(generator: string): boolean {
       return generators.includes(generator);
     }
 
@@ -131,9 +128,6 @@ cli.command(
       console.warn(`will use the following fallbacks: ${notOfficialSupported.map((v) => `${yellow(v.emoji_version)} -> ${yellow(v.fallback)}`).join(", ")}`);
     }
 
-    console.log("versions", versions);
-    console.log("existingEmojiVersions", existingEmojiVersions);
-
     console.info("generating emoji data for versions", versions.map((v) => yellow(v.emoji_version)).join(", "));
     console.info(`using the following generators ${args.generators.map((g) => yellow(g)).join(", ")}`);
 
@@ -153,9 +147,10 @@ cli.command(
           throw new MojisNotImplemented("metadata");
         }
 
-        const { groups, emojis } = await adapter.metadata({
+        const { groups, emojis } = await runAdapterHandler(adapter, "metadata", {
           force,
-          versions: version,
+          emoji_version: version.emoji_version,
+          unicode_version: version.unicode_version,
         });
 
         await fs.ensureDir(join(baseDir, "metadata"));
@@ -178,9 +173,10 @@ cli.command(
           throw new MojisNotImplemented("sequences");
         }
 
-        const { sequences, zwj } = await adapter.sequences({
-          versions: version,
+        const { sequences, zwj } = await runAdapterHandler(adapter, "sequences", {
           force,
+          emoji_version: version.emoji_version,
+          unicode_version: version.unicode_version,
         });
 
         await fs.writeFile(
@@ -196,25 +192,24 @@ cli.command(
         );
       }
 
-      // if (isGeneratorEnabled("variations")) {
-      //   if (adapter.variations == null) {
-      //     throw new MojisNotImplemented("variations");
-      //   }
+      if (isGeneratorEnabled("variations")) {
+        if (adapter.variations == null) {
+          throw new MojisNotImplemented("variations");
+        }
 
-      //   const variations = await adapter.variations({
-      //     emojiVersion: version,
-      //     force,
-      //     unicodeVersion: getUnicodeVersionByEmojiVersion(version)!,
-      //     lockfileMetadata,
-      //   });
+        const variations = await runAdapterHandler(adapter, "variations", {
+          force,
+          emoji_version: version.emoji_version,
+          unicode_version: version.unicode_version,
+        });
 
-      //   await fs.ensureDir(`./data/v${version}`);
-      //   await fs.writeFile(
-      //     `./data/v${version}/variations.json`,
-      //     JSON.stringify(variations, null, 2),
-      //     "utf-8",
-      //   );
-      // }
+        await fs.ensureDir(`./data/v${version.emoji_version}`);
+        await fs.writeFile(
+          `./data/v${version.emoji_version}/variations.json`,
+          JSON.stringify(variations, null, 2),
+          "utf-8",
+        );
+      }
 
       // if (isGeneratorEnabled("emojis")) {
       //   if (adapter.emojis == null) {
@@ -253,38 +248,38 @@ cli.command(
       //   }
       // }
 
-      if (isGeneratorEnabled("shortcodes")) {
-        const providers = await SHORTCODE_PROVIDERS_SCHEMA.parseAsync(args["shortcode-providers"]);
+      // if (isGeneratorEnabled("shortcodes")) {
+      //   const providers = await SHORTCODE_PROVIDERS_SCHEMA.parseAsync(args["shortcode-providers"]);
 
-        if (providers.length === 0) {
-          throw new Error("no shortcode providers specified");
-        }
+      //   if (providers.length === 0) {
+      //     throw new Error("no shortcode providers specified");
+      //   }
 
-        if (adapter.shortcodes == null) {
-          throw new MojisNotImplemented("shortcodes");
-        }
+      //   if (adapter.shortcodes == null) {
+      //     throw new MojisNotImplemented("shortcodes");
+      //   }
 
-        const shortcodes = await adapter.shortcodes({
-          versions: version,
-          force,
-          providers,
-        });
+      //   const shortcodes = await adapter.shortcodes({
+      //     versions: version,
+      //     force,
+      //     providers,
+      //   });
 
-        await fs.ensureDir(join(baseDir, "shortcodes"));
+      //   await fs.ensureDir(join(baseDir, "shortcodes"));
 
-        for (const provider of providers) {
-          if (shortcodes[provider] == null) {
-            console.warn(`no shortcodes found for provider ${provider}`);
-            continue;
-          }
+      //   for (const provider of providers) {
+      //     if (shortcodes[provider] == null) {
+      //       console.warn(`no shortcodes found for provider ${provider}`);
+      //       continue;
+      //     }
 
-          await fs.writeFile(
-            join(baseDir, "shortcodes", `${provider}.json`),
-            JSON.stringify(shortcodes[provider], null, 2),
-            "utf-8",
-          );
-        }
-      }
+      //     await fs.writeFile(
+      //       join(baseDir, "shortcodes", `${provider}.json`),
+      //       JSON.stringify(shortcodes[provider], null, 2),
+      //       "utf-8",
+      //     );
+      //   }
+      // }
     });
 
     const results = await Promise.allSettled(promises);

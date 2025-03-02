@@ -192,3 +192,25 @@ export async function fetchCache<TData>(url: string, options: FetchCacheOptions<
 
   return parsedData;
 }
+
+/**
+ * Creates a cache key from a URL by replacing all file system unfriendly characters with underscores.
+ *
+ * This function ensures that the returned string can be safely used as a file name by replacing
+ * any characters that are not alphanumeric with underscores.
+ *
+ * @param {string} url - The URL to convert into a cache key
+ * @returns {string} A string that can be safely used as a file name or cache key
+ *
+ * @example
+ * ```ts
+ * createCacheKeyFromUrl("https://mojis.dev"); // "mojis_dev"
+ * createCacheKeyFromUrl("https://mojis.dev/emojis"); // "mojis_dev_emojis"
+ * ```
+ */
+export function createCacheKeyFromUrl(url: string): string {
+  const _url = new URL(url);
+  return (_url.hostname + _url.pathname)
+    .replace(/\/$/, "")
+    .replace(/[^a-z0-9]/gi, "_");
+}
