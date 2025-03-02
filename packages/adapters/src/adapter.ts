@@ -7,13 +7,17 @@ import type {
   MojiAdapter,
 } from "./types";
 import { type EmojiVersion, fetchCache } from "@mojis/internal-utils";
+import { defu } from "defu";
 import semver from "semver";
-
 import { baseAdapter } from "./adapters/_base/adapter";
 import { modernAdapter } from "./adapters/modern/adapter";
 
 interface AdapterRegistry {
-  [key: string]: MojiAdapter<any, any, any>;
+  [key: string]: MojiAdapter<
+    any, // metadata
+    any, // sequence
+    any // variations
+  >;
 }
 
 const ADAPTERS: AdapterRegistry = {
@@ -109,7 +113,7 @@ export async function runAdapterHandler<
   THandler extends AdapterHandlers<TAdapter>,
   THandlerFn extends NonNullable<TAdapter[THandler]>,
   TUrlReturn extends CacheableUrlRequestReturnType = THandlerFn extends AdapterHandler<infer U, any, any> ? U : never,
-  TCtx extends Record<string, unknown> = THandlerFn extends AdapterHandler<any, infer E, any> ? E : never,
+  TExtraContext extends Record<string, unknown> = THandlerFn extends AdapterHandler<any, infer E, any> ? E : never,
   TTransformOutput = THandlerFn extends AdapterHandler<any, any, infer V, any> ? V : never,
   TOutput = THandlerFn extends AdapterHandler<any, any, any, infer V> ? V : never,
 >(
@@ -118,7 +122,7 @@ export async function runAdapterHandler<
   ctx: AdapterContext,
 ): Promise<TOutput> {
   // we know this is an AdapterHandler because of the constraint on THandler
-  const handler = adapter[handlerName] as unknown as AdapterHandler<TUrlReturn, AdapterContext & TCtx, TTransformOutput, TOutput>;
+  const handler = adapter[handlerName] as unknown as AdapterHandler<TUrlReturn, AdapterContext & TExtraContext, TTransformOutput, TOutput>;
 
   if (!handler) {
     throw new Error(`Handler ${String(handlerName)} not found in adapter ${adapter.name}`);
@@ -137,34 +141,56 @@ export async function runAdapterHandler<
     return undefined;
   }
 
-  const cacheOptions = handler.cacheOptions || {};
-
   if (!Array.isArray(urlsResult)) {
+    const cacheOptions = defu(urlsResult.cacheOptions || {}, handler.cacheOptions || {});
+    const fetchOptions = defu(urlsResult.fetchOptions || {}, handler.fetchOptions || {});
+    const key = urlsResult.key ?? createKeyFromUrl(urlsResult.url);
+
+    const newCtx = {
+      ...urlsResult.extraContext,
+      key,
+      emoji_version: ctx.emoji_version,
+      force: ctx.force,
+      unicode_version: ctx.unicode_version,
+    } as AdapterContext & TExtraContext;
+
     const data = await fetchCache(urlsResult.url, {
       cacheKey: urlsResult.cacheKey,
       parser: (data) => data,
-      options: handler.fetchOptions,
+      options: fetchOptions,
       cacheFolder: cacheOptions.cacheFolder,
       encoding: cacheOptions.encoding,
       ttl: cacheOptions.ttl,
       bypassCache: ctx.force,
     });
 
-    return handler.transform(ctx as AdapterContext & TCtx, data as ExtractDataTypeFromUrls<TUrlReturn>);
+    return handler.transform(newCtx, data as ExtractDataTypeFromUrls<TUrlReturn>);
   }
 
   const promises = urlsResult.map(async (item) => {
+    const key = item.key ?? createKeyFromUrl(item.url);
+    const cacheOptions = defu(item.cacheOptions || {}, handler.cacheOptions || {});
+    const fetchOptions = defu(item.fetchOptions || {}, handler.fetchOptions || {});
+
     const data = await fetchCache(item.url, {
       cacheKey: item.cacheKey,
       parser: (data) => data,
-      options: handler.fetchOptions,
+      options: fetchOptions,
       cacheFolder: cacheOptions.cacheFolder,
       encoding: cacheOptions.encoding,
       ttl: cacheOptions.ttl,
       bypassCache: ctx.force,
     });
 
-    return handler.transform(ctx as AdapterContext & TCtx, data as ExtractDataTypeFromUrls<TUrlReturn>);
+    const newCtx = {
+      ...item.extraContext,
+      key,
+      emoji_version: ctx.emoji_version,
+      force: ctx.force,
+      unicode_version: ctx.unicode_version,
+    } as AdapterContext & TExtraContext;
+
+    return handler.transform(newCtx, data as ExtractDataTypeFromUrls<TUrlReturn>);
   });
 
   const results = await Promise.all(promises);
@@ -174,4 +200,10 @@ export async function runAdapterHandler<
   }
 
   return handler.aggregate(ctx, results);
+}
+
+function createKeyFromUrl(url: string): string {
+  // replace all file system unfriendly characters with _
+  // so #, ?, &, etc. are all replaced with _
+  return url.replace(/[^a-z0-9]/gi, "_");
 }
