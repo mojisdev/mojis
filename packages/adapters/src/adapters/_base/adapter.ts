@@ -17,6 +17,8 @@ function slugify(val: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+// These emoji versions doesn't seem to have a emoji-test,
+// where we can extract the metadata from.
 const DISALLOWED_EMOJI_VERSIONS = ["1.0", "2.0", "3.0"];
 
 export const baseAdapter = defineMojiAdapter({
