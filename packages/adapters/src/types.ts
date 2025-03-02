@@ -34,23 +34,36 @@ export interface MojiAdapter<
   /**
    * The metadata handler for the adapter.
    */
-  metadata?: AdapterHandler<TMetadataUrlReturn, ExtraContext<TMetadataUrlReturn>, {
-    groups: EmojiGroup[];
-    emojis: Record<string, Record<string, EmojiMetadata>>;
-  }>;
+  metadata?: AdapterHandler<
+    TMetadataUrlReturn,
+    ExtraContext<TMetadataUrlReturn>,
+    {
+      groups: EmojiGroup[];
+      emojis: Record<string, Record<string, EmojiMetadata>>;
+    }
+  >;
 
   /**
    * The sequences handler for the adapter.
    */
-  sequences?: AdapterHandler<TSequencesUrlReturn, ExtraContext<TSequencesUrlReturn>, EmojiSequence[], {
-    sequences: EmojiSequence[];
-    zwj: EmojiSequence[];
-  }>;
+  sequences?: AdapterHandler<
+    TSequencesUrlReturn,
+    ExtraContext<TSequencesUrlReturn>,
+    EmojiSequence[],
+    {
+      sequences: EmojiSequence[];
+      zwj: EmojiSequence[];
+    }
+  >;
 
   /**
    * The variations handler for the adapter.
    */
-  variations?: AdapterHandler<TVariationsUrlReturn, ExtraContext<TVariationsUrlReturn>, EmojiVariation[]>;
+  variations?: AdapterHandler<
+    TVariationsUrlReturn,
+    ExtraContext<TVariationsUrlReturn>,
+    EmojiVariation[]
+  >;
 }
 
 type ExtraContext<T> = {
