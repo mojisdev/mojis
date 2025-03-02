@@ -23,26 +23,17 @@ export const modernAdapter = defineMojiAdapter({
     },
     transform(ctx, data) {
       if (data == null) {
-        return {
-          sequences: [],
-          zwj: [],
-        };
+        return [];
       }
 
       const sequences: EmojiSequence[] = [];
-      const zwj: EmojiSequence[] = [];
 
-      for (const __data of data) {
-        if (__data == null) {
+      for (const _data of data) {
+        if (_data == null) {
           throw new Error("invalid data");
         }
 
-        const { key, data: _data } = __data;
-
         const lines = _data.split("\n");
-
-        const isZwj = key === "zwj";
-        const internal = isZwj ? zwj : sequences;
 
         for (let line of lines) {
           // skip empty line & comments
@@ -65,7 +56,7 @@ export const modernAdapter = defineMojiAdapter({
           const expandedHex = expandHexRange(hex);
 
           for (const hex of expandedHex) {
-            internal.push({
+            sequences.push({
               hex: hex.replace(/\s+/g, "-"),
               property,
               description,
@@ -75,9 +66,12 @@ export const modernAdapter = defineMojiAdapter({
         }
       }
 
+      return sequences;
+    },
+    aggregate(ctx, data) {
       return {
-        sequences,
-        zwj,
+        sequences: data[0],
+        zwj: data[0],
       };
     },
   },

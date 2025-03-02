@@ -110,14 +110,15 @@ export async function runAdapterHandler<
   THandlerFn extends NonNullable<TAdapter[THandler]>,
   TUrlReturn extends CacheableUrlRequestReturnType = THandlerFn extends AdapterHandler<infer U, any, any> ? U : never,
   TCtx extends Record<string, unknown> = THandlerFn extends AdapterHandler<any, infer E, any> ? E : never,
-  TOutput = THandlerFn extends AdapterHandler<any, any, infer V> ? V : never,
+  TTransformOutput = THandlerFn extends AdapterHandler<any, any, infer V, any> ? V : never,
+  TOutput = THandlerFn extends AdapterHandler<any, any, any, infer V> ? V : never,
 >(
   adapter: TAdapter,
   handlerName: THandler,
   ctx: AdapterContext,
 ): Promise<TOutput> {
   // we know this is an AdapterHandler because of the constraint on THandler
-  const handler = adapter[handlerName] as unknown as AdapterHandler<TUrlReturn, AdapterContext & TCtx, TOutput>;
+  const handler = adapter[handlerName] as unknown as AdapterHandler<TUrlReturn, AdapterContext & TCtx, TTransformOutput, TOutput>;
 
   if (!handler) {
     throw new Error(`Handler ${String(handlerName)} not found in adapter ${adapter.name}`);

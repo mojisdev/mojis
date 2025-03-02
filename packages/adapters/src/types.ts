@@ -42,7 +42,7 @@ export interface MojiAdapter<
   /**
    * The sequences handler for the adapter.
    */
-  sequences?: AdapterHandler<TSequencesUrlReturn, ExtraContext<TSequencesUrlReturn>, {
+  sequences?: AdapterHandler<TSequencesUrlReturn, ExtraContext<TSequencesUrlReturn>, EmojiSequence[], {
     sequences: EmojiSequence[];
     zwj: EmojiSequence[];
   }>;
@@ -117,20 +117,21 @@ T extends undefined ? undefined :
 export interface AdapterHandler<
   TUrlsReturn extends CacheableUrlRequestReturnType,
   TExtraContext extends Record<string, unknown>,
-  TOutput,
+  TTransformOutput,
+  TOutput = TTransformOutput,
 > {
   urls: (ctx: AdapterContext) => Promise<TUrlsReturn> | TUrlsReturn;
 
   fetchOptions?: RequestInit;
   cacheOptions?: Omit<WriteCacheOptions<any>, "transform">;
 
-  transform: (ctx: AdapterContext & TExtraContext, data: ExtractDataTypeFromUrls<TUrlsReturn>) => TOutput;
+  transform: (ctx: AdapterContext & TExtraContext, data: ExtractDataTypeFromUrls<TUrlsReturn>) => TTransformOutput;
 
-  aggregate?: (ctx: AdapterContext, data: TOutput[]) => TOutput;
+  aggregate?: (ctx: AdapterContext, data: [TTransformOutput, ...TTransformOutput[]]) => TOutput;
 }
 
 export type AdapterHandlers<TAdapter = MojiAdapter<any, any, any>> = {
-  [K in keyof TAdapter]: NonNullable<TAdapter[K]> extends AdapterHandler<any, any, any> ? K : never;
+  [K in keyof TAdapter]: NonNullable<TAdapter[K]> extends AdapterHandler<any, any, any, any> ? K : never;
 }[keyof TAdapter];
 
 export interface AdapterContext {
