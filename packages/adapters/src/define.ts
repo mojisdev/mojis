@@ -1,4 +1,4 @@
-import type { AdapterHandler, MojiAdapter, UrlWithCacheKeyReturnType } from "./types";
+import type { AdapterHandler, MojiAdapter, CacheableUrlRequestReturnType } from "./types";
 import semver from "semver";
 
 /**
@@ -22,9 +22,9 @@ import semver from "semver";
  * ```
  */
 export function defineMojiAdapter<
-  TMetadataUrlReturn extends UrlWithCacheKeyReturnType,
-  TSequencesUrlReturn extends UrlWithCacheKeyReturnType,
-  TVariationsUrlReturn extends UrlWithCacheKeyReturnType,
+  TMetadataUrlReturn extends CacheableUrlRequestReturnType,
+  TSequencesUrlReturn extends CacheableUrlRequestReturnType,
+  TVariationsUrlReturn extends CacheableUrlRequestReturnType,
 >(adapter: MojiAdapter<
   TMetadataUrlReturn,
   TSequencesUrlReturn,

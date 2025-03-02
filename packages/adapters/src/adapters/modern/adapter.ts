@@ -21,7 +21,7 @@ export const modernAdapter = defineMojiAdapter({
         },
       ];
     },
-    transform(_, data) {
+    transform(ctx, data) {
       if (data == null) {
         return {
           sequences: [],

@@ -2,9 +2,9 @@ import type {
   AdapterContext,
   AdapterHandler,
   AdapterHandlers,
+  CacheableUrlRequestReturnType,
   ExtractDataTypeFromUrls,
   MojiAdapter,
-  UrlWithCacheKeyReturnType,
 } from "./types";
 import { type EmojiVersion, fetchCache } from "@mojis/internal-utils";
 import semver from "semver";
@@ -71,9 +71,9 @@ export function resolveAdapter<T extends EmojiVersion>(
 }
 
 function extendAdapter<
-  TMetadataUrlReturn extends UrlWithCacheKeyReturnType,
-  TSequencesUrlReturn extends UrlWithCacheKeyReturnType,
-  TVariationsUrlReturn extends UrlWithCacheKeyReturnType,
+  TMetadataUrlReturn extends CacheableUrlRequestReturnType,
+  TSequencesUrlReturn extends CacheableUrlRequestReturnType,
+  TVariationsUrlReturn extends CacheableUrlRequestReturnType,
 >(
   adapter: MojiAdapter<
     TMetadataUrlReturn,
@@ -108,15 +108,15 @@ export async function runAdapterHandler<
   TAdapter extends MojiAdapter<any, any, any>,
   THandler extends AdapterHandlers<TAdapter>,
   THandlerFn extends NonNullable<TAdapter[THandler]>,
-  TUrlReturn extends UrlWithCacheKeyReturnType = THandlerFn extends AdapterHandler<infer U, any> ? U : never,
-  TOutput = THandlerFn extends AdapterHandler<any, infer V> ? V : never,
+  TUrlReturn extends CacheableUrlRequestReturnType = THandlerFn extends AdapterHandler<infer U, any, any> ? U : never,
+  TOutput = THandlerFn extends AdapterHandler<any, any, infer V> ? V : never,
 >(
   adapter: TAdapter,
   handlerName: THandler,
   ctx: AdapterContext,
 ): Promise<TOutput> {
   // we know this is an AdapterHandler because of the constraint on THandler
-  const handler = adapter[handlerName] as unknown as AdapterHandler<TUrlReturn, TOutput>;
+  const handler = adapter[handlerName] as unknown as AdapterHandler<TUrlReturn, any, TOutput>;
 
   if (!handler) {
     throw new Error(`Handler ${String(handlerName)} not found in adapter ${adapter.name}`);
@@ -137,26 +137,7 @@ export async function runAdapterHandler<
 
   const cacheOptions = handler.cacheOptions || {};
 
-  // handle multiple urls
-  if (Array.isArray(urlsResult)) {
-    const dataPromises = urlsResult.map((item) =>
-      fetchCache(item.url, {
-        cacheKey: item.cacheKey,
-        parser: (data) => data,
-        options: handler.fetchOptions,
-        cacheFolder: cacheOptions.cacheFolder,
-        encoding: cacheOptions.encoding,
-        ttl: cacheOptions.ttl,
-        bypassCache: ctx.force,
-      }),
-    );
-    const dataArray = await Promise.all(dataPromises);
-
-    return handler.transform(ctx, dataArray.map((data, index) => ({
-      key: urlsResult[index]!.key,
-      data,
-    })) as ExtractDataTypeFromUrls<TUrlReturn>);
-  } else {
+  if (!Array.isArray(urlsResult)) {
     const data = await fetchCache(urlsResult.url, {
       cacheKey: urlsResult.cacheKey,
       parser: (data) => data,
@@ -166,6 +147,29 @@ export async function runAdapterHandler<
       ttl: cacheOptions.ttl,
       bypassCache: ctx.force,
     });
+
     return handler.transform(ctx, data as ExtractDataTypeFromUrls<TUrlReturn>);
   }
+
+  const promises = urlsResult.map(async (item) => {
+    const data = await fetchCache(item.url, {
+      cacheKey: item.cacheKey,
+      parser: (data) => data,
+      options: handler.fetchOptions,
+      cacheFolder: cacheOptions.cacheFolder,
+      encoding: cacheOptions.encoding,
+      ttl: cacheOptions.ttl,
+      bypassCache: ctx.force,
+    });
+
+    return handler.transform(ctx, data as ExtractDataTypeFromUrls<TUrlReturn>);
+  });
+
+  const results = await Promise.all(promises);
+
+  if (handler.aggregate == null) {
+    throw new Error(`Handler ${String(handlerName)} in adapter ${adapter.name} does not have an aggregate function`);
+  }
+
+  return handler.aggregate(ctx, results);
 }
