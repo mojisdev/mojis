@@ -21,57 +21,55 @@ export const modernAdapter = defineMojiAdapter({
         },
       ];
     },
-    transform(ctx, data) {
+    transform(_, data) {
       if (data == null) {
         return [];
       }
 
       const sequences: EmojiSequence[] = [];
 
-      for (const _data of data) {
-        if (_data == null) {
-          throw new Error("invalid data");
+      if (data == null) {
+        throw new Error("invalid data");
+      }
+
+      const lines = data.split("\n");
+
+      for (let line of lines) {
+        // skip empty line & comments
+        if (line.trim() === "" || line.startsWith("#")) {
+          continue;
         }
 
-        const lines = _data.split("\n");
+        // remove line comment
+        const commentIndex = line.indexOf("#");
+        if (commentIndex !== -1) {
+          line = line.slice(0, commentIndex).trim();
+        }
 
-        for (let line of lines) {
-          // skip empty line & comments
-          if (line.trim() === "" || line.startsWith("#")) {
-            continue;
-          }
+        const [hex, property, description] = line.split(";").map((col) => col.trim()).slice(0, 4);
 
-          // remove line comment
-          const commentIndex = line.indexOf("#");
-          if (commentIndex !== -1) {
-            line = line.slice(0, commentIndex).trim();
-          }
+        if (hex == null || property == null || description == null) {
+          throw new Error(`invalid line: ${line}`);
+        }
 
-          const [hex, property, description] = line.split(";").map((col) => col.trim()).slice(0, 4);
+        const expandedHex = expandHexRange(hex);
 
-          if (hex == null || property == null || description == null) {
-            throw new Error(`invalid line: ${line}`);
-          }
-
-          const expandedHex = expandHexRange(hex);
-
-          for (const hex of expandedHex) {
-            sequences.push({
-              hex: hex.replace(/\s+/g, "-"),
-              property,
-              description,
-              gender: hex.includes(FEMALE_SIGN) ? "female" : hex.includes(MALE_SIGN) ? "male" : null,
-            });
-          }
+        for (const hex of expandedHex) {
+          sequences.push({
+            hex: hex.replace(/\s+/g, "-"),
+            property,
+            description,
+            gender: hex.includes(FEMALE_SIGN) ? "female" : hex.includes(MALE_SIGN) ? "male" : null,
+          });
         }
       }
 
       return sequences;
     },
-    aggregate(ctx, data) {
+    aggregate(_, data) {
       return {
         sequences: data[0],
-        zwj: data[0],
+        zwj: data[1],
       };
     },
   },

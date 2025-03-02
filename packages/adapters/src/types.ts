@@ -40,7 +40,8 @@ export interface MojiAdapter<
     {
       groups: EmojiGroup[];
       emojis: Record<string, Record<string, EmojiMetadata>>;
-    }
+    },
+    any
   >;
 
   /**
@@ -50,10 +51,7 @@ export interface MojiAdapter<
     TSequencesUrlReturn,
     ExtraContext<TSequencesUrlReturn>,
     EmojiSequence[],
-    {
-      sequences: EmojiSequence[];
-      zwj: EmojiSequence[];
-    }
+    any
   >;
 
   /**
@@ -62,7 +60,8 @@ export interface MojiAdapter<
   variations?: AdapterHandler<
     TVariationsUrlReturn,
     ExtraContext<TVariationsUrlReturn>,
-    EmojiVariation[]
+    EmojiVariation[],
+    any
   >;
 }
 
