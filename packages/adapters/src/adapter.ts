@@ -2,10 +2,9 @@ import type {
   AdapterContext,
   AdapterHandler,
   AdapterHandlers,
-  CacheableUrlRequest,
-  CacheableUrlRequestReturnType,
   ExtractDataTypeFromUrls,
   MojiAdapter,
+  UrlWithCacheKeyReturnType,
 } from "./types";
 import { type EmojiVersion, fetchCache } from "@mojis/internal-utils";
 import semver from "semver";
@@ -14,7 +13,7 @@ import { baseAdapter } from "./adapters/_base/adapter";
 import { modernAdapter } from "./adapters/modern/adapter";
 
 interface AdapterRegistry {
-  [key: string]: MojiAdapter<any>;
+  [key: string]: MojiAdapter<any, any, any>;
 }
 
 const ADAPTERS: AdapterRegistry = {
@@ -23,9 +22,13 @@ const ADAPTERS: AdapterRegistry = {
 };
 
 type ExtractAdapterType<T> = T extends MojiAdapter<
-  infer Metadata
+  infer Metadata,
+  infer Sequences,
+  infer Variations
 > ? MojiAdapter<
-    Metadata
+    Metadata,
+    Sequences,
+    Variations
   > : never;
 
 export function resolveAdapter<T extends EmojiVersion>(
@@ -68,13 +71,19 @@ export function resolveAdapter<T extends EmojiVersion>(
 }
 
 function extendAdapter<
-  TMetadataUrlReturn extends CacheableUrlRequestReturnType,
+  TMetadataUrlReturn extends UrlWithCacheKeyReturnType,
+  TSequencesUrlReturn extends UrlWithCacheKeyReturnType,
+  TVariationsUrlReturn extends UrlWithCacheKeyReturnType,
 >(
   adapter: MojiAdapter<
-    TMetadataUrlReturn
+    TMetadataUrlReturn,
+    TSequencesUrlReturn,
+    TVariationsUrlReturn
   >,
 ): MojiAdapter<
-    TMetadataUrlReturn
+    TMetadataUrlReturn,
+    TSequencesUrlReturn,
+    TVariationsUrlReturn
   > {
   if (adapter.extend == null) {
     return adapter;
@@ -89,24 +98,25 @@ function extendAdapter<
   }
 
   return Object.assign({}, parent, adapter) as MojiAdapter<
-    TMetadataUrlReturn
+    TMetadataUrlReturn,
+    TSequencesUrlReturn,
+    TVariationsUrlReturn
   >;
 }
 
 export async function runAdapterHandler<
-  TAdapter extends MojiAdapter<any>,
+  TAdapter extends MojiAdapter<any, any, any>,
   THandler extends AdapterHandlers<TAdapter>,
   THandlerFn extends NonNullable<TAdapter[THandler]>,
-  TUrlReturn extends CacheableUrlRequestReturnType = THandlerFn extends AdapterHandler<infer U, any, any> ? U : never,
-  TCtx extends Record<string, unknown> = THandlerFn extends AdapterHandler<any, infer E, any> ? E : never,
-  TOutput = THandlerFn extends AdapterHandler<any, any, infer V> ? V : never,
+  TUrlReturn extends UrlWithCacheKeyReturnType = THandlerFn extends AdapterHandler<infer U, any> ? U : never,
+  TOutput = THandlerFn extends AdapterHandler<any, infer V> ? V : never,
 >(
   adapter: TAdapter,
   handlerName: THandler,
   ctx: AdapterContext,
-): Promise<TUrlReturn extends CacheableUrlRequest[] ? TOutput[] : TOutput | undefined> {
+): Promise<TOutput> {
   // we know this is an AdapterHandler because of the constraint on THandler
-  const handler = adapter[handlerName] as unknown as AdapterHandler<TUrlReturn, AdapterContext & TCtx, TOutput>;
+  const handler = adapter[handlerName] as unknown as AdapterHandler<TUrlReturn, TOutput>;
 
   if (!handler) {
     throw new Error(`Handler ${String(handlerName)} not found in adapter ${adapter.name}`);
@@ -117,20 +127,38 @@ export async function runAdapterHandler<
     throw new Error(`Handler ${String(handlerName)} in adapter ${adapter.name} does not have a urls function`);
   }
 
-  const _urlsResult = await handler.urls(ctx);
+  const urlsResult = await handler.urls(ctx);
 
   // early return for undefined
-  if (_urlsResult === undefined) {
+  if (urlsResult === undefined) {
     // @ts-expect-error - we're returning undefined but TypeScript doesn't know this matches TOutput
     return undefined;
   }
+
   const cacheOptions = handler.cacheOptions || {};
 
-  const urlsResult = Array.isArray(_urlsResult) ? _urlsResult : [_urlsResult];
+  // handle multiple urls
+  if (Array.isArray(urlsResult)) {
+    const dataPromises = urlsResult.map((item) =>
+      fetchCache(item.url, {
+        cacheKey: item.cacheKey,
+        parser: (data) => data,
+        options: handler.fetchOptions,
+        cacheFolder: cacheOptions.cacheFolder,
+        encoding: cacheOptions.encoding,
+        ttl: cacheOptions.ttl,
+        bypassCache: ctx.force,
+      }),
+    );
+    const dataArray = await Promise.all(dataPromises);
 
-  const promises = urlsResult.map(async (item) => {
-    const result = await fetchCache(item.url, {
-      cacheKey: item.cacheKey,
+    return handler.transform(ctx, dataArray.map((data, index) => ({
+      key: urlsResult[index]!.key,
+      data,
+    })) as ExtractDataTypeFromUrls<TUrlReturn>);
+  } else {
+    const data = await fetchCache(urlsResult.url, {
+      cacheKey: urlsResult.cacheKey,
       parser: (data) => data,
       options: handler.fetchOptions,
       cacheFolder: cacheOptions.cacheFolder,
@@ -138,26 +166,6 @@ export async function runAdapterHandler<
       ttl: cacheOptions.ttl,
       bypassCache: ctx.force,
     });
-
-    const newCtx = {
-      ...ctx,
-      ...item.extraCtx,
-      key: generateKeyFromUrl(item.url),
-    } as TCtx;
-
-    return handler.transform(newCtx, result as ExtractDataTypeFromUrls<TUrlReturn>);
-  });
-
-  const results = await Promise.all(promises);
-
-  if (results.length === 1) {
-    return results[0];
+    return handler.transform(ctx, data as ExtractDataTypeFromUrls<TUrlReturn>);
   }
-
-  return results;
-}
-
-function generateKeyFromUrl(url: string): string {
-  // replace :, /, #, ?, & and . with _
-  return url.replace(/[:/#?&.]/g, "_");
 }
