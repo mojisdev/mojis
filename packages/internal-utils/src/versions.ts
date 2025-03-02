@@ -1,6 +1,7 @@
 import type { z } from "zod";
 import type { EMOJI_VERSION_SCHEMA } from "./schemas";
 import semver from "semver";
+import { NON_EXISTING_VERSIONS } from "./constants";
 
 export const MAPPED_EMOJI_VERSIONS: Record<string, string> = {
   "1.0": "8.0",
@@ -25,14 +26,6 @@ export const MAPPED_EMOJI_VERSIONS: Record<string, string> = {
 export function toSemverCompatible(version: string): string | null {
   return semver.coerce(version)?.version || null;
 }
-
-/**
- * These versions don't exist in the Unicode Consortium's emoji versioning scheme.
- * This is because they aligned the emoji version with the Unicode version starting from v11.
- *
- * So actually, the emoji version v11.0 is v6.0
- */
-export const NON_EXISTING_VERSIONS = ["6.x", "7.x", "8.x", "9.x", "10.x"];
 
 // TODO: find a better name for this type, when the schema has been changed
 export type EmojiVersion = z.infer<typeof EMOJI_VERSION_SCHEMA>;
