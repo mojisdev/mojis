@@ -1,9 +1,5 @@
-import type { MojiAdapter } from "./types";
+import type { AdapterHandler, MojiAdapter, UrlWithCacheKeyReturnType } from "./types";
 import semver from "semver";
-
-type MojiAdapterFunctionNames<T> = {
-  [K in keyof T]: NonNullable<T[K]> extends (...args: any[]) => any ? K : never;
-}[keyof T];
 
 /**
  * Validates and defines a Moji adapter configuration.
@@ -25,7 +21,9 @@ type MojiAdapterFunctionNames<T> = {
  * });
  * ```
  */
-export function defineMojiAdapter(adapter: MojiAdapter): MojiAdapter {
+export function defineMojiAdapter<
+  TMetadataUrlReturn extends UrlWithCacheKeyReturnType,
+>(adapter: MojiAdapter<TMetadataUrlReturn>): MojiAdapter<TMetadataUrlReturn> {
   // validate the adapter has name, description, range.
   if (!adapter.name) {
     throw new Error(`adapter.name is required`);
@@ -44,23 +42,27 @@ export function defineMojiAdapter(adapter: MojiAdapter): MojiAdapter {
     throw new Error(`adapter.range is not a valid semver range ${adapter.range}`);
   }
 
-  if (adapter.extend == null) {
-    // verify the adapter has the required functions.
+  // if (adapter.extend == null) {
+  //   // verify the adapter has the required functions.
 
-    // TODO: figure out how we can make it throw type error if the adapter is missing a required function
-    const REQUIRED_FUNCTIONS = [
-      "sequences",
-      "metadata",
-      "shortcodes",
-      "variations",
-      "emojis",
-    ] satisfies NonNullable<MojiAdapterFunctionNames<MojiAdapter>>[];
+  //   // TODO: figure out how we can make it throw type error if the adapter is missing a required function
+  //   const REQUIRED_FUNCTIONS = [
+  //     "sequences",
+  //     "metadata",
+  //     "shortcodes",
+  //     "variations",
+  //     "emojis",
+  //   ] satisfies NonNullable<MojiAdapterFunctionNames<MojiAdapter>>[];
 
-    const missingFunctions = REQUIRED_FUNCTIONS.filter((fn) => adapter[fn] == null);
-    if (missingFunctions.length > 0) {
-      throw new Error(`adapter ${adapter.name} is missing required functions: ${missingFunctions.join(", ")}`);
-    }
-  }
+  //   const missingFunctions = REQUIRED_FUNCTIONS.filter((fn) => adapter[fn] == null);
+  //   if (missingFunctions.length > 0) {
+  //     throw new Error(`adapter ${adapter.name} is missing required functions: ${missingFunctions.join(", ")}`);
+  //   }
+  // }
 
   return adapter;
 }
+
+// export function defineAdapterGroupFn<THandler extends AdapterHandler, TKey extends keyof TGroup>(fn: TGroup[TKey]): TGroup[TKey] {
+//   return fn;
+// }

@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import process from "node:process";
-import { resolveAdapter } from "@mojis/adapters";
+import { resolveAdapter, runAdapterHandler } from "@mojis/adapters";
 import {
   type EmojiVersion,
   getAllEmojiVersions,
@@ -50,8 +50,6 @@ cli.command(
   async (args) => {
     const force = args.force ?? false;
     const existingEmojiVersions = await getAllEmojiVersions();
-
-    console.debug("existing emoji versions", existingEmojiVersions);
 
     let providedVersions = (Array.isArray(args.versions) ? args.versions : [args.versions]) as string[];
 
@@ -131,9 +129,6 @@ cli.command(
       console.warn(`will use the following fallbacks: ${notOfficialSupported.map((v) => `${yellow(v.emoji_version)} -> ${yellow(v.fallback)}`).join(", ")}`);
     }
 
-    console.log("versions", versions);
-    console.log("existingEmojiVersions", existingEmojiVersions);
-
     console.info("generating emoji data for versions", versions.map((v) => yellow(v.emoji_version)).join(", "));
     console.info(`using the following generators ${args.generators.map((g) => yellow(g)).join(", ")}`);
 
@@ -153,9 +148,10 @@ cli.command(
           throw new MojisNotImplemented("metadata");
         }
 
-        const { groups, emojis } = await adapter.metadata({
+        const { groups, emojis } = await runAdapterHandler(adapter, "metadata", {
           force,
-          versions: version,
+          emoji_version: version.emoji_version,
+          unicode_version: version.unicode_version,
         });
 
         await fs.ensureDir(join(baseDir, "metadata"));
@@ -173,28 +169,28 @@ cli.command(
         )));
       }
 
-      if (isGeneratorEnabled("sequences")) {
-        if (adapter.sequences == null) {
-          throw new MojisNotImplemented("sequences");
-        }
+      // if (isGeneratorEnabled("sequences")) {
+      //   if (adapter.sequences == null) {
+      //     throw new MojisNotImplemented("sequences");
+      //   }
 
-        const { sequences, zwj } = await adapter.sequences({
-          versions: version,
-          force,
-        });
+      //   const { sequences, zwj } = await adapter.sequences({
+      //     versions: version,
+      //     force,
+      //   });
 
-        await fs.writeFile(
-          join(baseDir, "zwj-sequences.json"),
-          JSON.stringify(zwj, null, 2),
-          "utf-8",
-        );
+      //   await fs.writeFile(
+      //     join(baseDir, "zwj-sequences.json"),
+      //     JSON.stringify(zwj, null, 2),
+      //     "utf-8",
+      //   );
 
-        await fs.writeFile(
-          join(baseDir, "sequences.json"),
-          JSON.stringify(sequences, null, 2),
-          "utf-8",
-        );
-      }
+      //   await fs.writeFile(
+      //     join(baseDir, "sequences.json"),
+      //     JSON.stringify(sequences, null, 2),
+      //     "utf-8",
+      //   );
+      // }
 
       // if (isGeneratorEnabled("variations")) {
       //   if (adapter.variations == null) {
@@ -253,38 +249,38 @@ cli.command(
       //   }
       // }
 
-      if (isGeneratorEnabled("shortcodes")) {
-        const providers = await SHORTCODE_PROVIDERS_SCHEMA.parseAsync(args["shortcode-providers"]);
+      // if (isGeneratorEnabled("shortcodes")) {
+      //   const providers = await SHORTCODE_PROVIDERS_SCHEMA.parseAsync(args["shortcode-providers"]);
 
-        if (providers.length === 0) {
-          throw new Error("no shortcode providers specified");
-        }
+      //   if (providers.length === 0) {
+      //     throw new Error("no shortcode providers specified");
+      //   }
 
-        if (adapter.shortcodes == null) {
-          throw new MojisNotImplemented("shortcodes");
-        }
+      //   if (adapter.shortcodes == null) {
+      //     throw new MojisNotImplemented("shortcodes");
+      //   }
 
-        const shortcodes = await adapter.shortcodes({
-          versions: version,
-          force,
-          providers,
-        });
+      //   const shortcodes = await adapter.shortcodes({
+      //     versions: version,
+      //     force,
+      //     providers,
+      //   });
 
-        await fs.ensureDir(join(baseDir, "shortcodes"));
+      //   await fs.ensureDir(join(baseDir, "shortcodes"));
 
-        for (const provider of providers) {
-          if (shortcodes[provider] == null) {
-            console.warn(`no shortcodes found for provider ${provider}`);
-            continue;
-          }
+      //   for (const provider of providers) {
+      //     if (shortcodes[provider] == null) {
+      //       console.warn(`no shortcodes found for provider ${provider}`);
+      //       continue;
+      //     }
 
-          await fs.writeFile(
-            join(baseDir, "shortcodes", `${provider}.json`),
-            JSON.stringify(shortcodes[provider], null, 2),
-            "utf-8",
-          );
-        }
-      }
+      //     await fs.writeFile(
+      //       join(baseDir, "shortcodes", `${provider}.json`),
+      //       JSON.stringify(shortcodes[provider], null, 2),
+      //       "utf-8",
+      //     );
+      //   }
+      // }
     });
 
     const results = await Promise.allSettled(promises);

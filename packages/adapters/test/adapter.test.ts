@@ -1,6 +1,6 @@
 import type { MojiAdapter } from "../src/types";
 import { describe, expect, it } from "vitest";
-import { defineMojiAdapter } from "../src/define-adapter";
+import { defineMojiAdapter } from "../src/define";
 
 function castToMojiAdapter<T extends Partial<Record<keyof MojiAdapter, unknown>>>(adapter: T): MojiAdapter {
   return adapter as unknown as MojiAdapter;

@@ -1,25 +1,38 @@
-import type { EmojiVersion } from "@mojis/internal-utils";
-import type { MojiAdapter } from "./types";
+import type {
+  AdapterContext,
+  AdapterHandler,
+  AdapterHandlers,
+  ExtractDataTypeFromUrls,
+  MojiAdapter,
+  UrlWithCacheKeyReturnType,
+} from "./types";
+import { type EmojiVersion, fetchCache } from "@mojis/internal-utils";
 import semver from "semver";
 
 import { baseAdapter } from "./adapters/_base/adapter";
 import { modernAdapter } from "./adapters/modern/adapter";
-import { preAlignmentAdapter } from "./adapters/pre-alignment/adapter";
 
-const ADAPTERS = new Map<string, MojiAdapter>([
-  ["base", baseAdapter],
-  ["modern", modernAdapter],
-  ["pre-alignment", preAlignmentAdapter],
-]);
+interface AdapterRegistry {
+  [key: string]: MojiAdapter<any>;
+}
 
-export function resolveAdapter(emojiVersion: EmojiVersion): MojiAdapter | null {
+const ADAPTERS: AdapterRegistry = {
+  base: baseAdapter,
+  modern: modernAdapter,
+};
+
+type ExtractAdapterType<T> = T extends MojiAdapter<infer U> ? MojiAdapter<U> : never;
+
+export function resolveAdapter<T extends EmojiVersion>(
+  emojiVersion: T,
+): ExtractAdapterType<typeof baseAdapter> | ExtractAdapterType<typeof modernAdapter> | null {
   const version = semver.coerce(emojiVersion.emoji_version);
 
   if (version == null) {
     throw new Error(`invalid emoji version ${emojiVersion.emoji_version}`);
   }
 
-  const matchingAdapters = Array.from(ADAPTERS.values()).filter((adapter) =>
+  const matchingAdapters = Object.values(ADAPTERS).filter((adapter) =>
     semver.satisfies(version, adapter.range),
   );
 
@@ -49,16 +62,71 @@ export function resolveAdapter(emojiVersion: EmojiVersion): MojiAdapter | null {
   return null;
 }
 
-function extendAdapter(adapter: MojiAdapter): MojiAdapter {
+function extendAdapter<T extends UrlWithCacheKeyReturnType>(
+  adapter: MojiAdapter<T>,
+): MojiAdapter<T> {
   if (adapter.extend == null) {
     return adapter;
   }
 
-  const parent = ADAPTERS.get(adapter.extend);
+  const parent = ADAPTERS[adapter.extend];
 
   if (parent == null) {
-    throw new Error(`adapter ${adapter.name} extends ${adapter.extend}, but ${adapter.extend} is not registered`);
+    throw new Error(
+      `adapter ${adapter.name} extends ${adapter.extend}, but ${adapter.extend} is not registered`,
+    );
   }
 
-  return Object.assign({}, parent, adapter);
+  return Object.assign({}, parent, adapter) as MojiAdapter<T>;
+}
+
+export async function runAdapterHandler<
+  TAdapter extends MojiAdapter<any>,
+  THandler extends AdapterHandlers<TAdapter>,
+  THandlerFn extends NonNullable<TAdapter[THandler]>,
+  TUrlReturn extends UrlWithCacheKeyReturnType = THandlerFn extends AdapterHandler<infer U, any> ? U : never,
+  TOutput = THandlerFn extends AdapterHandler<any, infer V> ? V : never,
+>(
+  adapter: TAdapter,
+  handlerName: THandler,
+  ctx: AdapterContext,
+): Promise<TOutput> {
+  // we know this is an AdapterHandler because of the constraint on THandler
+  const handler = adapter[handlerName] as unknown as AdapterHandler<TUrlReturn, TOutput>;
+
+  if (!handler) {
+    throw new Error(`Handler ${String(handlerName)} not found in adapter ${adapter.name}`);
+  }
+
+  // check if urls method exists
+  if (!handler.urls) {
+    throw new Error(`Handler ${String(handlerName)} in adapter ${adapter.name} does not have a urls function`);
+  }
+
+  const urlsResult = await handler.urls(ctx);
+
+  // early return for undefined
+  if (urlsResult === undefined) {
+    // @ts-expect-error - we're returning undefined but TypeScript doesn't know this matches TOutput
+    return undefined;
+  }
+
+  // handle multiple urls
+  if (Array.isArray(urlsResult)) {
+    const dataPromises = urlsResult.map((item) =>
+      fetchCache(item.url, {
+        cacheKey: item.cacheKey,
+        parser: (data) => data,
+      }),
+    );
+
+    const dataArray = await Promise.all(dataPromises);
+    return handler.transform(ctx, dataArray as ExtractDataTypeFromUrls<TUrlReturn>);
+  } else {
+    const data = await fetchCache(urlsResult.url, {
+      cacheKey: urlsResult.cacheKey,
+      parser: (data) => data,
+    });
+    return handler.transform(ctx, data as ExtractDataTypeFromUrls<TUrlReturn>);
+  }
 }

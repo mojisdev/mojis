@@ -8,13 +8,9 @@ import type {
   ShortcodeProvider,
 } from "@mojis/internal-utils";
 
-// TODO: find a better name
-interface EmojiDataStructure {
-  groups: EmojiGroup[];
-  emojis: Record<string, Record<string, EmojiMetadata>>;
-}
-
-export interface MojiAdapter {
+export interface MojiAdapter<
+  TMetadataUrlReturn extends UrlWithCacheKeyReturnType,
+> {
   /**
    * The name of the adapter.
    */
@@ -36,44 +32,41 @@ export interface MojiAdapter {
   extend?: string;
 
   /**
-   * A function to get the emoji group metadata.
-   * @param {BaseAdapterContext} ctx The adapter context.
-   * @returns {Promise<EmojiDataStructure>} The emoji group metadata.
+   * The metadata handler for the adapter.
    */
-  metadata?: (ctx: BaseAdapterContext) => Promise<EmojiDataStructure>;
-
-  /**
-   * A function to generate the emoji sequences for the specified version
-   * @param {BaseAdapterContext} ctx The adapter context.
-   * @returns {Promise<{ zwj: EmojiSequence[]; sequences: EmojiSequence[] }>} The emoji sequences.
-   */
-  sequences?: (ctx: BaseAdapterContext) => Promise<{ zwj: EmojiSequence[]; sequences: EmojiSequence[] }>;
-
-  /**
-   * A function to generate shortcodes for emojis based on provided shortcode providers.
-   * @param {BaseAdapterContext & { providers: ShortcodeProvider[] }} ctx The adapter context with shortcode providers.
-   * @returns {Promise<Partial<Record<ShortcodeProvider, EmojiShortcode[]>>>} The generated shortcodes mapped by provider.
-   */
-  shortcodes?: (ctx: BaseAdapterContext & {
-    providers: ShortcodeProvider[];
-  }) => Promise<Partial<Record<ShortcodeProvider, EmojiShortcode[]>>>;
-
-  /**
-   * A function to get the emoji variations.
-   * @param {BaseAdapterContext} ctx The adapter context
-   * @returns {Promise<EmojiVariation[]>} The emoji variation.
-   */
-  variations?: (ctx: BaseAdapterContext) => Promise<EmojiVariation[]>;
-
-  /**
-   * A function to get the emojis.
-   * @param {BaseAdapterContext} ctx The adapter context.
-   * @returns {Promise<Record<string, string>>} The emojis.
-   */
-  emojis?: (ctx: BaseAdapterContext) => Promise<Record<string, string>>;
+  metadata?: AdapterHandler<TMetadataUrlReturn, {
+    groups: EmojiGroup[];
+    emojis: Record<string, Record<string, EmojiMetadata>>;
+  }>;
 }
 
-export interface BaseAdapterContext {
+export interface UrlWithCacheKey {
+  url: string;
+  cacheKey: string;
+}
+
+export type UrlWithCacheKeyReturnType = UrlWithCacheKey | UrlWithCacheKey[] | undefined;
+
+export type ExtractDataTypeFromUrls<T extends UrlWithCacheKeyReturnType> =
+T extends undefined ? undefined :
+  T extends UrlWithCacheKey ? string :
+    T extends UrlWithCacheKey[] ? string[] :
+      never;
+
+export interface AdapterHandler<
+  TUrlsReturn extends UrlWithCacheKeyReturnType,
+  TOutput,
+> {
+  urls?: (ctx: AdapterContext) => Promise<TUrlsReturn> | TUrlsReturn;
+  transform: (ctx: AdapterContext, data: ExtractDataTypeFromUrls<TUrlsReturn>) => TOutput;
+}
+
+export type AdapterHandlers<TAdapter = MojiAdapter<any>> = {
+  [K in keyof TAdapter]: NonNullable<TAdapter[K]> extends AdapterHandler<any, any> ? K : never;
+}[keyof TAdapter];
+
+export interface AdapterContext {
   force: boolean;
-  versions: EmojiVersion;
+  emoji_version: string;
+  unicode_version: string;
 }
