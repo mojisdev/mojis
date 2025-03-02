@@ -35,20 +35,20 @@
   "dependencies": {
     "@mojis/adapters": "workspace:*",
     "@mojis/internal-utils": "workspace:*",
-    "farver": "^0.4.0",
-    "fs-extra": "^11.3.0",
-    "semver": "^7.7.1",
-    "yargs": "^17.7.2",
-    "zod": "^3.24.2"
+    "farver": "catalog:",
+    "fs-extra": "catalog:",
+    "semver": "catalog:",
+    "yargs": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@luxass/eslint-config": "^4.15.0",
-    "@types/fs-extra": "^11.0.4",
-    "@types/semver": "^7.5.8",
-    "@types/yargs": "^17.0.33",
-    "eslint": "^9.21.0",
-    "tsup": "^8.3.6",
-    "typescript": "^5.7.3"
+    "@luxass/eslint-config": "catalog:",
+    "@types/fs-extra": "catalog:",
+    "@types/semver": "catalog:",
+    "@types/yargs": "catalog:",
+    "eslint": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
   },
   "publishConfig": {
     "access": "public"
