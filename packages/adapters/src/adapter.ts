@@ -11,6 +11,7 @@ import { defu } from "defu";
 import semver from "semver";
 import { baseAdapter } from "./adapters/_base/adapter";
 import { modernAdapter } from "./adapters/modern/adapter";
+import { preAlignmentAdapter } from "./adapters/pre-alignment/adapter";
 
 interface AdapterRegistry {
   [key: string]: MojiAdapter<
@@ -23,6 +24,7 @@ interface AdapterRegistry {
 const ADAPTERS: AdapterRegistry = {
   base: baseAdapter,
   modern: modernAdapter,
+  preAlignment: preAlignmentAdapter,
 };
 
 type ExtractAdapterType<T> = T extends MojiAdapter<
