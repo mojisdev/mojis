@@ -34,7 +34,7 @@ importers:
         version: 3.0.6(@types/debug@4.1.12)(@types/node@22.13.5)(yaml@2.7.0)
       vitest-fetch-mock:
         specifier: ^0.4.3
-        version: 0.4.3(vitest@3.0.6(@types/debug@4.1.12)(@types/node@22.13.5)(yaml@2.7.0))
+        version: 0.4.4(vitest@3.0.6(@types/debug@4.1.12)(@types/node@22.13.5)(yaml@2.7.0))
 
   packages/adapters:
     dependencies:
@@ -2413,8 +2413,8 @@ packages:
       yaml:
         optional: true
 
-  vitest-fetch-mock@0.4.3:
-    resolution: {integrity: sha512-PhuEh+9HCsXFMRPUJilDL7yVDFufoxqk7ze+CNks64UGlfFXaJTn1bLABiNlEc0u25RERXQGj0Tm+M9i6UY9HQ==}
+  vitest-fetch-mock@0.4.4:
+    resolution: {integrity: sha512-i2RNEAKBgnLWwj5DVz8ouzaHaPVg1xaYgAUmU5p+baJ149upnO+yJLPchAiY9ij8hf0PDkJVVke1pftBxmT05g==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       vitest: '>=2.0.0'
@@ -5016,7 +5016,7 @@ snapshots:
       fsevents: 2.3.3
       yaml: 2.7.0
 
-  vitest-fetch-mock@0.4.3(vitest@3.0.6(@types/debug@4.1.12)(@types/node@22.13.5)(yaml@2.7.0)):
+  vitest-fetch-mock@0.4.4(vitest@3.0.6(@types/debug@4.1.12)(@types/node@22.13.5)(yaml@2.7.0)):
     dependencies:
       vitest: 3.0.6(@types/debug@4.1.12)(@types/node@22.13.5)(yaml@2.7.0)
 
