@@ -89,9 +89,8 @@ export interface CacheableUrlRequest {
   /**
    * The cache key for the data.
    * If not provided, a key will be generated based on the url.
-   * @default ""
    */
-  cacheKey: string;
+  cacheKey?: string;
 
   /**
    * Extra data to be passed to the handler.

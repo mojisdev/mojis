@@ -155,7 +155,7 @@ export async function runAdapterHandler<
     } as unknown as AdapterContext & TExtraContext;
 
     const data = await fetchCache(urlsResult.url, {
-      cacheKey: urlsResult.cacheKey,
+      cacheKey: urlsResult.cacheKey ?? `v${ctx.emoji_version}/${createKeyFromUrl(urlsResult.url)}`,
       parser: (data) => data,
       options: fetchOptions,
       cacheFolder: cacheOptions.cacheFolder,
@@ -173,7 +173,7 @@ export async function runAdapterHandler<
     const fetchOptions = defu(item.fetchOptions || {}, handler.fetchOptions || {});
 
     const data = await fetchCache(item.url, {
-      cacheKey: item.cacheKey,
+      cacheKey: item.cacheKey ?? `v${ctx.emoji_version}/${createKeyFromUrl(item.url)}`,
       parser: (data) => data,
       options: fetchOptions,
       cacheFolder: cacheOptions.cacheFolder,
