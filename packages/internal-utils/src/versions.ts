@@ -405,12 +405,19 @@ export function mapEmojiVersionToUnicodeVersion(emojiVersion: string): string {
  * ```
  */
 export function getLatestEmojiVersion(versions: EmojiVersion[]): EmojiVersion | null {
-  // filter draft versions out, and sort by using semver.
-  const filtered = versions.filter((v) => !v.draft).sort((a, b) => semver.compare(`${b.emoji_version}.0`, `${a.emoji_version}.0`));
+  // filter draft versions & invalid out and sort by using semver.
+  const filtered = versions
+    .filter((v) => !v.draft)
+    .map((v) => ({
+      original: v,
+      semver: toSemverCompatible(v.emoji_version),
+    }))
+    .filter((v): v is { original: EmojiVersion; semver: string } => v.semver !== null)
+    .sort((a, b) => semver.compare(b.semver, a.semver));
 
   if (!filtered.length || filtered[0] == null) {
     return null;
   }
 
-  return filtered[0];
+  return filtered[0].original;
 }

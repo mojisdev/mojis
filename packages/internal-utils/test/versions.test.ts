@@ -139,3 +139,93 @@ describe("convert to semver compatible version", () => {
     },
   );
 });
+
+describe("get latest emoji version", () => {
+  it("returns the latest non-draft version", () => {
+    const versions: EmojiVersion[] = [
+      { emoji_version: "15.1", unicode_version: "15.1", draft: false },
+      { emoji_version: "15.0", unicode_version: "15.0", draft: false },
+      { emoji_version: "15.2", unicode_version: "15.2", draft: true }, // Drafts should be excluded
+    ];
+
+    const result = getLatestEmojiVersion(versions);
+    expect(result).toEqual({
+      emoji_version: "15.1",
+      unicode_version: "15.1",
+      draft: false,
+    });
+  });
+
+  it("returns null if all versions are drafts", () => {
+    const versions: EmojiVersion[] = [
+      { emoji_version: "15.0", unicode_version: "15.0", draft: true },
+      { emoji_version: "15.1", unicode_version: "15.1", draft: true },
+    ];
+
+    const result = getLatestEmojiVersion(versions);
+    expect(result).toBeNull();
+  });
+
+  it("returns null if no versions are provided", () => {
+    const result = getLatestEmojiVersion([]);
+    expect(result).toBeNull();
+  });
+
+  it("returns the only non-draft version if only one is available", () => {
+    const versions: EmojiVersion[] = [
+      { emoji_version: "14.0", unicode_version: "14.0", draft: true },
+      { emoji_version: "15.0", unicode_version: "15.0", draft: false },
+    ];
+
+    const result = getLatestEmojiVersion(versions);
+    expect(result).toEqual({
+      emoji_version: "15.0",
+      unicode_version: "15.0",
+      draft: false,
+    });
+  });
+
+  it("handles versions out of order", () => {
+    const versions: EmojiVersion[] = [
+      { emoji_version: "15.0", unicode_version: "15.0", draft: false },
+      { emoji_version: "14.0", unicode_version: "14.0", draft: false },
+      { emoji_version: "15.1", unicode_version: "15.1", draft: false },
+    ];
+
+    const result = getLatestEmojiVersion(versions);
+    expect(result).toEqual({
+      emoji_version: "15.1",
+      unicode_version: "15.1",
+      draft: false,
+    });
+  });
+
+  it("handles versions with fallback included", () => {
+    const versions: EmojiVersion[] = [
+      { emoji_version: "15.0", unicode_version: "15.0", draft: false },
+      { emoji_version: "15.1", unicode_version: "15.1", draft: false, fallback: "some-fallback" },
+    ];
+
+    const result = getLatestEmojiVersion(versions);
+    expect(result).toEqual({
+      emoji_version: "15.1",
+      unicode_version: "15.1",
+      draft: false,
+      fallback: "some-fallback",
+    });
+  });
+
+  it("ignores invalid versions gracefully (if the function doesn't validate)", () => {
+    const versions: EmojiVersion[] = [
+      { emoji_version: "invalid", unicode_version: "15.0", draft: false },
+      { emoji_version: "15.0", unicode_version: "15.0", draft: false },
+    ];
+
+    const result = getLatestEmojiVersion(versions);
+    expect(result).toEqual({
+      emoji_version: "15.0",
+      unicode_version: "15.0",
+      draft: false,
+    });
+  });
+});
