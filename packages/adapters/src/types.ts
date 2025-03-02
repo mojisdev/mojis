@@ -7,6 +7,7 @@ import type {
   EmojiVersion,
   ShortcodeProvider,
 } from "@mojis/internal-utils";
+import type { WriteCacheOptions } from "packages/internal-utils/dist";
 
 export interface MojiAdapter<
   TMetadataUrlReturn extends UrlWithCacheKeyReturnType,
@@ -73,6 +74,8 @@ export interface AdapterHandler<
   TOutput,
 > {
   urls?: (ctx: AdapterContext) => Promise<TUrlsReturn> | TUrlsReturn;
+  fetchOptions?: RequestInit;
+  cacheOptions?: Omit<WriteCacheOptions<any>, "transform">;
   transform: (ctx: AdapterContext, data: ExtractDataTypeFromUrls<TUrlsReturn>) => TOutput;
 }
 

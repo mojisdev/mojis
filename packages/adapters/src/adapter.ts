@@ -135,12 +135,19 @@ export async function runAdapterHandler<
     return undefined;
   }
 
+  const cacheOptions = handler.cacheOptions || {};
+
   // handle multiple urls
   if (Array.isArray(urlsResult)) {
     const dataPromises = urlsResult.map((item) =>
       fetchCache(item.url, {
         cacheKey: item.cacheKey,
         parser: (data) => data,
+        options: handler.fetchOptions,
+        cacheFolder: cacheOptions.cacheFolder,
+        encoding: cacheOptions.encoding,
+        ttl: cacheOptions.ttl,
+        bypassCache: ctx.force,
       }),
     );
 
@@ -150,6 +157,11 @@ export async function runAdapterHandler<
     const data = await fetchCache(urlsResult.url, {
       cacheKey: urlsResult.cacheKey,
       parser: (data) => data,
+      options: handler.fetchOptions,
+      cacheFolder: cacheOptions.cacheFolder,
+      encoding: cacheOptions.encoding,
+      ttl: cacheOptions.ttl,
+      bypassCache: ctx.force,
     });
     return handler.transform(ctx, data as ExtractDataTypeFromUrls<TUrlReturn>);
   }
