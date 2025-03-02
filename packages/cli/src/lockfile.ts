@@ -1,12 +1,12 @@
 import path from "node:path";
 import process from "node:process";
-import { EMOJI_VERSION_SCHEMA } from "@mojis/internal-utils/schemas";
+import { EMOJI_SPEC_RECORD_SCHEMA } from "@mojis/internal-utils/schemas";
 import fs from "fs-extra";
 import z from "zod";
 
 const LOCKFILE_SCHEMA = z.object({
   latest_version: z.string().nullable().optional(),
-  versions: z.array(EMOJI_VERSION_SCHEMA),
+  versions: z.array(EMOJI_SPEC_RECORD_SCHEMA),
 });
 
 export type EmojiLockfile = z.infer<typeof LOCKFILE_SCHEMA>;
