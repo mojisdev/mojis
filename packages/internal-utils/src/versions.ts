@@ -14,6 +14,19 @@ export const MAPPED_EMOJI_VERSIONS: Record<string, string> = {
 };
 
 /**
+ * Converts a version string to a semver compatible version.
+ *
+ * @param {string} version - The version string to convert
+ * @returns {string | null} The semver compatible version string or null if the version cannot be coerced
+ *
+ * NOTE:
+ * Emoji Versions is almost always major.minor format.
+ */
+export function toSemverCompatible(version: string): string | null {
+  return semver.coerce(version)?.version || null;
+}
+
+/**
  * These versions don't exist in the Unicode Consortium's emoji versioning scheme.
  * This is because they aligned the emoji version with the Unicode version starting from v11.
  *
