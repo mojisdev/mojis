@@ -61,7 +61,7 @@ cli.command(
       process.exit(1);
     }
 
-    function isGeneratorEnabled(generator: string) {
+    function isGeneratorEnabled(generator: string): boolean {
       return generators.includes(generator);
     }
 
@@ -203,9 +203,9 @@ cli.command(
           unicode_version: version.unicode_version,
         });
 
-        await fs.ensureDir(`./data/v${version}`);
+        await fs.ensureDir(`./data/v${version.emoji_version}`);
         await fs.writeFile(
-          `./data/v${version}/variations.json`,
+          `./data/v${version.emoji_version}/variations.json`,
           JSON.stringify(variations, null, 2),
           "utf-8",
         );
