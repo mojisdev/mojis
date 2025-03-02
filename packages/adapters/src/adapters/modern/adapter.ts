@@ -28,10 +28,6 @@ export const modernAdapter = defineMojiAdapter({
 
       const sequences: EmojiSequence[] = [];
 
-      if (data == null) {
-        throw new Error("invalid data");
-      }
-
       const lines = data.split("\n");
 
       for (let line of lines) {
