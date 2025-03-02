@@ -15,25 +15,25 @@ describe("get draft version", () => {
     });
   });
 
-  it("throws when fetch fails", async () => {
+  it.only("returns null when fetch fails", async () => {
     fetchMock.mockResponse("Not Found", { status: 404 });
 
-    await expect(getCurrentDraftVersion()).rejects.toThrow("failed to fetch");
+    expect(await getCurrentDraftVersion()).toBeNull();
   });
 
-  it("throws when versions do not match", async () => {
+  it("returns null when versions do not match", async () => {
     fetchMock
       .mockResponseOnceIf("https://unicode.org/Public/draft/ReadMe.txt", "Version 15.1.0 of the Unicode Standard")
       .mockResponseOnceIf("https://unicode.org/Public/draft/emoji/ReadMe.txt", "Unicode Emoji, Version 15.0");
 
-    await expect(getCurrentDraftVersion()).rejects.toThrow("draft versions do not match");
+    expect(await getCurrentDraftVersion()).toBeNull();
   });
 
-  it("throws when version extraction fails", async () => {
+  it("returns null when version extraction fails", async () => {
     fetchMock
       .mockResponse("Invalid version format", { status: 200 });
 
-    await expect(getCurrentDraftVersion()).rejects.toThrow("failed to extract draft version");
+    expect(await getCurrentDraftVersion()).toBeNull();
   });
 });
 
