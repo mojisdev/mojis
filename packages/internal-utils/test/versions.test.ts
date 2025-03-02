@@ -15,7 +15,7 @@ describe("get draft version", () => {
     });
   });
 
-  it.only("returns null when fetch fails", async () => {
+  it("returns null when fetch fails", async () => {
     fetchMock.mockResponse("Not Found", { status: 404 });
 
     expect(await getCurrentDraftVersion()).toBeNull();
