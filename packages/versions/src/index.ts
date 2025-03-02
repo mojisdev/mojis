@@ -1,7 +1,13 @@
-import type { z } from "zod";
-import type { EMOJI_VERSION_SCHEMA } from "./schemas";
+import type { EmojiSpecRecord } from "@mojis/internal-utils";
 import semver from "semver";
-import { NON_EXISTING_VERSIONS } from "./constants";
+
+/**
+ * These versions don't exist in the Unicode Consortium's emoji versioning scheme.
+ * This is because they aligned the emoji version with the Unicode version starting from v11.
+ *
+ * So actually, the emoji version v11.0 is v6.0
+ */
+export const NON_EXISTING_VERSIONS = ["6.x", "7.x", "8.x", "9.x", "10.x"];
 
 export const MAPPED_EMOJI_VERSIONS: Record<string, string> = {
   "1.0": "8.0",
@@ -26,9 +32,6 @@ export const MAPPED_EMOJI_VERSIONS: Record<string, string> = {
 export function toSemverCompatible(version: string): string | null {
   return semver.coerce(version)?.version || null;
 }
-
-// TODO: find a better name for this type, when the schema has been changed
-export type EmojiVersion = z.infer<typeof EMOJI_VERSION_SCHEMA>;
 
 export interface DraftVersion {
   emoji_version: string;
@@ -195,10 +198,10 @@ export function extractUnicodeVersion(emojiVersion: string | null, unicodeVersio
  * 4. Normalizes version numbers to valid semver format
  *
  * @throws {Error} When either the root or emoji page fetch fails
- * @returns {Promise<EmojiVersion[]>} A promise that resolves to an array of emoji versions,
+ * @returns {Promise<EmojiSpecRecord[]>} A promise that resolves to an array of emoji versions,
  *                             sorted according to semver rules
  */
-export async function getAllEmojiVersions(): Promise<EmojiVersion[]> {
+export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
   const [rootResult, emojiResult] = await Promise.allSettled([
     "https://unicode.org/Public/",
     "https://unicode.org/Public/emoji/",
@@ -236,7 +239,7 @@ export async function getAllEmojiVersions(): Promise<EmojiVersion[]> {
     throw new Error("failed to fetch draft version");
   }
 
-  const versions: EmojiVersion[] = [];
+  const versions: EmojiSpecRecord[] = [];
 
   for (const match of rootHtml.matchAll(versionRegex)) {
     if (match == null || match[1] == null) continue;
@@ -369,8 +372,8 @@ export function mapEmojiVersionToUnicodeVersion(emojiVersion: string): string {
 /**
  * Gets the latest non-draft emoji version from an array of emoji versions.
  *
- * @param {EmojiVersion[]} versions - An array of emoji versions to search through
- * @returns {EmojiVersion | null} The latest non-draft emoji version, or null if no valid versions found
+ * @param {EmojiSpecRecord[]} versions - An array of emoji versions to search through
+ * @returns {EmojiSpecRecord | null} The latest non-draft emoji version, or null if no valid versions found
  *
  * @example
  * ```ts
@@ -383,7 +386,7 @@ export function mapEmojiVersionToUnicodeVersion(emojiVersion: string): string {
  * // Returns: { emoji_version: "15.1", draft: false }
  * ```
  */
-export function getLatestEmojiVersion(versions: EmojiVersion[]): EmojiVersion | null {
+export function getLatestEmojiVersion(versions: EmojiSpecRecord[]): EmojiSpecRecord | null {
   // filter draft versions & invalid out and sort by using semver.
   const filtered = versions
     .filter((v) => !v.draft)
@@ -391,7 +394,7 @@ export function getLatestEmojiVersion(versions: EmojiVersion[]): EmojiVersion | 
       original: v,
       semver: toSemverCompatible(v.emoji_version),
     }))
-    .filter((v): v is { original: EmojiVersion; semver: string } => v.semver !== null)
+    .filter((v): v is { original: EmojiSpecRecord; semver: string } => v.semver !== null)
     .sort((a, b) => semver.compare(b.semver, a.semver));
 
   if (!filtered.length || filtered[0] == null) {

@@ -5,7 +5,6 @@ export * from "./constants";
 export * from "./hexcode";
 export * from "./shortcodes";
 export type * from "./types";
-export * from "./versions";
 
 export class MojisNotImplemented extends Error {
   constructor(message: string) {

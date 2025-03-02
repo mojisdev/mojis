@@ -1,6 +1,10 @@
 import fs from "node:fs";
 import { describe, expect, it } from "vitest";
-import { type EmojiVersion, extractEmojiVersion, extractVersionFromReadme, getCurrentDraftVersion, getLatestEmojiVersion, mapEmojiVersionToUnicodeVersion, toSemverCompatible } from "../src/versions";
+import {
+  extractEmojiVersion,
+  extractVersionFromReadme, getCurrentDraftVersion, getLatestEmojiVersion, mapEmojiVersionToUnicodeVersion, toSemverCompatible
+} from "../src";
+import type { EmojiSpecRecord } from "@mojis/internal-utils";
 
 describe("get draft version", () => {
   it("returns draft versions when fetches succeed and versions match", async () => {
@@ -142,7 +146,7 @@ describe("convert to semver compatible version", () => {
 
 describe("get latest emoji version", () => {
   it("returns the latest non-draft version", () => {
-    const versions: EmojiVersion[] = [
+    const versions: EmojiSpecRecord[] = [
       { emoji_version: "15.1", unicode_version: "15.1", draft: false },
       { emoji_version: "15.0", unicode_version: "15.0", draft: false },
       { emoji_version: "15.2", unicode_version: "15.2", draft: true }, // Drafts should be excluded
@@ -157,7 +161,7 @@ describe("get latest emoji version", () => {
   });
 
   it("returns null if all versions are drafts", () => {
-    const versions: EmojiVersion[] = [
+    const versions: EmojiSpecRecord[] = [
       { emoji_version: "15.0", unicode_version: "15.0", draft: true },
       { emoji_version: "15.1", unicode_version: "15.1", draft: true },
     ];
@@ -172,7 +176,7 @@ describe("get latest emoji version", () => {
   });
 
   it("returns the only non-draft version if only one is available", () => {
-    const versions: EmojiVersion[] = [
+    const versions: EmojiSpecRecord[] = [
       { emoji_version: "14.0", unicode_version: "14.0", draft: true },
       { emoji_version: "15.0", unicode_version: "15.0", draft: false },
     ];
@@ -186,7 +190,7 @@ describe("get latest emoji version", () => {
   });
 
   it("handles versions out of order", () => {
-    const versions: EmojiVersion[] = [
+    const versions: EmojiSpecRecord[] = [
       { emoji_version: "15.0", unicode_version: "15.0", draft: false },
       { emoji_version: "14.0", unicode_version: "14.0", draft: false },
       { emoji_version: "15.1", unicode_version: "15.1", draft: false },
@@ -201,7 +205,7 @@ describe("get latest emoji version", () => {
   });
 
   it("handles versions with fallback included", () => {
-    const versions: EmojiVersion[] = [
+    const versions: EmojiSpecRecord[] = [
       { emoji_version: "15.0", unicode_version: "15.0", draft: false },
       { emoji_version: "15.1", unicode_version: "15.1", draft: false, fallback: "some-fallback" },
     ];
@@ -216,7 +220,7 @@ describe("get latest emoji version", () => {
   });
 
   it("ignores invalid versions gracefully (if the function doesn't validate)", () => {
-    const versions: EmojiVersion[] = [
+    const versions: EmojiSpecRecord[] = [
       { emoji_version: "invalid", unicode_version: "15.0", draft: false },
       { emoji_version: "15.0", unicode_version: "15.0", draft: false },
     ];

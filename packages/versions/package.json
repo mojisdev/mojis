@@ -1,0 +1,53 @@
+{
+  "name": "@mojis/versions",
+  "version": "0.0.0",
+  "type": "module",
+  "author": {
+    "name": "Lucas Nørgård",
+    "email": "lucasnrgaard@gmail.com",
+    "url": "https://luxass.dev"
+  },
+  "packageManager": "pnpm@10.4.1",
+  "license": "MIT",
+  "homepage": "https://github.com/mojisdev/mojis",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mojisdev/mojis.git",
+    "directory": "packages/versions"
+  },
+  "bugs": {
+    "url": "https://github.com/mojisdev/mojis/issues"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup --tsconfig tsconfig.build.json",
+    "dev": "tsup --tsconfig tsconfig.build.json --watch",
+    "clean": "git clean -xdf dist node_modules",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mojis/internal-utils": "workspace:*",
+    "semver": "^7.7.1"
+  },
+  "devDependencies": {
+    "@luxass/eslint-config": "^4.15.0",
+    "@types/semver": "^7.5.8",
+    "eslint": "^9.21.0",
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3",
+    "vitest-testdirs": "^2.1.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
