@@ -7,7 +7,7 @@
     "email": "lucasnrgaard@gmail.com",
     "url": "https://luxass.dev"
   },
-  "packageManager": "pnpm@10.4.1",
+  "packageManager": "pnpm@10.5.2",
   "license": "MIT",
   "homepage": "https://github.com/mojisdev/mojis",
   "repository": {
@@ -37,15 +37,15 @@
   },
   "dependencies": {
     "@mojis/internal-utils": "workspace:*",
-    "defu": "^6.1.4",
-    "semver": "^7.7.1"
+    "defu": "catalog:",
+    "semver": "catalog:"
   },
   "devDependencies": {
-    "@luxass/eslint-config": "^4.15.0",
-    "@types/semver": "^7.5.8",
-    "eslint": "^9.21.0",
-    "tsup": "^8.3.6",
-    "typescript": "^5.7.3"
+    "@luxass/eslint-config": "catalog:",
+    "@types/semver": "catalog:",
+    "eslint": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
   },
   "publishConfig": {
     "access": "public"
