@@ -2,17 +2,14 @@ import type {
   EmojiGroup,
   EmojiMetadata,
   EmojiSequence,
-  EmojiShortcode,
   EmojiVariation,
-  EmojiVersion,
-  ShortcodeProvider,
+  WriteCacheOptions,
 } from "@mojis/internal-utils";
-import type { WriteCacheOptions } from "packages/internal-utils/dist";
 
 export interface MojiAdapter<
-  TMetadataUrlReturn extends UrlWithCacheKeyReturnType,
-  TSequencesUrlReturn extends UrlWithCacheKeyReturnType,
-  TVariationsUrlReturn extends UrlWithCacheKeyReturnType,
+  TMetadataUrlReturn extends CacheableUrlRequestReturnType,
+  TSequencesUrlReturn extends CacheableUrlRequestReturnType,
+  TVariationsUrlReturn extends CacheableUrlRequestReturnType,
 > {
   /**
    * The name of the adapter.
@@ -37,54 +34,116 @@ export interface MojiAdapter<
   /**
    * The metadata handler for the adapter.
    */
-  metadata?: AdapterHandler<TMetadataUrlReturn, {
-    groups: EmojiGroup[];
-    emojis: Record<string, Record<string, EmojiMetadata>>;
-  }>;
+  metadata?: AdapterHandler<
+    TMetadataUrlReturn,
+    ExtraContext<TMetadataUrlReturn>,
+    {
+      groups: EmojiGroup[];
+      emojis: Record<string, Record<string, EmojiMetadata>>;
+    },
+    any
+  >;
 
   /**
    * The sequences handler for the adapter.
    */
-  sequences?: AdapterHandler<TSequencesUrlReturn, {
-    sequences: EmojiSequence[];
-    zwj: EmojiSequence[];
-  }>;
+  sequences?: AdapterHandler<
+    TSequencesUrlReturn,
+    ExtraContext<TSequencesUrlReturn>,
+    EmojiSequence[],
+    any
+  >;
 
   /**
    * The variations handler for the adapter.
    */
-  variations?: AdapterHandler<TVariationsUrlReturn, EmojiVariation[]>;
+  variations?: AdapterHandler<
+    TVariationsUrlReturn,
+    ExtraContext<TVariationsUrlReturn>,
+    EmojiVariation[],
+    any
+  >;
 }
 
-export interface UrlWithCacheKey {
-  url: string;
-  cacheKey: string;
-}
-
-export interface UrlWithCacheKeyAndKey extends UrlWithCacheKey {
+type ExtraContext<T> = {
   key: string;
+} & (T extends CacheableUrlRequest
+  ? T["extraContext"] extends Record<string, unknown>
+    ? T["extraContext"]
+    : Record<string, never>
+  : Record<string, never>);
+
+export interface CacheableUrlRequest {
+  /**
+   * The key for the data.
+   * If not provided, a key will be generated based on the url.
+   */
+  key?: string;
+
+  /**
+   * The url to fetch the data
+   * @example "https://example.com/data.json"
+   */
+  url: string;
+
+  /**
+   * The cache key for the data.
+   * If not provided, a key will be generated based on the url.
+   * @default ""
+   */
+  cacheKey: string;
+
+  /**
+   * Extra data to be passed to the handler.
+   * @default {}
+   */
+  extraContext?: Record<string, unknown>;
+
+  /**
+   * The fetch options for the request.
+   * @default {}
+   *
+   * NOTE:
+   * This will be merged together with the `fetchOptions` of the handler.
+   */
+  fetchOptions?: RequestInit;
+
+  /**
+   * The cache options for the data.
+   * @default {}
+   *
+   * NOTE:
+   * This will be merged together with the `cacheOptions` of the handler.
+   */
+  cacheOptions?: Omit<WriteCacheOptions<any>, "transform">;
 }
 
-export type UrlWithCacheKeyReturnType = UrlWithCacheKey | UrlWithCacheKeyAndKey[] | undefined;
+export type CacheableUrlRequestReturnType = CacheableUrlRequest | CacheableUrlRequest[] | undefined;
 
-export type ExtractDataTypeFromUrls<T extends UrlWithCacheKeyReturnType> =
+export type ExtractDataTypeFromUrls<T extends CacheableUrlRequestReturnType> =
 T extends undefined ? undefined :
-  T extends UrlWithCacheKey ? string :
-    T extends UrlWithCacheKey[] ? { key: string; data: string }[] :
+  T extends CacheableUrlRequest ? string :
+    T extends CacheableUrlRequest[] ? string :
       never;
 
 export interface AdapterHandler<
-  TUrlsReturn extends UrlWithCacheKeyReturnType,
-  TOutput,
+  TUrlsReturn extends CacheableUrlRequestReturnType,
+  TExtraContext extends Record<string, unknown>,
+  TTransformOutput,
+  TOutput = TTransformOutput,
 > {
   urls: (ctx: AdapterContext) => Promise<TUrlsReturn> | TUrlsReturn;
+
   fetchOptions?: RequestInit;
   cacheOptions?: Omit<WriteCacheOptions<any>, "transform">;
-  transform: (ctx: AdapterContext, data: ExtractDataTypeFromUrls<TUrlsReturn>) => TOutput;
+
+  transform: (ctx: AdapterContext & TExtraContext, data: ExtractDataTypeFromUrls<TUrlsReturn>) => TTransformOutput;
+
+  aggregate?: (ctx: AdapterContext, data: [TTransformOutput, ...TTransformOutput[]]) => TOutput;
 }
 
 export type AdapterHandlers<TAdapter = MojiAdapter<any, any, any>> = {
-  [K in keyof TAdapter]: NonNullable<TAdapter[K]> extends AdapterHandler<any, any> ? K : never;
+  [K in keyof TAdapter]: NonNullable<TAdapter[K]> extends AdapterHandler<any, any, any, any> ? K : never;
 }[keyof TAdapter];
 
 export interface AdapterContext {

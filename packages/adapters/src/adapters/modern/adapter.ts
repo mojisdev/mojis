@@ -23,61 +23,53 @@ export const modernAdapter = defineMojiAdapter({
     },
     transform(_, data) {
       if (data == null) {
-        return {
-          sequences: [],
-          zwj: [],
-        };
+        return [];
       }
 
       const sequences: EmojiSequence[] = [];
-      const zwj: EmojiSequence[] = [];
 
-      for (const __data of data) {
-        if (__data == null) {
-          throw new Error("invalid data");
+      if (data == null) {
+        throw new Error("invalid data");
+      }
+
+      const lines = data.split("\n");
+
+      for (let line of lines) {
+        // skip empty line & comments
+        if (line.trim() === "" || line.startsWith("#")) {
+          continue;
         }
 
-        const { key, data: _data } = __data;
+        // remove line comment
+        const commentIndex = line.indexOf("#");
+        if (commentIndex !== -1) {
+          line = line.slice(0, commentIndex).trim();
+        }
 
-        const lines = _data.split("\n");
+        const [hex, property, description] = line.split(";").map((col) => col.trim()).slice(0, 4);
 
-        const isZwj = key === "zwj";
-        const internal = isZwj ? zwj : sequences;
+        if (hex == null || property == null || description == null) {
+          throw new Error(`invalid line: ${line}`);
+        }
 
-        for (let line of lines) {
-          // skip empty line & comments
-          if (line.trim() === "" || line.startsWith("#")) {
-            continue;
-          }
+        const expandedHex = expandHexRange(hex);
 
-          // remove line comment
-          const commentIndex = line.indexOf("#");
-          if (commentIndex !== -1) {
-            line = line.slice(0, commentIndex).trim();
-          }
-
-          const [hex, property, description] = line.split(";").map((col) => col.trim()).slice(0, 4);
-
-          if (hex == null || property == null || description == null) {
-            throw new Error(`invalid line: ${line}`);
-          }
-
-          const expandedHex = expandHexRange(hex);
-
-          for (const hex of expandedHex) {
-            internal.push({
-              hex: hex.replace(/\s+/g, "-"),
-              property,
-              description,
-              gender: hex.includes(FEMALE_SIGN) ? "female" : hex.includes(MALE_SIGN) ? "male" : null,
-            });
-          }
+        for (const hex of expandedHex) {
+          sequences.push({
+            hex: hex.replace(/\s+/g, "-"),
+            property,
+            description,
+            gender: hex.includes(FEMALE_SIGN) ? "female" : hex.includes(MALE_SIGN) ? "male" : null,
+          });
         }
       }
 
+      return sequences;
+    },
+    aggregate(_, data) {
       return {
-        sequences,
-        zwj,
+        sequences: data[0],
+        zwj: data[1],
       };
     },
   },

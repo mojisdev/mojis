@@ -2,18 +2,22 @@ import type {
   AdapterContext,
   AdapterHandler,
   AdapterHandlers,
+  CacheableUrlRequestReturnType,
   ExtractDataTypeFromUrls,
   MojiAdapter,
-  UrlWithCacheKeyReturnType,
 } from "./types";
 import { type EmojiVersion, fetchCache } from "@mojis/internal-utils";
+import { defu } from "defu";
 import semver from "semver";
-
 import { baseAdapter } from "./adapters/_base/adapter";
 import { modernAdapter } from "./adapters/modern/adapter";
 
 interface AdapterRegistry {
-  [key: string]: MojiAdapter<any, any, any>;
+  [key: string]: MojiAdapter<
+    any, // metadata
+    any, // sequence
+    any // variations
+  >;
 }
 
 const ADAPTERS: AdapterRegistry = {
@@ -71,9 +75,9 @@ export function resolveAdapter<T extends EmojiVersion>(
 }
 
 function extendAdapter<
-  TMetadataUrlReturn extends UrlWithCacheKeyReturnType,
-  TSequencesUrlReturn extends UrlWithCacheKeyReturnType,
-  TVariationsUrlReturn extends UrlWithCacheKeyReturnType,
+  TMetadataUrlReturn extends CacheableUrlRequestReturnType,
+  TSequencesUrlReturn extends CacheableUrlRequestReturnType,
+  TVariationsUrlReturn extends CacheableUrlRequestReturnType,
 >(
   adapter: MojiAdapter<
     TMetadataUrlReturn,
@@ -108,15 +112,17 @@ export async function runAdapterHandler<
   TAdapter extends MojiAdapter<any, any, any>,
   THandler extends AdapterHandlers<TAdapter>,
   THandlerFn extends NonNullable<TAdapter[THandler]>,
-  TUrlReturn extends UrlWithCacheKeyReturnType = THandlerFn extends AdapterHandler<infer U, any> ? U : never,
-  TOutput = THandlerFn extends AdapterHandler<any, infer V> ? V : never,
+  TUrlReturn extends CacheableUrlRequestReturnType = THandlerFn extends AdapterHandler<infer U, any, any> ? U : never,
+  TExtraContext extends Record<string, unknown> = THandlerFn extends AdapterHandler<any, infer E, any> ? E : never,
+  TTransformOutput = THandlerFn extends AdapterHandler<any, any, infer V, any> ? V : never,
+  TOutput = THandlerFn extends AdapterHandler<any, any, any, infer V> ? V : never,
 >(
   adapter: TAdapter,
   handlerName: THandler,
   ctx: AdapterContext,
 ): Promise<TOutput> {
   // we know this is an AdapterHandler because of the constraint on THandler
-  const handler = adapter[handlerName] as unknown as AdapterHandler<TUrlReturn, TOutput>;
+  const handler = adapter[handlerName] as unknown as AdapterHandler<TUrlReturn, AdapterContext & TExtraContext, TTransformOutput, TOutput>;
 
   if (!handler) {
     throw new Error(`Handler ${String(handlerName)} not found in adapter ${adapter.name}`);
@@ -135,37 +141,69 @@ export async function runAdapterHandler<
     return undefined;
   }
 
-  const cacheOptions = handler.cacheOptions || {};
+  if (!Array.isArray(urlsResult)) {
+    const cacheOptions = defu(urlsResult.cacheOptions || {}, handler.cacheOptions || {});
+    const fetchOptions = defu(urlsResult.fetchOptions || {}, handler.fetchOptions || {});
+    const key = urlsResult.key ?? createKeyFromUrl(urlsResult.url);
 
-  // handle multiple urls
-  if (Array.isArray(urlsResult)) {
-    const dataPromises = urlsResult.map((item) =>
-      fetchCache(item.url, {
-        cacheKey: item.cacheKey,
-        parser: (data) => data,
-        options: handler.fetchOptions,
-        cacheFolder: cacheOptions.cacheFolder,
-        encoding: cacheOptions.encoding,
-        ttl: cacheOptions.ttl,
-        bypassCache: ctx.force,
-      }),
-    );
-    const dataArray = await Promise.all(dataPromises);
+    const newCtx = {
+      ...urlsResult.extraContext,
+      key,
+      emoji_version: ctx.emoji_version,
+      force: ctx.force,
+      unicode_version: ctx.unicode_version,
+    } as unknown as AdapterContext & TExtraContext;
 
-    return handler.transform(ctx, dataArray.map((data, index) => ({
-      key: urlsResult[index]!.key,
-      data,
-    })) as ExtractDataTypeFromUrls<TUrlReturn>);
-  } else {
     const data = await fetchCache(urlsResult.url, {
       cacheKey: urlsResult.cacheKey,
       parser: (data) => data,
-      options: handler.fetchOptions,
+      options: fetchOptions,
       cacheFolder: cacheOptions.cacheFolder,
       encoding: cacheOptions.encoding,
       ttl: cacheOptions.ttl,
       bypassCache: ctx.force,
     });
-    return handler.transform(ctx, data as ExtractDataTypeFromUrls<TUrlReturn>);
+
+    return handler.transform(newCtx, data as unknown as ExtractDataTypeFromUrls<TUrlReturn>) as unknown as TOutput;
   }
+
+  const promises = urlsResult.map(async (item) => {
+    const key = item.key ?? createKeyFromUrl(item.url);
+    const cacheOptions = defu(item.cacheOptions || {}, handler.cacheOptions || {});
+    const fetchOptions = defu(item.fetchOptions || {}, handler.fetchOptions || {});
+
+    const data = await fetchCache(item.url, {
+      cacheKey: item.cacheKey,
+      parser: (data) => data,
+      options: fetchOptions,
+      cacheFolder: cacheOptions.cacheFolder,
+      encoding: cacheOptions.encoding,
+      ttl: cacheOptions.ttl,
+      bypassCache: ctx.force,
+    });
+
+    const newCtx = {
+      ...item.extraContext,
+      key,
+      emoji_version: ctx.emoji_version,
+      force: ctx.force,
+      unicode_version: ctx.unicode_version,
+    } as unknown as AdapterContext & TExtraContext;
+
+    return handler.transform(newCtx, data as ExtractDataTypeFromUrls<TUrlReturn>);
+  });
+
+  const results = await Promise.all(promises);
+
+  if (handler.aggregate == null) {
+    throw new Error(`Handler ${String(handlerName)} in adapter ${adapter.name} does not have an aggregate function`);
+  }
+
+  return handler.aggregate(ctx, [results[0]!, ...results.slice(1)]);
+}
+
+function createKeyFromUrl(url: string): string {
+  // replace all file system unfriendly characters with _
+  // so #, ?, &, etc. are all replaced with _
+  return url.replace(/[^a-z0-9]/gi, "_");
 }
