@@ -1,6 +1,7 @@
+import type { EmojiSpecRecord } from "../src/types";
 import fs from "node:fs";
 import { describe, expect, it } from "vitest";
-import { extractEmojiVersion, extractVersionFromReadme, getCurrentDraftVersion, mapEmojiVersionToUnicodeVersion } from "../src/versions";
+import { extractEmojiVersion, extractVersionFromReadme, getCurrentDraftVersion, getLatestEmojiVersion, mapEmojiVersionToUnicodeVersion, toSemverCompatible } from "../src/versions";
 
 describe("get draft version", () => {
   it("returns draft versions when fetches succeed and versions match", async () => {
@@ -15,25 +16,25 @@ describe("get draft version", () => {
     });
   });
 
-  it("throws when fetch fails", async () => {
+  it("returns null when fetch fails", async () => {
     fetchMock.mockResponse("Not Found", { status: 404 });
 
-    await expect(getCurrentDraftVersion()).rejects.toThrow("failed to fetch");
+    expect(await getCurrentDraftVersion()).toBeNull();
   });
 
-  it("throws when versions do not match", async () => {
+  it("returns null when versions do not match", async () => {
     fetchMock
       .mockResponseOnceIf("https://unicode.org/Public/draft/ReadMe.txt", "Version 15.1.0 of the Unicode Standard")
       .mockResponseOnceIf("https://unicode.org/Public/draft/emoji/ReadMe.txt", "Unicode Emoji, Version 15.0");
 
-    await expect(getCurrentDraftVersion()).rejects.toThrow("draft versions do not match");
+    expect(await getCurrentDraftVersion()).toBeNull();
   });
 
-  it("throws when version extraction fails", async () => {
+  it("returns null when version extraction fails", async () => {
     fetchMock
       .mockResponse("Invalid version format", { status: 200 });
 
-    await expect(getCurrentDraftVersion()).rejects.toThrow("failed to extract draft version");
+    expect(await getCurrentDraftVersion()).toBeNull();
   });
 });
 
@@ -105,5 +106,127 @@ describe("map emoji version to unicode version", () => {
     { input: "13.1", expected: "13.0" },
   ])("should map emoji version to unicode version (input: $input, expected: $expected)", ({ input, expected }) => {
     expect(mapEmojiVersionToUnicodeVersion(input)).toBe(expected);
+  });
+});
+
+describe("convert to semver compatible version", () => {
+  it.each([
+    { input: "1.0", expected: "1.0.0" },
+    { input: "15.0", expected: "15.0.0" },
+    { input: "15.1", expected: "15.1.0" },
+    { input: "13.1", expected: "13.1.0" },
+    { input: "x.0.0", expected: "0.0.0" }, // correctly coerced to 0.0.0
+    { input: "1.2.3", expected: "1.2.3" }, // full semver
+    { input: "v2.0.0", expected: "2.0.0" }, // leading "v"
+    { input: "3.1.4-alpha", expected: "3.1.4" }, // extra characters
+    { input: "1.0.0+build.123", expected: "1.0.0" }, // build metadata
+    { input: "1.2.0-beta.1", expected: "1.2.0" }, // prerelease
+  ])(
+    "should convert emoji version to semver compatible version (input: $input, expected: $expected)",
+    ({ input, expected }) => {
+      expect(toSemverCompatible(input)).toBe(expected);
+    },
+  );
+
+  it.each([
+    { input: "invalid-version", expected: null },
+    { input: "", expected: null },
+    { input: null as any, expected: null },
+    { input: undefined as any, expected: null },
+  ])(
+    "should return null when input is not coercible (input: $input)",
+    ({ input, expected }) => {
+      expect(toSemverCompatible(input)).toBe(expected);
+    },
+  );
+});
+
+describe("get latest emoji version", () => {
+  it("returns the latest non-draft version", () => {
+    const versions: EmojiSpecRecord[] = [
+      { emoji_version: "15.1", unicode_version: "15.1", draft: false },
+      { emoji_version: "15.0", unicode_version: "15.0", draft: false },
+      { emoji_version: "15.2", unicode_version: "15.2", draft: true }, // Drafts should be excluded
+    ];
+
+    const result = getLatestEmojiVersion(versions);
+    expect(result).toEqual({
+      emoji_version: "15.1",
+      unicode_version: "15.1",
+      draft: false,
+    });
+  });
+
+  it("returns null if all versions are drafts", () => {
+    const versions: EmojiSpecRecord[] = [
+      { emoji_version: "15.0", unicode_version: "15.0", draft: true },
+      { emoji_version: "15.1", unicode_version: "15.1", draft: true },
+    ];
+
+    const result = getLatestEmojiVersion(versions);
+    expect(result).toBeNull();
+  });
+
+  it("returns null if no versions are provided", () => {
+    const result = getLatestEmojiVersion([]);
+    expect(result).toBeNull();
+  });
+
+  it("returns the only non-draft version if only one is available", () => {
+    const versions: EmojiSpecRecord[] = [
+      { emoji_version: "14.0", unicode_version: "14.0", draft: true },
+      { emoji_version: "15.0", unicode_version: "15.0", draft: false },
+    ];
+
+    const result = getLatestEmojiVersion(versions);
+    expect(result).toEqual({
+      emoji_version: "15.0",
+      unicode_version: "15.0",
+      draft: false,
+    });
+  });
+
+  it("handles versions out of order", () => {
+    const versions: EmojiSpecRecord[] = [
+      { emoji_version: "15.0", unicode_version: "15.0", draft: false },
+      { emoji_version: "14.0", unicode_version: "14.0", draft: false },
+      { emoji_version: "15.1", unicode_version: "15.1", draft: false },
+    ];
+
+    const result = getLatestEmojiVersion(versions);
+    expect(result).toEqual({
+      emoji_version: "15.1",
+      unicode_version: "15.1",
+      draft: false,
+    });
+  });
+
+  it("handles versions with fallback included", () => {
+    const versions: EmojiSpecRecord[] = [
+      { emoji_version: "15.0", unicode_version: "15.0", draft: false },
+      { emoji_version: "15.1", unicode_version: "15.1", draft: false, fallback: "some-fallback" },
+    ];
+
+    const result = getLatestEmojiVersion(versions);
+    expect(result).toEqual({
+      emoji_version: "15.1",
+      unicode_version: "15.1",
+      draft: false,
+      fallback: "some-fallback",
+    });
+  });
+
+  it("ignores invalid versions gracefully (if the function doesn't validate)", () => {
+    const versions: EmojiSpecRecord[] = [
+      { emoji_version: "invalid", unicode_version: "15.0", draft: false },
+      { emoji_version: "15.0", unicode_version: "15.0", draft: false },
+    ];
+
+    const result = getLatestEmojiVersion(versions);
+    expect(result).toEqual({
+      emoji_version: "15.0",
+      unicode_version: "15.0",
+      draft: false,
+    });
   });
 });

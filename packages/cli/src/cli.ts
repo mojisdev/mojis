@@ -2,7 +2,7 @@ import { join } from "node:path";
 import process from "node:process";
 import { resolveAdapter, runAdapterHandler } from "@mojis/adapters";
 import {
-  type EmojiVersion,
+  type EmojiSpecRecord,
   getAllEmojiVersions,
   getLatestEmojiVersion,
   mapEmojiVersionToUnicodeVersion,
@@ -84,7 +84,7 @@ cli.command(
       unicode_version: mapEmojiVersionToUnicodeVersion(v),
       draft: existingEmojiVersions.find((ev) => ev.emoji_version === v)?.draft ?? false,
       fallback: null as string | null,
-    })) satisfies EmojiVersion[];
+    })) satisfies EmojiSpecRecord[];
 
     // print out the versions that we don't officially support,
     // which will fallback to using a different version adapter.

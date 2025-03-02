@@ -36,6 +36,7 @@ export const baseAdapter = defineMojiAdapter({
         cacheKey: `v${ctx.emoji_version}/metadata`,
       };
     },
+
     transform(ctx, data) {
       if (data == null) {
         return {
