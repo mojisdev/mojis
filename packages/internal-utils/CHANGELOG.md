@@ -1,5 +1,11 @@
 # @mojis/internal-utils
 
+## 0.0.2
+
+### Patch Changes
+
+- [#14](https://github.com/mojisdev/mojis/pull/14) [`7815e52`](https://github.com/mojisdev/mojis/commit/7815e5221fdf73026c7d16e55570f8a0e1d7b981) Thanks [@luxass](https://github.com/luxass)! - refactor(internal-utils): rewrite cache capabilities
+
 ## 0.0.1
 
 ### Patch Changes
