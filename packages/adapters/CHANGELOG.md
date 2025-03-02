@@ -1,5 +1,14 @@
 # @mojis/adapters
 
+## 0.0.5
+
+### Patch Changes
+
+- [`d590a93`](https://github.com/mojisdev/mojis/commit/d590a934db5e8de7a421ceeb08e16f924b7ca324) Thanks [@luxass](https://github.com/luxass)! - chore: fix publish
+
+- Updated dependencies [[`d590a93`](https://github.com/mojisdev/mojis/commit/d590a934db5e8de7a421ceeb08e16f924b7ca324)]:
+  - @mojis/internal-utils@0.0.4
+
 ## 0.0.4
 
 ### Patch Changes
