@@ -1,4 +1,11 @@
-import { type EmojiSequence, type EmojiVariation, expandHexRange, FEMALE_SIGN, MALE_SIGN } from "@mojis/internal-utils";
+import {
+  type EmojiSequence,
+  type EmojiVariation,
+  expandHexRange,
+  FEMALE_SIGN,
+  MALE_SIGN,
+} from "@mojis/internal-utils";
+import semver from "semver";
 import { defineMojiAdapter } from "../../define";
 
 export const modernAdapter = defineMojiAdapter({
@@ -71,8 +78,14 @@ export const modernAdapter = defineMojiAdapter({
   },
   variations: {
     urls(ctx) {
+      if (semver.lte(`${ctx.unicode_version}.0`, "12.1.0")) {
+        return {
+          url: `https://unicode.org/Public/emoji/${ctx.emoji_version}/emoji-variation-sequences.txt`,
+          cacheKey: `v${ctx.emoji_version}/variations`,
+        };
+      }
       return {
-        url: `https://unicode.org/Public/${ctx.emoji_version}.0/ucd/emoji/emoji-variation-sequences.txt`,
+        url: `https://unicode.org/Public/${ctx.unicode_version}.0/ucd/emoji/emoji-variation-sequences.txt`,
         cacheKey: `v${ctx.emoji_version}/variations`,
       };
     },
