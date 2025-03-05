@@ -16,18 +16,21 @@ export const modern_metadata_handler = defineAdapterHandler({
       cacheKey: `v${ctx.emoji_version}/metadata`,
     };
   },
-  transform(ctx, data) {
+  transform(_ctx, _data) {
     return {
-      fuck: {
-
+      test: {
+        foo: "bar",
       },
     };
   },
-  aggregate(ctx, data) {
-    return "bitch";
+  aggregate(_ctx, data) {
+    console.warn("data.test", data[0].test);
+    return {
+      aggregatedTest: data.map((d) => d.test),
+    };
   },
-  output(ctx, transformed) {
+  output(_ctx, transformed) {
+    console.warn("transformed.aggregatedTest", transformed.aggregatedTest);
     return transformed;
   },
 });
-//  satisfies v2_AdapterHandler<"metadata", any, any, any>;

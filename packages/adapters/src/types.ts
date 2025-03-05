@@ -203,7 +203,7 @@ export type v2_OutputFn<
   TExtraContext extends Record<string, unknown>,
   TTransformOutput,
   TOutput,
-> = (ctx: TContext & TExtraContext, data: [TTransformOutput, ...TTransformOutput[]]) => TOutput;
+> = (ctx: TContext & TExtraContext, data: TTransformOutput) => TOutput;
 
 export interface v2_AdapterHandler<
   TType extends v2_AdapterHandlerType,
@@ -259,8 +259,58 @@ export interface v2_AdapterHandler<
    * Output function which will receive the transformed result from the transform function, or from the aggregate function.
    * It will then output the result.
    */
-  output: v2_OutputFn<TContext, TExtraContext, TTransformOutput, TOutput>;
+  output: v2_OutputFn<TContext, TExtraContext, TAggregateOutput extends TTransformOutput ? TTransformOutput : TAggregateOutput, TOutput>;
 }
+
+export function defineAdapterHandler<
+  TType extends v2_AdapterHandlerType,
+  TExtraContext extends Record<string, unknown>,
+  TContext extends AdapterContext,
+  TTransformOutput,
+  TAggregateOutput,
+>(
+  handler: Omit<
+    v2_AdapterHandler<
+      TType,
+      TExtraContext,
+      TContext,
+      TTransformOutput,
+      TAggregateOutput
+    >,
+"output" | "aggregate"
+  > & {
+    aggregate: v2_AggregateFn<TContext, TExtraContext, TTransformOutput, TAggregateOutput>;
+    output: v2_OutputFn<TContext, TExtraContext, TAggregateOutput, any>;
+  }
+): v2_AdapterHandler<
+  TType,
+  TExtraContext,
+  TContext,
+  TTransformOutput,
+  TAggregateOutput,
+  ReturnType<typeof handler.output>
+>;
+
+export function defineAdapterHandler<
+  TType extends v2_AdapterHandlerType,
+  TExtraContext extends Record<string, unknown>,
+  TContext extends AdapterContext,
+  TTransformOutput,
+>(
+  handler: Omit<
+    v2_AdapterHandler<TType, TExtraContext, TContext, TTransformOutput>,
+    "output"
+  > & {
+    output: v2_OutputFn<TContext, TExtraContext, TTransformOutput, any>;
+  }
+): v2_AdapterHandler<
+  TType,
+  TExtraContext,
+  TContext,
+  TTransformOutput,
+  TTransformOutput,
+  ReturnType<typeof handler.output>
+>;
 
 export function defineAdapterHandler<
   TType extends v2_AdapterHandlerType,
@@ -284,5 +334,5 @@ export function defineAdapterHandler<
     TAggregateOutput,
     TOutput
   > {
-  return handler;
+  return handler as any;
 }
