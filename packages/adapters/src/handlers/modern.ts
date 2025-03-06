@@ -6,6 +6,9 @@ const DISALLOWED_EMOJI_VERSIONS = ["1.0", "2.0", "3.0"];
 
 export const modern_metadata_handler = defineAdapterHandler({
   type: "metadata",
+  shouldExecute: (ctx) => {
+    return !DISALLOWED_EMOJI_VERSIONS.includes(ctx.emoji_version);
+  },
   urls: (ctx) => {
     if (DISALLOWED_EMOJI_VERSIONS.includes(ctx.emoji_version)) {
       return undefined;

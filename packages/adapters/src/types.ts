@@ -1,9 +1,10 @@
 import type {
   WriteCacheOptions,
 } from "@mojis/internal-utils";
+import type { BUILTIN_PARSERS } from "./utils";
 
 type Promisable<T> = T | Promise<T>;
-type Arrayable<T> = T | T[];
+export type Arrayable<T> = T | T[];
 
 export interface AdapterContext {
   /**
@@ -23,14 +24,13 @@ export interface AdapterContext {
   force: boolean;
 }
 
-export type AdapterHandlerType = "emojis" | "shortcodes" | "sequences" | "variations" | "metadata";
+export type AdapterHandlerType = "metadata";
 
 export type UrlBuilder = (ctx: AdapterContext) => Promisable<Arrayable<string> | Arrayable<undefined> | Arrayable<UrlWithCache>>;
 
 export type ShouldExecute<
   TContext extends AdapterContext,
-  TExtraContext extends Record<string, unknown>,
-> = (ctx: TContext & TExtraContext) => Promisable<boolean>;
+> = (ctx: TContext) => Promisable<boolean>;
 
 export interface UrlWithCache {
   /**
@@ -67,13 +67,12 @@ export type OutputFn<
 
 // TODO: find a better name for the splitter parser
 // The splitter parser is just a simple parser, that will split the data based on a separater character.
-export type BuiltinParser = "splitter";
+export type BuiltinParser = typeof BUILTIN_PARSERS[number];
 
 export type ParserFn<
   TContext extends AdapterContext,
-  TExtraContext extends Record<string, unknown>,
   TOutput,
-> = (ctx: TContext & TExtraContext, data: string) => TOutput;
+> = (ctx: TContext, data: string) => TOutput;
 
 export type GetParseOutputFromBuiltInParser<TParser extends BuiltinParser> =
   TParser extends "splitter" ? string[] :
@@ -116,7 +115,7 @@ export interface AdapterHandler<
   /**
    * Whether or not that this handler should handle the request.
    */
-  shouldExecute?: ShouldExecute<TContext, TExtraContext>;
+  shouldExecute: ShouldExecute<TContext>;
 
   /**
    * A list of other "handlers types", that is required to be run before this handler.
@@ -127,7 +126,7 @@ export interface AdapterHandler<
    * A parse function or a reference to a builtin parser.
    *
    */
-  parser: ParserFn<TContext, TExtraContext, TParseOutput> | TBuiltinParser;
+  parser: ParserFn<TContext, TParseOutput> | TBuiltinParser;
 
   /**
    * Options that will be passed to the parser.

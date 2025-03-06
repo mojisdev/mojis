@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import process from "node:process";
-import { resolveAdapter, runAdapterHandler } from "@mojis/adapters";
+import { runAdapterHandler } from "@mojis/adapters";
 import {
   type EmojiSpecRecord,
   getAllEmojiVersions,
@@ -132,22 +132,12 @@ cli.command(
     console.info(`using the following generators ${args.generators.map((g) => yellow(g)).join(", ")}`);
 
     const promises = versions.map(async (version) => {
-      const adapter = resolveAdapter(version);
-
-      if (adapter == null) {
-        throw new Error(`no adapter found for version ${version.emoji_version}`);
-      }
-
       const baseDir = `./data/v${version.emoji_version}`;
 
       await fs.ensureDir(baseDir);
 
       if (isGeneratorEnabled("metadata")) {
-        if (adapter.metadata == null) {
-          throw new MojisNotImplemented("metadata");
-        }
-
-        const { groups, emojis } = await runAdapterHandler(adapter, "metadata", {
+        const { groups, emojis } = await runAdapterHandler("metadata", {
           force,
           emoji_version: version.emoji_version,
           unicode_version: version.unicode_version,
@@ -168,48 +158,48 @@ cli.command(
         )));
       }
 
-      if (isGeneratorEnabled("sequences")) {
-        if (adapter.sequences == null) {
-          throw new MojisNotImplemented("sequences");
-        }
+      // if (isGeneratorEnabled("sequences")) {
+      //   if (adapter.sequences == null) {
+      //     throw new MojisNotImplemented("sequences");
+      //   }
 
-        const { sequences, zwj } = await runAdapterHandler(adapter, "sequences", {
-          force,
-          emoji_version: version.emoji_version,
-          unicode_version: version.unicode_version,
-        });
+      //   const { sequences, zwj } = await runAdapterHandler(adapter, "sequences", {
+      //     force,
+      //     emoji_version: version.emoji_version,
+      //     unicode_version: version.unicode_version,
+      //   });
 
-        await fs.writeFile(
-          join(baseDir, "zwj-sequences.json"),
-          JSON.stringify(zwj, null, 2),
-          "utf-8",
-        );
+      //   await fs.writeFile(
+      //     join(baseDir, "zwj-sequences.json"),
+      //     JSON.stringify(zwj, null, 2),
+      //     "utf-8",
+      //   );
 
-        await fs.writeFile(
-          join(baseDir, "sequences.json"),
-          JSON.stringify(sequences, null, 2),
-          "utf-8",
-        );
-      }
+      //   await fs.writeFile(
+      //     join(baseDir, "sequences.json"),
+      //     JSON.stringify(sequences, null, 2),
+      //     "utf-8",
+      //   );
+      // }
 
-      if (isGeneratorEnabled("variations")) {
-        if (adapter.variations == null) {
-          throw new MojisNotImplemented("variations");
-        }
+      // if (isGeneratorEnabled("variations")) {
+      //   if (adapter.variations == null) {
+      //     throw new MojisNotImplemented("variations");
+      //   }
 
-        const variations = await runAdapterHandler(adapter, "variations", {
-          force,
-          emoji_version: version.emoji_version,
-          unicode_version: version.unicode_version,
-        });
+      //   const variations = await runAdapterHandler(adapter, "variations", {
+      //     force,
+      //     emoji_version: version.emoji_version,
+      //     unicode_version: version.unicode_version,
+      //   });
 
-        await fs.ensureDir(`./data/v${version.emoji_version}`);
-        await fs.writeFile(
-          `./data/v${version.emoji_version}/variations.json`,
-          JSON.stringify(variations, null, 2),
-          "utf-8",
-        );
-      }
+      //   await fs.ensureDir(`./data/v${version.emoji_version}`);
+      //   await fs.writeFile(
+      //     `./data/v${version.emoji_version}/variations.json`,
+      //     JSON.stringify(variations, null, 2),
+      //     "utf-8",
+      //   );
+      // }
 
       // if (isGeneratorEnabled("emojis")) {
       //   if (adapter.emojis == null) {
