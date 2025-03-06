@@ -7,142 +7,7 @@ import type {
 } from "@mojis/internal-utils";
 
 type Promisable<T> = T | Promise<T>;
-
-export interface MojiAdapter<
-  TMetadataUrlReturn extends CacheableUrlRequestReturnType,
-  TSequencesUrlReturn extends CacheableUrlRequestReturnType,
-  TVariationsUrlReturn extends CacheableUrlRequestReturnType,
-> {
-  /**
-   * The name of the adapter.
-   */
-  name: string;
-
-  /**
-   * A description of the adapter.
-   */
-  description: string;
-
-  /**
-   * A valid semver range for the emoji version this adapter supports.
-   */
-  range: string;
-
-  /**
-   * The name of the adapter to extend from.
-   */
-  extend?: string;
-
-  /**
-   * The metadata handler for the adapter.
-   */
-  metadata?: AdapterHandler<
-    TMetadataUrlReturn,
-    ExtraContext<TMetadataUrlReturn>,
-    {
-      groups: EmojiGroup[];
-      emojis: Record<string, Record<string, EmojiMetadata>>;
-    },
-    any
-  >;
-
-  /**
-   * The sequences handler for the adapter.
-   */
-  sequences?: AdapterHandler<
-    TSequencesUrlReturn,
-    ExtraContext<TSequencesUrlReturn>,
-    EmojiSequence[],
-    any
-  >;
-
-  /**
-   * The variations handler for the adapter.
-   */
-  variations?: AdapterHandler<
-    TVariationsUrlReturn,
-    ExtraContext<TVariationsUrlReturn>,
-    EmojiVariation[],
-    any
-  >;
-}
-
-type ExtraContext<T> = {
-  key: string;
-} & (T extends CacheableUrlRequest
-  ? T["extraContext"] extends Record<string, unknown>
-    ? T["extraContext"]
-    : Record<string, never>
-  : Record<string, never>);
-
-export interface CacheableUrlRequest {
-  /**
-   * The key for the data.
-   * If not provided, a key will be generated based on the url.
-   */
-  key?: string;
-
-  /**
-   * The url to fetch the data
-   * @example "https://example.com/data.json"
-   */
-  url: string;
-
-  /**
-   * The cache key for the data.
-   * If not provided, a key will be generated based on the url.
-   */
-  cacheKey?: string;
-
-  /**
-   * Extra data to be passed to the handler.
-   * @default {}
-   */
-  extraContext?: Record<string, unknown>;
-
-  /**
-   * The fetch options for the request.
-   * @default {}
-   *
-   * NOTE:
-   * This will be merged together with the `fetchOptions` of the handler.
-   */
-  fetchOptions?: RequestInit;
-
-  /**
-   * The cache options for the data.
-   * @default {}
-   *
-   * NOTE:
-   * This will be merged together with the `cacheOptions` of the handler.
-   */
-  cacheOptions?: Omit<WriteCacheOptions<any>, "transform">;
-}
-
-export type CacheableUrlRequestReturnType = CacheableUrlRequest | CacheableUrlRequest[] | undefined;
-
-export type ExtractDataTypeFromUrls<T extends CacheableUrlRequestReturnType> =
-  T extends undefined ? undefined :
-    T extends CacheableUrlRequest ? string :
-      T extends CacheableUrlRequest[] ? string :
-        never;
-
-export interface AdapterHandler<
-  TUrlsReturn extends CacheableUrlRequestReturnType,
-  TExtraContext extends Record<string, unknown>,
-  TTransformOutput,
-  TOutput = TTransformOutput,
-> {
-  urls: (ctx: AdapterContext) => Promise<TUrlsReturn> | TUrlsReturn;
-  fetchOptions?: RequestInit;
-  cacheOptions?: Omit<WriteCacheOptions<unknown>, "transform">;
-  transform: (ctx: AdapterContext & TExtraContext, data: ExtractDataTypeFromUrls<TUrlsReturn>) => TTransformOutput;
-  aggregate?: (ctx: AdapterContext, data: [TTransformOutput, ...TTransformOutput[]]) => TOutput;
-}
-
-export type AdapterHandlers<TAdapter = MojiAdapter<any, any, any>> = {
-  [K in keyof TAdapter]: NonNullable<TAdapter[K]> extends AdapterHandler<any, any, any, any> ? K : never;
-}[keyof TAdapter];
+type Arrayable<T> = T | T[];
 
 export interface AdapterContext {
   /**
@@ -162,16 +27,14 @@ export interface AdapterContext {
   force: boolean;
 }
 
-export type UrlBuilder = (ctx: AdapterContext) => Promisable<Arrayable<string> | Arrayable<undefined> | Arrayable<v2_UrlWithCache>>;
-
 export type v2_AdapterHandlerType = "emojis" | "shortcodes" | "sequences" | "variations" | "metadata";
+
+export type UrlBuilder = (ctx: AdapterContext) => Promisable<Arrayable<string> | Arrayable<undefined> | Arrayable<v2_UrlWithCache>>;
 
 export type v2_ShouldExecute<
   TContext extends AdapterContext,
   TExtraContext extends Record<string, unknown>,
 > = (ctx: TContext & TExtraContext) => Promisable<boolean>;
-
-type Arrayable<T> = T | T[];
 
 export interface v2_UrlWithCache {
   /**
@@ -208,7 +71,7 @@ export type v2_OutputFn<
 
 // TODO: find a better name for the splitter parser
 // The splitter parser is just a simple parser, that will split the data based on a separater character.
-type BuiltinParser = "splitter";
+export type BuiltinParser = "splitter";
 
 export type v2_ParserFn<
   TContext extends AdapterContext,
@@ -293,84 +156,4 @@ export interface v2_AdapterHandler<
    * It will then output the result.
    */
   output: v2_OutputFn<TContext, TExtraContext, TAggregateOutput extends TTransformOutput ? TTransformOutput : TAggregateOutput, TOutput>;
-}
-
-export function defineAdapterHandler<
-  TType extends v2_AdapterHandlerType,
-  TExtraContext extends Record<string, unknown>,
-  TContext extends AdapterContext,
-  TTransformOutput,
-  TAggregateOutput,
->(
-  handler: Omit<
-    v2_AdapterHandler<
-      TType,
-      TExtraContext,
-      TContext,
-      TTransformOutput,
-      TAggregateOutput
-    >,
-"output" | "aggregate"
-  > & {
-    aggregate: v2_AggregateFn<TContext, TExtraContext, TTransformOutput, TAggregateOutput>;
-    output: v2_OutputFn<TContext, TExtraContext, TAggregateOutput, any>;
-  }
-): v2_AdapterHandler<
-  TType,
-  TExtraContext,
-  TContext,
-  TTransformOutput,
-  TAggregateOutput,
-  ReturnType<typeof handler.output>
->;
-
-export function defineAdapterHandler<
-  TType extends v2_AdapterHandlerType,
-  TExtraContext extends Record<string, unknown>,
-  TContext extends AdapterContext,
-  TTransformOutput,
->(
-  handler: Omit<
-    v2_AdapterHandler<TType, TExtraContext, TContext, TTransformOutput>,
-    "output"
-  > & {
-    output: v2_OutputFn<TContext, TExtraContext, TTransformOutput, any>;
-  }
-): v2_AdapterHandler<
-  TType,
-  TExtraContext,
-  TContext,
-  TTransformOutput,
-  TTransformOutput,
-  ReturnType<typeof handler.output>
->;
-export function defineAdapterHandler<
-  TType extends v2_AdapterHandlerType,
-  TExtraContext extends Record<string, unknown>,
-  TContext extends AdapterContext,
-  TTransformOutput,
-  TAggregateOutput = TTransformOutput,
-  TOutput = TTransformOutput | TAggregateOutput,
-  TBuiltinParser extends BuiltinParser = BuiltinParser,
-  TParseOutput = v2_GetParseOutputFromBuiltInParser<BuiltinParser>,
->(handler: v2_AdapterHandler<
-  TType,
-  TExtraContext,
-  TContext,
-  TTransformOutput,
-  TAggregateOutput,
-  TOutput,
-  TBuiltinParser,
-  TParseOutput
->): v2_AdapterHandler<
-    TType,
-    TExtraContext,
-    TContext,
-    TTransformOutput,
-    TAggregateOutput,
-    TOutput,
-    TBuiltinParser,
-    TParseOutput
-  > {
-  return handler;
 }

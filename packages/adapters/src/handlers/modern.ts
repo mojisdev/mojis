@@ -1,4 +1,4 @@
-import { defineAdapterHandler, type v2_AdapterHandler } from "../types";
+import { defineAdapterHandler } from "../define";
 
 // These emoji versions doesn't seem to have a emoji-test,
 // where we can extract the metadata from.

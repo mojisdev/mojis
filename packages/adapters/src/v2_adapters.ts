@@ -1,3 +1,7 @@
+import type {
+  EmojiGroup,
+  EmojiMetadata,
+} from "@mojis/internal-utils";
 import type { v2_AdapterHandler, v2_AdapterHandlerType } from "./types";
 import { modern_metadata_handler } from "./handlers/modern";
 
