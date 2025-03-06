@@ -16,29 +16,27 @@ export const modern_metadata_handler = defineAdapterHandler({
       cacheKey: `v${ctx.emoji_version}/metadata`,
     };
   },
-  parser(ctx, data) {
-    return "hello";
-  },
-  // parser: "splitter",
+  // parser(ctx, data) {
+  //   return "hello";
+  // },
+  parser: "splitter",
   // TODO: make thos fail if no a builtin parser
   parserOptions: {
-    separator: "sasd",
+    separator: ";",
   },
   transform(_ctx, _data) {
     return {
-      test: {
-        foo: "bar",
-      },
+      foo: "bar",
     };
   },
   aggregate(_ctx, data) {
-    console.warn("data.test", data[0].test);
+    console.warn("data.foo", data[0].foo);
     return {
-      aggregatedTest: data.map((d) => d.test),
+      aggregatedFoo: data.map((d) => d.foo),
     };
   },
   output(_ctx, transformed) {
-    console.warn("transformed.aggregatedTest", transformed.aggregatedTest);
+    console.warn("transformed.aggregatedFoo", transformed.aggregatedFoo);
     return transformed;
   },
 });

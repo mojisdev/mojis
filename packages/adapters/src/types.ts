@@ -300,6 +300,55 @@ export function defineAdapterHandler<
   TExtraContext extends Record<string, unknown>,
   TContext extends AdapterContext,
   TTransformOutput,
+  TAggregateOutput,
+>(
+  handler: Omit<
+    v2_AdapterHandler<
+      TType,
+      TExtraContext,
+      TContext,
+      TTransformOutput,
+      TAggregateOutput
+    >,
+"output" | "aggregate"
+  > & {
+    aggregate: v2_AggregateFn<TContext, TExtraContext, TTransformOutput, TAggregateOutput>;
+    output: v2_OutputFn<TContext, TExtraContext, TAggregateOutput, any>;
+  }
+): v2_AdapterHandler<
+  TType,
+  TExtraContext,
+  TContext,
+  TTransformOutput,
+  TAggregateOutput,
+  ReturnType<typeof handler.output>
+>;
+
+export function defineAdapterHandler<
+  TType extends v2_AdapterHandlerType,
+  TExtraContext extends Record<string, unknown>,
+  TContext extends AdapterContext,
+  TTransformOutput,
+>(
+  handler: Omit<
+    v2_AdapterHandler<TType, TExtraContext, TContext, TTransformOutput>,
+    "output"
+  > & {
+    output: v2_OutputFn<TContext, TExtraContext, TTransformOutput, any>;
+  }
+): v2_AdapterHandler<
+  TType,
+  TExtraContext,
+  TContext,
+  TTransformOutput,
+  TTransformOutput,
+  ReturnType<typeof handler.output>
+>;
+export function defineAdapterHandler<
+  TType extends v2_AdapterHandlerType,
+  TExtraContext extends Record<string, unknown>,
+  TContext extends AdapterContext,
+  TTransformOutput,
   TAggregateOutput = TTransformOutput,
   TOutput = TTransformOutput | TAggregateOutput,
   TBuiltinParser extends BuiltinParser = BuiltinParser,
