@@ -1,5 +1,6 @@
 import type { v2_AdapterHandler, v2_AdapterHandlerType } from "./types";
+import { modern_metadata_handler } from "./handlers/modern";
 
 export const v2_metadata_handlers = [
-
-] satisfies v2_AdapterHandler<"metadata", any, any, any>[];
+  modern_metadata_handler,
+] satisfies v2_AdapterHandler<"metadata", any, any, any, any>[];

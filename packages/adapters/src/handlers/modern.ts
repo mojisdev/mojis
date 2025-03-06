@@ -16,6 +16,14 @@ export const modern_metadata_handler = defineAdapterHandler({
       cacheKey: `v${ctx.emoji_version}/metadata`,
     };
   },
+  parser(ctx, data) {
+    return "hello";
+  },
+  // parser: "splitter",
+  // TODO: make thos fail if no a builtin parser
+  parserOptions: {
+    separator: "sasd",
+  },
   transform(_ctx, _data) {
     return {
       test: {

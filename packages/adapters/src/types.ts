@@ -166,7 +166,7 @@ export type UrlBuilder = (ctx: AdapterContext) => Promisable<Arrayable<string> |
 
 export type v2_AdapterHandlerType = "emojis" | "shortcodes" | "sequences" | "variations" | "metadata";
 
-export type v2_ShouldHandleFn<
+export type v2_ShouldExecute<
   TContext extends AdapterContext,
   TExtraContext extends Record<string, unknown>,
 > = (ctx: TContext & TExtraContext) => Promisable<boolean>;
@@ -188,8 +188,9 @@ export interface v2_UrlWithCache {
 export type v2_TransformFn<
   TContext extends AdapterContext,
   TExtraContext extends Record<string, unknown>,
+  TParseInput,
   TTransformOutput,
-> = (ctx: TContext & TExtraContext, data: string) => TTransformOutput;
+> = (ctx: TContext & TExtraContext, data: TParseInput) => TTransformOutput;
 
 export type v2_AggregateFn<
   TContext extends AdapterContext,
@@ -205,6 +206,24 @@ export type v2_OutputFn<
   TOutput,
 > = (ctx: TContext & TExtraContext, data: TTransformOutput) => TOutput;
 
+// TODO: find a better name for the splitter parser
+// The splitter parser is just a simple parser, that will split the data based on a separater character.
+type BuiltinParser = "splitter";
+
+export type v2_ParserFn<
+  TContext extends AdapterContext,
+  TExtraContext extends Record<string, unknown>,
+  TOutput,
+> = (ctx: TContext & TExtraContext, data: string) => TOutput;
+
+export type v2_GetParseOutputFromBuiltInParser<TParser extends BuiltinParser> =
+  TParser extends "splitter" ? string[] :
+    never;
+
+export type v2_GetParseOptionsFromParser<TParser extends BuiltinParser> =
+  TParser extends "splitter" ? { separator: string } :
+    never;
+
 export interface v2_AdapterHandler<
   TType extends v2_AdapterHandlerType,
   TExtraContext extends Record<string, unknown>,
@@ -212,6 +231,8 @@ export interface v2_AdapterHandler<
   TTransformOutput,
   TAggregateOutput = TTransformOutput,
   TOutput = TTransformOutput | TAggregateOutput,
+  TBuiltinParser extends BuiltinParser = BuiltinParser,
+  TParseOutput = v2_GetParseOutputFromBuiltInParser<TBuiltinParser>,
 > {
   /**
    * The type of the handler, this is used to identify the handler.
@@ -236,7 +257,7 @@ export interface v2_AdapterHandler<
   /**
    * Whether or not that this handler should handle the request.
    */
-  shouldHandle?: v2_ShouldHandleFn<TContext, TExtraContext>;
+  shouldExecute?: v2_ShouldExecute<TContext, TExtraContext>;
 
   /**
    * A list of other "handlers types", that is required to be run before this handler.
@@ -244,10 +265,22 @@ export interface v2_AdapterHandler<
   dependencies?: string[];
 
   /**
+   * A parse function or a reference to a builtin parser.
+   *
+   */
+  parser: v2_ParserFn<TContext, TExtraContext, TParseOutput> | TBuiltinParser;
+
+  /**
+   * Options that will be passed to the parser.
+   * This will only be used if the parser is a builtin parser.
+   */
+  parserOptions?: v2_GetParseOptionsFromParser<TBuiltinParser>;
+
+  /**
    * A transform function that will run for each of the urls.
    * It will pass the returned type downwards to either the aggregate function or the output.
    */
-  transform: v2_TransformFn<TContext, TExtraContext, TTransformOutput>;
+  transform: v2_TransformFn<TContext, TExtraContext, TParseOutput, TTransformOutput>;
 
   /**
    * An aggregate function that will run if defined.
@@ -267,72 +300,28 @@ export function defineAdapterHandler<
   TExtraContext extends Record<string, unknown>,
   TContext extends AdapterContext,
   TTransformOutput,
-  TAggregateOutput,
->(
-  handler: Omit<
-    v2_AdapterHandler<
-      TType,
-      TExtraContext,
-      TContext,
-      TTransformOutput,
-      TAggregateOutput
-    >,
-"output" | "aggregate"
-  > & {
-    aggregate: v2_AggregateFn<TContext, TExtraContext, TTransformOutput, TAggregateOutput>;
-    output: v2_OutputFn<TContext, TExtraContext, TAggregateOutput, any>;
-  }
-): v2_AdapterHandler<
-  TType,
-  TExtraContext,
-  TContext,
-  TTransformOutput,
-  TAggregateOutput,
-  ReturnType<typeof handler.output>
->;
-
-export function defineAdapterHandler<
-  TType extends v2_AdapterHandlerType,
-  TExtraContext extends Record<string, unknown>,
-  TContext extends AdapterContext,
-  TTransformOutput,
->(
-  handler: Omit<
-    v2_AdapterHandler<TType, TExtraContext, TContext, TTransformOutput>,
-    "output"
-  > & {
-    output: v2_OutputFn<TContext, TExtraContext, TTransformOutput, any>;
-  }
-): v2_AdapterHandler<
-  TType,
-  TExtraContext,
-  TContext,
-  TTransformOutput,
-  TTransformOutput,
-  ReturnType<typeof handler.output>
->;
-
-export function defineAdapterHandler<
-  TType extends v2_AdapterHandlerType,
-  TExtraContext extends Record<string, unknown>,
-  TContext extends AdapterContext,
-  TTransformOutput,
   TAggregateOutput = TTransformOutput,
   TOutput = TTransformOutput | TAggregateOutput,
+  TBuiltinParser extends BuiltinParser = BuiltinParser,
+  TParseOutput = v2_GetParseOutputFromBuiltInParser<BuiltinParser>,
 >(handler: v2_AdapterHandler<
   TType,
   TExtraContext,
   TContext,
   TTransformOutput,
   TAggregateOutput,
-  TOutput
+  TOutput,
+  TBuiltinParser,
+  TParseOutput
 >): v2_AdapterHandler<
     TType,
     TExtraContext,
     TContext,
     TTransformOutput,
     TAggregateOutput,
-    TOutput
+    TOutput,
+    TBuiltinParser,
+    TParseOutput
   > {
-  return handler as any;
+  return handler;
 }
