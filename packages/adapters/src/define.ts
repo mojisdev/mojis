@@ -2,11 +2,37 @@ import type {
   AdapterContext,
   AdapterHandler,
   AdapterHandlerType,
+  AggregateFn,
   BuiltinParser,
   GetParseOutputFromBuiltInParser,
   OutputFn,
 } from "./types";
 
+export function defineAdapterHandler<
+  TType extends AdapterHandlerType,
+  TExtraContext extends Record<string, unknown>,
+  TContext extends AdapterContext,
+  TTransformOutput,
+  TAggregateOutput,
+>(
+  handler: Omit<AdapterHandler<
+    TType,
+    TExtraContext,
+    TContext,
+    TTransformOutput,
+    TAggregateOutput
+  >, "output" | "aggregate"> & {
+    aggregate: AggregateFn<TContext, TExtraContext, TTransformOutput, TAggregateOutput>;
+    output: OutputFn<TContext, TExtraContext, TAggregateOutput, any>;
+  }
+): AdapterHandler<
+  TType,
+  TExtraContext,
+  TContext,
+  TTransformOutput,
+  TAggregateOutput,
+  ReturnType<typeof handler.output>
+>;
 export function defineAdapterHandler<
   TType extends AdapterHandlerType,
   TExtraContext extends Record<string, unknown>,

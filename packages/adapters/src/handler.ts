@@ -6,10 +6,11 @@ import { getHandlerUrls, isBuiltinParser, isUrlBuilder } from "./utils";
 export async function runAdapterHandler<
   THandlerType extends AdapterHandlerType,
   TContext extends AdapterContext,
+  TExtraContext extends Record<string, unknown>,
 >(
   type: THandlerType,
-  ctx: TContext,
-) {
+  ctx: TContext & TExtraContext,
+): Promise<any> {
   const handlerGroup = all_handlers[type];
 
   if (!handlerGroup) {
@@ -26,8 +27,9 @@ export async function runAdapterHandler<
 
     const urls = await getHandlerUrls(handler.urls, ctx);
     // fetch all the data from the urls
-    const fetchPromises = urls.map(async (url) => {
-      return fetchCache(url.url, {
+    const dataRequests = urls.map(async (url) => {
+      const key = url.cacheKey;
+      const result = await fetchCache(url.url, {
         cacheKey: url.cacheKey,
         parser(data) {
           if (isBuiltinParser(handler.parser)) {
@@ -50,15 +52,43 @@ export async function runAdapterHandler<
         options: handler.fetchOptions,
         bypassCache: ctx.force,
       });
+      return [key, result] as [string, typeof result];
     });
 
-    const dataList = await Promise.all(fetchPromises);
+    const dataResults = await Promise.all(dataRequests);
+
+    const transformedDataList: any[] = [];
 
     // run transform for each data in list
-    for (const data of dataList) {
+    for (const [key, data] of dataResults) {
       // run transform for each data in list
 
-      const transformedData = await handler.transform(ctx, data);
+      const transformedData = await handler.transform(buildContext(ctx, {
+        key,
+      }), data);
+
+      console.log("transformedData", transformedData);
+
+      transformedDataList.push(transformedData);
     }
+
+    // run aggregate
+    const aggregatedData = await handler.aggregate(buildContext(ctx, {
+      data: transformedDataList,
+    }), transformedDataList);
+
+    // run output
+    const output = await handler.output(buildContext(ctx, {
+      data: aggregatedData,
+    }), aggregatedData);
+
+    return output;
   }
+}
+
+export function buildContext<TContext extends AdapterContext, TExtraContext extends Record<string, unknown>>(
+  ctx: TContext,
+  extraContext: TExtraContext,
+): TContext {
+  return Object.assign(ctx, extraContext);
 }

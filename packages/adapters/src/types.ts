@@ -1,4 +1,5 @@
 import type {
+  ParseResult,
   WriteCacheOptions,
 } from "@mojis/internal-utils";
 import type { BUILTIN_PARSERS } from "./utils";
@@ -75,7 +76,7 @@ export type ParserFn<
 > = (ctx: TContext, data: string) => TOutput;
 
 export type GetParseOutputFromBuiltInParser<TParser extends BuiltinParser> =
-  TParser extends "splitter" ? string[] :
+  TParser extends "splitter" ? ParseResult :
     never;
 
 export type GetParseOptionsFromParser<TParser extends BuiltinParser> =

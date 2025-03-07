@@ -23,19 +23,27 @@ export const modern_metadata_handler = defineAdapterHandler({
   parserOptions: {
     separator: ";",
   },
-  transform(_ctx, _data) {
+  transform(ctx, data) {
+    console.warn("key", ctx.key);
+
+    console.log(data);
+
+    for (const line of data.lines) {
+      console.log(line);
+    }
+
     return {
       foo: "bar",
     };
   },
-  aggregate(_ctx, data) {
-    console.warn("data.foo", data[0].foo);
-    return {
-      aggregatedFoo: data.map((d) => d.foo),
-    };
+  aggregate(ctx, data) {
+    return data[0];
   },
   output(_ctx, transformed) {
-    console.warn("transformed.aggregatedFoo", transformed.aggregatedFoo);
-    return transformed;
+    console.warn("transformed.aggregatedFoo", transformed.foo);
+    return {
+      groups: [],
+      emojis: [],
+    };
   },
 });
