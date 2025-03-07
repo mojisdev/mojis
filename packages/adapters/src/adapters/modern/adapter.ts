@@ -1,6 +1,6 @@
+import type { EmojiSequence, EmojiVariation } from "@mojis/internal-utils";
 import {
-  type EmojiSequence,
-  type EmojiVariation,
+
   expandHexRange,
   FEMALE_SIGN,
   MALE_SIGN,

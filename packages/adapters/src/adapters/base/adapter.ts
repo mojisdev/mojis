@@ -1,6 +1,6 @@
+import type { EmojiGroup, EmojiMetadata } from "@mojis/internal-utils";
 import {
-  type EmojiGroup,
-  type EmojiMetadata,
+
   extractEmojiVersion,
   extractUnicodeVersion,
 } from "@mojis/internal-utils";

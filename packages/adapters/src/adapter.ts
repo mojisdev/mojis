@@ -1,3 +1,4 @@
+import type { EmojiSpecRecord } from "@mojis/internal-utils";
 import type {
   AdapterContext,
   AdapterHandler,
@@ -6,7 +7,7 @@ import type {
   ExtractDataTypeFromUrls,
   MojiAdapter,
 } from "./types";
-import { createCacheKeyFromUrl, type EmojiSpecRecord, fetchCache } from "@mojis/internal-utils";
+import { createCacheKeyFromUrl, fetchCache } from "@mojis/internal-utils";
 import { defu } from "defu";
 import semver from "semver";
 import { baseAdapter } from "./adapters/base/adapter";
@@ -17,7 +18,7 @@ interface AdapterRegistry {
   [key: string]: MojiAdapter<
     any, // metadata
     any, // sequence
-    any // variations
+    any
   >;
 }
 

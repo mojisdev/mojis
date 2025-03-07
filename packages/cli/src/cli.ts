@@ -1,19 +1,21 @@
+import type { EmojiSpecRecord, ShortcodeProvider } from "@mojis/internal-utils";
+import type { Argv } from "yargs";
 import { join } from "node:path";
 import process from "node:process";
 import { resolveAdapter, runAdapterHandler } from "@mojis/adapters";
 import {
-  type EmojiSpecRecord,
+
   getAllEmojiVersions,
   getLatestEmojiVersion,
   mapEmojiVersionToUnicodeVersion,
   MojisNotImplemented,
-  type ShortcodeProvider,
+
 } from "@mojis/internal-utils";
 import { OFFICIAL_SUPPORTED_VERSIONS } from "@mojis/internal-utils/constants";
 import { green, red, yellow } from "farver/fast";
 import fs from "fs-extra";
 import semver from "semver";
-import yargs, { type Argv } from "yargs";
+import yargs from "yargs";
 import pkg from "../package.json" with { type: "json" };
 import { readLockfile, writeLockfile } from "./lockfile";
 
