@@ -93,5 +93,5 @@ function buildContext<TContext extends AdapterContext, TExtraContext extends Rec
   ctx: TContext,
   extraContext: TExtraContext,
 ): TContext {
-  return Object.assign(ctx, extraContext);
+  return Object.assign({}, ctx, extraContext);
 }
