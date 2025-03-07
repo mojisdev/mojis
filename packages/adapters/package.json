@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "@mojis/internal-utils": "workspace:*",
+    "@mojis/parsers": "workspace:*",
     "defu": "catalog:",
     "semver": "catalog:"
   },
