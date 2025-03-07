@@ -1,3 +1,4 @@
+import { isBeforeAlignment } from "@mojis/internal-utils";
 import { defineAdapterHandler } from "../../define";
 
 export const preAlignmentMetadataHandler = defineAdapterHandler({
