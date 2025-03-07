@@ -1,5 +1,6 @@
 import type { AdapterContext, AdapterHandlerType, UrlBuilder, UrlWithCache } from "./types";
-import { createCacheKeyFromUrl, fetchCache, parse } from "@mojis/internal-utils";
+import { createCacheKeyFromUrl, fetchCache } from "@mojis/internal-utils";
+import { parse } from "@mojis/parsers";
 import { all_handlers } from "./_handlers";
 import { getHandlerUrls, isBuiltinParser, isUrlBuilder } from "./utils";
 
