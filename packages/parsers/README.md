@@ -8,7 +8,7 @@ A collection of parsers to parse different Unicode data files.
 ## Installation
 
 ```bash
-pnpm add @mojis/parsers
+npm install @mojis/parsers
 ```
 
 > [!NOTE]
