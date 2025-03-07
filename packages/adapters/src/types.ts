@@ -81,11 +81,11 @@ export type ParserFn<
   TOutput,
 > = (ctx: TContext, data: string) => TOutput;
 
-export type GetParseOutputFromBuiltInParser<TParser extends BuiltinParser> =
+export type GetParseOutputFromBuiltInParser<TParser extends string> =
   TParser extends "generic" ? ParseResult :
     never;
 
-export type GetParseOptionsFromParser<TParser extends BuiltinParser> =
+export type GetParseOptionsFromParser<TParser extends string> =
   TParser extends "generic" ? { separator: string } :
     never;
 
