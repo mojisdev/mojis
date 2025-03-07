@@ -29,6 +29,34 @@ export function isBuiltinParser(parser: unknown): parser is BuiltinParser {
   return typeof parser === "string" && BUILTIN_PARSERS.includes(parser as BuiltinParser);
 }
 
+function createUrlWithCache(url: string): UrlWithCache {
+  const cacheKey = createCacheKeyFromUrl(url);
+  return { url, cacheKey, key: cacheKey };
+}
+
+/**
+ * Processes various URL formats into a standardized array of URL objects with cache keys.
+ *
+ * This utility function handles multiple input formats:
+ * - Single string URL
+ * - Array of string URLs
+ * - URL object with cache information
+ * - Array of URL objects
+ * - URL builder function that returns URLs based on context
+ * - Null/undefined values (returns empty array)
+ *
+ * @param {Arrayable<string> | Arrayable<undefined> | Arrayable<UrlWithCache> | UrlBuilder} urls - The URL(s) to process, which can be:
+ *               - A single string URL
+ *               - An array of string URLs
+ *               - A single {@link UrlWithCache} object
+ *               - An array of {@link UrlWithCache} objects
+ *               - A {@link UrlBuilder} function that generates URLs from context
+ *               - null or undefined (returns empty array)
+ * @param {TContext} ctx - The adapter context object used when resolving URL builder functions
+ * @returns A promise that resolves to an array of {@link UrlWithCache} objects with normalized structure
+ *
+ * @template TContext - The type of context passed to URL builder functions
+ */
 export async function getHandlerUrls<TContext extends AdapterContext>(
   urls: Arrayable<string> | Arrayable<undefined> | Arrayable<UrlWithCache> | UrlBuilder,
   ctx: TContext,
@@ -47,37 +75,30 @@ export async function getHandlerUrls<TContext extends AdapterContext>(
     }
 
     if (!Array.isArray(urlsResults)) {
-      return typeof urlsResults === "string"
-        ? [{
-            url: urlsResults,
-            cacheKey: createCacheKeyFromUrl(urlsResults),
-          }]
-        : [urlsResults];
+      if (typeof urlsResults === "string") {
+        return [createUrlWithCache(urlsResults)];
+      }
+
+      return [urlsResults];
     }
 
     return urlsResults
       .filter((url) => url != null)
-      .map((url) =>
-        typeof url === "string"
-          ? { url, cacheKey: createCacheKeyFromUrl(url) }
-          : url,
-      );
+      .map((url) => typeof url === "string" ? createUrlWithCache(url) : url);
   }
 
   if (Array.isArray(urls)) {
     for (const url of urls) {
       if (url != null) {
-        result.push(
-          typeof url === "string"
-            ? { url, cacheKey: createCacheKeyFromUrl(url) }
-            : url,
-        );
+        result.push(typeof url === "string" ? createUrlWithCache(url) : url);
       }
     }
     return result;
   }
 
-  return typeof urls === "string"
-    ? [{ url: urls, cacheKey: createCacheKeyFromUrl(urls) }]
-    : [urls];
+  if (typeof urls === "string") {
+    return [createUrlWithCache(urls)];
+  }
+
+  return [urls];
 }
