@@ -18,3 +18,14 @@ export function isBeforeAlignment(version: string): boolean {
 
   return coerced.major < 13;
 }
+
+/**
+ * Checks if the given version is after the alignment.
+ * It is the inverse of `isBeforeAlignment`.
+ *
+ * @param {string} version - The version string to check
+ * @returns {boolean} `true` if the version is after alignment, `false` otherwise
+ */
+export function isAfterAlignment(version: string): boolean {
+  return !isBeforeAlignment(version);
+}
