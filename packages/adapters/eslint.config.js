@@ -14,4 +14,6 @@ export default luxass({
       },
     ],
   },
+}, {
+  ignores: ["**/*.md"],
 });
