@@ -16,7 +16,7 @@ export const preAlignmentMetadataHandler = defineAdapterHandler({
   output() {
     return {
       groups: [],
-      emojis: [],
+      emojis: {},
     };
   },
 });

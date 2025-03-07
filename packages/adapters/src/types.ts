@@ -1,4 +1,6 @@
 import type {
+  EmojiGroup,
+  EmojiMetadata,
   WriteCacheOptions,
 } from "@mojis/internal-utils";
 import type { ParseResult } from "@mojis/parsers";
@@ -55,24 +57,21 @@ export interface UrlWithCache {
 
 export type TransformFn<
   TContext extends AdapterContext,
-  TExtraContext extends Record<string, unknown>,
   TParseInput,
   TTransformOutput,
-> = (ctx: TContext & TExtraContext, data: TParseInput) => TTransformOutput;
+> = (ctx: TContext, data: TParseInput) => TTransformOutput;
 
 export type AggregateFn<
   TContext extends AdapterContext,
-  TExtraContext extends Record<string, unknown>,
   TTransformOutput,
   TAggregateOutput,
-> = (ctx: TContext & TExtraContext, data: [TTransformOutput, ...TTransformOutput[]]) => TAggregateOutput;
+> = (ctx: TContext, data: [TTransformOutput, ...TTransformOutput[]]) => TAggregateOutput;
 
 export type OutputFn<
   TContext extends AdapterContext,
-  TExtraContext extends Record<string, unknown>,
   TTransformOutput,
   TOutput,
-> = (ctx: TContext & TExtraContext, data: TTransformOutput) => TOutput;
+> = (ctx: TContext, data: TTransformOutput) => TOutput;
 
 export type BuiltinParser = typeof BUILTIN_PARSERS[number];
 
@@ -91,7 +90,6 @@ export type GetParseOptionsFromParser<TParser extends string> =
 
 export interface AdapterHandler<
   TType extends AdapterHandlerType,
-  TExtraContext extends Record<string, unknown>,
   TContext extends AdapterContext,
   TTransformOutput,
   TAggregateOutput = TTransformOutput,
@@ -145,17 +143,38 @@ export interface AdapterHandler<
    * A transform function that will run for each of the urls.
    * It will pass the returned type downwards to either the aggregate function or the output.
    */
-  transform: TransformFn<TContext, TExtraContext, TParseOutput, TTransformOutput>;
+  transform: TransformFn<TContext & {
+    key: string;
+  }, TParseOutput, TTransformOutput>;
 
   /**
    * An aggregate function that will run if defined.
    * It will receive all the transformed results as parameters, which it can then aggregate the results into a final output.
    */
-  aggregate?: AggregateFn<TContext, TExtraContext, TTransformOutput, TAggregateOutput>;
+  aggregate?: AggregateFn<TContext, TTransformOutput, TAggregateOutput>;
 
   /**
    * Output function which will receive the transformed result from the transform function, or from the aggregate function.
    * It will then output the result.
    */
-  output: OutputFn<TContext, TExtraContext, TAggregateOutput extends TTransformOutput ? TTransformOutput : TAggregateOutput, TOutput>;
+  output: OutputFn<TContext, TAggregateOutput extends TTransformOutput ? TTransformOutput : TAggregateOutput, TOutput>;
 }
+
+export type MetadataAdapterHandler = AdapterHandler<
+  "metadata", // type
+  AdapterContext, // context
+  {
+    groups: EmojiGroup[];
+    emojis: Record<string, Record<string, EmojiMetadata>>;
+  }, // transform output
+  {
+    groups: EmojiGroup[];
+    emojis: Record<string, Record<string, EmojiMetadata>>;
+  }, // aggregate output
+  {
+    groups: EmojiGroup[];
+    emojis: Record<string, Record<string, EmojiMetadata>>;
+  }, // output
+  "generic", // parser
+  ParseResult
+>;

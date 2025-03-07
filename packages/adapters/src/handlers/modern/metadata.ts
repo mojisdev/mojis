@@ -1,3 +1,4 @@
+import type { EmojiGroup, EmojiMetadata } from "@mojis/internal-utils";
 import { defineAdapterHandler } from "../../define";
 
 // These emoji versions doesn't seem to have a emoji-test,
@@ -33,17 +34,11 @@ export const modernMetadataHandler = defineAdapterHandler({
     }
 
     return {
-      foo: "bar",
+      groups: [] as EmojiGroup[],
+      emojis: {} as Record<string, Record<string, EmojiMetadata>>,
     };
-  },
-  aggregate(ctx, data) {
-    return data[0];
   },
   output(_ctx, transformed) {
-    console.warn("transformed.aggregatedFoo", transformed.foo);
-    return {
-      groups: [],
-      emojis: [],
-    };
+    return transformed;
   },
 });
