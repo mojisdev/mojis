@@ -8,6 +8,10 @@
   - changed-files:
       - any-glob-to-any-file: packages/internal-utils/**
 
+"pkg: parsers":
+  - changed-files:
+      - any-glob-to-any-file: packages/parsers/**
+
 "pkg: cli":
   - changed-files:
       - any-glob-to-any-file: packages/cli/**

@@ -57,6 +57,17 @@ export default defineConfig({
         },
         esbuild: { target: "es2020" },
         resolve: { alias: aliases },
+      },
+      {
+        extends: true,
+        test: {
+          include: ["./packages/parsers/**/*.test.{ts,js}"],
+          name: "parsers",
+          environment: "node",
+          mockReset: true,
+        },
+        esbuild: { target: "es2020" },
+        resolve: { alias: aliases },
       }
     ]
   }
