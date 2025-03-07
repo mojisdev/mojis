@@ -85,6 +85,8 @@ export async function runAdapterHandler<
 
     return output;
   }
+
+  throw new Error(`No handler found for type: ${type}`);
 }
 
 function buildContext<TContext extends AdapterContext, TExtraContext extends Record<string, unknown>>(
