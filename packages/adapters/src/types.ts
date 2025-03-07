@@ -25,7 +25,7 @@ export interface AdapterContext {
   force: boolean;
 }
 
-export type AdapterHandlerType = "metadata" | "sequence";
+export type AdapterHandlerType = "metadata" | "sequence" | "variation";
 
 export type UrlBuilder = (ctx: AdapterContext) => Promisable<Arrayable<string> | Arrayable<undefined> | Arrayable<UrlWithCache>>;
 
