@@ -14,7 +14,7 @@ export function isUrlBuilder(fn: unknown): fn is UrlBuilder {
 }
 
 export const BUILTIN_PARSERS = [
-  "splitter",
+  "generic",
 ] as const;
 
 /**

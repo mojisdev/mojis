@@ -34,7 +34,7 @@ export async function runAdapterHandler<
         cacheKey: url.cacheKey,
         parser(data) {
           if (isBuiltinParser(handler.parser)) {
-            if (handler.parser !== "splitter") {
+            if (handler.parser !== "generic") {
               throw new Error(`Parser "${handler.parser}" is not implemented.`);
             }
 

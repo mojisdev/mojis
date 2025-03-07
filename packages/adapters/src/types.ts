@@ -82,11 +82,11 @@ export type ParserFn<
 > = (ctx: TContext, data: string) => TOutput;
 
 export type GetParseOutputFromBuiltInParser<TParser extends BuiltinParser> =
-  TParser extends "splitter" ? ParseResult :
+  TParser extends "generic" ? ParseResult :
     never;
 
 export type GetParseOptionsFromParser<TParser extends BuiltinParser> =
-  TParser extends "splitter" ? { separator: string } :
+  TParser extends "generic" ? { separator: string } :
     never;
 
 export interface AdapterHandler<

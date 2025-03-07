@@ -19,7 +19,7 @@ export const modern_metadata_handler = defineAdapterHandler({
       cacheKey: `v${ctx.emoji_version}/metadata`,
     };
   },
-  parser: "splitter",
+  parser: "generic",
   parserOptions: {
     separator: ";",
   },
@@ -64,7 +64,7 @@ export const modern_sequence_handler = defineAdapterHandler({
       },
     ];
   },
-  parser: "splitter",
+  parser: "generic",
   shouldExecute: (ctx) => {
     return ctx.emoji_version === "16.0";
   },
