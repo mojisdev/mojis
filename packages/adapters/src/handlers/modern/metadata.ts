@@ -1,10 +1,10 @@
-import { defineAdapterHandler } from "../define";
+import { defineAdapterHandler } from "../../define";
 
 // These emoji versions doesn't seem to have a emoji-test,
 // where we can extract the metadata from.
 const DISALLOWED_EMOJI_VERSIONS = ["1.0", "2.0", "3.0"];
 
-export const modern_metadata_handler = defineAdapterHandler({
+export const modernMetadataHandler = defineAdapterHandler({
   type: "metadata",
   shouldExecute: (ctx) => {
     return !DISALLOWED_EMOJI_VERSIONS.includes(ctx.emoji_version);
@@ -45,38 +45,5 @@ export const modern_metadata_handler = defineAdapterHandler({
       groups: [],
       emojis: [],
     };
-  },
-});
-
-export const modern_sequence_handler = defineAdapterHandler({
-  type: "sequence",
-  urls: (ctx) => {
-    return [
-      {
-        key: "sequences",
-        url: `https://unicode.org/Public/emoji/${ctx.emoji_version}/emoji-sequences.txt`,
-        cacheKey: `v${ctx.emoji_version}/sequences`,
-      },
-      {
-        key: "zwj",
-        url: `https://unicode.org/Public/emoji/${ctx.emoji_version}/emoji-zwj-sequences.txt`,
-        cacheKey: `v${ctx.emoji_version}/zwj-sequences`,
-      },
-    ];
-  },
-  parser: "generic",
-  shouldExecute: (ctx) => {
-    return ctx.emoji_version === "16.0";
-  },
-  transform(ctx, data) {
-    console.warn("key", ctx.key);
-    return data;
-  },
-  aggregate(ctx, data) {
-    console.log("aggregate", data);
-    return data.flat();
-  },
-  output(_ctx, transformed) {
-    return transformed;
   },
 });
