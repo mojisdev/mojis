@@ -26,7 +26,19 @@ describe("is builtin parser", () => {
       false,
     ],
     [
-      () => "splitter",
+      () => "generic",
+      false,
+    ],
+    [
+      null,
+      false,
+    ],
+    [
+      undefined,
+      false,
+    ],
+    [
+      0,
       false,
     ],
   ])("should return %p for %p", (value, expected) => {
