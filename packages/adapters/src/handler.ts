@@ -87,7 +87,7 @@ export async function runAdapterHandler<
   }
 }
 
-export function buildContext<TContext extends AdapterContext, TExtraContext extends Record<string, unknown>>(
+function buildContext<TContext extends AdapterContext, TExtraContext extends Record<string, unknown>>(
   ctx: TContext,
   extraContext: TExtraContext,
 ): TContext {

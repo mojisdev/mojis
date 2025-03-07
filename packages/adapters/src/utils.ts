@@ -48,7 +48,10 @@ export async function getHandlerUrls<TContext extends AdapterContext>(
 
     if (!Array.isArray(urlsResults)) {
       return typeof urlsResults === "string"
-        ? [{ url: urlsResults, cacheKey: createCacheKeyFromUrl(urlsResults) }]
+        ? [{
+            url: urlsResults,
+            cacheKey: createCacheKeyFromUrl(urlsResults),
+          }]
         : [urlsResults];
     }
 

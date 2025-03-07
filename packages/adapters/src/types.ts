@@ -1,7 +1,7 @@
 import type {
-  ParseResult,
   WriteCacheOptions,
 } from "@mojis/internal-utils";
+import type { ParseResult } from "@mojis/parsers";
 import type { BUILTIN_PARSERS } from "./utils";
 
 type Promisable<T> = T | Promise<T>;
@@ -25,7 +25,7 @@ export interface AdapterContext {
   force: boolean;
 }
 
-export type AdapterHandlerType = "metadata";
+export type AdapterHandlerType = "metadata" | "sequence";
 
 export type UrlBuilder = (ctx: AdapterContext) => Promisable<Arrayable<string> | Arrayable<undefined> | Arrayable<UrlWithCache>>;
 
@@ -43,6 +43,14 @@ export interface UrlWithCache {
    * The cache key for the data.
    */
   cacheKey: string;
+
+  /**
+   * The key to identify the data.
+   *
+   * NOTE:
+   * If not set it will be generated from the cache key.
+   */
+  key?: string;
 }
 
 export type TransformFn<
@@ -66,8 +74,6 @@ export type OutputFn<
   TOutput,
 > = (ctx: TContext & TExtraContext, data: TTransformOutput) => TOutput;
 
-// TODO: find a better name for the splitter parser
-// The splitter parser is just a simple parser, that will split the data based on a separater character.
 export type BuiltinParser = typeof BUILTIN_PARSERS[number];
 
 export type ParserFn<
