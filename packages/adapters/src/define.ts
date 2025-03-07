@@ -61,7 +61,7 @@ export function defineAdapterHandler<
   TAggregateOutput = TTransformOutput,
   TOutput = TTransformOutput | TAggregateOutput,
   TBuiltinParser extends BuiltinParser = BuiltinParser,
-  TParseOutput = GetParseOutputFromBuiltInParser<BuiltinParser>,
+  TParseOutput = GetParseOutputFromBuiltInParser<TBuiltinParser>,
 >(handler: AdapterHandler<
   TType,
   TExtraContext,
