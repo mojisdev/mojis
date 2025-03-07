@@ -216,6 +216,24 @@ importers:
         specifier: 'catalog:'
         version: 2.1.1(vitest@3.0.7)
 
+  packages/parsers:
+    devDependencies:
+      '@luxass/eslint-config':
+        specifier: 'catalog:'
+        version: 4.15.0(@typescript-eslint/utils@8.24.1(eslint@9.21.0)(typescript@5.8.2))(@vue/compiler-sfc@3.5.13)(eslint@9.21.0)(typescript@5.8.2)(vitest@3.0.7)
+      eslint:
+        specifier: 'catalog:'
+        version: 9.21.0
+      tsup:
+        specifier: 'catalog:'
+        version: 8.4.0(postcss@8.5.3)(typescript@5.8.2)(yaml@2.7.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.2
+      vitest-testdirs:
+        specifier: 'catalog:'
+        version: 2.1.1(vitest@3.0.7)
+
 packages:
 
   '@ampproject/remapping@2.3.0':
