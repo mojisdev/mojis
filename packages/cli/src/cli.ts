@@ -4,12 +4,9 @@ import { join } from "node:path";
 import process from "node:process";
 import { runAdapterHandler } from "@mojis/adapters";
 import {
-
   getAllEmojiVersions,
   getLatestEmojiVersion,
   mapEmojiVersionToUnicodeVersion,
-  MojisNotImplemented,
-
 } from "@mojis/internal-utils";
 import { OFFICIAL_SUPPORTED_VERSIONS } from "@mojis/internal-utils/constants";
 import { green, red, yellow } from "farver/fast";
@@ -270,10 +267,6 @@ cli.command(
 
     for (const result of results) {
       if (result.status === "rejected") {
-        if (result.reason instanceof MojisNotImplemented) {
-          console.warn(result.reason.message);
-          continue;
-        }
         console.error(result.reason);
       }
     }
