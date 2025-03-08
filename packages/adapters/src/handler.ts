@@ -19,14 +19,16 @@ export async function runAdapterHandler<
   }
 
   for (const handler of handlerGroup) {
-    // should we execute?
+    // figure out if we should execute this handler
     const shouldExecute = await handler.shouldExecute(ctx);
 
     if (!shouldExecute) {
       continue;
     }
 
+    // generate a list of all urls, that should be handled
     const urls = await getHandlerUrls(handler.urls, ctx);
+
     // fetch all the data from the urls
     const dataRequests = urls.map(async (url) => {
       const key = url.cacheKey;
@@ -64,7 +66,7 @@ export async function runAdapterHandler<
     for (const [key, data] of dataResults) {
       // run transform for each data in list
 
-      const transformedData = await handler.transform(buildContext(ctx, {
+      const transformedData = handler.transform(buildContext(ctx, {
         key,
       }), data);
 
@@ -74,15 +76,15 @@ export async function runAdapterHandler<
     // only run aggregate if defined, but still call output
     if (!handler.aggregate) {
       const data = transformedDataList.length === 1 ? transformedDataList[0] : transformedDataList;
-      return await handler.output(buildContext(ctx, {}), data);
+      return handler.output(buildContext(ctx, {}), data);
     }
 
-    const aggregatedData = await handler.aggregate(buildContext(ctx, {
+    const aggregatedData = handler.aggregate(buildContext(ctx, {
       data: transformedDataList,
     }), transformedDataList);
 
     // run output
-    const output = await handler.output(buildContext(ctx, {
+    const output = handler.output(buildContext(ctx, {
       data: aggregatedData,
     }), aggregatedData);
 

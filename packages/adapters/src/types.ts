@@ -123,11 +123,6 @@ export interface AdapterHandler<
   shouldExecute: ShouldExecute<TContext>;
 
   /**
-   * A list of other "handlers types", that is required to be run before this handler.
-   */
-  dependencies?: string[];
-
-  /**
    * A parse function or a reference to a builtin parser.
    *
    */
@@ -175,8 +170,8 @@ export type MetadataAdapterHandler = AdapterHandler<
     groups: EmojiGroup[];
     emojis: Record<string, Record<string, EmojiMetadata>>;
   }, // output
-  "generic", // parser
-  ParseResult
+  never, // parser
+  { lines: string[] }
 >;
 
 export type InferOutputFromAdapterHandlerType<THandlerType extends AdapterHandlerType> = THandlerType extends "metadata" ? ReturnType<MetadataAdapterHandler["output"]> : never;
