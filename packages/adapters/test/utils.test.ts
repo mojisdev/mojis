@@ -136,6 +136,17 @@ describe("getHandlerUrls", () => {
     ]);
   });
 
+  it("should handle UrlBuilder returning array of UrlWithCache", async () => {
+    const urlList = [
+      { url: "https://example.com", cacheKey: "builder-key", key: "builder-key" },
+      { url: "https://test.com", cacheKey: "builder-key-2", key: "builder-key-2" },
+    ];
+    const urlBuilder = vi.fn().mockResolvedValue(urlList);
+    const result = await getHandlerUrls(urlBuilder, ctx);
+    expect(urlBuilder).toHaveBeenCalledWith(ctx);
+    expect(result).toEqual(urlList);
+  });
+
   it("should handle UrlBuilder returning array with null values", async () => {
     const urlBuilder = vi.fn().mockResolvedValue(["https://example.com", null, "https://test.com"]);
     const result = await getHandlerUrls(urlBuilder, ctx);
