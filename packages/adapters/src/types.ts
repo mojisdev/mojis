@@ -91,11 +91,15 @@ export type GetParseOptionsFromParser<TParser extends string> =
 export interface AdapterHandler<
   TType extends AdapterHandlerType,
   TContext extends AdapterContext,
+  TParser extends string | ParserFn<TContext, any>,
   TTransformOutput,
+  TParseOutput = TParser extends ParserFn<TContext, infer T>
+    ? T
+    : TParser extends BuiltinParser
+      ? GetParseOutputFromBuiltInParser<TParser>
+      : never,
   TAggregateOutput = TTransformOutput,
   TOutput = TTransformOutput | TAggregateOutput,
-  TBuiltinParser extends BuiltinParser = BuiltinParser,
-  TParseOutput = GetParseOutputFromBuiltInParser<TBuiltinParser>,
 > {
   /**
    * The type of the handler, this is used to identify the handler.
@@ -126,13 +130,13 @@ export interface AdapterHandler<
    * A parse function or a reference to a builtin parser.
    *
    */
-  parser: ParserFn<TContext, TParseOutput> | TBuiltinParser;
+  parser: TParser;
 
   /**
    * Options that will be passed to the parser.
    * This will only be used if the parser is a builtin parser.
    */
-  parserOptions?: GetParseOptionsFromParser<TBuiltinParser>;
+  parserOptions?: TParser extends BuiltinParser ? GetParseOptionsFromParser<TParser> : never;
 
   /**
    * A transform function that will run for each of the urls.
@@ -158,20 +162,11 @@ export interface AdapterHandler<
 export type MetadataAdapterHandler = AdapterHandler<
   "metadata", // type
   AdapterContext, // context
+  () => { lines: string[] }, // parser
   {
     groups: EmojiGroup[];
     emojis: Record<string, Record<string, EmojiMetadata>>;
-  }, // transform output
-  {
-    groups: EmojiGroup[];
-    emojis: Record<string, Record<string, EmojiMetadata>>;
-  }, // aggregate output
-  {
-    groups: EmojiGroup[];
-    emojis: Record<string, Record<string, EmojiMetadata>>;
-  }, // output
-  never, // parser
-  { lines: string[] }
+  } // transform output
 >;
 
 export type InferOutputFromAdapterHandlerType<THandlerType extends AdapterHandlerType> = THandlerType extends "metadata" ? ReturnType<MetadataAdapterHandler["output"]> : never;

@@ -1,11 +1,8 @@
 import type {
-  EmojiGroup,
-  EmojiMetadata,
   EmojiSequence,
   EmojiVariation,
 } from "@mojis/internal-utils";
-import type { ParseResult } from "@mojis/parsers";
-import type { AdapterContext, AdapterHandler, MetadataAdapterHandler } from "./types";
+import type { AdapterHandler, MetadataAdapterHandler } from "./types";
 import { modernMetadataHandler } from "./handlers/modern/metadata";
 import { modernSequenceHandler } from "./handlers/modern/sequence";
 import { modernVariationHandler } from "./handlers/modern/variation";

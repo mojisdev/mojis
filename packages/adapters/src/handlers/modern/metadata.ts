@@ -36,9 +36,6 @@ export const modernMetadataHandler = defineAdapterHandler({
       lines: data.split("\n"),
     };
   },
-  parserOptions: {
-    separator: ";",
-  },
   transform(ctx, data) {
     let currentGroup: EmojiGroup | undefined;
 

@@ -2,36 +2,39 @@ import type {
   AdapterContext,
   AdapterHandler,
   AdapterHandlerType,
-  AggregateFn,
   BuiltinParser,
   GetParseOutputFromBuiltInParser,
-  OutputFn,
+  ParserFn,
 } from "./types";
 
 export function defineAdapterHandler<
   TAdapterHandlerType extends AdapterHandlerType,
   TContext extends AdapterContext,
+  TParser extends (string | ParserFn<TContext, unknown>),
   TTransformOutput,
+  TParseOutput = TParser extends ParserFn<TContext, infer TParserOutput>
+    ? TParserOutput
+    : TParser extends BuiltinParser
+      ? GetParseOutputFromBuiltInParser<TParser>
+      : never,
   TAggregateOutput = TTransformOutput,
   TOutput = TTransformOutput | TAggregateOutput,
-  TBuiltinParser extends BuiltinParser = BuiltinParser,
-  TParseOutput = GetParseOutputFromBuiltInParser<TBuiltinParser>,
 >(handler: AdapterHandler<
   TAdapterHandlerType,
   TContext,
+  TParser,
   TTransformOutput,
+  TParseOutput,
   TAggregateOutput,
-  TOutput,
-  TBuiltinParser,
-  TParseOutput
+  TOutput
 >): AdapterHandler<
     TAdapterHandlerType,
     TContext,
+    TParser,
     TTransformOutput,
+    TParseOutput,
     TAggregateOutput,
-    TOutput,
-    TBuiltinParser,
-    TParseOutput
+    TOutput
   > {
   return handler;
 }
