@@ -1,4 +1,4 @@
-import type { AdapterContext, AdapterHandlerType, InferOutputFromAdapterHandlerType, UrlBuilder, UrlWithCache } from "./types";
+import type { AdapterContext, AdapterHandler, AdapterHandlerType, InferOutputFromAdapterHandlerType, InferParseOutput, ParserFn, UrlBuilder, UrlWithCache } from "./types";
 import { createCacheKeyFromUrl, fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
 import { ALL_HANDLERS } from "./_handlers";
@@ -65,11 +65,10 @@ export async function runAdapterHandler<
 
     // run transform for each data in list
     for (const [key, data] of dataResults) {
-      // run transform for each data in list
-
+      // Narrow the type of data based on the parser type
       const transformedData = handler.transform(buildContext(ctx, {
         key,
-      }), data);
+      }), data as InferParseOutput<TContext, typeof handler.parser>);
 
       transformedDataList.push(transformedData);
     }

@@ -93,11 +93,7 @@ export interface AdapterHandler<
   TContext extends AdapterContext,
   TParser extends string | ParserFn<TContext, any>,
   TTransformOutput,
-  TParseOutput = TParser extends ParserFn<TContext, infer T>
-    ? T
-    : TParser extends BuiltinParser
-      ? GetParseOutputFromBuiltInParser<TParser>
-      : never,
+  TParseOutput = InferParseOutput<TContext, TParser>,
   TAggregateOutput = TTransformOutput,
   TOutput = TTransformOutput | TAggregateOutput,
 > {
@@ -174,3 +170,8 @@ export type InferOutputFromAdapterHandlerType<THandlerType extends AdapterHandle
      THandlerType extends "sequence" ? unknown :
        THandlerType extends "variation" ? unknown :
          unknown;
+
+export type InferParseOutput<TContext extends AdapterContext, TParser extends string | ParserFn<TContext, any>> =
+  TParser extends ParserFn<AdapterContext, infer TOutput> ? TOutput :
+    TParser extends BuiltinParser ? GetParseOutputFromBuiltInParser<TParser> :
+      never;

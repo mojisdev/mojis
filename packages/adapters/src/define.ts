@@ -4,6 +4,7 @@ import type {
   AdapterHandlerType,
   BuiltinParser,
   GetParseOutputFromBuiltInParser,
+  InferParseOutput,
   ParserFn,
 } from "./types";
 
@@ -12,11 +13,7 @@ export function defineAdapterHandler<
   TContext extends AdapterContext,
   TParser extends (string | ParserFn<TContext, unknown>),
   TTransformOutput,
-  TParseOutput = TParser extends ParserFn<TContext, infer TParserOutput>
-    ? TParserOutput
-    : TParser extends BuiltinParser
-      ? GetParseOutputFromBuiltInParser<TParser>
-      : never,
+  TParseOutput = InferParseOutput<TContext, TParser>,
   TAggregateOutput = TTransformOutput,
   TOutput = TTransformOutput | TAggregateOutput,
 >(handler: AdapterHandler<
