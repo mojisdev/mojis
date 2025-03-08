@@ -109,6 +109,16 @@ export async function getHandlerUrls<TContext extends AdapterContext>(
   return [urls];
 }
 
+/**
+ * Builds a new context object by merging the properties of the original context with additional properties.
+ *
+ * @param {TContext} ctx - The original context object.
+ * @param {TExtraContext} extraContext - An object containing additional properties to be added to the context.
+ * @returns {TContext & TExtraContext} A new context object that is the result of merging the original context with the extra context.
+ *
+ * @template {AdapterContext} TContext - The type of the original context object
+ * @template {Record<string, unknown>} TExtraContext - The type of the additional context object
+ */
 export function buildContext<TContext extends AdapterContext, TExtraContext extends Record<string, unknown>>(
   ctx: TContext,
   extraContext: TExtraContext,

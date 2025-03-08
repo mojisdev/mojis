@@ -1,6 +1,6 @@
 import type { AdapterContext, Arrayable } from "../src/types";
 import { describe, expect, it, vi } from "vitest";
-import { BUILTIN_PARSERS, getHandlerUrls, isBuiltinParser, isUrlBuilder } from "../src/utils";
+import { buildContext, BUILTIN_PARSERS, getHandlerUrls, isBuiltinParser, isUrlBuilder } from "../src/utils";
 
 describe("is url builder", () => {
   it.each([
@@ -155,5 +155,55 @@ describe("getHandlerUrls", () => {
       { url: "https://example.com", cacheKey: "example_com", key: "example_com" },
       { url: "https://test.com", cacheKey: "test_com", key: "test_com" },
     ]);
+  });
+});
+
+describe("buildContext", () => {
+  it("should merge context objects", () => {
+    const ctx = {
+      force: false,
+      emoji_version: "1.0",
+      unicode_version: "1.0",
+    } as AdapterContext;
+    const extraContext = { foo: "bar", baz: 123 };
+    const result = buildContext(ctx, extraContext);
+    expect(result).toEqual({
+      force: false,
+      emoji_version: "1.0",
+      unicode_version: "1.0",
+      foo: "bar",
+      baz: 123,
+    });
+  });
+
+  it("should override properties in the original context", () => {
+    const ctx = {
+      force: false,
+      emoji_version: "1.0",
+      unicode_version: "1.0",
+    } as AdapterContext;
+    const extraContext = { foo: "override" };
+    const result = buildContext(ctx, extraContext);
+    expect(result).toEqual({
+      force: false,
+      emoji_version: "1.0",
+      unicode_version: "1.0",
+      foo: "override",
+    });
+  });
+
+  it("should handle empty extra context", () => {
+    const ctx = {
+      force: false,
+      emoji_version: "1.0",
+      unicode_version: "1.0",
+    } as AdapterContext;
+    const extraContext = {};
+    const result = buildContext(ctx, extraContext);
+    expect(result).toEqual({
+      force: false,
+      emoji_version: "1.0",
+      unicode_version: "1.0",
+    });
   });
 });
