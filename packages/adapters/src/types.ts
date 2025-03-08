@@ -156,16 +156,6 @@ export interface AdapterHandler<
   output: OutputFn<TContext, TAggregateOutput extends TTransformOutput ? TTransformOutput : TAggregateOutput, TOutput>;
 }
 
-export type MetadataAdapterHandler = AdapterHandler<
-  "metadata", // type
-  AdapterContext, // context
-  () => { lines: string[] }, // parser
-  {
-    groups: EmojiGroup[];
-    emojis: Record<string, Record<string, EmojiMetadata>>;
-  }
->;
-
 export type InferOutputFromAdapterHandlerType<THandlerType extends AdapterHandlerType> =
    THandlerType extends "metadata" ? ReturnType<typeof METADATA_HANDLERS[number]["output"]> :
      THandlerType extends "sequence" ? ReturnType<typeof SEQUENCE_HANDLERS[number]["output"]> :
