@@ -180,24 +180,20 @@ cli.command(
         );
       }
 
-      // if (isGeneratorEnabled("variations")) {
-      //   if (adapter.variations == null) {
-      //     throw new MojisNotImplemented("variations");
-      //   }
+      if (isGeneratorEnabled("variations")) {
+        const variations = await runAdapterHandler("variation", {
+          force,
+          emoji_version: version.emoji_version,
+          unicode_version: version.unicode_version,
+        });
 
-      //   const variations = await runAdapterHandler(adapter, "variations", {
-      //     force,
-      //     emoji_version: version.emoji_version,
-      //     unicode_version: version.unicode_version,
-      //   });
-
-      //   await fs.ensureDir(`./data/v${version.emoji_version}`);
-      //   await fs.writeFile(
-      //     `./data/v${version.emoji_version}/variations.json`,
-      //     JSON.stringify(variations, null, 2),
-      //     "utf-8",
-      //   );
-      // }
+        await fs.ensureDir(join(baseDir, "variations"));
+        await fs.writeFile(
+          join(baseDir, "variations.json"),
+          JSON.stringify(variations, null, 2),
+          "utf-8",
+        );
+      }
 
       // if (isGeneratorEnabled("emojis")) {
       //   if (adapter.emojis == null) {
