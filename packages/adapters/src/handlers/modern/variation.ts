@@ -25,7 +25,6 @@ export const modernVariationHandler = defineAdapterHandler({
     return data;
   },
   aggregate(ctx, data) {
-    console.log("aggregate", data);
     return data.flat();
   },
   output(_ctx, transformed) {
