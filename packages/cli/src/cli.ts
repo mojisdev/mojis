@@ -4,17 +4,15 @@ import { join } from "node:path";
 import process from "node:process";
 import { runAdapterHandler } from "@mojis/adapters";
 import {
-
   getAllEmojiVersions,
   getLatestEmojiVersion,
   mapEmojiVersionToUnicodeVersion,
   MojisNotImplemented,
-
 } from "@mojis/internal-utils";
 import { OFFICIAL_SUPPORTED_VERSIONS } from "@mojis/internal-utils/constants";
+import { compare, compareVersions } from "compare-versions";
 import { green, red, yellow } from "farver/fast";
 import fs from "fs-extra";
-import semver from "semver";
 import yargs from "yargs";
 import pkg from "../package.json" with { type: "json" };
 import { readLockfile, writeLockfile } from "./lockfile";
@@ -102,8 +100,8 @@ cli.command(
       // set the fallback for each of the versions that are not officially supported
       for (const version of notOfficialSupported) {
         const sortedVersions = [...existingEmojiVersions]
-          .filter((v) => semver.lt(`${v.emoji_version}.0`, `${version.emoji_version}.0`))
-          .sort((a, b) => semver.compare(`${b.emoji_version}.0`, `${a.emoji_version}.0`));
+          .filter((v) => compare(v.emoji_version, version.emoji_version, "<"))
+          .sort((a, b) => compareVersions(b.emoji_version, a.emoji_version));
 
         const previousVersion = sortedVersions[0];
 
@@ -305,7 +303,7 @@ cli.command(
     console.log(versions.map((v) => `${yellow(v.emoji_version)}${v.draft ? ` ${red("(draft)")}` : ""}`).join(", "));
 
     if (args.writeLockfile) {
-      const sortedVersions = versions.filter((v) => !v.draft).sort((a, b) => semver.rcompare(a.unicode_version, b.unicode_version));
+      const sortedVersions = versions.filter((v) => !v.draft).sort((a, b) => compareVersions(b.emoji_version, a.emoji_version));
 
       if (sortedVersions.length === 0 || sortedVersions[0] == null) {
         console.warn("no stable versions found, skipping lockfile update");
