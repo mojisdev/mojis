@@ -1,7 +1,14 @@
 import type { EmojiSpecRecord } from "../src/types";
 import fs from "node:fs";
 import { describe, expect, it } from "vitest";
-import { extractEmojiVersion, extractVersionFromReadme, getCurrentDraftVersion, getLatestEmojiVersion, mapEmojiVersionToUnicodeVersion, toSemverCompatible } from "../src/versions";
+import {
+  extractEmojiVersion,
+  extractVersionFromReadme,
+  getCurrentDraftVersion,
+  getLatestEmojiVersion,
+  mapEmojiVersionToUnicodeVersion,
+  toSemverCompatible,
+} from "../src/versions";
 
 describe("get draft version", () => {
   it("returns draft versions when fetches succeed and versions match", async () => {
@@ -63,7 +70,6 @@ describe("extract version", () => {
 
     { name: "draft readme", path: "root/README-valid.txt", version: "17.0.0" },
     { name: "invalid draft readme", path: "root/README-invalid.txt", version: null },
-
   ])("extract version from $name", ({ path, version }) => {
     it("should extract version from file path", () => {
       const content = fs.readFileSync(`./test/fixtures/extract-version/${path}`, "utf-8");

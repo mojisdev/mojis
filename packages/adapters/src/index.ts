@@ -1,3 +1,3 @@
-export * from "./adapter";
+export * from "./handler";
 
 export type * from "./types";

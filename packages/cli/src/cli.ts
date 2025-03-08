@@ -2,7 +2,7 @@ import type { EmojiSpecRecord, ShortcodeProvider } from "@mojis/internal-utils";
 import type { Argv } from "yargs";
 import { join } from "node:path";
 import process from "node:process";
-import { resolveAdapter, runAdapterHandler } from "@mojis/adapters";
+import { runAdapterHandler } from "@mojis/adapters";
 import {
 
   getAllEmojiVersions,
@@ -134,22 +134,12 @@ cli.command(
     console.info(`using the following generators ${args.generators.map((g) => yellow(g)).join(", ")}`);
 
     const promises = versions.map(async (version) => {
-      const adapter = resolveAdapter(version);
-
-      if (adapter == null) {
-        throw new Error(`no adapter found for version ${version.emoji_version}`);
-      }
-
       const baseDir = `./data/v${version.emoji_version}`;
 
       await fs.ensureDir(baseDir);
 
       if (isGeneratorEnabled("metadata")) {
-        if (adapter.metadata == null) {
-          throw new MojisNotImplemented("metadata");
-        }
-
-        const { groups, emojis } = await runAdapterHandler(adapter, "metadata", {
+        const { groups, emojis } = await runAdapterHandler("metadata", {
           force,
           emoji_version: version.emoji_version,
           unicode_version: version.unicode_version,
@@ -171,11 +161,7 @@ cli.command(
       }
 
       if (isGeneratorEnabled("sequences")) {
-        if (adapter.sequences == null) {
-          throw new MojisNotImplemented("sequences");
-        }
-
-        const { sequences, zwj } = await runAdapterHandler(adapter, "sequences", {
+        const { sequences, zwj } = await runAdapterHandler("sequence", {
           force,
           emoji_version: version.emoji_version,
           unicode_version: version.unicode_version,
@@ -195,19 +181,15 @@ cli.command(
       }
 
       if (isGeneratorEnabled("variations")) {
-        if (adapter.variations == null) {
-          throw new MojisNotImplemented("variations");
-        }
-
-        const variations = await runAdapterHandler(adapter, "variations", {
+        const variations = await runAdapterHandler("variation", {
           force,
           emoji_version: version.emoji_version,
           unicode_version: version.unicode_version,
         });
 
-        await fs.ensureDir(`./data/v${version.emoji_version}`);
+        await fs.ensureDir(join(baseDir, "variations"));
         await fs.writeFile(
-          `./data/v${version.emoji_version}/variations.json`,
+          join(baseDir, "variations.json"),
           JSON.stringify(variations, null, 2),
           "utf-8",
         );

@@ -1,1 +1,6 @@
-export { parse, type ParsedLine, type ParseOptions, type ParseResult } from "./generic";
+export {
+  genericParse,
+  type GenericParseOptions,
+  type GenericParseResult,
+  type ParsedLine,
+} from "./generic";
