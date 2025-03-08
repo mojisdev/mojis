@@ -35,16 +35,15 @@
   "dependencies": {
     "@mojis/adapters": "workspace:*",
     "@mojis/internal-utils": "workspace:*",
+    "compare-versions": "catalog:",
     "farver": "catalog:",
     "fs-extra": "catalog:",
-    "semver": "catalog:",
     "yargs": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@luxass/eslint-config": "catalog:",
     "@types/fs-extra": "catalog:",
-    "@types/semver": "catalog:",
     "@types/yargs": "catalog:",
     "eslint": "catalog:",
     "tsup": "catalog:",
