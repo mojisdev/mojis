@@ -1,6 +1,4 @@
 import type {
-  EmojiGroup,
-  EmojiMetadata,
   WriteCacheOptions,
 } from "@mojis/internal-utils";
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
