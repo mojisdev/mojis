@@ -17,8 +17,6 @@ async function run() {
 
   await mkdir(root, { recursive: true });
 
-  // recursively loop over all the entries inside rootEntry.children
-
   async function processEntry(entry: Entry) {
     if (entry.type === "directory") {
       for (const child of entry.children) {
