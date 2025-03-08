@@ -1,11 +1,10 @@
-import { baseMetadataHandler } from "./handlers/base/metadata";
 import { baseVariationHandler } from "./handlers/base/variation";
+import { baseMetadataHandler, notSupportedMetadataHandler } from "./handlers/metadata";
 import { modernSequenceHandler } from "./handlers/modern/sequence";
-import { preAlignmentMetadataHandler } from "./handlers/pre-alignment/metadata";
 
 export const METADATA_HANDLERS = [
   baseMetadataHandler,
-  preAlignmentMetadataHandler,
+  notSupportedMetadataHandler,
 ];
 
 export const SEQUENCE_HANDLERS = [

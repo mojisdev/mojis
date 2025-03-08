@@ -1,6 +1,6 @@
 import type { EmojiGroup, EmojiMetadata } from "@mojis/internal-utils";
 import { extractEmojiVersion, extractUnicodeVersion } from "@mojis/internal-utils";
-import { defineAdapterHandler } from "../../define";
+import { defineAdapterHandler } from "../define";
 
 function slugify(val: string): string {
   return val.normalize("NFD")
@@ -17,6 +17,7 @@ function slugify(val: string): string {
 // where we can extract the metadata from.
 const DISALLOWED_EMOJI_VERSIONS = ["1.0", "2.0", "3.0"];
 
+// TODO: give this a better name
 export const baseMetadataHandler = defineAdapterHandler({
   type: "metadata",
   shouldExecute: (ctx) => {
@@ -122,5 +123,26 @@ export const baseMetadataHandler = defineAdapterHandler({
   },
   output(_ctx, transformed) {
     return transformed;
+  },
+});
+
+// TODO: find a better name
+export const notSupportedMetadataHandler = defineAdapterHandler({
+  type: "metadata",
+  shouldExecute: (ctx) => {
+    return DISALLOWED_EMOJI_VERSIONS.includes(ctx.emoji_version);
+  },
+  urls: () => {
+    return undefined;
+  },
+  parser: "generic",
+  transform() {
+    return undefined;
+  },
+  output() {
+    return {
+      groups: [],
+      emojis: {},
+    };
   },
 });
