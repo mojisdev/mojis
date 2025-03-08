@@ -1,4 +1,5 @@
-import { type EmojiGroup, type EmojiMetadata, extractEmojiVersion, extractUnicodeVersion } from "@mojis/internal-utils";
+import type { EmojiGroup, EmojiMetadata } from "@mojis/internal-utils";
+import { extractEmojiVersion, extractUnicodeVersion } from "@mojis/internal-utils";
 import { defineAdapterHandler } from "../../define";
 
 function slugify(val: string): string {

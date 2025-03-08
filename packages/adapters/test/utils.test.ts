@@ -1,4 +1,4 @@
-import type { AdapterContext, Arrayable, UrlWithCache } from "../src/types";
+import type { AdapterContext, Arrayable } from "../src/types";
 import { describe, expect, it, vi } from "vitest";
 import { BUILTIN_PARSERS, getHandlerUrls, isBuiltinParser, isUrlBuilder } from "../src/utils";
 

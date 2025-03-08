@@ -163,7 +163,7 @@ export type MetadataAdapterHandler = AdapterHandler<
   {
     groups: EmojiGroup[];
     emojis: Record<string, Record<string, EmojiMetadata>>;
-  } // transform output
+  }
 >;
 
 export type InferOutputFromAdapterHandlerType<THandlerType extends AdapterHandlerType> =

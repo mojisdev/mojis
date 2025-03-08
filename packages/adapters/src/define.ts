@@ -2,8 +2,6 @@ import type {
   AdapterContext,
   AdapterHandler,
   AdapterHandlerType,
-  BuiltinParser,
-  GetParseOutputFromBuiltInParser,
   InferParseOutput,
   ParserFn,
 } from "./types";
