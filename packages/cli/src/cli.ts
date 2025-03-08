@@ -184,7 +184,6 @@ cli.command(
           unicode_version: version.unicode_version,
         });
 
-        await fs.ensureDir(join(baseDir, "variations"));
         await fs.writeFile(
           join(baseDir, "variations.json"),
           JSON.stringify(variations, null, 2),

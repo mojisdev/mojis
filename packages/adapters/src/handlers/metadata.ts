@@ -1,5 +1,5 @@
 import type { EmojiGroup, EmojiMetadata } from "@mojis/internal-utils";
-import { extractEmojiVersion, extractUnicodeVersion } from "@mojis/internal-utils";
+import { extractEmojiVersion, extractUnicodeVersion, isBefore } from "@mojis/internal-utils";
 import { defineAdapterHandler } from "../define";
 
 function slugify(val: string): string {
@@ -92,8 +92,18 @@ export const baseMetadataHandler = defineAdapterHandler({
       const hexcode = baseHexcode.trim().replace(/\s+/g, "-");
       const qualifier = baseQualifier.trim();
 
-      const emojiVersion = extractEmojiVersion(comment.trim());
-      const [emoji, trimmedComment] = comment.trim().split(` E${emojiVersion} `);
+      // if the emoji_version is v5 and under.
+      // the content after the # doesn't include the emoji version.
+      let emoji;
+      let trimmedComment;
+
+      const extractedEmojiVersion = extractEmojiVersion(comment.trim());
+
+      if (isBefore(ctx.emoji_version, "6.0.0")) {
+        [emoji, trimmedComment] = comment.trim().split(" ");
+      } else {
+        [emoji, trimmedComment] = comment.trim().split(` E${extractedEmojiVersion} `);
+      }
 
       const groupName = currentGroup?.slug ?? "unknown";
       const subgroupName = currentGroup?.subgroups[currentGroup.subgroups.length - 1] ?? "unknown";
@@ -108,8 +118,8 @@ export const baseMetadataHandler = defineAdapterHandler({
         group: groupName,
         subgroup: subgroupName,
         qualifier,
-        emojiVersion: emojiVersion || null,
-        unicodeVersion: extractUnicodeVersion(emojiVersion, ctx.unicode_version),
+        emojiVersion: extractedEmojiVersion || null,
+        unicodeVersion: extractUnicodeVersion(extractedEmojiVersion, ctx.unicode_version),
         description: trimmedComment || "",
         emoji: emoji || null,
         hexcodes: hexcode.split("-"),
