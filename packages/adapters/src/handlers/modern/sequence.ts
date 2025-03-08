@@ -1,3 +1,4 @@
+import semver from "semver";
 import { defineAdapterHandler } from "../../define";
 
 export const modernSequenceHandler = defineAdapterHandler({
@@ -18,15 +19,18 @@ export const modernSequenceHandler = defineAdapterHandler({
   },
   parser: "generic",
   shouldExecute: (ctx) => {
-    return ctx.emoji_version === "16.0";
+    return semver.gte(ctx.emoji_version, "16.0.0");
   },
   transform(ctx, data) {
     console.warn("key", ctx.key);
+    console.log(data);
     return data;
   },
-  aggregate(ctx, data) {
-    console.log("aggregate", data);
-    return data.flat();
+  aggregate(_, data) {
+    return {
+      sequences: data[0],
+      zwj: data[1],
+    };
   },
   output(_ctx, transformed) {
     return transformed;
