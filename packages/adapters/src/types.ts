@@ -8,6 +8,8 @@ import type { BUILTIN_PARSERS } from "./utils";
 type Promisable<T> = T | Promise<T>;
 export type Arrayable<T> = T | T[];
 
+export type AdapterUrls = Arrayable<string> | Arrayable<undefined> | Arrayable<UrlWithCache>;
+
 export interface AdapterContext {
   /**
    * The emoji version.
@@ -28,7 +30,7 @@ export interface AdapterContext {
 
 export type AdapterHandlerType = "metadata" | "sequence" | "variation";
 
-export type UrlBuilder = (ctx: AdapterContext) => Promisable<Arrayable<string> | Arrayable<undefined> | Arrayable<UrlWithCache>>;
+export type UrlBuilder = (ctx: AdapterContext) => Promisable<AdapterUrls>;
 
 export type ShouldExecute<
   TContext extends AdapterContext,
@@ -104,7 +106,7 @@ export interface AdapterHandler<
   /**
    * The urls that will be fetched.
    */
-  urls: Arrayable<string> | Arrayable<undefined> | Arrayable<UrlWithCache> | UrlBuilder;
+  urls: AdapterUrls | UrlBuilder;
 
   /**
    * Options that will be passed to the fetch function.

@@ -51,7 +51,7 @@ cli.command(
 
     let providedVersions = (Array.isArray(args.versions) ? args.versions : [args.versions]) as string[];
 
-    const generators = Array.isArray(args.generators) ? args.generators : [args.generators];
+    const generators = (Array.isArray(args.generators) ? args.generators : [args.generators]) as string[];
 
     const lockfile = await readLockfile();
 
