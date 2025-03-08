@@ -29,6 +29,12 @@ export function isBuiltinParser(parser: unknown): parser is BuiltinParser {
   return typeof parser === "string" && BUILTIN_PARSERS.includes(parser as BuiltinParser);
 }
 
+/**
+ * Creates a URL object with associated cache key.
+ *
+ * @param {string} url - The URL string.
+ * @returns {UrlWithCache} An object containing the original URL, a cache key derived from the URL, and the cache key itself (aliased as 'key').
+ */
 function createUrlWithCache(url: string): UrlWithCache {
   const cacheKey = createCacheKeyFromUrl(url);
   return { url, cacheKey, key: cacheKey };
@@ -53,7 +59,7 @@ function createUrlWithCache(url: string): UrlWithCache {
  *               - A {@link UrlBuilder} function that generates URLs from context
  *               - null or undefined (returns empty array)
  * @param {TContext} ctx - The adapter context object used when resolving URL builder functions
- * @returns A promise that resolves to an array of {@link UrlWithCache} objects with normalized structure
+ * @returns {Promise<UrlWithCache[]>} A promise that resolves to an array of {@link UrlWithCache} objects with normalized structure
  *
  * @template TContext - The type of context passed to URL builder functions
  */
