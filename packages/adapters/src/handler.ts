@@ -1,4 +1,4 @@
-import type { AdapterContext, AdapterHandlerType, UrlBuilder, UrlWithCache } from "./types";
+import type { AdapterContext, AdapterHandlerType, InferOutputFromAdapterHandlerType, UrlBuilder, UrlWithCache } from "./types";
 import { createCacheKeyFromUrl, fetchCache } from "@mojis/internal-utils";
 import { parse } from "@mojis/parsers";
 import { all_handlers } from "./_handlers";
@@ -11,7 +11,7 @@ export async function runAdapterHandler<
 >(
   type: THandlerType,
   ctx: TContext & TExtraContext,
-): Promise<any> {
+): Promise<InferOutputFromAdapterHandlerType<THandlerType>> {
   const handlerGroup = all_handlers[type];
 
   if (!handlerGroup) {
@@ -68,12 +68,15 @@ export async function runAdapterHandler<
         key,
       }), data);
 
-      console.log("transformedData", transformedData);
-
       transformedDataList.push(transformedData);
     }
 
-    // run aggregate
+    // only run aggregate if defined, but still call output
+    if (!handler.aggregate) {
+      const data = transformedDataList.length === 1 ? transformedDataList[0] : transformedDataList;
+      return await handler.output(buildContext(ctx, {}), data);
+    }
+
     const aggregatedData = await handler.aggregate(buildContext(ctx, {
       data: transformedDataList,
     }), transformedDataList);
@@ -92,6 +95,6 @@ export async function runAdapterHandler<
 function buildContext<TContext extends AdapterContext, TExtraContext extends Record<string, unknown>>(
   ctx: TContext,
   extraContext: TExtraContext,
-): TContext {
+): TContext & TExtraContext {
   return Object.assign({}, ctx, extraContext);
 }

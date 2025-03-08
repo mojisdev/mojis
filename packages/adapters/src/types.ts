@@ -178,3 +178,5 @@ export type MetadataAdapterHandler = AdapterHandler<
   "generic", // parser
   ParseResult
 >;
+
+export type InferOutputFromAdapterHandlerType<THandlerType extends AdapterHandlerType> = THandlerType extends "metadata" ? ReturnType<MetadataAdapterHandler["output"]> : never;
