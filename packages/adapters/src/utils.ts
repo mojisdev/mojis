@@ -108,3 +108,10 @@ export async function getHandlerUrls<TContext extends AdapterContext>(
 
   return [urls];
 }
+
+export function buildContext<TContext extends AdapterContext, TExtraContext extends Record<string, unknown>>(
+  ctx: TContext,
+  extraContext: TExtraContext,
+): TContext & TExtraContext {
+  return Object.assign({}, ctx, extraContext);
+}

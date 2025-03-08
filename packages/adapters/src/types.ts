@@ -4,7 +4,7 @@ import type {
   WriteCacheOptions,
 } from "@mojis/internal-utils";
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
-import type { METADATA_HANDLERS, SEQUENCE_HANDLERS, VARIATION_HANDLERS } from "./_handlers";
+import type { METADATA_HANDLERS, SEQUENCE_HANDLERS, VARIATION_HANDLERS } from "./handlers";
 import type { BUILTIN_PARSERS } from "./utils";
 
 type Promisable<T> = T | Promise<T>;
