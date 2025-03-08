@@ -1,8 +1,3 @@
-import type {
-  EmojiSequence,
-  EmojiVariation,
-} from "@mojis/internal-utils";
-import type { AdapterHandler, MetadataAdapterHandler } from "./types";
 import { modernMetadataHandler } from "./handlers/modern/metadata";
 import { modernSequenceHandler } from "./handlers/modern/sequence";
 import { modernVariationHandler } from "./handlers/modern/variation";

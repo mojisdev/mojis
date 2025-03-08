@@ -4,6 +4,7 @@ import type {
   WriteCacheOptions,
 } from "@mojis/internal-utils";
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
+import type { METADATA_HANDLERS, SEQUENCE_HANDLERS, VARIATION_HANDLERS } from "./_handlers";
 import type { BUILTIN_PARSERS } from "./utils";
 
 type Promisable<T> = T | Promise<T>;
@@ -166,9 +167,9 @@ export type MetadataAdapterHandler = AdapterHandler<
 >;
 
 export type InferOutputFromAdapterHandlerType<THandlerType extends AdapterHandlerType> =
-   THandlerType extends "metadata" ? ReturnType<MetadataAdapterHandler["output"]> :
-     THandlerType extends "sequence" ? unknown :
-       THandlerType extends "variation" ? unknown :
+   THandlerType extends "metadata" ? ReturnType<typeof METADATA_HANDLERS[number]["output"]> :
+     THandlerType extends "sequence" ? ReturnType<typeof SEQUENCE_HANDLERS[number]["output"]> :
+       THandlerType extends "variation" ? ReturnType<typeof VARIATION_HANDLERS[number]["output"]> :
          unknown;
 
 export type InferParseOutput<TContext extends AdapterContext, TParser extends string | ParserFn<TContext, any>> =
