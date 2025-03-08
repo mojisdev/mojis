@@ -17,7 +17,7 @@ function slugify(val: string): string {
 // where we can extract the metadata from.
 const DISALLOWED_EMOJI_VERSIONS = ["1.0", "2.0", "3.0"];
 
-export const modernMetadataHandler = defineAdapterHandler({
+export const baseMetadataHandler = defineAdapterHandler({
   type: "metadata",
   shouldExecute: (ctx) => {
     return !DISALLOWED_EMOJI_VERSIONS.includes(ctx.emoji_version);
