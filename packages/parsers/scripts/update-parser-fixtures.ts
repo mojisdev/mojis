@@ -1,4 +1,4 @@
-import type { Entry, FileEntry } from "apache-autoindex-parse";
+import type { Entry } from "apache-autoindex-parse";
 import { mkdir, writeFile } from "node:fs/promises";
 import { extname } from "node:path";
 import process from "node:process";
