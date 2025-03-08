@@ -1,7 +1,7 @@
 import type { AdapterContext, AdapterHandlerType, InferOutputFromAdapterHandlerType, UrlBuilder, UrlWithCache } from "./types";
 import { createCacheKeyFromUrl, fetchCache } from "@mojis/internal-utils";
-import { parse } from "@mojis/parsers";
-import { all_handlers } from "./_handlers";
+import { genericParse } from "@mojis/parsers";
+import { ALL_HANDLERS } from "./_handlers";
 import { getHandlerUrls, isBuiltinParser, isUrlBuilder } from "./utils";
 
 export async function runAdapterHandler<
@@ -12,7 +12,7 @@ export async function runAdapterHandler<
   type: THandlerType,
   ctx: TContext & TExtraContext,
 ): Promise<InferOutputFromAdapterHandlerType<THandlerType>> {
-  const handlerGroup = all_handlers[type];
+  const handlerGroup = ALL_HANDLERS[type];
 
   if (!handlerGroup) {
     throw new Error(`No handler found for type: ${type}`);
@@ -36,15 +36,16 @@ export async function runAdapterHandler<
         cacheKey: url.cacheKey,
         parser(data) {
           if (isBuiltinParser(handler.parser)) {
-            if (handler.parser !== "generic") {
-              throw new Error(`Parser "${handler.parser}" is not implemented.`);
+            if (handler.parser === "generic") {
+              return genericParse(data, {
+                separator: handler.parserOptions?.separator ?? ";",
+                commentPrefix: handler.parserOptions?.commentPrefix ?? "#",
+                defaultProperty: handler.parserOptions?.defaultProperty ?? "",
+                propertyMap: handler.parserOptions?.propertyMap ?? {},
+              });
             }
 
-            const separator = handler.parserOptions?.separator ?? ";";
-            return parse(data, {
-              separator,
-              commentPrefix: "#",
-            });
+            throw new Error(`Parser "${handler.parser}" is not implemented.`);
           }
 
           return handler.parser(ctx, data);

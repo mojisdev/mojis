@@ -31,12 +31,10 @@ export const modernMetadataHandler = defineAdapterHandler({
       cacheKey: `v${ctx.emoji_version}/metadata`,
     };
   },
-  parser: (ctx, data) => {
-    return {
-      lines: data.split("\n"),
-    };
+  parser: (_, data) => {
+    return data.split("\n");
   },
-  transform(ctx, data) {
+  transform(ctx, lines) {
     let currentGroup: EmojiGroup | undefined;
 
     const groups: EmojiGroup[] = [];
@@ -44,7 +42,7 @@ export const modernMetadataHandler = defineAdapterHandler({
     // [group-subgroup][hexcode] = metadata
     const emojis: Record<string, Record<string, EmojiMetadata>> = {};
 
-    for (const line of data.lines) {
+    for (const line of lines) {
       if (line.trim() === "") {
         continue;
       }

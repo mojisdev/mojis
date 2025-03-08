@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { parse } from "../src/generic";
+import { genericParse } from "../src/generic";
 
 describe("parse function", () => {
   it("should handle empty content", () => {
-    const result = parse("");
+    const result = genericParse("");
     expect(result).toEqual({ totalLines: 0, lines: [] });
   });
 
   it("should parse simple lines with default options", () => {
     const content = "field1;field2;field3\nfield4;field5;field6";
-    const result = parse(content);
+    const result = genericParse(content);
     expect(result).toEqual({
       totalLines: 2,
       lines: [
@@ -21,7 +21,7 @@ describe("parse function", () => {
 
   it("should handle custom separator", () => {
     const content = "field1,field2,field3\nfield4,field5,field6";
-    const result = parse(content, { separator: "," });
+    const result = genericParse(content, { separator: "," });
     expect(result).toEqual({
       totalLines: 2,
       lines: [
@@ -33,7 +33,7 @@ describe("parse function", () => {
 
   it("should handle comments", () => {
     const content = "field1;field2;field3 # comment1\nfield4;field5;field6 # comment2";
-    const result = parse(content);
+    const result = genericParse(content);
     expect(result).toEqual({
       totalLines: 2,
       lines: [
@@ -45,7 +45,7 @@ describe("parse function", () => {
 
   it("should handle custom comment prefix", () => {
     const content = "field1;field2;field3 // comment1\nfield4;field5;field6 // comment2";
-    const result = parse(content, { commentPrefix: "//" });
+    const result = genericParse(content, { commentPrefix: "//" });
     expect(result).toEqual({
       totalLines: 2,
       lines: [
@@ -57,7 +57,7 @@ describe("parse function", () => {
 
   it("should handle property mapping", () => {
     const content = "# SECTION1\nfield1;field2\n# SECTION2\nfield3;field4";
-    const result = parse(content, { propertyMap: { "# SECTION1": "section1", "# SECTION2": "section2" } });
+    const result = genericParse(content, { propertyMap: { "# SECTION1": "section1", "# SECTION2": "section2" } });
     expect(result).toEqual({
       totalLines: 2,
       lines: [
@@ -70,7 +70,7 @@ describe("parse function", () => {
 
   it("should handle default property", () => {
     const content = "field1;field2\n# SECTION1\nfield3;field4";
-    const result = parse(content, { propertyMap: { "# SECTION1": "section1" }, defaultProperty: "default" });
+    const result = genericParse(content, { propertyMap: { "# SECTION1": "section1" }, defaultProperty: "default" });
     expect(result).toEqual({
       totalLines: 2,
       lines: [
@@ -83,7 +83,7 @@ describe("parse function", () => {
 
   it("should handle totals in comments", () => {
     const content = "# SECTION1 Total: 10\nfield1;field2\n# SECTION2 Total: 20\nfield3;field4";
-    const result = parse(content, { propertyMap: { "# SECTION1": "section1", "# SECTION2": "section2" } });
+    const result = genericParse(content, { propertyMap: { "# SECTION1": "section1", "# SECTION2": "section2" } });
     expect(result).toEqual({
       totalLines: 2,
       lines: [
@@ -97,7 +97,7 @@ describe("parse function", () => {
 
   it("should skip empty lines", () => {
     const content = "field1;field2\n\nfield3;field4";
-    const result = parse(content);
+    const result = genericParse(content);
     expect(result).toEqual({
       totalLines: 2,
       lines: [
@@ -109,13 +109,13 @@ describe("parse function", () => {
 
   it("should handle a line with only a comment", () => {
     const content = "# This is a comment only line";
-    const result = parse(content, {});
+    const result = genericParse(content, {});
     expect(result).toEqual({ totalLines: 0, lines: [] });
   });
 
   it("should handle a line with a comment at the very beginning of the string", () => {
     const content = "#comment\nfield1;field2";
-    const result = parse(content);
+    const result = genericParse(content);
     expect(result).toEqual({
       totalLines: 1,
       lines: [

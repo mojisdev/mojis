@@ -3,7 +3,7 @@ import type {
   EmojiMetadata,
   WriteCacheOptions,
 } from "@mojis/internal-utils";
-import type { ParseResult } from "@mojis/parsers";
+import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
 import type { BUILTIN_PARSERS } from "./utils";
 
 type Promisable<T> = T | Promise<T>;
@@ -81,11 +81,11 @@ export type ParserFn<
 > = (ctx: TContext, data: string) => TOutput;
 
 export type GetParseOutputFromBuiltInParser<TParser extends string> =
-  TParser extends "generic" ? ParseResult :
+  TParser extends "generic" ? GenericParseResult :
     never;
 
 export type GetParseOptionsFromParser<TParser extends string> =
-  TParser extends "generic" ? { separator: string } :
+  TParser extends "generic" ? GenericParseOptions :
     never;
 
 export interface AdapterHandler<
@@ -169,4 +169,8 @@ export type MetadataAdapterHandler = AdapterHandler<
   } // transform output
 >;
 
-export type InferOutputFromAdapterHandlerType<THandlerType extends AdapterHandlerType> = THandlerType extends "metadata" ? ReturnType<MetadataAdapterHandler["output"]> : never;
+export type InferOutputFromAdapterHandlerType<THandlerType extends AdapterHandlerType> =
+   THandlerType extends "metadata" ? ReturnType<MetadataAdapterHandler["output"]> :
+     THandlerType extends "sequence" ? unknown :
+       THandlerType extends "variation" ? unknown :
+         unknown;

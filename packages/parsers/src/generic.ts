@@ -4,14 +4,14 @@ export interface ParsedLine {
   property?: string;
 }
 
-export interface ParseResult {
+export interface GenericParseResult {
   totalLines: number;
   lines: ParsedLine[];
   properties?: Record<string, string>;
   totals?: Record<string, number>;
 }
 
-export interface ParseOptions {
+export interface GenericParseOptions {
   commentPrefix?: string;
   separator?: string;
   propertyMap?: Record<string, string>;
@@ -22,9 +22,9 @@ export interface ParseOptions {
  * Parses a string content into a structured format based on provided options.
  *
  * @param {string} content - The string content to parse
- * @param {ParseOptions} options - Configuration options for parsing
+ * @param {GenericParseOptions} options - Configuration options for parsing
  *
- * @returns  {ParseResult} A ParseResult object containing:
+ * @returns  {GenericParseResult} A ParseResult object containing:
  *   - totalLines: The number of non-empty, non-comment lines parsed
  *   - lines: Array of ParsedLine objects with fields, comments, and property values
  *   - properties: (Optional) Record of property mappings that were found in the content
@@ -38,10 +38,10 @@ export interface ParseOptions {
  * });
  * ```
  */
-export function parse(
+export function genericParse(
   content: string,
-  options: ParseOptions = {},
-): ParseResult {
+  options: GenericParseOptions = {},
+): GenericParseResult {
   const {
     commentPrefix = "#",
     separator = ";",
@@ -120,7 +120,7 @@ export function parse(
   }
 
   // only include optional properties and totals if they have content
-  const result: ParseResult = {
+  const result: GenericParseResult = {
     totalLines,
     lines,
   };

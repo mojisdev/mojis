@@ -167,20 +167,17 @@ cli.command(
           unicode_version: version.unicode_version,
         });
 
-        console.log("sequences", sequences);
-        console.log("zwj", zwj);
+        await fs.writeFile(
+          join(baseDir, "zwj-sequences.json"),
+          JSON.stringify(zwj, null, 2),
+          "utf-8",
+        );
 
-        // await fs.writeFile(
-        //   join(baseDir, "zwj-sequences.json"),
-        //   JSON.stringify(zwj, null, 2),
-        //   "utf-8",
-        // );
-
-        // await fs.writeFile(
-        //   join(baseDir, "sequences.json"),
-        //   JSON.stringify(sequences, null, 2),
-        //   "utf-8",
-        // );
+        await fs.writeFile(
+          join(baseDir, "sequences.json"),
+          JSON.stringify(sequences, null, 2),
+          "utf-8",
+        );
       }
 
       // if (isGeneratorEnabled("variations")) {
