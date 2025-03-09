@@ -3,6 +3,7 @@ import semver from "semver";
 import { NON_EXISTING_VERSIONS } from "./constants";
 
 export const MAPPED_EMOJI_VERSIONS: Record<string, string> = {
+  "0.7": "7.0",
   "1.0": "8.0",
   "2.0": "8.0",
   "3.0": "9.0",
@@ -178,18 +179,8 @@ export function extractUnicodeVersion(emojiVersion: string | null, unicodeVersio
     return semver.lt(coercedEmojiVersion, coercedUnicodeVersion) ? emojiVersion : unicodeVersion;
   }
 
-  // mapping for earlier emoji versions to unicode versions
-  const versionMap: Record<string, string> = {
-    "0.7": "7.0",
-    "1.0": "8.0",
-    "2.0": "8.0",
-    "3.0": "9.0",
-    "4.0": "9.0",
-    "5.0": "10.0",
-  };
-
   // return mapped version or default to "6.0"
-  return versionMap[emojiVersion] || "6.0";
+  return MAPPED_EMOJI_VERSIONS[emojiVersion] || "6.0";
 }
 
 /**
