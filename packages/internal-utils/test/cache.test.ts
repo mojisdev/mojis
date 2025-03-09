@@ -285,7 +285,7 @@ describe("fetchCache", () => {
       bypassCache: true,
     };
 
-    mockFetch("https://mojis.dev", "get", () => {
+    mockFetch("GET https://mojis.dev", () => {
       return HttpResponse.text(rawData, { status: 200 });
     });
 
@@ -302,7 +302,7 @@ describe("fetchCache", () => {
       bypassCache: true,
     };
 
-    mockFetch("https://mojis.dev/", "get", () => {
+    mockFetch("GET https://mojis.dev/", () => {
       return new HttpResponse("Not Found", { status: 404 });
     });
 
@@ -320,7 +320,7 @@ describe("fetchCache", () => {
       bypassCache: true,
     };
 
-    mockFetch("https://mojis.dev", "get", () => {
+    mockFetch("GET https://mojis.dev", () => {
       return HttpResponse.text(rawData, { status: 200 });
     });
 
