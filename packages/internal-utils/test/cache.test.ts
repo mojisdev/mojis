@@ -1,9 +1,9 @@
 import type { CacheMeta } from "../src/cache";
 import fs from "fs-extra";
 import { HttpResponse } from "msw";
-import { mockFetch } from "test/msw-utils/msw";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { testdir } from "vitest-testdirs";
+import { mockFetch } from "../../../test/msw-utils/msw";
 import { createCacheKeyFromUrl, fetchCache, readCache, readCacheMeta, writeCache } from "../src/cache";
 
 vi.mock("fs-extra", {
@@ -286,7 +286,7 @@ describe("fetchCache", () => {
     };
 
     mockFetch("https://mojis.dev", "get", () => {
-      return HttpResponse.json(rawData, { status: 200 });
+      return HttpResponse.text(rawData, { status: 200 });
     });
 
     const result = await fetchCache<Record<string, string>>("https://mojis.dev", options);
