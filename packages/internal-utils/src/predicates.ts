@@ -42,6 +42,10 @@ export function isBefore(version: string, target: string): boolean {
     return false;
   }
 
+  if (target == null) {
+    return false;
+  }
+
   const coercedVersion = semver.coerce(version);
   if (coercedVersion == null) {
     return false;

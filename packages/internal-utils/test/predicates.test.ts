@@ -71,8 +71,9 @@ describe("version predicates", () => {
       { version: null, target: "11.0.0", expected: false },
       { version: undefined, target: "11.0.0", expected: false },
       { version: "abc", target: "11.0.0", expected: false },
-      { version: "10.0.0", target: null, expected: false },
-      { version: "10.0.0", target: undefined, expected: false },
+      { version: "11.0.0", target: null, expected: false },
+      { version: "11.0.0", target: undefined, expected: false },
+      { version: "11.0.0", target: "abc", expected: false },
     ])("should return $expected for version $version and target $target", ({ version, target, expected }) => {
       expect(isBefore(version as string, target as string)).toBe(expected);
     });
