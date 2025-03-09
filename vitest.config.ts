@@ -15,7 +15,8 @@ const aliases = readdirSync(new URL("./packages", import.meta.url).pathname)
     {});
 
 const hiddenLogs = [
-  "[shortcodes]"
+  "[shortcodes]",
+  "[versions]"
 ]
 
 export default defineConfig({
@@ -25,7 +26,7 @@ export default defineConfig({
       include: ["**/src/**"],
     },
     setupFiles: [
-      "./test/setup/fetch-mock.ts"
+      "./test/setup/msw.ts"
     ],
     onConsoleLog(log, type) {
       if (type === "stderr") {

@@ -44,41 +44,40 @@ export interface DraftVersion {
  * @returns {Promise<DraftVersion | null>} A Promise that resolves to the current draft version string, or null if not found
  */
 export async function getCurrentDraftVersion(): Promise<DraftVersion | null> {
-  try {
-    const [draftText, emojiText] = await Promise.all([
-      "https://unicode.org/Public/draft/ReadMe.txt",
-      "https://unicode.org/Public/draft/emoji/ReadMe.txt",
-    ].map(async (url) => {
-      const res = await fetch(url);
+  const [draftText, emojiText] = await Promise.all([
+    "https://unicode.org/Public/draft/ReadMe.txt",
+    "https://unicode.org/Public/draft/emoji/ReadMe.txt",
+  ].map(async (url) => {
+    const res = await fetch(url);
 
-      if (!res.ok) {
-        throw new Error(`failed to fetch ${url}: ${res.statusText}`);
-      }
-
-      return res.text();
-    }));
-
-    const rootVersion = extractVersionFromReadme(draftText);
-    const emojiVersion = extractVersionFromReadme(emojiText);
-
-    if (rootVersion == null || emojiVersion == null) {
-      throw new Error("failed to extract draft version");
+    if (!res.ok) {
+      throw new Error(`failed to fetch ${url}: ${res.status}`);
     }
 
-    // the emoji version is only using major.minor format.
-    // so, we will need to add the last 0 to the version.
-    // if they don't match the major and minor version, we will throw an error.
-    if (semver.major(rootVersion) !== semver.major(`${emojiVersion}.0`) || semver.minor(rootVersion) !== semver.minor(`${emojiVersion}.0`)) {
-      throw new Error("draft versions do not match");
-    }
+    return res.text();
+  }));
 
-    return {
-      emoji_version: emojiVersion,
-      unicode_version: rootVersion,
-    };
-  } catch {
-    return null;
+  console.warn("draftText", draftText);
+  console.warn("emojiText", emojiText);
+
+  const rootVersion = extractVersionFromReadme(draftText);
+  const emojiVersion = extractVersionFromReadme(emojiText);
+
+  if (rootVersion == null || emojiVersion == null) {
+    throw new Error("failed to extract draft version");
   }
+
+  // the emoji version is only using major.minor format.
+  // so, we will need to add the last 0 to the version.
+  // if they don't match the major and minor version, we will throw an error.
+  if (semver.major(rootVersion) !== semver.major(`${emojiVersion}.0`) || semver.minor(rootVersion) !== semver.minor(`${emojiVersion}.0`)) {
+    throw new Error("draft versions do not match");
+  }
+
+  return {
+    emoji_version: emojiVersion,
+    unicode_version: rootVersion,
+  };
 }
 
 /**
@@ -219,7 +218,7 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
     const res = await fetch(url);
 
     if (!res.ok) {
-      throw new Error(`failed to fetch ${url}: ${res.statusText}`);
+      throw new Error(`[versions]: failed to fetch ${url}: ${res.statusText}`);
     }
 
     return res.text();
@@ -246,7 +245,7 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
   const draft = await getCurrentDraftVersion();
 
   if (draft == null) {
-    throw new Error("failed to fetch draft version");
+    throw new Error("failed to extract draft version");
   }
 
   const versions: EmojiSpecRecord[] = [];
