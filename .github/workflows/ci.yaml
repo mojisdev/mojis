@@ -37,12 +37,12 @@ jobs:
         run: pnpm lint
 
       - name: test
-        run: pnpm test
+        run: pnpm test --coverage
 
       - name: typecheck
         run: pnpm typecheck
 
-      - name: Upload coverage reports to Codecov
+      - name: upload coverage reports to codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
