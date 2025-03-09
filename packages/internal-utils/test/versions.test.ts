@@ -12,7 +12,7 @@ import {
   toSemverCompatible,
 } from "../src/versions";
 
-describe("get draft version", () => {
+describe("getCurrentDraftVersion", () => {
   it("returns draft versions when fetches succeed and versions match", async () => {
     fetchMock
       .mockResponseOnceIf("https://unicode.org/Public/draft/ReadMe.txt", "Version 15.1.0 of the Unicode Standard")
@@ -47,7 +47,7 @@ describe("get draft version", () => {
   });
 });
 
-describe("extract version", () => {
+describe("extractVersionFromReadme", () => {
   it.each([
     { input: "Version 15.1.0 of the Unicode Standard", expected: "15.1.0" },
     { input: "Version 15.1 of the Unicode Standard", expected: "15.1" },
@@ -79,7 +79,7 @@ describe("extract version", () => {
     });
   });
 
-  describe("extract emoji version", () => {
+  describe("extractEmojiVersion", () => {
     it.each([
       { input: "E14.0", expected: "14.0" },
       { input: "E15.1", expected: "15.1" },
