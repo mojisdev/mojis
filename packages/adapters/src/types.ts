@@ -1,14 +1,14 @@
 import type {
-  EmojiGroup,
-  EmojiMetadata,
   WriteCacheOptions,
 } from "@mojis/internal-utils";
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
-import type { METADATA_HANDLERS, SEQUENCE_HANDLERS, VARIATION_HANDLERS } from "./_handlers";
+import type { METADATA_HANDLERS, SEQUENCE_HANDLERS, VARIATION_HANDLERS } from "./handlers";
 import type { BUILTIN_PARSERS } from "./utils";
 
 type Promisable<T> = T | Promise<T>;
 export type Arrayable<T> = T | T[];
+
+export type AdapterUrls = Arrayable<string> | Arrayable<undefined> | Arrayable<UrlWithCache>;
 
 export interface AdapterContext {
   /**
@@ -30,7 +30,7 @@ export interface AdapterContext {
 
 export type AdapterHandlerType = "metadata" | "sequence" | "variation";
 
-export type UrlBuilder = (ctx: AdapterContext) => Promisable<Arrayable<string> | Arrayable<undefined> | Arrayable<UrlWithCache>>;
+export type UrlBuilder = (ctx: AdapterContext) => Promisable<AdapterUrls>;
 
 export type ShouldExecute<
   TContext extends AdapterContext,
@@ -106,7 +106,7 @@ export interface AdapterHandler<
   /**
    * The urls that will be fetched.
    */
-  urls: Arrayable<string> | Arrayable<undefined> | Arrayable<UrlWithCache> | UrlBuilder;
+  urls: AdapterUrls | UrlBuilder;
 
   /**
    * Options that will be passed to the fetch function.
@@ -155,16 +155,6 @@ export interface AdapterHandler<
    */
   output: OutputFn<TContext, TAggregateOutput extends TTransformOutput ? TTransformOutput : TAggregateOutput, TOutput>;
 }
-
-export type MetadataAdapterHandler = AdapterHandler<
-  "metadata", // type
-  AdapterContext, // context
-  () => { lines: string[] }, // parser
-  {
-    groups: EmojiGroup[];
-    emojis: Record<string, Record<string, EmojiMetadata>>;
-  }
->;
 
 export type InferOutputFromAdapterHandlerType<THandlerType extends AdapterHandlerType> =
    THandlerType extends "metadata" ? ReturnType<typeof METADATA_HANDLERS[number]["output"]> :

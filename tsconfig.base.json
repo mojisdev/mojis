@@ -11,9 +11,6 @@
       "@mojis/internal-utils/constants": ["./packages/internal-utils/src/constants"],
       "@mojis/adapters": ["./packages/adapters/src/index.ts"],
       "@mojis/parsers": ["./packages/parsers/src/index.ts"],
-    },
-    "types": [
-      "vitest-fetch-mock"
-    ]
+    }
   }
 }

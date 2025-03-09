@@ -14,6 +14,10 @@ const aliases = readdirSync(new URL("./packages", import.meta.url).pathname)
     },
     {});
 
+const hiddenLogs = [
+  "[shortcodes]",
+  "[versions]"
+]
 
 export default defineConfig({
   test: {
@@ -22,8 +26,13 @@ export default defineConfig({
       include: ["**/src/**"],
     },
     setupFiles: [
-      "./test/setup/fetch-mock.ts"
+      "./test/setup/msw.ts"
     ],
+    onConsoleLog(log, type) {
+      if (type === "stderr") {
+        return !hiddenLogs.some((hidden) => log.includes(hidden));
+      }
+    },
     workspace: [
       {
         extends: true,
@@ -33,9 +42,10 @@ export default defineConfig({
           environment: "node",
           mockReset: true,
           typecheck: {
+            checker: "tsc",
             enabled: true,
             include: ["./packages/internal-utils/**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
-            tsconfig: "./packages/internal-utils/tsconfig.json"
+            tsconfig: "./packages/internal-utils/tsconfig.test.json"
           }
         },
         esbuild: { target: "es2020" },
@@ -50,9 +60,10 @@ export default defineConfig({
           environment: "node",
           mockReset: true,
           typecheck: {
+            checker: "tsc",
             enabled: true,
             include: ["./packages/adapters/**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
-            tsconfig: "./packages/adapters/tsconfig.json"
+            tsconfig: "./packages/adapters/tsconfig.test.json"
           }
         },
         esbuild: { target: "es2020" },
@@ -66,9 +77,10 @@ export default defineConfig({
           environment: "node",
           mockReset: true,
           typecheck: {
+            checker: "tsc",
             enabled: true,
             include: ["./packages/cli/**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
-            tsconfig: "./packages/cli/tsconfig.json"
+            tsconfig: "./packages/cli/tsconfig.test.json"
           }
         },
         esbuild: { target: "es2020" },
@@ -82,9 +94,10 @@ export default defineConfig({
           environment: "node",
           mockReset: true,
           typecheck: {
+            checker: "tsc",
             enabled: true,
             include: ["./packages/parsers/**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
-            tsconfig: "./packages/parsers/tsconfig.json"
+            tsconfig: "./packages/parsers/tsconfig.test.json"
           }
         },
         esbuild: { target: "es2020" },

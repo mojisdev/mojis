@@ -4,12 +4,9 @@ import { join } from "node:path";
 import process from "node:process";
 import { runAdapterHandler } from "@mojis/adapters";
 import {
-
   getAllEmojiVersions,
   getLatestEmojiVersion,
   mapEmojiVersionToUnicodeVersion,
-  MojisNotImplemented,
-
 } from "@mojis/internal-utils";
 import { OFFICIAL_SUPPORTED_VERSIONS } from "@mojis/internal-utils/constants";
 import { green, red, yellow } from "farver/fast";
@@ -54,7 +51,7 @@ cli.command(
 
     let providedVersions = (Array.isArray(args.versions) ? args.versions : [args.versions]) as string[];
 
-    const generators = Array.isArray(args.generators) ? args.generators : [args.generators];
+    const generators = (Array.isArray(args.generators) ? args.generators : [args.generators]) as string[];
 
     const lockfile = await readLockfile();
 
@@ -187,7 +184,6 @@ cli.command(
           unicode_version: version.unicode_version,
         });
 
-        await fs.ensureDir(join(baseDir, "variations"));
         await fs.writeFile(
           join(baseDir, "variations.json"),
           JSON.stringify(variations, null, 2),
@@ -270,10 +266,6 @@ cli.command(
 
     for (const result of results) {
       if (result.status === "rejected") {
-        if (result.reason instanceof MojisNotImplemented) {
-          console.warn(result.reason.message);
-          continue;
-        }
         console.error(result.reason);
       }
     }

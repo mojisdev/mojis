@@ -1,6 +1,5 @@
 import z from "zod";
 
-// TODO: find a better name for this schema
 export const EMOJI_SPEC_RECORD_SCHEMA = z.object({
   emoji_version: z.string(),
   unicode_version: z.string(),

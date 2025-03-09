@@ -184,6 +184,7 @@ export async function fetchCache<TData>(url: string, options: FetchCacheOptions<
   if (!response.ok) {
     throw new Error(`failed to fetch: url=(${url}) status=(${response.status})`);
   }
+
   // TODO: don't use .text if encoding is binary or something like that
   const data = await response.text();
   const parsedData = parser(data);

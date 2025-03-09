@@ -1,5 +1,5 @@
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
-import type { GetParseOptionsFromParser, GetParseOutputFromBuiltInParser } from "../src/types";
+import type { AdapterContext, GetParseOptionsFromParser, GetParseOutputFromBuiltInParser, InferParseOutput, ParserFn } from "../src/types";
 import { describe, expectTypeOf, it } from "vitest";
 
 describe("GetParseOutputFromBuiltInParser", () => {
@@ -23,5 +23,21 @@ describe("GetParseOptionsFromParser", () => {
   it("invalid parser should return never", () => {
     type Result = GetParseOptionsFromParser<"unknown">;
     expectTypeOf<Result>().toEqualTypeOf<never>();
+  });
+});
+
+describe("InferParseOutput", () => {
+  it("should infer the output of a parser function", () => {
+    type Result = InferParseOutput<
+      AdapterContext,
+      ParserFn<AdapterContext, number>
+    >;
+
+    expectTypeOf<Result>().toEqualTypeOf<number>();
+  });
+
+  it("should infer the output of a builtin parser", () => {
+    type Result = InferParseOutput<AdapterContext, "generic">;
+    expectTypeOf<Result>().toEqualTypeOf<GenericParseResult>();
   });
 });

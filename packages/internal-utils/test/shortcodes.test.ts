@@ -72,4 +72,23 @@ describe("generateGitHubShortcodes", () => {
       { code: "smile", vendor: "github", source: "github" },
     ]);
   });
+
+  it("should handle fetch error", async () => {
+    vi.mocked(cache.fetchCache).mockRejectedValueOnce(new Error("fetch error"));
+
+    const result = await generateGitHubShortcodes({
+      emojis: mockEmojis,
+      force: false,
+    });
+
+    expect(result).toEqual([]);
+
+    expect(cache.fetchCache).toHaveBeenCalledWith(
+      "https://api.mojis.dev/api/gateway/github/emojis",
+      expect.objectContaining({
+        cacheKey: "github-emojis.json",
+        bypassCache: false,
+      }),
+    );
+  });
 });
