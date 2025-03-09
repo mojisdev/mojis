@@ -138,45 +138,62 @@ export function extractVersionFromReadme(text?: string): string | null {
   return null;
 }
 
-// https://unicode.org/reports/tr51/#EmojiVersions
+/**
+ * Extracts and aligns the Unicode version based on the provided emoji version.
+ *
+ * For emoji versions 11.0.0 and above, it compares the emoji version with the Unicode version (if provided)
+ * and returns the smaller of the two. If no Unicode version is provided, it returns the emoji version.
+ *
+ * For emoji versions prior to 11.0.0, it uses a mapping to determine the corresponding Unicode version.
+ *
+ * @param {string | null} emojiVersion - The emoji version string (e.g., "1.0", "12.0"). Can be null.
+ * @param {string?} unicodeVersion - The Unicode version string (e.g., "8.0", "13.0"). Optional.
+ * @returns {string | null} The aligned Unicode version string or null if the emoji version is null or invalid.
+ * Returns "6.0" if the emoji version is not found in the version map and is less than 11.0.0.
+ */
 export function extractUnicodeVersion(emojiVersion: string | null, unicodeVersion?: string): string | null {
-  const coercedEmojiVersion = semver.coerce(emojiVersion);
-  const coercedUnicodeVersion = semver.coerce(unicodeVersion);
+  // handle null case early
+  if (emojiVersion == null) {
+    return null;
+  }
 
-  if (coercedEmojiVersion == null || coercedUnicodeVersion == null) {
+  const coercedEmojiVersion = semver.coerce(emojiVersion);
+
+  // early return if emoji version is invalid
+  if (coercedEmojiVersion == null) {
     return null;
   }
 
   // v11+ aligned emoji and unicode specs (except for minor versions)
   if (semver.gte(coercedEmojiVersion, "11.0.0")) {
-    // if the unicode version is not provided, we will return the emoji version.
+    // if Unicode version is not provided, return the emoji version
     if (unicodeVersion == null) {
       return emojiVersion;
     }
 
-    // return the smallest version between the emoji and unicode version.
-    if (semver.lt(coercedEmojiVersion, coercedUnicodeVersion)) {
+    const coercedUnicodeVersion = semver.coerce(unicodeVersion);
+
+    // if Unicode version is invalid, return emoji version
+    if (coercedUnicodeVersion == null) {
       return emojiVersion;
     }
 
-    return unicodeVersion;
+    // return the smaller version between emoji and unicode version
+    return semver.lt(coercedEmojiVersion, coercedUnicodeVersion) ? emojiVersion : unicodeVersion;
   }
 
-  switch (emojiVersion) {
-    case "0.7":
-      return "7.0";
-    case "1.0":
-    case "2.0":
-      return "8.0";
-    case "3.0":
-    case "4.0":
-      return "9.0";
-    case "5.0":
-      return "10.0";
-    default:
-      // v6 is the first unicode spec emojis appeared in
-      return "6.0";
-  }
+  // mapping for earlier emoji versions to unicode versions
+  const versionMap: Record<string, string> = {
+    "0.7": "7.0",
+    "1.0": "8.0",
+    "2.0": "8.0",
+    "3.0": "9.0",
+    "4.0": "9.0",
+    "5.0": "10.0",
+  };
+
+  // return mapped version or default to "6.0"
+  return versionMap[emojiVersion] || "6.0";
 }
 
 /**

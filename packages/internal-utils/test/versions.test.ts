@@ -3,6 +3,7 @@ import fs from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   extractEmojiVersion,
+  extractUnicodeVersion,
   extractVersionFromReadme,
   getCurrentDraftVersion,
   getLatestEmojiVersion,
@@ -235,6 +236,44 @@ describe("get latest emoji version", () => {
       unicode_version: "15.0",
       draft: false,
     });
+  });
+});
+
+describe("extract unicode version", () => {
+  it("should return null if emojiVersion is null", () => {
+    expect(extractUnicodeVersion(null)).toBeNull();
+  });
+
+  it("should return null if emojiVersion is invalid", () => {
+    expect(extractUnicodeVersion("invalid")).toBeNull();
+  });
+
+  it("should return emojiVersion if unicodeVersion is not provided and emojiVersion is >= 11.0.0", () => {
+    expect(extractUnicodeVersion("11.0.0")).toBe("11.0.0");
+    expect(extractUnicodeVersion("12.0.0")).toBe("12.0.0");
+  });
+
+  it("should return emojiVersion if unicodeVersion is invalid and emojiVersion is >= 11.0.0", () => {
+    expect(extractUnicodeVersion("11.0.0", "invalid")).toBe("11.0.0");
+  });
+
+  it("should return the smaller version if both emojiVersion and unicodeVersion are valid and emojiVersion is >= 11.0.0", () => {
+    expect(extractUnicodeVersion("11.0.0", "12.0.0")).toBe("11.0.0");
+    expect(extractUnicodeVersion("12.0.0", "11.0.0")).toBe("11.0.0");
+  });
+
+  it("should return the mapped unicode version if emojiVersion is < 11.0.0", () => {
+    expect(extractUnicodeVersion("1.0")).toBe("8.0");
+    expect(extractUnicodeVersion("5.0")).toBe("10.0");
+  });
+
+  it("should return '6.0' if emojiVersion is < 11.0.0 and not in the version map", () => {
+    expect(extractUnicodeVersion("6.0")).toBe("6.0");
+    expect(extractUnicodeVersion("10.0")).toBe("6.0");
+  });
+
+  it("should handle emojiVersion 0.7 correctly", () => {
+    expect(extractUnicodeVersion("0.7")).toBe("7.0");
   });
 });
 
