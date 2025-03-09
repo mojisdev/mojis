@@ -60,7 +60,7 @@ export async function generateGitHubShortcodes(options: ShortcodeOptions): Promi
       parser: (data) => JSON.parse(data) as Record<string, string>,
     });
   } catch (err) {
-    console.error("failed to fetch github emojis", err);
+    console.error("[shortcodes]: failed to fetch github emojis", err);
   }
 
   const shortcodes: EmojiShortcode[] = [];

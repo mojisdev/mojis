@@ -14,6 +14,10 @@ const aliases = readdirSync(new URL("./packages", import.meta.url).pathname)
     },
     {});
 
+const hiddenLogs = [
+  "[shortcodes]"
+]
+
 export default defineConfig({
   test: {
     coverage: {
@@ -23,6 +27,11 @@ export default defineConfig({
     setupFiles: [
       "./test/setup/fetch-mock.ts"
     ],
+    onConsoleLog(log, type) {
+      if (type === "stderr") {
+        return !hiddenLogs.some((hidden) => log.includes(hidden));
+      }
+    },
     workspace: [
       {
         extends: true,
