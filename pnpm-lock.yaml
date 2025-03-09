@@ -181,6 +181,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.8.2
+      vitest-testdirs:
+        specifier: 'catalog:'
+        version: 2.1.1(vitest@3.0.8)
 
   packages/internal-utils:
     dependencies:
