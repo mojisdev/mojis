@@ -2,7 +2,7 @@ import type { EmojiSpecRecord } from "../src/types";
 import fs from "node:fs";
 import { HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
-import { http, msw_server } from "../../../test/setup/msw";
+import { mockFetch } from "../../../test/msw-utils/msw";
 import {
   extractEmojiVersion,
   extractUnicodeVersion,
@@ -296,13 +296,11 @@ describe("is emoji version allowed", () => {
   });
 });
 
-describe.only("all emoji versions", () => {
+describe("all emoji versions", () => {
   it("should fail if fetch fails", async () => {
-    msw_server.use(
-      http.get("*", () => {
-        return new HttpResponse("Not Found", { status: 404 });
-      }),
-    );
+    mockFetch("*", "get", () => {
+      return new HttpResponse("Not Found", { status: 404 });
+    });
 
     await expect(() => getAllEmojiVersions()).rejects.toThrow("failed to fetch root or emoji page");
   });
@@ -318,30 +316,38 @@ describe.only("all emoji versions", () => {
   // });
 });
 
-// describe("draft", () => {
-//   it("returns draft versions when fetches succeed and versions match", async () => {
-//     fetchMock
-//       .mockResponseOnceIf("https://unicode.org/Public/draft/ReadMe.txt", "Version 15.1.0 of the Unicode Standard")
-//       .mockResponseOnceIf("https://unicode.org/Public/draft/emoji/ReadMe.txt", "Unicode Emoji, Version 15.1");
+describe("draft", () => {
+  it("returns draft versions when fetches succeed and versions match", async () => {
+    mockFetch("https://unicode.org/Public/draft/ReadMe.txt", "get", () => {
+      return HttpResponse.text("Version 15.1.0 of the Unicode Standard");
+    });
+    mockFetch("https://unicode.org/Public/draft/emoji/ReadMe.txt", "get", () => {
+      return HttpResponse.text("Unicode Emoji, Version 15.1");
+    });
 
-//     const result = await getCurrentDraftVersion();
-//     expect(result).toEqual({
-//       emoji_version: "15.1",
-//       unicode_version: "15.1.0",
-//     });
-//   });
+    const result = await getCurrentDraftVersion();
+    expect(result).toEqual({
+      emoji_version: "15.1",
+      unicode_version: "15.1.0",
+    });
+  });
 
-//   it("should throw when versions do not match", async () => {
-//     fetchMock
-//       .mockResponseOnceIf("https://unicode.org/Public/draft/ReadMe.txt", "Version 15.1.0 of the Unicode Standard")
-//       .mockResponseOnceIf("https://unicode.org/Public/draft/emoji/ReadMe.txt", "Unicode Emoji, Version 15.0");
+  it("should throw when versions do not match", async () => {
+    mockFetch("https://unicode.org/Public/draft/ReadMe.txt", "get", () => {
+      return HttpResponse.text("Version 15.1.0 of the Unicode Standard");
+    });
+    mockFetch("https://unicode.org/Public/draft/emoji/ReadMe.txt", "get", () => {
+      return HttpResponse.text("Unicode Emoji, Version 15.0");
+    });
 
-//     await expect(() => getCurrentDraftVersion()).rejects.toThrow("draft versions do not match");
-//   });
+    await expect(() => getCurrentDraftVersion()).rejects.toThrow("draft versions do not match");
+  });
 
-//   it("should throw if fetch fails", async () => {
-//     fetchMock.mockResponse("Not Found", { status: 404 });
+  it("should throw if fetch fails", async () => {
+    mockFetch("*", "get", () => {
+      return new HttpResponse("Not Found", { status: 404 });
+    });
 
-//     await expect(() => getCurrentDraftVersion()).rejects.toThrow("failed to fetch https://unicode.org/Public/draft/ReadMe.txt: 404");
-//   });
-// });
+    await expect(() => getCurrentDraftVersion()).rejects.toThrow("failed to fetch https://unicode.org/Public/draft/ReadMe.txt: 404");
+  });
+});

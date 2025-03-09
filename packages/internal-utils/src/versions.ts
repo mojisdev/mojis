@@ -57,9 +57,6 @@ export async function getCurrentDraftVersion(): Promise<DraftVersion | null> {
     return res.text();
   }));
 
-  console.warn("draftText", draftText);
-  console.warn("emojiText", emojiText);
-
   const rootVersion = extractVersionFromReadme(draftText);
   const emojiVersion = extractVersionFromReadme(emojiText);
 
