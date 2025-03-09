@@ -12,41 +12,6 @@ import {
   toSemverCompatible,
 } from "../src/versions";
 
-describe("getCurrentDraftVersion", () => {
-  it("returns draft versions when fetches succeed and versions match", async () => {
-    fetchMock
-      .mockResponseOnceIf("https://unicode.org/Public/draft/ReadMe.txt", "Version 15.1.0 of the Unicode Standard")
-      .mockResponseOnceIf("https://unicode.org/Public/draft/emoji/ReadMe.txt", "Unicode Emoji, Version 15.1");
-
-    const result = await getCurrentDraftVersion();
-    expect(result).toEqual({
-      emoji_version: "15.1",
-      unicode_version: "15.1.0",
-    });
-  });
-
-  it("returns null when fetch fails", async () => {
-    fetchMock.mockResponse("Not Found", { status: 404 });
-
-    expect(await getCurrentDraftVersion()).toBeNull();
-  });
-
-  it("returns null when versions do not match", async () => {
-    fetchMock
-      .mockResponseOnceIf("https://unicode.org/Public/draft/ReadMe.txt", "Version 15.1.0 of the Unicode Standard")
-      .mockResponseOnceIf("https://unicode.org/Public/draft/emoji/ReadMe.txt", "Unicode Emoji, Version 15.0");
-
-    expect(await getCurrentDraftVersion()).toBeNull();
-  });
-
-  it("returns null when version extraction fails", async () => {
-    fetchMock
-      .mockResponse("Invalid version format", { status: 200 });
-
-    expect(await getCurrentDraftVersion()).toBeNull();
-  });
-});
-
 describe("extractVersionFromReadme", () => {
   it.each([
     { input: "Version 15.1.0 of the Unicode Standard", expected: "15.1.0" },
@@ -274,7 +239,7 @@ describe("extractUnicodeVersion", () => {
   });
 });
 
-describe("isEmojiVersionAllowed", () => {
+describe("is emoji version allowed", () => {
   it.each([
     { version: "11.0.0", expected: true },
     { version: "12.0.0", expected: true },
@@ -325,5 +290,40 @@ describe("isEmojiVersionAllowed", () => {
     { version: "5.0.1", expected: false },
   ])("returns false for patch versions within 1-5: $version", async ({ version, expected }) => {
     expect(await isEmojiVersionAllowed(version)).toBe(expected);
+  });
+});
+
+describe("draft", () => {
+  it("returns draft versions when fetches succeed and versions match", async () => {
+    fetchMock
+      .mockResponseOnceIf("https://unicode.org/Public/draft/ReadMe.txt", "Version 15.1.0 of the Unicode Standard")
+      .mockResponseOnceIf("https://unicode.org/Public/draft/emoji/ReadMe.txt", "Unicode Emoji, Version 15.1");
+
+    const result = await getCurrentDraftVersion();
+    expect(result).toEqual({
+      emoji_version: "15.1",
+      unicode_version: "15.1.0",
+    });
+  });
+
+  it("returns null when fetch fails", async () => {
+    fetchMock.mockResponse("Not Found", { status: 404 });
+
+    expect(await getCurrentDraftVersion()).toBeNull();
+  });
+
+  it("returns null when versions do not match", async () => {
+    fetchMock
+      .mockResponseOnceIf("https://unicode.org/Public/draft/ReadMe.txt", "Version 15.1.0 of the Unicode Standard")
+      .mockResponseOnceIf("https://unicode.org/Public/draft/emoji/ReadMe.txt", "Unicode Emoji, Version 15.0");
+
+    expect(await getCurrentDraftVersion()).toBeNull();
+  });
+
+  it("returns null when version extraction fails", async () => {
+    fetchMock
+      .mockResponse("Invalid version format", { status: 200 });
+
+    expect(await getCurrentDraftVersion()).toBeNull();
   });
 });
