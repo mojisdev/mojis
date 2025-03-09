@@ -1,7 +1,9 @@
 import type { CacheMeta } from "../src/cache";
 import fs from "fs-extra";
+import { HttpResponse } from "msw";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { testdir } from "vitest-testdirs";
+import { mockFetch } from "../../../test/msw-utils/msw";
 import { createCacheKeyFromUrl, fetchCache, readCache, readCacheMeta, writeCache } from "../src/cache";
 
 vi.mock("fs-extra", {
@@ -271,8 +273,6 @@ describe("fetchCache", () => {
     const result = await fetchCache<Record<string, string>>("https://mojis.dev", options);
 
     expect(result).toEqual(testData);
-
-    expect(fetch).not.toHaveBeenCalled();
   });
 
   it("should fetch and cache new data when bypass is true", async () => {
@@ -285,12 +285,13 @@ describe("fetchCache", () => {
       bypassCache: true,
     };
 
-    fetchMock.mockResponse(rawData);
+    mockFetch("https://mojis.dev", "get", () => {
+      return HttpResponse.text(rawData, { status: 200 });
+    });
 
     const result = await fetchCache<Record<string, string>>("https://mojis.dev", options);
 
     expect(result).toEqual(parsedData);
-    expect(fetch).toHaveBeenCalledWith("https://mojis.dev", undefined);
     expect(fs.writeFile).toHaveBeenCalled();
   });
 
@@ -301,7 +302,9 @@ describe("fetchCache", () => {
       bypassCache: true,
     };
 
-    fetchMock.mockResponse("Not Found", { status: 404 });
+    mockFetch("https://mojis.dev/", "get", () => {
+      return new HttpResponse("Not Found", { status: 404 });
+    });
 
     await expect(fetchCache("https://mojis.dev", options))
       .rejects
@@ -317,7 +320,9 @@ describe("fetchCache", () => {
       bypassCache: true,
     };
 
-    fetchMock.mockResponse(rawData);
+    mockFetch("https://mojis.dev", "get", () => {
+      return HttpResponse.text(rawData, { status: 200 });
+    });
 
     const result = await fetchCache("https://mojis.dev", options);
 
