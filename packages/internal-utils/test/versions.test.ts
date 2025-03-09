@@ -7,7 +7,7 @@ import {
   extractVersionFromReadme,
   getCurrentDraftVersion,
   getLatestEmojiVersion,
-  isEmojiVersionValid,
+  isEmojiVersionAllowed,
   mapEmojiVersionToUnicodeVersion,
   toSemverCompatible,
 } from "../src/versions";
@@ -277,7 +277,7 @@ describe("extract unicode version", () => {
   });
 });
 
-describe("is emoji version valid", () => {
+describe("isEmojiVersionAllowed", () => {
   it.each([
     { version: "11.0.0", expected: true },
     { version: "12.0.0", expected: true },
@@ -286,8 +286,8 @@ describe("is emoji version valid", () => {
     { version: "15.0.0", expected: true },
     { version: "15.1.0", expected: true },
     { version: "16.0.0", expected: true },
-  ])("should return true for valid emoji versions >= 11.0.0 (version: $version)", async ({ version, expected }) => {
-    expect(await isEmojiVersionValid(version)).toBe(expected);
+  ])("returns true for major version >= 11: $version", async ({ version, expected }) => {
+    expect(await isEmojiVersionAllowed(version)).toBe(expected);
   });
 
   it.each([
@@ -296,8 +296,8 @@ describe("is emoji version valid", () => {
     { version: "3.0.0", expected: true },
     { version: "4.0.0", expected: true },
     { version: "5.0.0", expected: true },
-  ])("should return true for valid emoji versions 1.0.0 - 5.0.0 (version: $version)", async ({ version, expected }) => {
-    expect(await isEmojiVersionValid(version)).toBe(expected);
+  ])("returns true for major versions 1-5: $version", async ({ version, expected }) => {
+    expect(await isEmojiVersionAllowed(version)).toBe(expected);
   });
 
   it.each([
@@ -306,8 +306,8 @@ describe("is emoji version valid", () => {
     { version: "8.0.0", expected: false },
     { version: "9.0.0", expected: false },
     { version: "10.0.0", expected: false },
-  ])("should return false for invalid emoji versions 6.0.0 - 10.0.0 (version: $version)", async ({ version, expected }) => {
-    expect(await isEmojiVersionValid(version)).toBe(expected);
+  ])("returns false for major versions 6-10: $version", async ({ version, expected }) => {
+    expect(await isEmojiVersionAllowed(version)).toBe(expected);
   });
 
   it.each([
@@ -316,8 +316,8 @@ describe("is emoji version valid", () => {
     { version: "3.1.0", expected: false },
     { version: "4.1.0", expected: false },
     { version: "5.1.0", expected: false },
-  ])("should return false for invalid emoji versions 1.1.0 - 5.1.0 (version: $version)", async ({ version, expected }) => {
-    expect(await isEmojiVersionValid(version)).toBe(expected);
+  ])("returns false for minor versions within 1-5: $version", async ({ version, expected }) => {
+    expect(await isEmojiVersionAllowed(version)).toBe(expected);
   });
 
   it.each([
@@ -326,7 +326,7 @@ describe("is emoji version valid", () => {
     { version: "3.0.1", expected: false },
     { version: "4.0.1", expected: false },
     { version: "5.0.1", expected: false },
-  ])("should return false for invalid emoji versions 1.0.1 - 5.0.1 (version: $version)", async ({ version, expected }) => {
-    expect(await isEmojiVersionValid(version)).toBe(expected);
+  ])("returns false for patch versions within 1-5: $version", async ({ version, expected }) => {
+    expect(await isEmojiVersionAllowed(version)).toBe(expected);
   });
 });

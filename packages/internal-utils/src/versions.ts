@@ -256,7 +256,7 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
 
     const version = match[1];
 
-    if (!await isEmojiVersionValid(version)) {
+    if (!await isEmojiVersionAllowed(version)) {
       continue;
     }
 
@@ -283,7 +283,7 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
       version += ".0";
     }
 
-    if (!await isEmojiVersionValid(version)) {
+    if (!await isEmojiVersionAllowed(version)) {
       continue;
     }
 
@@ -328,35 +328,32 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
 }
 
 /**
- * Checks if the given emoji version is valid according to Unicode Consortium standards.
+ * Checks if a given emoji version is allowed based on specific criteria.
  *
  * Due to Unicode Consortium's versioning changes in 2017:
  * - Versions 6-10 don't exist (they aligned emoji versions with Unicode versions)
  * - Versions 1-5 only had major releases (no minor or patch versions)
  *
- * @param {string} version - The emoji version string to validate
- * @returns {Promise<boolean>} A promise that resolves to true if the version is valid, false otherwise
- *
- * @example
- * ```ts
- * await isEmojiVersionValid('11.0.0') // true
- * await isEmojiVersionValid('6.0.0')  // false
- * await isEmojiVersionValid('1.1.0')  // false
- * ```
+ * @param {string} version - The emoji version string to check.
+ * @returns {Promise<boolean>} A promise that resolves to true if the version is allowed, false otherwise.
  */
-export async function isEmojiVersionValid(version: string): Promise<boolean> {
-  // unicode consortium made a huge change in v11, because that is actually the version
-  // right after v5. They decided to align the unicode version with the emoji version in 2017.
-  // So, no emoji version 6, 7, 8, 9, or 10.
-  const isVersionInNoEmojiVersions = NON_EXISTING_VERSIONS.find((v) => semver.satisfies(version, v));
-  if (isVersionInNoEmojiVersions) {
+export async function isEmojiVersionAllowed(version: string): Promise<boolean> {
+  const semverVersion = toSemverCompatible(version);
+
+  if (semverVersion == null) {
+    return false;
+  }
+
+  // There isn't any Emoji 6.0-10.0. They aligned the emoji version with the unicode version in 2017.
+  // Starting from v11.0.
+  if (NON_EXISTING_VERSIONS.find((v) => semver.satisfies(semverVersion, v))) {
     return false;
   }
 
   // from v1 to v5, there was only major releases. So no v1.1, v1.2, etc.
   // only, v1.0, v2.0, v3.0, v4.0, v5.0.
   // if version has any minor or patch, it is invalid.
-  if (semver.major(version) <= 5 && (semver.minor(version) !== 0 || semver.patch(version) !== 0)) {
+  if (semver.major(semverVersion) <= 5 && (semver.minor(semverVersion) !== 0 || semver.patch(semverVersion) !== 0)) {
     return false;
   }
 
