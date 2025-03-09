@@ -4,6 +4,8 @@ import { genericParse } from "@mojis/parsers";
 import { ALL_HANDLERS } from "./handlers";
 import { buildContext, getHandlerUrls, isBuiltinParser } from "./utils";
 
+export type { AdapterContext, AdapterHandlerType };
+
 export async function runAdapterHandler<
   TAdapterHandlerType extends AdapterHandlerType,
   TContext extends AdapterContext,

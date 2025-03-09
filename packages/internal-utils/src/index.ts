@@ -1,5 +1,3 @@
-// TODO: fix the export to remove barrel file
-
 export * from "./cache";
 export * from "./constants";
 export * from "./hexcode";
