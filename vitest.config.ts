@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { defineConfig } from "vitest/config";
 
 const pkgRoot = (pkg: string) =>
