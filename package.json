@@ -30,7 +30,7 @@
     "turbo": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:",
-    "vitest-fetch-mock": "catalog:"
+    "msw": "^2.7.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
