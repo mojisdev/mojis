@@ -5,17 +5,17 @@ import { defineAdapterHandler } from "../../define";
 
 export const modernSequenceHandler = defineAdapterHandler({
   type: "sequence",
-  urls: (ctx) => {
+  urls: ({ emoji_version }) => {
     return [
       {
         key: "sequences",
-        url: `https://unicode.org/Public/emoji/${ctx.emoji_version}/emoji-sequences.txt`,
-        cacheKey: `v${ctx.emoji_version}/sequences`,
+        url: `https://unicode.org/Public/emoji/${emoji_version}/emoji-sequences.txt`,
+        cacheKey: `v${emoji_version}/sequences`,
       },
       {
         key: "zwj",
-        url: `https://unicode.org/Public/emoji/${ctx.emoji_version}/emoji-zwj-sequences.txt`,
-        cacheKey: `v${ctx.emoji_version}/zwj-sequences`,
+        url: `https://unicode.org/Public/emoji/${emoji_version}/emoji-zwj-sequences.txt`,
+        cacheKey: `v${emoji_version}/zwj-sequences`,
       },
     ];
   },
