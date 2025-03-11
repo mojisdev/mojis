@@ -347,7 +347,7 @@ describe("draft", () => {
 
   it("should throw if emoji version is invalid", async () => {
     mockFetch([
-      ["GET https://unicode.org/Public/draft/ReadMe.txt", () => HttpResponse.text("Version 15.1.0 of the Unicode Standard")],
+      ["GET https://unicode.org/Public/draft/ReadMe.txt", () => HttpResponse.text("")],
       ["GET https://unicode.org/Public/draft/emoji/ReadMe.txt", () => HttpResponse.text("Unicode Emoji, Version 15.0")],
     ]);
 
