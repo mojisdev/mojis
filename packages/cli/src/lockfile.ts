@@ -1,15 +1,15 @@
 import path from "node:path";
 import process from "node:process";
-import { EMOJI_SPEC_RECORD_SCHEMA } from "@mojis/internal-utils/schemas";
+import { ARKTYPE_EMOJI_SPEC_RECORD_SCHEMA } from "@mojis/internal-utils/schemas";
+import { type } from "arktype";
 import fs from "fs-extra";
-import z from "zod";
 
-const LOCKFILE_SCHEMA = z.object({
-  latest_version: z.string().nullable().optional(),
-  versions: z.array(EMOJI_SPEC_RECORD_SCHEMA),
+const LOCKFILE_SCHEMA = type({
+  latest_version: "string | null",
+  versions: ARKTYPE_EMOJI_SPEC_RECORD_SCHEMA.array(),
 });
 
-export type EmojiLockfile = z.infer<typeof LOCKFILE_SCHEMA>;
+export type EmojiLockfile = typeof LOCKFILE_SCHEMA.infer;
 
 const DEFAULT_LOCKFILE = {
   versions: [],
@@ -27,8 +27,9 @@ const DEFAULT_LOCKFILE = {
  */
 export async function readLockfile(cwd: string = process.cwd()): Promise<EmojiLockfile> {
   const json = await fs.readJSON(path.join(cwd, "emojis.lock")).catch(() => DEFAULT_LOCKFILE);
+  const out = LOCKFILE_SCHEMA(json);
 
-  return LOCKFILE_SCHEMA.parseAsync(json);
+  return out instanceof type.errors ? out.throw() : out;
 }
 
 /**
@@ -41,15 +42,13 @@ export async function readLockfile(cwd: string = process.cwd()): Promise<EmojiLo
  * @returns {Promise<void>} A promise that resolves when the file is written
  */
 export async function writeLockfile(lockfile: EmojiLockfile, cwd: string = process.cwd()): Promise<void> {
-  const result = await LOCKFILE_SCHEMA.safeParseAsync(lockfile);
+  const out = LOCKFILE_SCHEMA(lockfile);
 
-  if (!result.success) {
-    // if lockfile is invalid, throw an error with the pretty-printed validation errors
-    console.error(result.error);
-    throw new Error("invalid lockfile");
+  if (out instanceof type.errors) {
+    out.throw();
+  } else {
+    await fs.writeJSON(path.join(cwd, "emojis.lock"), out, { spaces: 2 });
   }
-
-  await fs.writeJSON(path.join(cwd, "emojis.lock"), result.data, { spaces: 2 });
 }
 
 /**

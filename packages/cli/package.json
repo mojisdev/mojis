@@ -35,6 +35,7 @@
   "dependencies": {
     "@mojis/adapters": "workspace:*",
     "@mojis/internal-utils": "workspace:*",
+    "arktype": "catalog:",
     "farver": "catalog:",
     "fs-extra": "catalog:",
     "semver": "catalog:",

@@ -17,7 +17,8 @@
     "forceConsistentCasingInFileNames": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "exactOptionalPropertyTypes": true
   },
   "include": ["*.ts"],
   "exclude": ["node_modules", "dist"]

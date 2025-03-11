@@ -1,11 +1,18 @@
+import { type } from "arktype";
 import z from "zod";
 
-// TODO: find a better name for this schema
 export const EMOJI_SPEC_RECORD_SCHEMA = z.object({
   emoji_version: z.string(),
   unicode_version: z.string(),
   draft: z.boolean(),
   fallback: z.string().optional().nullable(),
+});
+
+export const ARKTYPE_EMOJI_SPEC_RECORD_SCHEMA = type({
+  "emoji_version": "string",
+  "unicode_version": "string",
+  "draft": "boolean",
+  "fallback?": "string | null",
 });
 
 export const SHORTCODE_PROVIDER_SCHEMA = z.union([

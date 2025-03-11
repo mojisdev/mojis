@@ -39,6 +39,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "arktype": "catalog:",
     "fs-extra": "catalog:",
     "semver": "catalog:",
     "zod": "catalog:"
