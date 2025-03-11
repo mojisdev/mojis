@@ -102,7 +102,7 @@ describe("writeLockfile", () => {
       ],
     };
 
-    await expect(writeLockfile(mockLockfile as any)).rejects.toThrowError("invalid lockfile");
+    await expect(writeLockfile(mockLockfile as any)).rejects.toThrowError("versions[0].draft must be boolean (was \"not a boolean\")");
   });
 });
 
