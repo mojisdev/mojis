@@ -93,6 +93,7 @@ export async function runAdapterHandler<
       // @ts-expect-error i'm not smart enough to fix these
     }), aggregatedData);
 
+    // @ts-expect-error i'm not smart enough to fix these
     return output;
   }
 
