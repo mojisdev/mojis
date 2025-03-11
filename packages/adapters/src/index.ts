@@ -22,7 +22,7 @@ export async function runAdapterHandler<
 
   for (const handler of handlerGroup) {
     // figure out if we should execute this handler
-    const shouldExecute = await handler.shouldExecute(ctx);
+    const shouldExecute = typeof handler.shouldExecute === "boolean" ? handler.shouldExecute : await handler.shouldExecute(ctx);
 
     if (!shouldExecute) {
       continue;
@@ -93,7 +93,6 @@ export async function runAdapterHandler<
       // @ts-expect-error i'm not smart enough to fix these
     }), aggregatedData);
 
-    // @ts-expect-error i'm not smart enough to fix these
     return output;
   }
 

@@ -121,7 +121,7 @@ export interface AdapterHandler<
   /**
    * Whether or not that this handler should handle the request.
    */
-  shouldExecute: ShouldExecute<TContext>;
+  shouldExecute: boolean | ShouldExecute<TContext>;
 
   /**
    * A parse function or a reference to a builtin parser.
