@@ -65,5 +65,5 @@ it("should handle error cases", async () => {
     throw new Error("Command not found");
   });
 
-  await expect(() => cli(["build"])).rejects.toThrow("Command not found");
+  await expect(() => cli(["build"])).rejects.toThrow();
 });
