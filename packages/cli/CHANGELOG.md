@@ -1,5 +1,11 @@
 # @mojis/cli
 
+## 0.0.12
+
+### Patch Changes
+
+- [#46](https://github.com/mojisdev/mojis/pull/46) [`35e0338`](https://github.com/mojisdev/mojis/commit/35e033802c23917936750f8795cf5025aa3def4f) Thanks [@luxass](https://github.com/luxass)! - fix: handle cli flags correctly
+
 ## 0.0.11
 
 ### Patch Changes
