@@ -1,5 +1,17 @@
 # @mojis/cli
 
+## 0.0.11
+
+### Patch Changes
+
+- [#30](https://github.com/mojisdev/mojis/pull/30) [`3d9d9d8`](https://github.com/mojisdev/mojis/commit/3d9d9d870ac1b873b559d6f4e0ef458240ba2537) Thanks [@luxass](https://github.com/luxass)! - refactor: rewrite our adapter code to improve our type dx
+
+- [#41](https://github.com/mojisdev/mojis/pull/41) [`5d630fc`](https://github.com/mojisdev/mojis/commit/5d630fcbb34baef172c725e523a08134ecfc3079) Thanks [@luxass](https://github.com/luxass)! - feat: improve handlers
+
+- Updated dependencies [[`3d9d9d8`](https://github.com/mojisdev/mojis/commit/3d9d9d870ac1b873b559d6f4e0ef458240ba2537), [`2324bf6`](https://github.com/mojisdev/mojis/commit/2324bf668498f447e57a59da630e55c5bd4b1511), [`5d630fc`](https://github.com/mojisdev/mojis/commit/5d630fcbb34baef172c725e523a08134ecfc3079)]:
+  - @mojis/internal-utils@0.0.5
+  - @mojis/adapters@0.0.6
+
 ## 0.0.10
 
 ### Patch Changes
