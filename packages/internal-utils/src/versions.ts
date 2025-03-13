@@ -247,7 +247,7 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
 
     const version = match[1];
 
-    if (!await isEmojiVersionAllowed(version)) {
+    if (!isEmojiVersionAllowed(version)) {
       continue;
     }
 
@@ -274,7 +274,7 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
       version += ".0";
     }
 
-    if (!await isEmojiVersionAllowed(version)) {
+    if (!isEmojiVersionAllowed(version)) {
       continue;
     }
 

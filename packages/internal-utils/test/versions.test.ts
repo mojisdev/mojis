@@ -298,6 +298,7 @@ describe("is emoji version allowed", () => {
   it("should return false for invalid versions", async () => {
     expect(isEmojiVersionAllowed("invalid")).toBe(false);
     expect(isEmojiVersionAllowed("abc")).toBe(false);
+    expect(isEmojiVersionAllowed(null as any)).toBe(false);
   });
 });
 
