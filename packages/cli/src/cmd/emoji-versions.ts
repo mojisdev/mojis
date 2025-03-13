@@ -1,4 +1,4 @@
-import type { Arguments } from "yargs-parser";
+import type { CLIArguments } from "../cli-utils";
 import { getAllEmojiVersions } from "@mojis/internal-utils";
 import { red, yellow } from "farver/fast";
 import semver from "semver";
@@ -6,7 +6,10 @@ import { printHelp } from "../cli-utils";
 import { readLockfile, writeLockfile } from "../lockfile";
 
 interface VersionOptions {
-  flags: Arguments;
+  flags: CLIArguments<{
+    writeLockfile: boolean;
+    force: boolean;
+  }>;
 }
 
 export async function runEmojiVersions({ flags }: VersionOptions) {

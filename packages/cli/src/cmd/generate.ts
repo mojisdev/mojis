@@ -1,5 +1,5 @@
 import type { EmojiSpecRecord } from "@mojis/internal-utils";
-import type { Arguments } from "yargs-parser";
+import type { CLIArguments } from "../cli-utils";
 import { join } from "node:path";
 import { runAdapterHandler } from "@mojis/adapters";
 import {
@@ -15,7 +15,11 @@ import { printHelp } from "../cli-utils";
 import { readLockfile } from "../lockfile";
 
 interface GenerateOptions {
-  flags: Arguments;
+  flags: CLIArguments<{
+    generators: string[];
+    force: boolean;
+    shortcodeProviders: string[];
+  }>;
   versions: string[];
 }
 
