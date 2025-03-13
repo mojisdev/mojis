@@ -37,13 +37,13 @@ it("should override default values when specified", async () => {
 });
 
 it("should handle multiple array values correctly", async () => {
-  await cli(["build", "--generators", "custom", "another", "--shortcode-providers", "gitlab", "bitbucket"]);
+  await cli(["build", "--generators", "custom", "another", "--shortcode-providers", "not-found", "not-found2"]);
 
   expect(cliUtils.resolveCommand).toHaveBeenCalledWith(
     expect.objectContaining({
       "_": ["build"],
       "generators": ["custom", "another"],
-      "shortcode-providers": ["gitlab", "bitbucket"],
+      "shortcode-providers": ["not-found", "not-found2"],
     }),
   );
 });
@@ -65,5 +65,5 @@ it("should handle error cases", async () => {
     throw new Error("Command not found");
   });
 
-  await expect(() => cli(["build"])).rejects.toThrow();
+  await expect(() => cli(["build"])).rejects.toThrow("Command not found");
 });
