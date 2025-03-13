@@ -3,7 +3,7 @@ import { expect, it, vi } from "vitest";
 import { cli } from "../src/cli";
 import * as cliUtils from "../src/cli-utils";
 
-vi.mock("./cli-utils", {
+vi.mock("../src/cli-utils", {
   spy: true,
 });
 
