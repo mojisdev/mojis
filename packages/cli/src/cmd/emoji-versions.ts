@@ -1,4 +1,3 @@
-import type { Arguments } from "yargs-parser";
 import type { CLIArguments } from "../cli-utils";
 import { getAllEmojiVersions } from "@mojis/internal-utils";
 import { red, yellow } from "farver/fast";
