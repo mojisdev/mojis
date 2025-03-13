@@ -156,6 +156,9 @@ importers:
       yargs:
         specifier: 'catalog:'
         version: 17.7.2
+      yargs-parser:
+        specifier: ^21.1.1
+        version: 21.1.1
       zod:
         specifier: 'catalog:'
         version: 3.24.2
@@ -172,6 +175,9 @@ importers:
       '@types/yargs':
         specifier: 'catalog:'
         version: 17.0.33
+      '@types/yargs-parser':
+        specifier: ^21.0.3
+        version: 21.0.3
       eslint:
         specifier: 'catalog:'
         version: 9.21.0
