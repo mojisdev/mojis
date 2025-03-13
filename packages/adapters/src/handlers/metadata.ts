@@ -18,7 +18,6 @@ function slugify(val: string): string {
 // We will probably just have to "generate" them from a html page.
 const DISALLOWED_EMOJI_VERSIONS = ["1.0", "2.0", "3.0"];
 
-// TODO: give this a better name
 export const baseMetadataHandler = defineAdapterHandler({
   type: "metadata",
   shouldExecute: (ctx) => {

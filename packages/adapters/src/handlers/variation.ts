@@ -1,12 +1,14 @@
 import type { EmojiVariation } from "@mojis/internal-utils";
 import semver from "semver";
-import { defineAdapterHandler } from "../../define";
+import { defineAdapterHandler } from "../define";
 
+export const NOT_EXISTING = ["1.0", "2.0", "3.0", "4.0"];
+
+// There doesn't seem to exists a emoji-variation-sequences.txt file for versions
+// before v5.0
 export const baseVariationHandler = defineAdapterHandler({
   type: "variation",
-  shouldExecute: (ctx) => {
-    return semver.gte(`${ctx.unicode_version}.0`, "5.0.0");
-  },
+  shouldExecute: ({ emoji_version }) => !NOT_EXISTING.includes(emoji_version),
   urls: (ctx) => {
     if (semver.lte(`${ctx.unicode_version}.0`, "12.1.0")) {
       return {
@@ -21,7 +23,7 @@ export const baseVariationHandler = defineAdapterHandler({
     };
   },
   parser: "generic",
-  transform(ctx, data) {
+  transform(_, data) {
     const variations: EmojiVariation[] = [];
 
     for (const line of data.lines) {
@@ -47,7 +49,24 @@ export const baseVariationHandler = defineAdapterHandler({
 
     return variations;
   },
-  output(_ctx, transformed) {
+  output(_, transformed) {
     return transformed;
+  },
+});
+
+// Handles the versions that doesn't seem to have an emoji-test file.
+// We will just return an empty object for these versions.
+export const notSupportedVariationHandler = defineAdapterHandler({
+  type: "variation",
+  shouldExecute: (ctx) => NOT_EXISTING.includes(ctx.emoji_version),
+  urls: () => {
+    return undefined;
+  },
+  parser: "generic",
+  transform() {
+    return undefined;
+  },
+  output() {
+    return [];
   },
 });
