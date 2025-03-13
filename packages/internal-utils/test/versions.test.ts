@@ -252,7 +252,7 @@ describe("is emoji version allowed", () => {
     { version: "15.1.0", expected: true },
     { version: "16.0.0", expected: true },
   ])("returns true for major version >= 11: $version", async ({ version, expected }) => {
-    expect(await isEmojiVersionAllowed(version)).toBe(expected);
+    expect(isEmojiVersionAllowed(version)).toBe(expected);
   });
 
   it.each([
@@ -262,7 +262,7 @@ describe("is emoji version allowed", () => {
     { version: "4.0.0", expected: true },
     { version: "5.0.0", expected: true },
   ])("returns true for major versions 1-5: $version", async ({ version, expected }) => {
-    expect(await isEmojiVersionAllowed(version)).toBe(expected);
+    expect(isEmojiVersionAllowed(version)).toBe(expected);
   });
 
   it.each([
@@ -272,7 +272,7 @@ describe("is emoji version allowed", () => {
     { version: "9.0.0", expected: false },
     { version: "10.0.0", expected: false },
   ])("returns false for major versions 6-10: $version", async ({ version, expected }) => {
-    expect(await isEmojiVersionAllowed(version)).toBe(expected);
+    expect(isEmojiVersionAllowed(version)).toBe(expected);
   });
 
   it.each([
@@ -282,7 +282,7 @@ describe("is emoji version allowed", () => {
     { version: "4.1.0", expected: false },
     { version: "5.1.0", expected: false },
   ])("returns false for minor versions within 1-5: $version", async ({ version, expected }) => {
-    expect(await isEmojiVersionAllowed(version)).toBe(expected);
+    expect(isEmojiVersionAllowed(version)).toBe(expected);
   });
 
   it.each([
@@ -292,7 +292,12 @@ describe("is emoji version allowed", () => {
     { version: "4.0.1", expected: false },
     { version: "5.0.1", expected: false },
   ])("returns false for patch versions within 1-5: $version", async ({ version, expected }) => {
-    expect(await isEmojiVersionAllowed(version)).toBe(expected);
+    expect(isEmojiVersionAllowed(version)).toBe(expected);
+  });
+
+  it("should return false for invalid versions", async () => {
+    expect(isEmojiVersionAllowed("invalid")).toBe(false);
+    expect(isEmojiVersionAllowed("abc")).toBe(false);
   });
 });
 

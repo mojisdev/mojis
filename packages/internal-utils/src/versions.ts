@@ -322,9 +322,9 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
  * - Versions 1-5 only had major releases (no minor or patch versions)
  *
  * @param {string} version - The emoji version string to check.
- * @returns {Promise<boolean>} A promise that resolves to true if the version is allowed, false otherwise.
+ * @returns {boolean} A boolean that resolves true if the version is allowed, false otherwise.
  */
-export async function isEmojiVersionAllowed(version: string): Promise<boolean> {
+export function isEmojiVersionAllowed(version: string): boolean {
   const semverVersion = toSemverCompatible(version);
 
   if (semverVersion == null) {
