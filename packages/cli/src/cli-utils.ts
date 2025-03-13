@@ -90,6 +90,9 @@ export function printHelp({
   if (usage) {
     message.push(linebreak(), `  ${green(commandName)} ${bold(usage)}`);
   }
+  if (description) {
+    message.push(linebreak(), `  ${description}`);
+  }
 
   if (tables) {
     function calculateTablePadding(rows: [string, string][]) {
@@ -101,10 +104,6 @@ export function printHelp({
     for (const [tableTitle, tableRows] of tableEntries) {
       message.push(linebreak(), title(tableTitle), table(tableRows, { padding }));
     }
-  }
-
-  if (description) {
-    message.push(linebreak(), `${description}`);
   }
 
   // eslint-disable-next-line no-console

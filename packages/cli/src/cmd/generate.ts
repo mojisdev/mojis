@@ -22,6 +22,7 @@ interface GenerateOptions {
 export async function runGenerate({ versions: providedVersions, flags }: GenerateOptions) {
   if (flags?.help || flags?.h) {
     printHelp({
+      headline: "Generate emoji data for the specified versions.",
       commandName: "mojis generate",
       usage: "<...versions> [...flags]",
       tables: {
@@ -32,7 +33,6 @@ export async function runGenerate({ versions: providedVersions, flags }: Generat
           ["--help (-h)", "See all available flags."],
         ],
       },
-      description: `Generate emoji data for the specified versions.`,
     });
     return;
   }
