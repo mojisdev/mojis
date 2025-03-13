@@ -8,7 +8,6 @@ import {
   dim,
   green,
 } from "farver/fast";
-import yargs from "yargs-parser";
 import pkg from "../package.json" with { type: "json" };
 
 type CLICommand =
