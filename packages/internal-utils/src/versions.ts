@@ -3,6 +3,7 @@ import semver from "semver";
 import { NON_EXISTING_VERSIONS } from "./constants";
 
 export const MAPPED_EMOJI_VERSIONS: Record<string, string> = {
+  "0.7": "7.0",
   "1.0": "8.0",
   "2.0": "8.0",
   "3.0": "9.0",
@@ -44,41 +45,37 @@ export interface DraftVersion {
  * @returns {Promise<DraftVersion | null>} A Promise that resolves to the current draft version string, or null if not found
  */
 export async function getCurrentDraftVersion(): Promise<DraftVersion | null> {
-  try {
-    const [draftText, emojiText] = await Promise.all([
-      "https://unicode.org/Public/draft/ReadMe.txt",
-      "https://unicode.org/Public/draft/emoji/ReadMe.txt",
-    ].map(async (url) => {
-      const res = await fetch(url);
+  const [draftText, emojiText] = await Promise.all([
+    "https://unicode.org/Public/draft/ReadMe.txt",
+    "https://unicode.org/Public/draft/emoji/ReadMe.txt",
+  ].map(async (url) => {
+    const res = await fetch(url);
 
-      if (!res.ok) {
-        throw new Error(`failed to fetch ${url}: ${res.statusText}`);
-      }
-
-      return res.text();
-    }));
-
-    const rootVersion = extractVersionFromReadme(draftText);
-    const emojiVersion = extractVersionFromReadme(emojiText);
-
-    if (rootVersion == null || emojiVersion == null) {
-      throw new Error("failed to extract draft version");
+    if (!res.ok) {
+      throw new Error(`failed to fetch ${url}: ${res.status}`);
     }
 
-    // the emoji version is only using major.minor format.
-    // so, we will need to add the last 0 to the version.
-    // if they don't match the major and minor version, we will throw an error.
-    if (semver.major(rootVersion) !== semver.major(`${emojiVersion}.0`) || semver.minor(rootVersion) !== semver.minor(`${emojiVersion}.0`)) {
-      throw new Error("draft versions do not match");
-    }
+    return res.text();
+  }));
 
-    return {
-      emoji_version: emojiVersion,
-      unicode_version: rootVersion,
-    };
-  } catch {
-    return null;
+  const rootVersion = extractVersionFromReadme(draftText);
+  const emojiVersion = extractVersionFromReadme(emojiText);
+
+  if (rootVersion == null || emojiVersion == null) {
+    throw new Error("failed to extract draft version");
   }
+
+  // the emoji version is only using major.minor format.
+  // so, we will need to add the last 0 to the version.
+  // if they don't match the major and minor version, we will throw an error.
+  if (semver.major(rootVersion) !== semver.major(`${emojiVersion}.0`) || semver.minor(rootVersion) !== semver.minor(`${emojiVersion}.0`)) {
+    throw new Error("draft versions do not match");
+  }
+
+  return {
+    emoji_version: emojiVersion,
+    unicode_version: rootVersion,
+  };
 }
 
 /**
@@ -138,45 +135,52 @@ export function extractVersionFromReadme(text?: string): string | null {
   return null;
 }
 
-// https://unicode.org/reports/tr51/#EmojiVersions
+/**
+ * Extracts and aligns the Unicode version based on the provided emoji version.
+ *
+ * For emoji versions 11.0.0 and above, it compares the emoji version with the Unicode version (if provided)
+ * and returns the smaller of the two. If no Unicode version is provided, it returns the emoji version.
+ *
+ * For emoji versions prior to 11.0.0, it uses a mapping to determine the corresponding Unicode version.
+ *
+ * @param {string | null} emojiVersion - The emoji version string (e.g., "1.0", "12.0"). Can be null.
+ * @param {string?} unicodeVersion - The Unicode version string (e.g., "8.0", "13.0"). Optional.
+ * @returns {string | null} The aligned Unicode version string or null if the emoji version is null or invalid.
+ * Returns "6.0" if the emoji version is not found in the version map and is less than 11.0.0.
+ */
 export function extractUnicodeVersion(emojiVersion: string | null, unicodeVersion?: string): string | null {
-  const coercedEmojiVersion = semver.coerce(emojiVersion);
-  const coercedUnicodeVersion = semver.coerce(unicodeVersion);
+  // handle null case early
+  if (emojiVersion == null) {
+    return null;
+  }
 
-  if (coercedEmojiVersion == null || coercedUnicodeVersion == null) {
+  const coercedEmojiVersion = semver.coerce(emojiVersion);
+
+  // early return if emoji version is invalid
+  if (coercedEmojiVersion == null) {
     return null;
   }
 
   // v11+ aligned emoji and unicode specs (except for minor versions)
   if (semver.gte(coercedEmojiVersion, "11.0.0")) {
-    // if the unicode version is not provided, we will return the emoji version.
+    // if Unicode version is not provided, return the emoji version
     if (unicodeVersion == null) {
       return emojiVersion;
     }
 
-    // return the smallest version between the emoji and unicode version.
-    if (semver.lt(coercedEmojiVersion, coercedUnicodeVersion)) {
+    const coercedUnicodeVersion = semver.coerce(unicodeVersion);
+
+    // if Unicode version is invalid, return emoji version
+    if (coercedUnicodeVersion == null) {
       return emojiVersion;
     }
 
-    return unicodeVersion;
+    // return the smaller version between emoji and unicode version
+    return semver.lt(coercedEmojiVersion, coercedUnicodeVersion) ? emojiVersion : unicodeVersion;
   }
 
-  switch (emojiVersion) {
-    case "0.7":
-      return "7.0";
-    case "1.0":
-    case "2.0":
-      return "8.0";
-    case "3.0":
-    case "4.0":
-      return "9.0";
-    case "5.0":
-      return "10.0";
-    default:
-      // v6 is the first unicode spec emojis appeared in
-      return "6.0";
-  }
+  // return mapped version or default to "6.0"
+  return MAPPED_EMOJI_VERSIONS[emojiVersion] || "6.0";
 }
 
 /**
@@ -202,7 +206,7 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
     const res = await fetch(url);
 
     if (!res.ok) {
-      throw new Error(`failed to fetch ${url}: ${res.statusText}`);
+      throw new Error(`[versions]: failed to fetch ${url}: ${res.statusText}`);
     }
 
     return res.text();
@@ -229,7 +233,7 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
   const draft = await getCurrentDraftVersion();
 
   if (draft == null) {
-    throw new Error("failed to fetch draft version");
+    throw new Error("failed to extract draft version");
   }
 
   const versions: EmojiSpecRecord[] = [];
@@ -239,7 +243,7 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
 
     const version = match[1];
 
-    if (!await isEmojiVersionValid(version)) {
+    if (!await isEmojiVersionAllowed(version)) {
       continue;
     }
 
@@ -266,7 +270,7 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
       version += ".0";
     }
 
-    if (!await isEmojiVersionValid(version)) {
+    if (!await isEmojiVersionAllowed(version)) {
       continue;
     }
 
@@ -311,35 +315,32 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
 }
 
 /**
- * Checks if the given emoji version is valid according to Unicode Consortium standards.
+ * Checks if a given emoji version is allowed based on specific criteria.
  *
  * Due to Unicode Consortium's versioning changes in 2017:
  * - Versions 6-10 don't exist (they aligned emoji versions with Unicode versions)
  * - Versions 1-5 only had major releases (no minor or patch versions)
  *
- * @param {string} version - The emoji version string to validate
- * @returns {Promise<boolean>} A promise that resolves to true if the version is valid, false otherwise
- *
- * @example
- * ```ts
- * await isEmojiVersionValid('11.0.0') // true
- * await isEmojiVersionValid('6.0.0')  // false
- * await isEmojiVersionValid('1.1.0')  // false
- * ```
+ * @param {string} version - The emoji version string to check.
+ * @returns {Promise<boolean>} A promise that resolves to true if the version is allowed, false otherwise.
  */
-export async function isEmojiVersionValid(version: string): Promise<boolean> {
-  // unicode consortium made a huge change in v11, because that is actually the version
-  // right after v5. They decided to align the unicode version with the emoji version in 2017.
-  // So, no emoji version 6, 7, 8, 9, or 10.
-  const isVersionInNoEmojiVersions = NON_EXISTING_VERSIONS.find((v) => semver.satisfies(version, v));
-  if (isVersionInNoEmojiVersions) {
+export async function isEmojiVersionAllowed(version: string): Promise<boolean> {
+  const semverVersion = toSemverCompatible(version);
+
+  if (semverVersion == null) {
+    return false;
+  }
+
+  // There isn't any Emoji 6.0-10.0. They aligned the emoji version with the unicode version in 2017.
+  // Starting from v11.0.
+  if (NON_EXISTING_VERSIONS.find((v) => semver.satisfies(semverVersion, v))) {
     return false;
   }
 
   // from v1 to v5, there was only major releases. So no v1.1, v1.2, etc.
   // only, v1.0, v2.0, v3.0, v4.0, v5.0.
   // if version has any minor or patch, it is invalid.
-  if (semver.major(version) <= 5 && (semver.minor(version) !== 0 || semver.patch(version) !== 0)) {
+  if (semver.major(semverVersion) <= 5 && (semver.minor(semverVersion) !== 0 || semver.patch(semverVersion) !== 0)) {
     return false;
   }
 

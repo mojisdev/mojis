@@ -38,17 +38,18 @@
     "farver": "catalog:",
     "fs-extra": "catalog:",
     "semver": "catalog:",
-    "yargs": "catalog:",
+    "yargs-parser": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@luxass/eslint-config": "catalog:",
     "@types/fs-extra": "catalog:",
     "@types/semver": "catalog:",
-    "@types/yargs": "catalog:",
+    "@types/yargs-parser": "catalog:",
     "eslint": "catalog:",
     "tsup": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest-testdirs": "catalog:"
   },
   "publishConfig": {
     "access": "public"

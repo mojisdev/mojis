@@ -1,7 +1,10 @@
+import type { CacheMeta } from "../src/cache";
 import fs from "fs-extra";
+import { HttpResponse } from "msw";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { testdir } from "vitest-testdirs";
-import { createCacheKeyFromUrl, fetchCache, readCache, writeCache } from "../src/cache";
+import { mockFetch } from "../../../test/msw-utils/msw";
+import { createCacheKeyFromUrl, fetchCache, readCache, readCacheMeta, writeCache } from "../src/cache";
 
 vi.mock("fs-extra", {
   spy: true,
@@ -164,8 +167,7 @@ describe("write cache", () => {
 
 describe("read cache", () => {
   it("should read data from cache file", async () => {
-    const testdirPath = await testdir({
-    });
+    const testdirPath = await testdir({});
 
     const testData = { foo: "bar" };
     const cacheName = "test-cache";
@@ -202,6 +204,59 @@ describe("read cache", () => {
 
     expect(result).toEqual(complexData);
   });
+
+  it("should return undefined if cache meta doesn't exist", async () => {
+    const testdirPath = await testdir({
+      "no-meta": "test data",
+    });
+
+    const result = await readCache("no-meta", (data) => data, testdirPath);
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should return undefined if cache is expired", async () => {
+    const testdirPath = await testdir({
+      "expired": "test data",
+      "expired.meta": JSON.stringify({ ttl: Date.now() - 1000 }),
+    });
+
+    // ensure that both the cache and meta files exist
+    expect(await fs.pathExists(`${testdirPath}/expired`)).toBe(true);
+    expect(await fs.pathExists(`${testdirPath}/expired.meta`)).toBe(true);
+
+    const result = await readCache("expired", (data) => data, testdirPath);
+
+    expect(result).toBeUndefined();
+
+    // ensure that the cache and meta files were deleted
+    expect(await fs.pathExists(`${testdirPath}/expired`)).toBe(false);
+    expect(await fs.pathExists(`${testdirPath}/expired.meta`)).toBe(false);
+  });
+});
+
+describe("read cache meta", () => {
+  it("should read cache metadata from file", async () => {
+    const testdirPath = await testdir({});
+    const cacheKey = "test-cache";
+    const meta: CacheMeta = { encoding: "utf-8", ttl: 12345 };
+    const metaFilePath = `${testdirPath}/${cacheKey}.meta`;
+
+    await fs.writeFile(metaFilePath, JSON.stringify(meta), "utf-8");
+
+    const result = await readCacheMeta(cacheKey, testdirPath);
+
+    expect(result).toEqual(meta);
+  });
+
+  it("should return undefined if metadata file does not exist", async () => {
+    const testdirPath = await testdir({});
+    const cacheKey = "non-existent-cache";
+
+    const result = await readCacheMeta(cacheKey, testdirPath);
+
+    expect(result).toBeUndefined();
+  });
 });
 
 describe("fetchCache", () => {
@@ -218,8 +273,6 @@ describe("fetchCache", () => {
     const result = await fetchCache<Record<string, string>>("https://mojis.dev", options);
 
     expect(result).toEqual(testData);
-
-    expect(fetch).not.toHaveBeenCalled();
   });
 
   it("should fetch and cache new data when bypass is true", async () => {
@@ -232,12 +285,13 @@ describe("fetchCache", () => {
       bypassCache: true,
     };
 
-    fetchMock.mockResponse(rawData);
+    mockFetch("GET https://mojis.dev", () => {
+      return HttpResponse.text(rawData, { status: 200 });
+    });
 
     const result = await fetchCache<Record<string, string>>("https://mojis.dev", options);
 
     expect(result).toEqual(parsedData);
-    expect(fetch).toHaveBeenCalledWith("https://mojis.dev", undefined);
     expect(fs.writeFile).toHaveBeenCalled();
   });
 
@@ -248,7 +302,9 @@ describe("fetchCache", () => {
       bypassCache: true,
     };
 
-    fetchMock.mockResponse("Not Found", { status: 404 });
+    mockFetch("GET https://mojis.dev/", () => {
+      return new HttpResponse("Not Found", { status: 404 });
+    });
 
     await expect(fetchCache("https://mojis.dev", options))
       .rejects
@@ -264,7 +320,9 @@ describe("fetchCache", () => {
       bypassCache: true,
     };
 
-    fetchMock.mockResponse(rawData);
+    mockFetch("GET https://mojis.dev", () => {
+      return HttpResponse.text(rawData, { status: 200 });
+    });
 
     const result = await fetchCache("https://mojis.dev", options);
 

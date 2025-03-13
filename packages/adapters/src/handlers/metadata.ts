@@ -1,6 +1,6 @@
 import type { EmojiGroup, EmojiMetadata } from "@mojis/internal-utils";
-import { extractEmojiVersion, extractUnicodeVersion } from "@mojis/internal-utils";
-import { defineAdapterHandler } from "../../define";
+import { extractEmojiVersion, extractUnicodeVersion, isBefore } from "@mojis/internal-utils";
+import { defineAdapterHandler } from "../define";
 
 function slugify(val: string): string {
   return val.normalize("NFD")
@@ -14,19 +14,19 @@ function slugify(val: string): string {
 }
 
 // These emoji versions doesn't seem to have a emoji-test,
-// where we can extract the metadata from.
+// which we need to extract the groups and such from.
+// We will probably just have to "generate" them from a html page.
 const DISALLOWED_EMOJI_VERSIONS = ["1.0", "2.0", "3.0"];
 
-export const modernMetadataHandler = defineAdapterHandler({
+export const baseMetadataHandler = defineAdapterHandler({
   type: "metadata",
   shouldExecute: (ctx) => {
+    // Since we can't get the metadata for these versions,
+    // we will just skip them.
+    // We have a fallback handler for these versions (notSupportedMetadataHandler) find it below.
     return !DISALLOWED_EMOJI_VERSIONS.includes(ctx.emoji_version);
   },
   urls: (ctx) => {
-    if (DISALLOWED_EMOJI_VERSIONS.includes(ctx.emoji_version)) {
-      return undefined;
-    }
-
     return {
       url: `https://unicode.org/Public/emoji/${ctx.emoji_version}/emoji-test.txt`,
       cacheKey: `v${ctx.emoji_version}/metadata`,
@@ -91,8 +91,18 @@ export const modernMetadataHandler = defineAdapterHandler({
       const hexcode = baseHexcode.trim().replace(/\s+/g, "-");
       const qualifier = baseQualifier.trim();
 
-      const emojiVersion = extractEmojiVersion(comment.trim());
-      const [emoji, trimmedComment] = comment.trim().split(` E${emojiVersion} `);
+      // if the emoji_version is v5 and under.
+      // the content after the # doesn't include the emoji version.
+      let emoji;
+      let trimmedComment;
+
+      const extractedEmojiVersion = extractEmojiVersion(comment.trim());
+
+      if (isBefore(ctx.emoji_version, "6.0.0")) {
+        [emoji, trimmedComment] = comment.trim().split(" ");
+      } else {
+        [emoji, trimmedComment] = comment.trim().split(` E${extractedEmojiVersion} `);
+      }
 
       const groupName = currentGroup?.slug ?? "unknown";
       const subgroupName = currentGroup?.subgroups[currentGroup.subgroups.length - 1] ?? "unknown";
@@ -107,8 +117,8 @@ export const modernMetadataHandler = defineAdapterHandler({
         group: groupName,
         subgroup: subgroupName,
         qualifier,
-        emojiVersion: emojiVersion || null,
-        unicodeVersion: extractUnicodeVersion(emojiVersion, ctx.unicode_version),
+        emojiVersion: extractedEmojiVersion || null,
+        unicodeVersion: extractUnicodeVersion(extractedEmojiVersion, ctx.unicode_version),
         description: trimmedComment || "",
         emoji: emoji || null,
         hexcodes: hexcode.split("-"),
@@ -122,5 +132,27 @@ export const modernMetadataHandler = defineAdapterHandler({
   },
   output(_ctx, transformed) {
     return transformed;
+  },
+});
+
+// Handles the versions that doesn't seem to have an emoji-test file.
+// We will just return an empty object for these versions.
+export const notSupportedMetadataHandler = defineAdapterHandler({
+  type: "metadata",
+  shouldExecute: (ctx) => {
+    return DISALLOWED_EMOJI_VERSIONS.includes(ctx.emoji_version);
+  },
+  urls: () => {
+    return undefined;
+  },
+  parser: "generic",
+  transform() {
+    return undefined;
+  },
+  output() {
+    return {
+      groups: [],
+      emojis: {},
+    };
   },
 });

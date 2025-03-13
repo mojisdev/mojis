@@ -29,6 +29,12 @@ export function isBuiltinParser(parser: unknown): parser is BuiltinParser {
   return typeof parser === "string" && BUILTIN_PARSERS.includes(parser as BuiltinParser);
 }
 
+/**
+ * Creates a URL object with associated cache key.
+ *
+ * @param {string} url - The URL string.
+ * @returns {UrlWithCache} An object containing the original URL, a cache key derived from the URL, and the cache key itself (aliased as 'key').
+ */
 function createUrlWithCache(url: string): UrlWithCache {
   const cacheKey = createCacheKeyFromUrl(url);
   return { url, cacheKey, key: cacheKey };
@@ -53,7 +59,7 @@ function createUrlWithCache(url: string): UrlWithCache {
  *               - A {@link UrlBuilder} function that generates URLs from context
  *               - null or undefined (returns empty array)
  * @param {TContext} ctx - The adapter context object used when resolving URL builder functions
- * @returns A promise that resolves to an array of {@link UrlWithCache} objects with normalized structure
+ * @returns {Promise<UrlWithCache[]>} A promise that resolves to an array of {@link UrlWithCache} objects with normalized structure
  *
  * @template TContext - The type of context passed to URL builder functions
  */
@@ -101,4 +107,21 @@ export async function getHandlerUrls<TContext extends AdapterContext>(
   }
 
   return [urls];
+}
+
+/**
+ * Builds a new context object by merging the properties of the original context with additional properties.
+ *
+ * @param {TContext} ctx - The original context object.
+ * @param {TExtraContext} extraContext - An object containing additional properties to be added to the context.
+ * @returns {TContext & TExtraContext} A new context object that is the result of merging the original context with the extra context.
+ *
+ * @template {AdapterContext} TContext - The type of the original context object
+ * @template {Record<string, unknown>} TExtraContext - The type of the additional context object
+ */
+export function buildContext<TContext extends AdapterContext, TExtraContext extends Record<string, unknown>>(
+  ctx: TContext,
+  extraContext: TExtraContext,
+): TContext & TExtraContext {
+  return Object.assign({}, ctx, extraContext);
 }
