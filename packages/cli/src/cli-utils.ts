@@ -13,12 +13,12 @@ import pkg from "../package.json" with { type: "json" };
 type CLICommand =
   | "help"
   | "version"
-  | "versions"
+  | "emoji-versions"
   | "generate";
 
 const SUPPORTED_COMMANDS = new Set<CLICommand>([
   "generate",
-  "versions",
+  "emoji-versions",
 ]);
 
 /**
@@ -141,9 +141,9 @@ export async function runCommand(cmd: CLICommand, flags: Arguments): Promise<voi
       // eslint-disable-next-line no-console
       console.log(`  ${bgGreen(black(` mojis `))} ${green(`v${pkg.version ?? "x.y.z"}`)}`);
       break;
-    case "versions": {
-      const { runVersions } = await import("./cmd/versions");
-      await runVersions({
+    case "emoji-versions": {
+      const { runEmojiVersions } = await import("./cmd/emoji-versions");
+      await runEmojiVersions({
         flags,
       });
       break;

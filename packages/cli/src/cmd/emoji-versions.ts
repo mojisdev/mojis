@@ -9,7 +9,7 @@ interface VersionOptions {
   flags: Arguments;
 }
 
-export async function runVersions({ flags }: VersionOptions) {
+export async function runEmojiVersions({ flags }: VersionOptions) {
   if (flags?.help || flags?.h) {
     printHelp({
       commandName: "mojis versions",
