@@ -21,6 +21,8 @@ const SUPPORTED_COMMANDS = new Set<CLICommand>([
   "emoji-versions",
 ]);
 
+export type CLIArguments<T extends Record<string, unknown>> = Arguments & T;
+
 /**
  * Resolves the CLI command based on the provided arguments.
  *
@@ -144,7 +146,10 @@ export async function runCommand(cmd: CLICommand, flags: Arguments): Promise<voi
     case "emoji-versions": {
       const { runEmojiVersions } = await import("./cmd/emoji-versions");
       await runEmojiVersions({
-        flags,
+        flags: flags as CLIArguments<{
+          writeLockfile: boolean;
+          force: boolean;
+        }>,
       });
       break;
     }
@@ -153,7 +158,11 @@ export async function runCommand(cmd: CLICommand, flags: Arguments): Promise<voi
       const versions = flags._.slice(3) as string[];
       await runGenerate({
         versions,
-        flags,
+        flags: flags as CLIArguments<{
+          generators: string[];
+          shortcodeProviders: string[];
+          force: boolean;
+        }>,
       });
       break;
     }

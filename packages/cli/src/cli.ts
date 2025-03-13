@@ -7,7 +7,6 @@ export async function cli(args: string[]): Promise<void> {
     const flags = yargs(args, {
       configuration: {
         "parse-positional-numbers": false,
-        "camel-case-expansion": false,
       },
       array: ["generators", "shortcode-providers"],
       boolean: ["force", "write-lockfile"],
