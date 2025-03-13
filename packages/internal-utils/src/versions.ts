@@ -228,6 +228,10 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
   const rootHtml = rootResult.value;
   const emojiHtml = emojiResult.value;
 
+  if (!rootHtml || !emojiHtml) {
+    throw new Error("failed to fetch root or emoji page");
+  }
+
   const versionRegex = /href="(\d+\.\d+(?:\.\d+)?)\/?"/g;
 
   const draft = await getCurrentDraftVersion();

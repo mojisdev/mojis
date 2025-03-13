@@ -317,6 +317,14 @@ describe("all emoji versions", () => {
 
     await expect(() => getAllEmojiVersions()).rejects.toThrow("failed to fetch root or emoji page");
   });
+
+  it("should throw if empty data is returned", async () => {
+    mockFetch("GET https://unicode.org/Public/", () => {
+      return HttpResponse.text("");
+    });
+
+    await expect(() => getAllEmojiVersions()).rejects.toThrow("failed to fetch root or emoji page");
+  });
 });
 
 describe("draft", () => {
