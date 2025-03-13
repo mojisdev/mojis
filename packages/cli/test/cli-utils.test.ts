@@ -1,6 +1,6 @@
 import type { Arguments } from "yargs-parser";
 import { describe, expect, it } from "vitest";
-import { resolveCommand } from "./cli-utils";
+import { resolveCommand } from "../src/cli-utils";
 
 describe("resolveCommand", () => {
   it("should return 'version' when version flag is present", () => {
