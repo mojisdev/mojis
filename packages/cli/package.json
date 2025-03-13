@@ -39,6 +39,7 @@
     "fs-extra": "catalog:",
     "semver": "catalog:",
     "yargs": "catalog:",
+    "yargs-parser": "^21.1.1",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -46,6 +47,7 @@
     "@types/fs-extra": "catalog:",
     "@types/semver": "catalog:",
     "@types/yargs": "catalog:",
+    "@types/yargs-parser": "^21.0.3",
     "eslint": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",
