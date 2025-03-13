@@ -1,7 +1,18 @@
 import process from "node:process";
-import { cli } from "./cli-utils";
+import yargs from "yargs-parser";
+import { resolveCommand, runCommand } from "./cli-utils";
 
-cli(process.argv).catch((err) => {
-  console.error(err);
-  process.exit(1);
+const flags = yargs(process.argv, {
+  configuration: {
+    "parse-positional-numbers": false,
+  },
+  array: ["generators", "shortcode-providers"],
+  boolean: ["force", "write-lockfile"],
+  default: {
+    "generators": ["metadata"],
+    "shortcode-providers": ["github"],
+  },
 });
+
+const cmd = resolveCommand(flags);
+await runCommand(cmd, flags);

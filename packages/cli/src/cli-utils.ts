@@ -1,3 +1,4 @@
+import type { Arguments } from "yargs-parser";
 import process from "node:process";
 import {
   bgGreen,
@@ -13,29 +14,31 @@ import pkg from "../package.json" with { type: "json" };
 type CLICommand =
   | "help"
   | "version"
-  // TODO: find a better name for versions
   | "versions"
   | "generate";
 
+const SUPPORTED_COMMANDS = new Set<CLICommand>([
+  "generate",
+  "versions",
+]);
+
 /**
- * Resolves the CLI command based on the provided flags.
+ * Resolves the CLI command based on the provided arguments.
  *
- * @param {string} flags - The parsed command-line arguments from yargs.
- * @returns {CLICommand} A `CLICommand` representing the resolved command.
- *          If the `--version` flag is present, returns "version".
- *          If the command is supported, returns the command string.
- *          Otherwise, returns "help" as the default command.
+ * If the `version` flag is present, it returns the "version" command.
+ * Otherwise, it checks if the third argument in the positional arguments (`flags._[2]`)
+ * is a supported command. If it is, it returns that command.
+ * If no supported command is found, it defaults to the "help" command.
+ *
+ * @param {Arguments} flags - The parsed arguments from the command line.
+ * @returns {CLICommand} The resolved CLI command.
  */
-function resolveCommand(flags: yargs.Arguments): CLICommand {
-  const cmd = flags._[2] as string;
+export function resolveCommand(flags: Arguments): CLICommand {
   if (flags.version) return "version";
 
-  const supportedCommands = new Set([
-    "generate",
-    "versions",
-  ]);
+  const cmd = flags._[2] as string;
 
-  if (supportedCommands.has(cmd)) {
+  if (SUPPORTED_COMMANDS.has(cmd as CLICommand)) {
     return cmd as CLICommand;
   }
 
@@ -108,7 +111,15 @@ export function printHelp({
   console.log(`${message.join("\n")}\n`);
 }
 
-async function runCommand(cmd: string, flags: yargs.Arguments) {
+/**
+ * Runs a command based on the provided CLI command and flags.
+ *
+ * @param {CLICommand} cmd - The CLI command to execute.
+ * @param {Arguments} flags - The flags passed to the command.
+ * @returns {Promise<void>} A promise that resolves when the command has finished executing.
+ * @throws An error if the command is not found.
+ */
+export async function runCommand(cmd: CLICommand, flags: Arguments): Promise<void> {
   switch (cmd) {
     case "help":
       printHelp({
@@ -127,19 +138,17 @@ async function runCommand(cmd: string, flags: yargs.Arguments) {
           ],
         },
       });
-      return;
+      break;
     case "version":
       // eslint-disable-next-line no-console
-      console.log();
-      // eslint-disable-next-line no-console
       console.log(`  ${bgGreen(black(` mojis `))} ${green(`v${pkg.version ?? "x.y.z"}`)}`);
-      return;
+      break;
     case "versions": {
       const { runVersions } = await import("./cmd/versions");
       await runVersions({
         flags,
       });
-      return;
+      break;
     }
     case "generate": {
       const { runGenerate } = await import("./cmd/generate");
@@ -148,30 +157,9 @@ async function runCommand(cmd: string, flags: yargs.Arguments) {
         versions,
         flags,
       });
-      return;
+      break;
     }
-  }
-
-  throw new Error(`Error running ${cmd} -- no command found.`);
-}
-
-export async function cli(argv: string[]) {
-  const flags = yargs(argv, {
-    configuration: {
-      "parse-positional-numbers": false,
-    },
-    array: ["generators", "shortcode-providers"],
-    boolean: ["force", "write-lockfile"],
-    default: {
-      "generators": ["metadata"],
-      "shortcode-providers": ["github"],
-    },
-  });
-  const cmd = resolveCommand(flags);
-  try {
-    await runCommand(cmd, flags);
-  } catch (err) {
-    console.error(err);
-    process.exit(1);
+    default:
+      throw new Error(`Error running ${cmd} -- no command found.`);
   }
 }
