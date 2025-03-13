@@ -27,4 +27,4 @@ export async function cli(args: string[]): Promise<void> {
   }
 }
 
-cli(process.argv.slice(2));
+cli(process.argv);
