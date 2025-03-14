@@ -89,6 +89,12 @@ export type GetParseOptionsFromParser<TParser extends string> =
   TParser extends "generic" ? GenericParseOptions :
     never;
 
+export type WrapContextFn<
+  TContext extends AdapterContext,
+  TExtraContext extends Record<string, unknown>,
+  TReturn,
+> = ((ctx: TContext & TExtraContext) => TReturn) | TReturn;
+
 export interface AdapterHandler<
   TType extends AdapterHandlerType,
   TContext extends AdapterContext,
@@ -133,7 +139,9 @@ export interface AdapterHandler<
    * Options that will be passed to the parser.
    * This will only be used if the parser is a builtin parser.
    */
-  parserOptions?: TParser extends BuiltinParser ? GetParseOptionsFromParser<TParser> : never;
+  parserOptions?: TParser extends BuiltinParser ? WrapContextFn<TContext, {
+    key: string;
+  }, GetParseOptionsFromParser<TParser>> : never;
 
   /**
    * A transform function that will run for each of the urls.
