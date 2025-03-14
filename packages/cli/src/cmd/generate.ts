@@ -188,6 +188,20 @@ export async function runGenerate({ versions: providedVersions, flags }: Generat
       );
     }
 
+    if (isGeneratorEnabled("unicode-names")) {
+      const unicodeNames = await runAdapterHandler("unicode-names", {
+        force,
+        emoji_version: version.emoji_version,
+        unicode_version: version.unicode_version,
+      });
+
+      await fs.writeFile(
+        join(baseDir, "unicode-names.json"),
+        JSON.stringify(unicodeNames, null, 2),
+        "utf-8",
+      );
+    }
+
     // if (isGeneratorEnabled("emojis")) {
     //   if (adapter.emojis == null) {
     //     throw new MojisNotImplemented("emojis");

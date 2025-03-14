@@ -4,6 +4,7 @@ export const DEFAULT_GENERATORS = [
   "metadata",
   "sequences",
   "variations",
+  "unicode-names",
   // "shortcodes",
   // "emojis",
 ] satisfies AdapterHandlerType[];
