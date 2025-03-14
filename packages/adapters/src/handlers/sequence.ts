@@ -1,6 +1,5 @@
 import type { EmojiSequence } from "@mojis/internal-utils";
 import { expandHexRange, FEMALE_SIGN, MALE_SIGN } from "@mojis/internal-utils";
-import semver from "semver";
 import { defineAdapterHandler } from "../define";
 
 export const NOT_EXISTING = ["1.0"];
