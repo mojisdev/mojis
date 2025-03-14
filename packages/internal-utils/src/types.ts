@@ -23,7 +23,7 @@ export interface EmojiMetadata {
 export interface EmojiSequence {
   property: string;
   hex: string;
-  description: string;
+  description: string | null;
   gender: string | null;
 }
 

@@ -1,10 +1,14 @@
 import type { EmojiSequence } from "@mojis/internal-utils";
 import { expandHexRange, FEMALE_SIGN, MALE_SIGN } from "@mojis/internal-utils";
-import semver from "semver";
-import { defineAdapterHandler } from "../../define";
+import { defineAdapterHandler } from "../define";
 
-export const modernSequenceHandler = defineAdapterHandler({
+export const NOT_AVAILABLE_SEQUENCES = ["1.0"];
+
+// There doesn't seem to exists a emoji-sequences.txt or emoji-zwj-sequences.txt file for versions
+// before v2.
+export const baseSequenceHandler = defineAdapterHandler({
   type: "sequence",
+  shouldExecute: ({ emoji_version }) => !NOT_AVAILABLE_SEQUENCES.includes(emoji_version),
   urls: ({ emoji_version }) => {
     return [
       {
@@ -47,17 +51,27 @@ export const modernSequenceHandler = defineAdapterHandler({
       "# RGI_Emoji_ZWJ_Sequence": "RGI_Emoji_ZWJ_Sequence",
     },
   },
-  shouldExecute: (ctx) => {
-    return semver.gte(`${ctx.emoji_version}.0`, "16.0.0");
-  },
-  transform(ctx, data) {
+  transform(_, data) {
     const sequences: EmojiSequence[] = [];
 
     for (const line of data.lines) {
-      const [hex, property, description] = line.fields;
+      // on versions after 3.0, the line looks like this:
+      // 0023 FE0F 20E3; Emoji_Combining_Sequence  ; keycap: #     # 3.0  [1] (#️⃣)
+      // 002A FE0F 20E3; Emoji_Combining_Sequence  ; keycap: *     # 3.0  [1] (*️⃣)
+      // 3.0 and before:
+      // 0023 FE0F 20E3; Emoji_Combining_Sequence  # 3.0  [1] (#️⃣)      Keycap NUMBER SIGN
+      // 002A FE0F 20E3; Emoji_Combining_Sequence  # 3.0  [1] (*️⃣)      Keycap ASTERISK
 
-      if (hex == null || property == null || description == null) {
-        throw new Error(`invalid line: ${line}`);
+      const property = line.property;
+
+      if (property == null) {
+        throw new Error(`property is null, invalid line: ${JSON.stringify(line)}`);
+      }
+
+      const [hex, _, description] = line.fields;
+
+      if (hex == null) {
+        throw new Error(`hex is null, invalid line: ${JSON.stringify(line)}`);
       }
 
       const expandedHex = expandHexRange(hex);
@@ -66,7 +80,7 @@ export const modernSequenceHandler = defineAdapterHandler({
         sequences.push({
           hex: hex.replace(/\s+/g, "-"),
           property,
-          description,
+          description: description ?? null,
           gender: hex.includes(FEMALE_SIGN) ? "female" : hex.includes(MALE_SIGN) ? "male" : null,
         });
       }
@@ -80,7 +94,27 @@ export const modernSequenceHandler = defineAdapterHandler({
       zwj: data[1],
     };
   },
-  output(_ctx, transformed) {
+  output(_, transformed) {
     return transformed;
+  },
+});
+
+// Handles the versions that doesn't seem to have an emoji-sequences.txt or emoji-zwj-sequences.txt file.
+// We will just return an empty object for these versions.
+export const notSupportedSequenceHandler = defineAdapterHandler({
+  type: "sequence",
+  shouldExecute: (ctx) => NOT_AVAILABLE_SEQUENCES.includes(ctx.emoji_version),
+  urls: () => {
+    return undefined;
+  },
+  parser: "generic",
+  transform() {
+    return undefined;
+  },
+  output() {
+    return {
+      zwj: [],
+      sequences: [],
+    };
   },
 });
