@@ -49,7 +49,7 @@ export async function runGenerate({ versions: providedVersions, flags }: Generat
   const lockfile = await readLockfile();
 
   if (lockfile == null) {
-    console.error("no lockfile found, run `mojis versions --write-lockfile` to generate one");
+    console.error("no lockfile found, run `mojis emoji-versions --write-lockfile` to generate one");
     // eslint-disable-next-line node/prefer-global/process
     process.exit(1);
   }
