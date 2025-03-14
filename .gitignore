@@ -37,3 +37,4 @@ dist
 tsup.config.bundled_*
 .vitest-testdirs
 .cache
+tsconfig.test.vitest-temp.json
