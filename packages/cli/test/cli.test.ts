@@ -15,7 +15,12 @@ it("should pass the correct arguments to resolveCommand", async () => {
   expect(resolveSpy).toHaveBeenCalledWith(
     expect.objectContaining({
       "_": ["build"],
-      "generators": ["metadata", "sequences", "variations", "unicode-names"],
+      "generators": [
+        "metadata",
+        "sequences",
+        "variations",
+        "unicode-names",
+      ],
       "shortcode-providers": ["github"],
       "shortcodeProviders": ["github"],
       "force": false,
