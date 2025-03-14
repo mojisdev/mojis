@@ -7,7 +7,7 @@ export const UNSUPPORTED_VARIATION_VERSIONS = ["1.0", "2.0", "3.0", "4.0"];
 // There doesn't seem to exists a emoji-variation-sequences.txt file for versions
 // before v5.0
 export const baseVariationHandler = defineAdapterHandler({
-  type: "variation",
+  type: "variations",
   shouldExecute: ({ emoji_version }) => !UNSUPPORTED_VARIATION_VERSIONS.includes(emoji_version),
   urls: (ctx) => {
     if (semver.lte(`${ctx.unicode_version}.0`, "12.1.0")) {
@@ -57,7 +57,7 @@ export const baseVariationHandler = defineAdapterHandler({
 // Handles the versions that doesn't seem to have an emoji-test file.
 // We will just return an empty object for these versions.
 export const notSupportedVariationHandler = defineAdapterHandler({
-  type: "variation",
+  type: "variations",
   shouldExecute: (ctx) => UNSUPPORTED_VARIATION_VERSIONS.includes(ctx.emoji_version),
   urls: () => {
     return undefined;

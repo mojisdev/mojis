@@ -19,6 +19,6 @@ export const VARIATION_HANDLERS = [
 
 export const ALL_HANDLERS = {
   metadata: METADATA_HANDLERS,
-  sequence: SEQUENCE_HANDLERS,
-  variation: VARIATION_HANDLERS,
+  sequences: SEQUENCE_HANDLERS,
+  variations: VARIATION_HANDLERS,
 };

@@ -32,7 +32,7 @@ const DEFAULT_PROPERTY_MAP = {
 // There doesn't seem to exists a emoji-sequences.txt or emoji-zwj-sequences.txt file for versions
 // before v2.
 export const baseSequenceHandler = defineAdapterHandler({
-  type: "sequence",
+  type: "sequences",
   shouldExecute: ({ emoji_version }) => !NOT_AVAILABLE_SEQUENCES.includes(emoji_version),
   urls: ({ emoji_version }) => {
     return [
@@ -116,7 +116,7 @@ export const baseSequenceHandler = defineAdapterHandler({
 // Handles the versions that doesn't seem to have an emoji-sequences.txt or emoji-zwj-sequences.txt file.
 // We will just return an empty object for these versions.
 export const notSupportedSequenceHandler = defineAdapterHandler({
-  type: "sequence",
+  type: "sequences",
   shouldExecute: (ctx) => NOT_AVAILABLE_SEQUENCES.includes(ctx.emoji_version),
   urls: () => {
     return undefined;

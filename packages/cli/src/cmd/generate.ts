@@ -155,7 +155,7 @@ export async function runGenerate({ versions: providedVersions, flags }: Generat
     }
 
     if (isGeneratorEnabled("sequences")) {
-      const { sequences, zwj } = await runAdapterHandler("sequence", {
+      const { sequences, zwj } = await runAdapterHandler("sequences", {
         force,
         emoji_version: version.emoji_version,
         unicode_version: version.unicode_version,
@@ -175,7 +175,7 @@ export async function runGenerate({ versions: providedVersions, flags }: Generat
     }
 
     if (isGeneratorEnabled("variations")) {
-      const variations = await runAdapterHandler("variation", {
+      const variations = await runAdapterHandler("variations", {
         force,
         emoji_version: version.emoji_version,
         unicode_version: version.unicode_version,

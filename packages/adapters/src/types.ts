@@ -28,7 +28,7 @@ export interface AdapterContext {
   force: boolean;
 }
 
-export type AdapterHandlerType = "metadata" | "sequence" | "variation";
+export type AdapterHandlerType = "metadata" | "sequences" | "variations";
 
 export type UrlBuilder = (ctx: AdapterContext) => Promisable<AdapterUrls>;
 
@@ -166,8 +166,8 @@ export interface AdapterHandler<
 
 export type InferOutputFromAdapterHandlerType<THandlerType extends AdapterHandlerType> =
    THandlerType extends "metadata" ? ReturnType<typeof METADATA_HANDLERS[number]["output"]> :
-     THandlerType extends "sequence" ? ReturnType<typeof SEQUENCE_HANDLERS[number]["output"]> :
-       THandlerType extends "variation" ? ReturnType<typeof VARIATION_HANDLERS[number]["output"]> :
+     THandlerType extends "sequences" ? ReturnType<typeof SEQUENCE_HANDLERS[number]["output"]> :
+       THandlerType extends "variations" ? ReturnType<typeof VARIATION_HANDLERS[number]["output"]> :
          unknown;
 
 export type InferParseOutput<TContext extends AdapterContext, TParser extends string | ParserFn<TContext, any>> =
