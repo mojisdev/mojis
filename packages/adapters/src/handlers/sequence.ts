@@ -2,13 +2,13 @@ import type { EmojiSequence } from "@mojis/internal-utils";
 import { expandHexRange, FEMALE_SIGN, MALE_SIGN } from "@mojis/internal-utils";
 import { defineAdapterHandler } from "../define";
 
-export const NOT_EXISTING = ["1.0"];
+export const NOT_AVAILABLE_SEQUENCES = ["1.0"];
 
 // There doesn't seem to exists a emoji-sequences.txt or emoji-zwj-sequences.txt file for versions
 // before v2.
 export const baseSequenceHandler = defineAdapterHandler({
   type: "sequence",
-  shouldExecute: ({ emoji_version }) => !NOT_EXISTING.includes(emoji_version),
+  shouldExecute: ({ emoji_version }) => !NOT_AVAILABLE_SEQUENCES.includes(emoji_version),
   urls: ({ emoji_version }) => {
     return [
       {
@@ -103,7 +103,7 @@ export const baseSequenceHandler = defineAdapterHandler({
 // We will just return an empty object for these versions.
 export const notSupportedSequenceHandler = defineAdapterHandler({
   type: "sequence",
-  shouldExecute: (ctx) => NOT_EXISTING.includes(ctx.emoji_version),
+  shouldExecute: (ctx) => NOT_AVAILABLE_SEQUENCES.includes(ctx.emoji_version),
   urls: () => {
     return undefined;
   },
