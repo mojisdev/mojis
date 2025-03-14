@@ -1,5 +1,16 @@
 # @mojis/cli
 
+## 0.0.13
+
+### Patch Changes
+
+- [#52](https://github.com/mojisdev/mojis/pull/52) [`e71cd2b`](https://github.com/mojisdev/mojis/commit/e71cd2b1d4a8b89ee1db0ec523726e4b5cb9ed64) Thanks [@luxass](https://github.com/luxass)! - feat: add handler for unicode names
+
+- [`ed99e0a`](https://github.com/mojisdev/mojis/commit/ed99e0ab9799cdc95a7ca1e9571735086a510870) Thanks [@luxass](https://github.com/luxass)! - fix: rename handler types to align with generators
+
+- Updated dependencies [[`e71cd2b`](https://github.com/mojisdev/mojis/commit/e71cd2b1d4a8b89ee1db0ec523726e4b5cb9ed64), [`ed99e0a`](https://github.com/mojisdev/mojis/commit/ed99e0ab9799cdc95a7ca1e9571735086a510870), [`525f402`](https://github.com/mojisdev/mojis/commit/525f40248ce10328a414bb8acfd5d43748cb72b6), [`6b87f51`](https://github.com/mojisdev/mojis/commit/6b87f51b8a54e4503fb47d143957f04a2151a7bc)]:
+  - @mojis/adapters@0.0.7
+
 ## 0.0.12
 
 ### Patch Changes
