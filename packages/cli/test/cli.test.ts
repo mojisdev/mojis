@@ -15,10 +15,12 @@ it("should pass the correct arguments to resolveCommand", async () => {
   expect(resolveSpy).toHaveBeenCalledWith(
     expect.objectContaining({
       "_": ["build"],
-      "generators": ["metadata"],
+      "generators": ["metadata", "sequences", "variations", "unicode-names"],
       "shortcode-providers": ["github"],
+      "shortcodeProviders": ["github"],
       "force": false,
       "write-lockfile": false,
+      "writeLockfile": false,
     }),
   );
 });
