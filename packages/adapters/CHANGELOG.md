@@ -1,5 +1,11 @@
 # @mojis/adapters
 
+## 0.0.8
+
+### Patch Changes
+
+- [`2874f39`](https://github.com/mojisdev/mojis/commit/2874f39d2ba2ca57f782749839635acd6ed560cc) Thanks [@luxass](https://github.com/luxass)! - fix: handle unicode names correctly
+
 ## 0.0.7
 
 ### Patch Changes
