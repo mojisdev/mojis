@@ -39,11 +39,19 @@ export async function runAdapterHandler<
         parser(data) {
           if (isBuiltinParser(handler.parser)) {
             if (handler.parser === "generic") {
+              const parserOptions = typeof handler.parserOptions === "function"
+                ? handler.parserOptions(
+                    buildContext(ctx, {
+                      key,
+                    }),
+                  )
+                : handler.parserOptions;
+
               return genericParse(data, {
-                separator: handler.parserOptions?.separator ?? ";",
-                commentPrefix: handler.parserOptions?.commentPrefix ?? "#",
-                defaultProperty: handler.parserOptions?.defaultProperty ?? "",
-                propertyMap: handler.parserOptions?.propertyMap ?? {},
+                separator: parserOptions?.separator ?? ";",
+                commentPrefix: parserOptions?.commentPrefix ?? "#",
+                defaultProperty: parserOptions?.defaultProperty ?? "",
+                propertyMap: parserOptions?.propertyMap ?? {},
               });
             }
 

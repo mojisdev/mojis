@@ -4,6 +4,31 @@ import { defineAdapterHandler } from "../define";
 
 export const NOT_AVAILABLE_SEQUENCES = ["1.0"];
 
+const DEFAULT_PROPERTY_MAP = {
+  "# Combining sequences": "Emoji_Combining_Sequence",
+  "# Emoji Combining Sequence": "Emoji_Combining_Sequence",
+  "# Emoji Flag Sequence": "Emoji_Flag_Sequence",
+  "# Emoji Keycap Sequence": "Emoji_Keycap_Sequence",
+  "# Emoji Modifier Sequence": "Emoji_Modifier_Sequence",
+  "# Emoji Tag Sequence": "Emoji_Tag_Sequence",
+  "# Emoji ZWJ Sequence": "Emoji_ZWJ_Sequence",
+  "# Flag sequences": "Emoji_Flag_Sequence",
+  "# Modifier sequences": "Emoji_Modifier_Sequence",
+  "# ZWJ sequences": "Emoji_ZWJ_Sequence",
+  // 12.0+
+  "# Basic_Emoji": "Basic_Emoji",
+  "# Emoji_Keycap_Sequence": "Emoji_Keycap_Sequence",
+  "# Emoji_Flag_Sequence": "Emoji_Flag_Sequence",
+  "# Emoji_Tag_Sequence": "Emoji_Tag_Sequence",
+  "# Emoji_Modifier_Sequence": "Emoji_Modifier_Sequence",
+  "# Emoji_ZWJ_Sequence": "Emoji_ZWJ_Sequence",
+  // 13.0+
+  "# RGI_Emoji_Flag_Sequence": "RGI_Emoji_Flag_Sequence",
+  "# RGI_Emoji_Modifier_Sequence": "RGI_Emoji_Modifier_Sequence",
+  "# RGI_Emoji_Tag_Sequence": "RGI_Emoji_Tag_Sequence",
+  "# RGI_Emoji_ZWJ_Sequence": "RGI_Emoji_ZWJ_Sequence",
+};
+
 // There doesn't seem to exists a emoji-sequences.txt or emoji-zwj-sequences.txt file for versions
 // before v2.
 export const baseSequenceHandler = defineAdapterHandler({
@@ -24,32 +49,21 @@ export const baseSequenceHandler = defineAdapterHandler({
     ];
   },
   parser: "generic",
-  parserOptions: {
-    defaultProperty: "Emoji",
-    propertyMap: {
-      "# Combining sequences": "Emoji_Combining_Sequence",
-      "# Emoji Combining Sequence": "Emoji_Combining_Sequence",
-      "# Emoji Flag Sequence": "Emoji_Flag_Sequence",
-      "# Emoji Keycap Sequence": "Emoji_Keycap_Sequence",
-      "# Emoji Modifier Sequence": "Emoji_Modifier_Sequence",
-      "# Emoji Tag Sequence": "Emoji_Tag_Sequence",
-      "# Emoji ZWJ Sequence": "Emoji_ZWJ_Sequence",
-      "# Flag sequences": "Emoji_Flag_Sequence",
-      "# Modifier sequences": "Emoji_Modifier_Sequence",
-      "# ZWJ sequences": "Emoji_ZWJ_Sequence",
-      // 12.0+
-      "# Basic_Emoji": "Basic_Emoji",
-      "# Emoji_Keycap_Sequence": "Emoji_Keycap_Sequence",
-      "# Emoji_Flag_Sequence": "Emoji_Flag_Sequence",
-      "# Emoji_Tag_Sequence": "Emoji_Tag_Sequence",
-      "# Emoji_Modifier_Sequence": "Emoji_Modifier_Sequence",
-      "# Emoji_ZWJ_Sequence": "Emoji_ZWJ_Sequence",
-      // 13.0+
-      "# RGI_Emoji_Flag_Sequence": "RGI_Emoji_Flag_Sequence",
-      "# RGI_Emoji_Modifier_Sequence": "RGI_Emoji_Modifier_Sequence",
-      "# RGI_Emoji_Tag_Sequence": "RGI_Emoji_Tag_Sequence",
-      "# RGI_Emoji_ZWJ_Sequence": "RGI_Emoji_ZWJ_Sequence",
-    },
+  parserOptions: ({ key }) => {
+    let defaultProperty = "Emoji";
+
+    // TODO: figure out what the default is for other versions
+
+    if (key === "zwj") {
+      defaultProperty = "RGI_Emoji_ZWJ_Sequence";
+    } else if (key === "sequences") {
+      defaultProperty = "RGI_Emoji_Modifier_Sequence";
+    }
+
+    return {
+      defaultProperty,
+      propertyMap: DEFAULT_PROPERTY_MAP,
+    };
   },
   transform(_, data) {
     const sequences: EmojiSequence[] = [];
