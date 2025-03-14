@@ -2,7 +2,7 @@ import type {
   WriteCacheOptions,
 } from "@mojis/internal-utils";
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
-import type { METADATA_HANDLERS, SEQUENCE_HANDLERS, VARIATION_HANDLERS } from "./handlers";
+import type { METADATA_HANDLERS, SEQUENCE_HANDLERS, UNICODE_NAME_HANDLERS, VARIATION_HANDLERS } from "./handlers";
 import type { BUILTIN_PARSERS } from "./utils";
 
 type Promisable<T> = T | Promise<T>;
@@ -28,7 +28,7 @@ export interface AdapterContext {
   force: boolean;
 }
 
-export type AdapterHandlerType = "metadata" | "sequences" | "variations";
+export type AdapterHandlerType = "metadata" | "sequences" | "variations" | "unicode-names";
 
 export type UrlBuilder = (ctx: AdapterContext) => Promisable<AdapterUrls>;
 
@@ -168,7 +168,8 @@ export type InferOutputFromAdapterHandlerType<THandlerType extends AdapterHandle
    THandlerType extends "metadata" ? ReturnType<typeof METADATA_HANDLERS[number]["output"]> :
      THandlerType extends "sequences" ? ReturnType<typeof SEQUENCE_HANDLERS[number]["output"]> :
        THandlerType extends "variations" ? ReturnType<typeof VARIATION_HANDLERS[number]["output"]> :
-         unknown;
+         THandlerType extends "unicode-names" ? ReturnType<typeof UNICODE_NAME_HANDLERS[number]["output"]> :
+           unknown;
 
 export type InferParseOutput<TContext extends AdapterContext, TParser extends string | ParserFn<TContext, any>> =
   TParser extends ParserFn<AdapterContext, infer TOutput> ? TOutput :
