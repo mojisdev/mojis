@@ -1,5 +1,5 @@
 import { baseMetadataHandler, notSupportedMetadataHandler } from "./handlers/metadata";
-import { modernSequenceHandler } from "./handlers/modern/sequence";
+import { baseSequenceHandler, notSupportedSequenceHandler } from "./handlers/sequence";
 import { baseVariationHandler, notSupportedVariationHandler } from "./handlers/variation";
 
 export const METADATA_HANDLERS = [
@@ -8,7 +8,8 @@ export const METADATA_HANDLERS = [
 ];
 
 export const SEQUENCE_HANDLERS = [
-  modernSequenceHandler,
+  baseSequenceHandler,
+  notSupportedSequenceHandler,
 ];
 
 export const VARIATION_HANDLERS = [

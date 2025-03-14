@@ -1,10 +1,15 @@
 import type { EmojiSequence } from "@mojis/internal-utils";
 import { expandHexRange, FEMALE_SIGN, MALE_SIGN } from "@mojis/internal-utils";
 import semver from "semver";
-import { defineAdapterHandler } from "../../define";
+import { defineAdapterHandler } from "../define";
 
-export const modernSequenceHandler = defineAdapterHandler({
+export const NOT_EXISTING = ["1.0"];
+
+// There doesn't seem to exists a emoji-sequences.txt or emoji-zwj-sequences.txt file for versions
+// before v2.
+export const baseSequenceHandler = defineAdapterHandler({
   type: "sequence",
+  shouldExecute: ({ emoji_version }) => !NOT_EXISTING.includes(emoji_version),
   urls: ({ emoji_version }) => {
     return [
       {
@@ -47,10 +52,7 @@ export const modernSequenceHandler = defineAdapterHandler({
       "# RGI_Emoji_ZWJ_Sequence": "RGI_Emoji_ZWJ_Sequence",
     },
   },
-  shouldExecute: (ctx) => {
-    return semver.gte(`${ctx.emoji_version}.0`, "16.0.0");
-  },
-  transform(ctx, data) {
+  transform(_, data) {
     const sequences: EmojiSequence[] = [];
 
     for (const line of data.lines) {
@@ -80,7 +82,27 @@ export const modernSequenceHandler = defineAdapterHandler({
       zwj: data[1],
     };
   },
-  output(_ctx, transformed) {
+  output(_, transformed) {
     return transformed;
+  },
+});
+
+// Handles the versions that doesn't seem to have an emoji-sequences.txt or emoji-zwj-sequences.txt file.
+// We will just return an empty object for these versions.
+export const notSupportedSequenceHandler = defineAdapterHandler({
+  type: "sequence",
+  shouldExecute: (ctx) => NOT_EXISTING.includes(ctx.emoji_version),
+  urls: () => {
+    return undefined;
+  },
+  parser: "generic",
+  transform() {
+    return undefined;
+  },
+  output() {
+    return {
+      zwj: [],
+      sequences: [],
+    };
   },
 });
