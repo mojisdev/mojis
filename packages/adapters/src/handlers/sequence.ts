@@ -55,10 +55,23 @@ export const baseSequenceHandler = defineAdapterHandler({
     const sequences: EmojiSequence[] = [];
 
     for (const line of data.lines) {
-      const [hex, property, description] = line.fields;
+      // on versions after 3.0, the line looks like this:
+      // 0023 FE0F 20E3; Emoji_Combining_Sequence  ; keycap: #     # 3.0  [1] (#️⃣)
+      // 002A FE0F 20E3; Emoji_Combining_Sequence  ; keycap: *     # 3.0  [1] (*️⃣)
+      // 3.0 and before:
+      // 0023 FE0F 20E3; Emoji_Combining_Sequence  # 3.0  [1] (#️⃣)      Keycap NUMBER SIGN
+      // 002A FE0F 20E3; Emoji_Combining_Sequence  # 3.0  [1] (*️⃣)      Keycap ASTERISK
 
-      if (hex == null || property == null || description == null) {
-        throw new Error(`invalid line: ${line}`);
+      const property = line.property;
+
+      if (property == null) {
+        throw new Error(`property is null, invalid line: ${JSON.stringify(line)}`);
+      }
+
+      const [hex, _, description] = line.fields;
+
+      if (hex == null) {
+        throw new Error(`hex is null, invalid line: ${JSON.stringify(line)}`);
       }
 
       const expandedHex = expandHexRange(hex);
@@ -67,7 +80,7 @@ export const baseSequenceHandler = defineAdapterHandler({
         sequences.push({
           hex: hex.replace(/\s+/g, "-"),
           property,
-          description,
+          description: description ?? null,
           gender: hex.includes(FEMALE_SIGN) ? "female" : hex.includes(MALE_SIGN) ? "male" : null,
         });
       }
