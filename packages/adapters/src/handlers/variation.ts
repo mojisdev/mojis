@@ -2,13 +2,13 @@ import type { EmojiVariation } from "@mojis/internal-utils";
 import semver from "semver";
 import { defineAdapterHandler } from "../define";
 
-export const NOT_EXISTING = ["1.0", "2.0", "3.0", "4.0"];
+export const UNSUPPORTED_VARIATION_VERSIONS = ["1.0", "2.0", "3.0", "4.0"];
 
 // There doesn't seem to exists a emoji-variation-sequences.txt file for versions
 // before v5.0
 export const baseVariationHandler = defineAdapterHandler({
   type: "variation",
-  shouldExecute: ({ emoji_version }) => !NOT_EXISTING.includes(emoji_version),
+  shouldExecute: ({ emoji_version }) => !UNSUPPORTED_VARIATION_VERSIONS.includes(emoji_version),
   urls: (ctx) => {
     if (semver.lte(`${ctx.unicode_version}.0`, "12.1.0")) {
       return {
@@ -58,7 +58,7 @@ export const baseVariationHandler = defineAdapterHandler({
 // We will just return an empty object for these versions.
 export const notSupportedVariationHandler = defineAdapterHandler({
   type: "variation",
-  shouldExecute: (ctx) => NOT_EXISTING.includes(ctx.emoji_version),
+  shouldExecute: (ctx) => UNSUPPORTED_VARIATION_VERSIONS.includes(ctx.emoji_version),
   urls: () => {
     return undefined;
   },
