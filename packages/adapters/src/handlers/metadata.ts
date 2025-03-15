@@ -28,7 +28,7 @@ export const baseMetadataHandler = defineAdapterHandler({
   },
   urls: (ctx) => {
     return {
-      url: `https://unicode.org/Public/emoji/${ctx.emoji_version}/emoji-test.txt`,
+      url: `https://unicode-proxy.mojis.dev/proxy/emoji/${ctx.emoji_version}/emoji-test.txt`,
       cacheKey: `v${ctx.emoji_version}/metadata`,
     };
   },

@@ -7,7 +7,7 @@ import { traverse } from "apache-autoindex-parse/traverse";
 const root = new URL("../../../test/fixtures/parsers/", import.meta.url);
 
 async function run() {
-  const rootEntry = await traverse("https://unicode.org/Public/emoji/", {
+  const rootEntry = await traverse("https://unicode-proxy.mojis.dev/proxy/emoji/", {
     format: "F2",
   });
 
