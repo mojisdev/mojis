@@ -1,75 +1,120 @@
-import { expect, it } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { runCLI } from "../src/cli-utils";
 
-it("expect true to be true", () => {
-  expect(true).toBe(true);
+const mockRunEmojiVersions = vi.fn();
+const mockRunGenerate = vi.fn();
+
+vi.mock("../src/cmd/emoji-versions", () => ({
+  runEmojiVersions: mockRunEmojiVersions,
+}));
+
+vi.mock("../src/cmd/generate", () => ({
+  runGenerate: mockRunGenerate,
+}));
+
+beforeEach(() => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  vi.spyOn(process, "exit").mockImplementation((code) => {
+    throw new Error(`Process exit with code ${code}`);
+  });
 });
 
-// vi.mock("../src/cli-utils", {
-//   spy: true,
-// });
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
-// it("should pass the correct arguments to resolveCommand", async () => {
-//   const resolveSpy = vi.spyOn(cliUtils, "resolveCommand");
+it("should run the help command by default", async () => {
+  const consoleLogSpy = vi.spyOn(console, "log");
+  await runCLI(["node", "script.js"]);
+  expect(consoleLogSpy).toHaveBeenCalled();
+  expect(consoleLogSpy.mock.calls[0]?.[0]).toContain("mojis");
+});
 
-//   await runCLI(["build"]);
+it("should run the version command when --version flag is provided", async () => {
+  const consoleLogSpy = vi.spyOn(console, "log");
+  await runCLI(["node", "script.js", "--version"]);
+  expect(consoleLogSpy).toHaveBeenCalled();
+  expect(consoleLogSpy.mock.calls[0]?.[0]).toContain("mojis");
+  expect(consoleLogSpy.mock.calls[0]?.[0]).toContain("v");
+});
 
-//   expect(resolveSpy).toHaveBeenCalledWith(
-//     expect.objectContaining({
-//       "_": ["build"],
-//       "generators": [
-//         "metadata",
-//         "sequences",
-//         "variations",
-//         "unicode-names",
-//       ],
-//       "shortcode-providers": ["github"],
-//       "shortcodeProviders": ["github"],
-//       "force": false,
-//     }),
-//   );
-// });
+it("should handle emoji-versions command", async () => {
+  await runCLI(["node", "script.js", "emoji-versions"]);
+  expect(mockRunEmojiVersions).toHaveBeenCalledWith("", expect.objectContaining({
+    flags: expect.objectContaining({
+      drafts: false,
+      force: false,
+    }),
+  }));
+});
 
-// it("should override default values when specified", async () => {
-//   await runCLI(["build", "--generators", "custom", "--shortcode-providers", "gitlab", "--force"]);
+it("should handle emoji-versions command with subcommand", async () => {
+  await runCLI(["node", "script.js", "emoji-versions", "latest"]);
 
-//   expect(cliUtils.resolveCommand).toHaveBeenCalledWith(
-//     expect.objectContaining({
-//       "_": ["build"],
-//       "generators": ["custom"],
-//       "shortcode-providers": ["gitlab"],
-//       "force": true,
-//     }),
-//   );
-// });
+  expect(mockRunEmojiVersions).toHaveBeenCalledWith("latest", expect.objectContaining({
+    flags: expect.objectContaining({
+      drafts: false,
+      force: false,
+    }),
+  }));
+});
 
-// it("should handle multiple array values correctly", async () => {
-//   await runCLI(["build", "--generators", "custom", "another", "--shortcode-providers", "not-found", "not-found2"]);
+it("should handle emoji-versions command with drafts flag", async () => {
+  await runCLI(["node", "script.js", "emoji-versions", "--drafts"]);
+  expect(mockRunEmojiVersions).toHaveBeenCalledWith("", expect.objectContaining({
+    flags: expect.objectContaining({
+      drafts: true,
+      force: false,
+    }),
+  }));
+});
 
-//   expect(cliUtils.resolveCommand).toHaveBeenCalledWith(
-//     expect.objectContaining({
-//       "_": ["build"],
-//       "generators": ["custom", "another"],
-//       "shortcode-providers": ["not-found", "not-found2"],
-//     }),
-//   );
-// });
+it("should handle generate command with versions", async () => {
+  await runCLI(["node", "script.js", "generate", "15.0", "14.0"]);
 
-// it("should pass the resolved command to runCommand", async () => {
-//   (cliUtils.resolveCommand as Mock).mockReturnValueOnce("help");
-//   const runSpy = vi.spyOn(cliUtils, "runCommand");
+  expect(mockRunGenerate).toHaveBeenCalledWith(expect.objectContaining({
+    versions: ["15.0", "14.0"],
+    flags: expect.objectContaining({
+      force: false,
+    }),
+  }));
+});
 
-//   await runCLI(["help"]);
+it("should handle generate command with custom generators", async () => {
+  await runCLI(["node", "script.js", "generate", "--generators", "json", "ts"]);
+  expect(mockRunGenerate).toHaveBeenCalledWith(expect.objectContaining({
+    versions: [],
+    flags: expect.objectContaining({
+      generators: ["json", "ts"],
+      force: false,
+    }),
+  }));
+});
 
-//   expect(runSpy).toHaveBeenCalledWith(
-//     "help",
-//     expect.any(Object),
-//   );
-// });
+it("should handle generate command with custom shortcode providers", async () => {
+  await runCLI(["node", "script.js", "generate", "--shortcode-providers", "github", "discord"]);
+  expect(mockRunGenerate).toHaveBeenCalledWith(expect.objectContaining({
+    versions: [],
+    flags: expect.objectContaining({
+      "shortcode-providers": ["github", "discord"],
+      "force": false,
+    }),
+  }));
+});
 
-// it("should handle error cases", async () => {
-//   (cliUtils.resolveCommand as Mock).mockImplementationOnce(() => {
-//     throw new Error("Command not found");
-//   });
+it("should handle force flag", async () => {
+  await runCLI(["node", "script.js", "generate", "--force"]);
+  expect(mockRunGenerate).toHaveBeenCalledWith(expect.objectContaining({
+    flags: expect.objectContaining({
+      force: true,
+    }),
+  }));
+});
 
-//   await expect(() => runCLI(["build"])).rejects.toThrow();
-// });
+it("should call process.exit with code 1 when an error occurs", async () => {
+  mockRunGenerate.mockRejectedValue(new Error("Test error"));
+
+  await expect(runCLI(["node", "script.js", "generate"])).rejects.toThrow("Process exit with code 1");
+  expect(console.error).toHaveBeenCalled();
+});

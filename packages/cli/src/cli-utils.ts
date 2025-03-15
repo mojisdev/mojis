@@ -186,6 +186,7 @@ export function parseFlags(args: string[]) {
       "generators": DEFAULT_GENERATORS,
       "shortcode-providers": DEFAULT_SHORTCODE_PROVIDERS,
       "force": false,
+      "drafts": false,
     },
   });
 }
