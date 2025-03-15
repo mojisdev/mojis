@@ -37,7 +37,6 @@
   },
   "devDependencies": {
     "@luxass/eslint-config": "catalog:",
-    "apache-autoindex-parse": "catalog:",
     "eslint": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",
