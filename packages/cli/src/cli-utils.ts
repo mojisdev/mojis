@@ -8,7 +8,9 @@ import {
   dim,
   green,
 } from "farver/fast";
+import yargs from "yargs-parser";
 import pkg from "../package.json" with { type: "json" };
+import { DEFAULT_GENERATORS, DEFAULT_SHORTCODE_PROVIDERS } from "./constants";
 
 type CLICommand =
   | "help"
@@ -129,7 +131,7 @@ export async function runCommand(cmd: CLICommand, flags: Arguments): Promise<voi
         tables: {
           "Commands": [
             ["generate", "Generate emoji data for the specified versions."],
-            ["versions", "Print all emoji versions available."],
+            ["emoji-versions", "Print all emoji versions available."],
           ],
           "Global Flags": [
             ["--force", "Force the operation to run, even if it's not needed."],
@@ -146,9 +148,10 @@ export async function runCommand(cmd: CLICommand, flags: Arguments): Promise<voi
     case "emoji-versions": {
       const { runEmojiVersions } = await import("./cmd/emoji-versions");
 
-      await runEmojiVersions({
+      const subcommand = flags._[3]?.toString() ?? "";
+      await runEmojiVersions(subcommand, {
         flags: flags as CLIArguments<{
-          writeLockfile: boolean;
+          drafts: boolean;
           force: boolean;
         }>,
       });
@@ -169,5 +172,33 @@ export async function runCommand(cmd: CLICommand, flags: Arguments): Promise<voi
     }
     default:
       throw new Error(`Error running ${cmd} -- no command found.`);
+  }
+}
+
+export function parseFlags(args: string[]) {
+  return yargs(args, {
+    configuration: {
+      "parse-positional-numbers": false,
+    },
+    array: ["generators", "shortcode-providers"],
+    boolean: ["force", "drafts"],
+    default: {
+      "generators": DEFAULT_GENERATORS,
+      "shortcode-providers": DEFAULT_SHORTCODE_PROVIDERS,
+      "force": false,
+      "drafts": false,
+    },
+  });
+}
+
+export async function runCLI(args: string[]): Promise<void> {
+  try {
+    const flags = parseFlags(args);
+
+    const cmd = resolveCommand(flags);
+    await runCommand(cmd, flags);
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
   }
 }

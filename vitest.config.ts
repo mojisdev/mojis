@@ -32,6 +32,8 @@ export default defineConfig({
       if (type === "stderr") {
         return !hiddenLogs.some((hidden) => log.includes(hidden));
       }
+
+      return false;
     },
     workspace: [
       {
