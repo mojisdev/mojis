@@ -8,7 +8,6 @@ import * as cliUtils from "../../src/cli-utils";
 import { runEmojiVersions } from "../../src/cmd/emoji-versions";
 import * as files from "../../src/files";
 
-// Mock the dependencies
 vi.mock("@mojis/internal-utils", async () => {
   const actual = await vi.importActual("@mojis/internal-utils");
   return {
