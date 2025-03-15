@@ -129,7 +129,7 @@ export async function runCommand(cmd: CLICommand, flags: Arguments): Promise<voi
         tables: {
           "Commands": [
             ["generate", "Generate emoji data for the specified versions."],
-            ["versions", "Print all emoji versions available."],
+            ["emoji-versions", "Print all emoji versions available."],
           ],
           "Global Flags": [
             ["--force", "Force the operation to run, even if it's not needed."],
@@ -146,9 +146,10 @@ export async function runCommand(cmd: CLICommand, flags: Arguments): Promise<voi
     case "emoji-versions": {
       const { runEmojiVersions } = await import("./cmd/emoji-versions");
 
-      await runEmojiVersions({
+      const subcommand = flags._[3]?.toString() ?? "";
+      await runEmojiVersions(subcommand, {
         flags: flags as CLIArguments<{
-          writeLockfile: boolean;
+          drafts: boolean;
           force: boolean;
         }>,
       });

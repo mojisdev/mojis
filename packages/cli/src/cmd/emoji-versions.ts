@@ -1,57 +1,129 @@
+import type { EmojiSpecRecord } from "@mojis/internal-utils";
 import type { CLIArguments } from "../cli-utils";
-import { getAllEmojiVersions } from "@mojis/internal-utils";
+import { getAllEmojiVersions, getLatestEmojiVersion } from "@mojis/internal-utils";
+import { green } from "farver";
 import { red, yellow } from "farver/fast";
-import semver from "semver";
+import fs from "fs-extra";
 import { printHelp } from "../cli-utils";
-import { readLockfile, writeLockfile } from "../lockfile";
 
-interface VersionOptions {
-  flags: CLIArguments<{
-    writeLockfile: boolean;
-    force: boolean;
-  }>;
+export interface VersionOptions {
+  flags: CLIArguments<{ drafts: boolean; force: boolean; format?: "table" | "json"; output?: string }>;
 }
 
-export async function runEmojiVersions({ flags }: VersionOptions) {
-  if (flags?.help || flags?.h) {
+const EMOJI_VERSIONS_SUBCOMMANDS = [
+  "latest",
+  "all",
+] as const;
+export type Subcommand = (typeof EMOJI_VERSIONS_SUBCOMMANDS)[number];
+
+function isValidSubcommand(subcommand: string): subcommand is Subcommand {
+  return EMOJI_VERSIONS_SUBCOMMANDS.includes(subcommand as Subcommand);
+}
+
+export async function runEmojiVersions(subcommand: string, { flags }: VersionOptions) {
+  if (!isValidSubcommand(subcommand) || flags?.help || flags?.h) {
     printHelp({
       commandName: "mojis emoji-versions",
-      usage: "[...flags]",
+      usage: "[command] [...flags]",
       tables: {
+        Commands: [
+          ["latest", "Get the latest version of all emojis"],
+          ["all", "Get all versions of all emojis"],
+        ],
         Flags: [
-          ["--write-lockfile", `Write the lockfile with the latest version.`],
-          ["--force", "Force the operation to run, even if it's not needed."],
+          ["--drafts", "Whether to include draft versions in the output."],
+          ["--format", "The format of the output. (default: table) (options: table, json)"],
+          ["--output", "The output file to write the results to. Output will always be in json format."],
+          ["--force", "Force the output to be written to the output file even if it already exists."],
           ["--help (-h)", "See all available flags."],
         ],
       },
-      description: `Print all emoji versions available.`,
     });
+    return;
   }
 
-  const versions = await getAllEmojiVersions();
+  const allVersions = await getAllEmojiVersions();
 
+  const format = flags.format ?? "table";
+  const output = flags.output;
+
+  switch (subcommand) {
+    case "latest":
+      return printLatestVersion(getLatestEmojiVersion(allVersions, !!flags.drafts), format, output, !!flags.force);
+    case "all":
+      return printAllVersions(allVersions, !!flags.drafts, format, output, !!flags.force);
+    default:
+      throw new Error(`Invalid subcommand: ${subcommand}`);
+  }
+}
+
+async function writeOutput(output: string, data: string, force?: boolean) {
+  if (output == null) {
+    throw new Error("Output file not provided.");
+  }
+
+  if (await fs.pathExists(output) && !force) {
+    throw new Error(`Output file already exists: ${output}`);
+  }
+
+  await fs.writeFile(output, data);
   // eslint-disable-next-line no-console
-  console.log("all available versions:");
-  // eslint-disable-next-line no-console
-  console.log(versions.map((v) => `${yellow(v.emoji_version)}${v.draft ? ` ${red("(draft)")}` : ""}`).join(", "));
+  console.log(`${green("Successfully wrote to")} ${output}`);
+}
 
-  if (flags.writeLockfile) {
-    const sortedVersions = versions.filter((v) => !v.draft).sort((a, b) => semver.rcompare(a.unicode_version, b.unicode_version));
+function formatEmojiSpec(spec: EmojiSpecRecord): string {
+  return ` ${yellow(spec.emoji_version).padEnd(15)}${spec.draft ? red("draft") : green("release")}`;
+}
 
-    if (sortedVersions.length === 0 || sortedVersions[0] == null) {
-      console.warn("no stable versions found, skipping lockfile update");
-      return;
+function transformOutput(versions: EmojiSpecRecord | EmojiSpecRecord[], format: "table" | "json"): string {
+  if (Array.isArray(versions)) {
+    if (format === "json") {
+      return JSON.stringify(versions, null, 2);
     }
 
-    const latestVersion = sortedVersions[0].emoji_version;
-
-    const lockfile = await readLockfile();
-
-    lockfile.versions = Array.from(versions);
-    lockfile.latest_version = latestVersion;
-
-    await writeLockfile(lockfile);
-    // eslint-disable-next-line no-console
-    console.log(`updated ${yellow("emojis.lock")}`);
+    return versions.map(formatEmojiSpec).join("\n");
   }
+
+  if (format === "json") {
+    return JSON.stringify(versions, null, 2);
+  }
+  return formatEmojiSpec(versions);
+}
+
+async function printLatestVersion(version: EmojiSpecRecord | null, format: "table" | "json", output?: string, force?: boolean) {
+  if (version == null) {
+    // eslint-disable-next-line no-console
+    console.log("No emoji versions found.");
+    return;
+  }
+
+  const formatted = transformOutput(version, output != null ? "json" : format);
+
+  if (output != null) {
+    await writeOutput(output, formatted, force);
+    return;
+  }
+
+  // eslint-disable-next-line no-console
+  console.log(formatted);
+}
+
+async function printAllVersions(versions: EmojiSpecRecord[], includeDrafts: boolean, format: "table" | "json", output?: string, force?: boolean) {
+  const filtered = includeDrafts ? versions : versions.filter((v) => !v.draft);
+
+  if (filtered.length === 0) {
+    // eslint-disable-next-line no-console
+    console.log("No emoji versions found.");
+    return;
+  }
+
+  const formatted = transformOutput(filtered, output != null ? "json" : format);
+
+  if (output != null) {
+    await writeOutput(output, formatted, force);
+    return;
+  }
+
+  // eslint-disable-next-line no-console
+  console.log(formatted);
 }

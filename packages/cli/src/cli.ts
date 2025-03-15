@@ -10,12 +10,11 @@ export async function cli(args: string[]): Promise<void> {
         "parse-positional-numbers": false,
       },
       array: ["generators", "shortcode-providers"],
-      boolean: ["force", "write-lockfile"],
+      boolean: ["force", "drafts"],
       default: {
         "generators": DEFAULT_GENERATORS,
         "shortcode-providers": DEFAULT_SHORTCODE_PROVIDERS,
         "force": false,
-        "write-lockfile": false,
       },
     });
 

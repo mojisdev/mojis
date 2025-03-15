@@ -384,10 +384,10 @@ export function mapEmojiVersionToUnicodeVersion(emojiVersion: string): string {
  * // Returns: { emoji_version: "15.1", draft: false }
  * ```
  */
-export function getLatestEmojiVersion(versions: EmojiSpecRecord[]): EmojiSpecRecord | null {
+export function getLatestEmojiVersion(versions: EmojiSpecRecord[], includeDrafts: boolean): EmojiSpecRecord | null {
   // filter draft versions & invalid out and sort by using semver.
   const filtered = versions
-    .filter((v) => !v.draft)
+    .filter((v) => includeDrafts || !v.draft)
     .map((v) => ({
       original: v,
       semver: toSemverCompatible(v.emoji_version),
