@@ -60,7 +60,7 @@ export async function runAdapterHandler<
               });
             }
 
-            throw new Error(`Parser "${handler.parser}" is not implemented.`);
+            throw new AdapterError(`Parser "${handler.parser}" is not implemented.`);
           }
 
           return handler.parser(ctx, data);
