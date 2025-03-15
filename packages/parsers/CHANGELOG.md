@@ -1,5 +1,11 @@
 # @mojis/parsers
 
+## 0.0.2
+
+### Patch Changes
+
+- [#59](https://github.com/mojisdev/mojis/pull/59) [`c9e0c6d`](https://github.com/mojisdev/mojis/commit/c9e0c6d0977d2a72e999a4686913cd97d6162f41) Thanks [@luxass](https://github.com/luxass)! - refactor: use unicode-proxy
+
 ## 0.0.1
 
 ### Patch Changes
