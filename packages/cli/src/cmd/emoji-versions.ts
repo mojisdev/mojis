@@ -15,7 +15,7 @@ interface VersionOptions {
 export async function runEmojiVersions({ flags }: VersionOptions) {
   if (flags?.help || flags?.h) {
     printHelp({
-      commandName: "mojis versions",
+      commandName: "mojis emoji-versions",
       usage: "[...flags]",
       tables: {
         Flags: [

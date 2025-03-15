@@ -145,6 +145,7 @@ export async function runCommand(cmd: CLICommand, flags: Arguments): Promise<voi
       break;
     case "emoji-versions": {
       const { runEmojiVersions } = await import("./cmd/emoji-versions");
+
       await runEmojiVersions({
         flags: flags as CLIArguments<{
           writeLockfile: boolean;
