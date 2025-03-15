@@ -114,11 +114,12 @@ describe("runCommand", () => {
   });
 
   it("should handle 'emoji-versions' command with no subcommand", async () => {
-    const flags = { _: ["", "", "emoji-versions"], drafts: false, force: false };
-    await runCommand("emoji-versions", flags);
     vi.mock("../src/cmd/emoji-versions", () => ({
       runEmojiVersions: mockRunEmojiVersions,
     }));
+
+    const flags = { _: ["", "", "emoji-versions"], drafts: false, force: false };
+    await runCommand("emoji-versions", flags);
 
     expect(mockRunEmojiVersions).toHaveBeenCalledWith(
       "",
