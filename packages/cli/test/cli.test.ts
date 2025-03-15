@@ -24,8 +24,6 @@ it("should pass the correct arguments to resolveCommand", async () => {
       "shortcode-providers": ["github"],
       "shortcodeProviders": ["github"],
       "force": false,
-      "write-lockfile": false,
-      "writeLockfile": false,
     }),
   );
 });
