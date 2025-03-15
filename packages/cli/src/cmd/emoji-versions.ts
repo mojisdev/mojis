@@ -53,7 +53,7 @@ export async function runEmojiVersions(subcommand: string, { flags }: VersionOpt
   if (subcommand === "all") {
     return printAllVersions(allVersions, !!flags.drafts, format, output, !!flags.force);
   }
-
+  /* v8 ignore next 2 */
   throw new Error(`Invalid subcommand: ${subcommand}`);
 }
 
