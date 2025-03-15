@@ -38,12 +38,12 @@ export const baseSequenceHandler = defineAdapterHandler({
     return [
       {
         key: "sequences",
-        url: `https://unicode.org/Public/emoji/${emoji_version}/emoji-sequences.txt`,
+        url: `https://unicode-proxy.mojis.dev/proxy/emoji/${emoji_version}/emoji-sequences.txt`,
         cacheKey: `v${emoji_version}/sequences`,
       },
       {
         key: "zwj",
-        url: `https://unicode.org/Public/emoji/${emoji_version}/emoji-zwj-sequences.txt`,
+        url: `https://unicode-proxy.mojis.dev/proxy/emoji/${emoji_version}/emoji-zwj-sequences.txt`,
         cacheKey: `v${emoji_version}/zwj-sequences`,
       },
     ];

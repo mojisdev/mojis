@@ -46,8 +46,8 @@ export interface DraftVersion {
  */
 export async function getCurrentDraftVersion(): Promise<DraftVersion | null> {
   const [draftText, emojiText] = await Promise.all([
-    "https://unicode.org/Public/draft/ReadMe.txt",
-    "https://unicode.org/Public/draft/emoji/ReadMe.txt",
+    "https://unicode-proxy.mojis.dev/proxy/draft/ReadMe.txt",
+    "https://unicode-proxy.mojis.dev/proxy/draft/emoji/ReadMe.txt",
   ].map(async (url) => {
     const res = await fetch(url);
 
@@ -200,8 +200,8 @@ export function extractUnicodeVersion(emojiVersion: string | null, unicodeVersio
  */
 export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
   const [rootResult, emojiResult] = await Promise.allSettled([
-    "https://unicode.org/Public/",
-    "https://unicode.org/Public/emoji/",
+    "https://unicode-proxy.mojis.dev/proxy/",
+    "https://unicode-proxy.mojis.dev/proxy/emoji/",
   ].map(async (url) => {
     const res = await fetch(url);
 

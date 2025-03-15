@@ -12,13 +12,13 @@ export const baseVariationHandler = defineAdapterHandler({
   urls: (ctx) => {
     if (semver.lte(`${ctx.unicode_version}.0`, "12.1.0")) {
       return {
-        url: `https://unicode.org/Public/emoji/${ctx.emoji_version}/emoji-variation-sequences.txt`,
+        url: `https://unicode-proxy.mojis.dev/proxy/emoji/${ctx.emoji_version}/emoji-variation-sequences.txt`,
         cacheKey: `v${ctx.emoji_version}/variations`,
       };
     }
 
     return {
-      url: `https://unicode.org/Public/${ctx.unicode_version}.0/ucd/emoji/emoji-variation-sequences.txt`,
+      url: `https://unicode-proxy.mojis.dev/proxy/${ctx.unicode_version}.0/ucd/emoji/emoji-variation-sequences.txt`,
       cacheKey: `v${ctx.emoji_version}/variations`,
     };
   },
