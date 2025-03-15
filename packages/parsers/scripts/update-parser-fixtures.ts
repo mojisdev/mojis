@@ -1,55 +1,62 @@
-import type { Entry } from "apache-autoindex-parse";
 import { mkdir, writeFile } from "node:fs/promises";
 import { extname } from "node:path";
 import process from "node:process";
-import { traverse } from "apache-autoindex-parse/traverse";
 
 const root = new URL("../../../test/fixtures/parsers/", import.meta.url);
 
-async function run() {
-  const rootEntry = await traverse("https://unicode-proxy.mojis.dev/proxy/emoji/", {
-    format: "F2",
-  });
+interface Entry {
+  type: "directory" | "file";
+  name: string;
+  path: string;
+}
 
-  if (!rootEntry) {
+async function run() {
+  const rootResponse = await fetch("https://unicode-proxy.mojis.dev/proxy/emoji/");
+
+  if (!rootResponse.ok) {
     throw new Error("failed to fetch root entry");
   }
 
+  const rootEntries: Entry[] = await rootResponse.json();
   await mkdir(root, { recursive: true });
 
-  async function processEntry(entry: Entry) {
-    if (entry.type === "directory") {
-      for (const child of entry.children) {
-        await processEntry(child);
-      }
+  async function processDirectory(entry: Entry, basePath: string) {
+    const dirResponse = await fetch(`https://unicode-proxy.mojis.dev/proxy${entry.path}`);
+    const dirEntries: Entry[] = await dirResponse.json();
 
-      return;
-    }
+    const fileEntries = dirEntries.filter(
+      (e) =>
+        e.type === "file"
+        && e.name !== "ReadMe.txt"
+        && !e.path.includes("latest")
+        && !e.path.includes("draft"),
+    );
 
-    if (
-      entry.name === "ReadMe.txt"
-      || entry.path.includes("latest")
-      || entry.path.includes("draft")
-    ) {
-      return;
-    }
+    await Promise.all(
+      fileEntries.map(async (fileEntry) => {
+        const fullPath = basePath + fileEntry.path;
+        const [_, version, ...rest] = fullPath.replace(/^\//, "").split("/");
+        const fileExt = extname(fileEntry.name);
+        const type = rest.join("").replace(fileExt, "");
 
-    const [version, ...rest] = entry.path.replace(/^\/Public\/emoji\//, "").split("/");
-    const fileExt = extname(entry.name);
+        await mkdir(new URL(type, root), { recursive: true });
 
-    const type = rest.join("").replace(fileExt, "");
-    await mkdir(new URL(type, root), { recursive: true });
+        const content = await fetch(`https://unicode-proxy.mojis.dev/proxy${fullPath}`).then((res) => res.text());
+        await writeFile(
+          new URL(`${type}/v${version.toString()}${fileExt}`, root),
+          content,
+        );
+      }),
+    );
 
-    const content = await fetch(`https://unicode.org${entry.path}`).then((res) => res.text());
-    await writeFile(
-      new URL(`${type}/v${version.toString()}${fileExt}`, root),
-      content,
+    const dirEntriesToProcess = dirEntries.filter((e) => e.type === "directory");
+    await Promise.all(
+      dirEntriesToProcess.map((dir) => processDirectory(dir, basePath + entry.path)),
     );
   }
 
-  for (const entry of rootEntry.children) {
-    await processEntry(entry);
-  }
+  const directories = rootEntries.filter((e) => e.type === "directory");
+  await Promise.all(directories.map((dir) => processDirectory(dir, "")));
 }
 
 run().catch((err) => {
