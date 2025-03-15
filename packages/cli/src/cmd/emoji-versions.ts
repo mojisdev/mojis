@@ -46,14 +46,15 @@ export async function runEmojiVersions(subcommand: string, { flags }: VersionOpt
   const format = flags.format ?? "table";
   const output = flags.output;
 
-  switch (subcommand) {
-    case "latest":
-      return printLatestVersion(getLatestEmojiVersion(allVersions, !!flags.drafts), format, output, !!flags.force);
-    case "all":
-      return printAllVersions(allVersions, !!flags.drafts, format, output, !!flags.force);
-    default:
-      throw new Error(`Invalid subcommand: ${subcommand}`);
+  if (subcommand === "latest") {
+    return printLatestVersion(getLatestEmojiVersion(allVersions, !!flags.drafts), format, output, !!flags.force);
   }
+
+  if (subcommand === "all") {
+    return printAllVersions(allVersions, !!flags.drafts, format, output, !!flags.force);
+  }
+
+  throw new Error(`Invalid subcommand: ${subcommand}`);
 }
 
 function formatEmojiSpec(spec: EmojiSpecRecord): string {
