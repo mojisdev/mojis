@@ -38,14 +38,14 @@
   "dependencies": {
     "@mojis/internal-utils": "workspace:*",
     "@mojis/parsers": "workspace:*",
-    "semver": "catalog:"
+    "semver": "catalog:prod"
   },
   "devDependencies": {
-    "@luxass/eslint-config": "catalog:",
-    "@types/semver": "catalog:",
-    "eslint": "catalog:",
-    "tsup": "catalog:",
-    "typescript": "catalog:"
+    "@luxass/eslint-config": "catalog:dev",
+    "@types/semver": "catalog:dev",
+    "eslint": "catalog:dev",
+    "tsup": "catalog:dev",
+    "typescript": "catalog:dev"
   },
   "publishConfig": {
     "access": "public"

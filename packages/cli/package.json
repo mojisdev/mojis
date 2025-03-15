@@ -35,21 +35,21 @@
   "dependencies": {
     "@mojis/adapters": "workspace:*",
     "@mojis/internal-utils": "workspace:*",
-    "farver": "catalog:",
-    "fs-extra": "catalog:",
-    "semver": "catalog:",
-    "yargs-parser": "catalog:",
-    "zod": "catalog:"
+    "farver": "catalog:prod",
+    "fs-extra": "catalog:prod",
+    "semver": "catalog:prod",
+    "yargs-parser": "catalog:prod",
+    "zod": "catalog:prod"
   },
   "devDependencies": {
-    "@luxass/eslint-config": "catalog:",
-    "@types/fs-extra": "catalog:",
-    "@types/semver": "catalog:",
-    "@types/yargs-parser": "catalog:",
-    "eslint": "catalog:",
-    "tsup": "catalog:",
-    "typescript": "catalog:",
-    "vitest-testdirs": "catalog:"
+    "@luxass/eslint-config": "catalog:dev",
+    "@types/fs-extra": "catalog:dev",
+    "@types/semver": "catalog:dev",
+    "@types/yargs-parser": "catalog:dev",
+    "eslint": "catalog:dev",
+    "tsup": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vitest-testdirs": "catalog:dev"
   },
   "publishConfig": {
     "access": "public"

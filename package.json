@@ -21,20 +21,15 @@
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "catalog:",
-    "@changesets/cli": "catalog:",
-    "@types/node": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
-    "@vitest/ui": "catalog:",
-    "eslint": "catalog:",
-    "msw": "catalog:",
-    "turbo": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "catalog:"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
+    "@changesets/changelog-github": "catalog:monorepo",
+    "@changesets/cli": "catalog:monorepo",
+    "@types/node": "catalog:dev",
+    "@vitest/coverage-v8": "catalog:monorepo",
+    "@vitest/ui": "catalog:monorepo",
+    "eslint": "catalog:dev",
+    "msw": "catalog:monorepo",
+    "turbo": "catalog:monorepo",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:dev"
   }
 }
