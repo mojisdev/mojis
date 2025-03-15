@@ -1,6 +1,7 @@
 import type { AdapterContext, AdapterHandlerType, InferOutputFromAdapterHandlerType } from "./types";
 import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
+import { AdapterError } from "./errors";
 import { ALL_HANDLERS } from "./handlers";
 import { buildContext, getHandlerUrls, isBuiltinParser } from "./utils";
 
@@ -31,6 +32,10 @@ export async function runAdapterHandler<
     // generate a list of all urls, that should be handled
     const urls = await getHandlerUrls(handler.urls, ctx);
 
+    if (urls.length === 0) {
+      throw new AdapterError(`No urls found for handler: ${type}`);
+    }
+
     // fetch all the data from the urls
     const dataRequests = urls.map(async (url) => {
       const key = url.cacheKey;
@@ -55,7 +60,7 @@ export async function runAdapterHandler<
               });
             }
 
-            throw new Error(`Parser "${handler.parser}" is not implemented.`);
+            throw new AdapterError(`Parser "${handler.parser}" is not implemented.`);
           }
 
           return handler.parser(ctx, data);
@@ -105,5 +110,5 @@ export async function runAdapterHandler<
     return output;
   }
 
-  throw new Error(`No handler found for type: ${type}`);
+  throw new AdapterError(`No handler found for type: ${type}`);
 }
