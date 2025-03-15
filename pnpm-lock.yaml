@@ -5,13 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 catalogs:
-  default:
-    '@changesets/changelog-github':
-      specifier: ^0.5.1
-      version: 0.5.1
-    '@changesets/cli':
-      specifier: ^2.28.1
-      version: 2.28.1
+  dev:
     '@luxass/eslint-config':
       specifier: ^4.17.1
       version: 4.17.1
@@ -27,33 +21,12 @@ catalogs:
     '@types/yargs-parser':
       specifier: ^21.0.3
       version: 21.0.3
-    '@vitest/coverage-v8':
-      specifier: ^3.0.8
-      version: 3.0.8
-    '@vitest/ui':
-      specifier: ^3.0.8
-      version: 3.0.8
     eslint:
       specifier: ^9.22.0
       version: 9.22.0
-    farver:
-      specifier: ^0.4.2
-      version: 0.4.2
-    fs-extra:
-      specifier: ^11.3.0
-      version: 11.3.0
-    msw:
-      specifier: ^2.7.3
-      version: 2.7.3
-    semver:
-      specifier: ^7.7.1
-      version: 7.7.1
     tsup:
       specifier: ^8.4.0
       version: 8.4.0
-    turbo:
-      specifier: ^2.4.4
-      version: 2.4.4
     typescript:
       specifier: ^5.8.2
       version: 5.8.2
@@ -63,6 +36,35 @@ catalogs:
     vitest-testdirs:
       specifier: ^2.2.0
       version: 2.2.0
+  monorepo:
+    '@changesets/changelog-github':
+      specifier: ^0.5.1
+      version: 0.5.1
+    '@changesets/cli':
+      specifier: ^2.28.1
+      version: 2.28.1
+    '@vitest/coverage-v8':
+      specifier: ^3.0.8
+      version: 3.0.8
+    '@vitest/ui':
+      specifier: ^3.0.8
+      version: 3.0.8
+    msw:
+      specifier: ^2.7.3
+      version: 2.7.3
+    turbo:
+      specifier: ^2.4.4
+      version: 2.4.4
+  prod:
+    farver:
+      specifier: ^0.4.2
+      version: 0.4.2
+    fs-extra:
+      specifier: ^11.3.0
+      version: 11.3.0
+    semver:
+      specifier: ^7.7.1
+      version: 7.7.1
     yargs-parser:
       specifier: ^21.1.1
       version: 21.1.1
@@ -75,34 +77,34 @@ importers:
   .:
     devDependencies:
       '@changesets/changelog-github':
-        specifier: 'catalog:'
+        specifier: catalog:monorepo
         version: 0.5.1
       '@changesets/cli':
-        specifier: 'catalog:'
+        specifier: catalog:monorepo
         version: 2.28.1
       '@types/node':
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 22.13.9
       '@vitest/coverage-v8':
-        specifier: 'catalog:'
+        specifier: catalog:monorepo
         version: 3.0.8(vitest@3.0.8)
       '@vitest/ui':
-        specifier: 'catalog:'
+        specifier: catalog:monorepo
         version: 3.0.8(vitest@3.0.8)
       eslint:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 9.22.0
       msw:
-        specifier: 'catalog:'
+        specifier: catalog:monorepo
         version: 2.7.3(@types/node@22.13.9)(typescript@5.8.2)
       turbo:
-        specifier: 'catalog:'
+        specifier: catalog:monorepo
         version: 2.4.4
       typescript:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 5.8.2
       vitest:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 3.0.8(@types/debug@4.1.12)(@types/node@22.13.9)(@vitest/ui@3.0.8)(msw@2.7.3(@types/node@22.13.9)(typescript@5.8.2))(yaml@2.7.0)
 
   packages/adapters:
@@ -114,23 +116,23 @@ importers:
         specifier: workspace:*
         version: link:../parsers
       semver:
-        specifier: 'catalog:'
+        specifier: catalog:prod
         version: 7.7.1
     devDependencies:
       '@luxass/eslint-config':
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 4.17.1(@typescript-eslint/utils@8.26.1(eslint@9.22.0)(typescript@5.8.2))(@vue/compiler-sfc@3.5.13)(eslint@9.22.0)(typescript@5.8.2)(vitest@3.0.8)
       '@types/semver':
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 7.5.8
       eslint:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 9.22.0
       tsup:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 8.4.0(postcss@8.5.3)(typescript@5.8.2)(yaml@2.7.0)
       typescript:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 5.8.2
 
   packages/cli:
@@ -142,96 +144,96 @@ importers:
         specifier: workspace:*
         version: link:../internal-utils
       farver:
-        specifier: 'catalog:'
+        specifier: catalog:prod
         version: 0.4.2
       fs-extra:
-        specifier: 'catalog:'
+        specifier: catalog:prod
         version: 11.3.0
       semver:
-        specifier: 'catalog:'
+        specifier: catalog:prod
         version: 7.7.1
       yargs-parser:
-        specifier: 'catalog:'
+        specifier: catalog:prod
         version: 21.1.1
       zod:
-        specifier: 'catalog:'
+        specifier: catalog:prod
         version: 3.24.2
     devDependencies:
       '@luxass/eslint-config':
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 4.17.1(@typescript-eslint/utils@8.26.1(eslint@9.22.0)(typescript@5.8.2))(@vue/compiler-sfc@3.5.13)(eslint@9.22.0)(typescript@5.8.2)(vitest@3.0.8)
       '@types/fs-extra':
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 11.0.4
       '@types/semver':
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 7.5.8
       '@types/yargs-parser':
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 21.0.3
       eslint:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 9.22.0
       tsup:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 8.4.0(postcss@8.5.3)(typescript@5.8.2)(yaml@2.7.0)
       typescript:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 5.8.2
       vitest-testdirs:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 2.2.0(vitest@3.0.8)
 
   packages/internal-utils:
     dependencies:
       fs-extra:
-        specifier: 'catalog:'
+        specifier: catalog:prod
         version: 11.3.0
       semver:
-        specifier: 'catalog:'
+        specifier: catalog:prod
         version: 7.7.1
       zod:
-        specifier: 'catalog:'
+        specifier: catalog:prod
         version: 3.24.2
     devDependencies:
       '@luxass/eslint-config':
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 4.17.1(@typescript-eslint/utils@8.26.1(eslint@9.22.0)(typescript@5.8.2))(@vue/compiler-sfc@3.5.13)(eslint@9.22.0)(typescript@5.8.2)(vitest@3.0.8)
       '@types/fs-extra':
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 11.0.4
       '@types/semver':
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 7.5.8
       eslint:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 9.22.0
       tsup:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 8.4.0(postcss@8.5.3)(typescript@5.8.2)(yaml@2.7.0)
       typescript:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 5.8.2
       vitest-testdirs:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 2.2.0(vitest@3.0.8)
 
   packages/parsers:
     devDependencies:
       '@luxass/eslint-config':
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 4.17.1(@typescript-eslint/utils@8.26.1(eslint@9.22.0)(typescript@5.8.2))(@vue/compiler-sfc@3.5.13)(eslint@9.22.0)(typescript@5.8.2)(vitest@3.0.8)
       eslint:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 9.22.0
       tsup:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 8.4.0(postcss@8.5.3)(typescript@5.8.2)(yaml@2.7.0)
       typescript:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 5.8.2
       vitest-testdirs:
-        specifier: 'catalog:'
+        specifier: catalog:dev
         version: 2.2.0(vitest@3.0.8)
 
 packages:
@@ -883,10 +885,6 @@ packages:
       eslint: ^8.57.0 || ^9.0.0
       typescript: '>=4.8.4 <5.9.0'
 
-  '@typescript-eslint/scope-manager@8.26.0':
-    resolution: {integrity: sha512-E0ntLvsfPqnPwng8b8y4OGuzh/iIOm2z8U3S9zic2TeMLW61u5IH2Q1wu0oSTkfrSzwbDJIB/Lm8O3//8BWMPA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
   '@typescript-eslint/scope-manager@8.26.1':
     resolution: {integrity: sha512-6EIvbE5cNER8sqBu6V7+KeMZIC1664d2Yjt+B9EWUXrsyWpxx4lEZrmvxgSKRC6gX+efDL/UY9OpPZ267io3mg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -898,31 +896,14 @@ packages:
       eslint: ^8.57.0 || ^9.0.0
       typescript: '>=4.8.4 <5.9.0'
 
-  '@typescript-eslint/types@8.26.0':
-    resolution: {integrity: sha512-89B1eP3tnpr9A8L6PZlSjBvnJhWXtYfZhECqlBl1D9Lme9mHO6iWlsprBtVenQvY1HMhax1mWOjhtL3fh/u+pA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
   '@typescript-eslint/types@8.26.1':
     resolution: {integrity: sha512-n4THUQW27VmQMx+3P+B0Yptl7ydfceUj4ON/AQILAASwgYdZ/2dhfymRMh5egRUrvK5lSmaOm77Ry+lmXPOgBQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@typescript-eslint/typescript-estree@8.26.0':
-    resolution: {integrity: sha512-tiJ1Hvy/V/oMVRTbEOIeemA2XoylimlDQ03CgPPNaHYZbpsc78Hmngnt+WXZfJX1pjQ711V7g0H7cSJThGYfPQ==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      typescript: '>=4.8.4 <5.9.0'
 
   '@typescript-eslint/typescript-estree@8.26.1':
     resolution: {integrity: sha512-yUwPpUHDgdrv1QJ7YQal3cMVBGWfnuCdKbXw1yyjArax3353rEJP1ZA+4F8nOlQ3RfS2hUN/wze3nlY+ZOhvoA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
-      typescript: '>=4.8.4 <5.9.0'
-
-  '@typescript-eslint/utils@8.26.0':
-    resolution: {integrity: sha512-2L2tU3FVwhvU14LndnQCA2frYC8JnPDVKyQtWFPf8IYFMt/ykEN1bPolNhNbCVgOmdzTlWdusCTKA/9nKrf8Ig==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      eslint: ^8.57.0 || ^9.0.0
       typescript: '>=4.8.4 <5.9.0'
 
   '@typescript-eslint/utils@8.26.1':
@@ -931,10 +912,6 @@ packages:
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
       typescript: '>=4.8.4 <5.9.0'
-
-  '@typescript-eslint/visitor-keys@8.26.0':
-    resolution: {integrity: sha512-2z8JQJWAzPdDd51dRQ/oqIJxe99/hoLIqmf8RMCAJQtYDc535W/Jt2+RTP4bP0aKeBG1F65yjIZuczOXCmbWwg==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@typescript-eslint/visitor-keys@8.26.1':
     resolution: {integrity: sha512-AjOC3zfnxd6S4Eiy3jwktJPclqhFHNyd8L6Gycf9WUPoKZpgM5PjkxY1X7uSy61xVpiJDhhk7XT2NVsN3ALTWg==}
@@ -1430,10 +1407,6 @@ packages:
     peerDependencies:
       '@vue/compiler-sfc': ^3.3.0
       eslint: '>=9.0.0'
-
-  eslint-scope@8.2.0:
-    resolution: {integrity: sha512-PHlWUfG6lvPc3yvP5A4PNyBL1W8fkDUccmI21JUu/+GKZBoH/W5u6usENXUrWFRsyoW5ACUjFGgAFQp5gUlb/A==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   eslint-scope@8.3.0:
     resolution: {integrity: sha512-pUNxi75F8MJ/GdeKtVLSbYg4ZI34J6C0C7sbL4YOp2exGwen7ZsuBqKzUhXd0qMQ362yET3z+uPwKeg/0C2XCQ==}
@@ -3393,7 +3366,7 @@ snapshots:
 
   '@stylistic/eslint-plugin@4.2.0(eslint@9.22.0)(typescript@5.8.2)':
     dependencies:
-      '@typescript-eslint/utils': 8.26.0(eslint@9.22.0)(typescript@5.8.2)
+      '@typescript-eslint/utils': 8.26.1(eslint@9.22.0)(typescript@5.8.2)
       eslint: 9.22.0
       eslint-visitor-keys: 4.2.0
       espree: 10.3.0
@@ -3477,11 +3450,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/scope-manager@8.26.0':
-    dependencies:
-      '@typescript-eslint/types': 8.26.0
-      '@typescript-eslint/visitor-keys': 8.26.0
-
   '@typescript-eslint/scope-manager@8.26.1':
     dependencies:
       '@typescript-eslint/types': 8.26.1
@@ -3498,23 +3466,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/types@8.26.0': {}
-
   '@typescript-eslint/types@8.26.1': {}
-
-  '@typescript-eslint/typescript-estree@8.26.0(typescript@5.8.2)':
-    dependencies:
-      '@typescript-eslint/types': 8.26.0
-      '@typescript-eslint/visitor-keys': 8.26.0
-      debug: 4.4.0
-      fast-glob: 3.3.3
-      is-glob: 4.0.3
-      minimatch: 9.0.5
-      semver: 7.7.1
-      ts-api-utils: 2.0.1(typescript@5.8.2)
-      typescript: 5.8.2
-    transitivePeerDependencies:
-      - supports-color
 
   '@typescript-eslint/typescript-estree@8.26.1(typescript@5.8.2)':
     dependencies:
@@ -3530,17 +3482,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.26.0(eslint@9.22.0)(typescript@5.8.2)':
-    dependencies:
-      '@eslint-community/eslint-utils': 4.4.1(eslint@9.22.0)
-      '@typescript-eslint/scope-manager': 8.26.0
-      '@typescript-eslint/types': 8.26.0
-      '@typescript-eslint/typescript-estree': 8.26.0(typescript@5.8.2)
-      eslint: 9.22.0
-      typescript: 5.8.2
-    transitivePeerDependencies:
-      - supports-color
-
   '@typescript-eslint/utils@8.26.1(eslint@9.22.0)(typescript@5.8.2)':
     dependencies:
       '@eslint-community/eslint-utils': 4.4.1(eslint@9.22.0)
@@ -3551,11 +3492,6 @@ snapshots:
       typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
-
-  '@typescript-eslint/visitor-keys@8.26.0':
-    dependencies:
-      '@typescript-eslint/types': 8.26.0
-      eslint-visitor-keys: 4.2.0
 
   '@typescript-eslint/visitor-keys@8.26.1':
     dependencies:
@@ -3974,8 +3910,8 @@ snapshots:
   eslint-plugin-import-x@4.6.1(eslint@9.22.0)(typescript@5.8.2):
     dependencies:
       '@types/doctrine': 0.0.9
-      '@typescript-eslint/scope-manager': 8.26.0
-      '@typescript-eslint/utils': 8.26.0(eslint@9.22.0)(typescript@5.8.2)
+      '@typescript-eslint/scope-manager': 8.26.1
+      '@typescript-eslint/utils': 8.26.1(eslint@9.22.0)(typescript@5.8.2)
       debug: 4.4.0
       doctrine: 3.0.0
       enhanced-resolve: 5.18.1
@@ -4036,8 +3972,8 @@ snapshots:
 
   eslint-plugin-perfectionist@4.10.1(eslint@9.22.0)(typescript@5.8.2):
     dependencies:
-      '@typescript-eslint/types': 8.26.0
-      '@typescript-eslint/utils': 8.26.0(eslint@9.22.0)(typescript@5.8.2)
+      '@typescript-eslint/types': 8.26.1
+      '@typescript-eslint/utils': 8.26.1(eslint@9.22.0)(typescript@5.8.2)
       eslint: 9.22.0
       natural-orderby: 5.0.0
     transitivePeerDependencies:
@@ -4117,11 +4053,6 @@ snapshots:
     dependencies:
       '@vue/compiler-sfc': 3.5.13
       eslint: 9.22.0
-
-  eslint-scope@8.2.0:
-    dependencies:
-      esrecurse: 4.3.0
-      estraverse: 5.3.0
 
   eslint-scope@8.3.0:
     dependencies:
@@ -5538,7 +5469,7 @@ snapshots:
     dependencies:
       debug: 4.4.0
       eslint: 9.22.0
-      eslint-scope: 8.2.0
+      eslint-scope: 8.3.0
       eslint-visitor-keys: 4.2.0
       espree: 10.3.0
       esquery: 1.6.0
