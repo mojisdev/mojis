@@ -1,6 +1,4 @@
-import { expect, it, vi } from "vitest";
-import { runCLI } from "../src/cli-utils";
-import * as cliUtils from "../src/cli-utils";
+import { expect, it } from "vitest";
 
 it("expect true to be true", () => {
   expect(true).toBe(true);
