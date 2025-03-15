@@ -105,8 +105,8 @@ export async function runGenerate({ versions: providedVersions, flags }: Generat
   // eslint-disable-next-line no-console
   console.info(`using the following generators ${generators.map((g) => yellow(g)).join(", ")}`);
 
-  // Generate the promises for each version
-  const promises = versions.map((version) => generateEmojiDataForVersion(version, generators, force));
+  // generate the promises for each version
+  const promises = versions.map((version) => buildEmojiGenerateRequest(version, generators, force));
 
   const results = await Promise.allSettled(promises);
 
@@ -124,7 +124,14 @@ function isGeneratorEnabled(generator: string, generators: string[]): boolean {
   return generators.includes(generator);
 }
 
-async function generateEmojiDataForVersion(
+/**
+ * Builds a request for the emoji data generation.
+ * @param {EmojiSpecRecord} version - The version of the emoji data to generate.
+ * @param {string[]} generators - The generators to use.
+ * @param {boolean} force - Whether to force the generation.
+ * @returns {Promise<void>} A promise that resolves to the emoji data.
+ */
+export async function buildEmojiGenerateRequest(
   version: EmojiSpecRecord,
   generators: string[],
   force: boolean,
