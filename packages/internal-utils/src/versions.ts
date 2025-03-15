@@ -371,6 +371,7 @@ export function mapEmojiVersionToUnicodeVersion(emojiVersion: string): string {
  * Gets the latest non-draft emoji version from an array of emoji versions.
  *
  * @param {EmojiSpecRecord[]} versions - An array of emoji versions to search through
+ * @param {boolean} includeDrafts - Whether to include draft versions in the search
  * @returns {EmojiSpecRecord | null} The latest non-draft emoji version, or null if no valid versions found
  *
  * @example
@@ -384,7 +385,7 @@ export function mapEmojiVersionToUnicodeVersion(emojiVersion: string): string {
  * // Returns: { emoji_version: "15.1", draft: false }
  * ```
  */
-export function getLatestEmojiVersion(versions: EmojiSpecRecord[], includeDrafts: boolean): EmojiSpecRecord | null {
+export function getLatestEmojiVersion(versions: EmojiSpecRecord[], includeDrafts: boolean = false): EmojiSpecRecord | null {
   // filter draft versions & invalid out and sort by using semver.
   const filtered = versions
     .filter((v) => includeDrafts || !v.draft)
