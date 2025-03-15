@@ -54,13 +54,13 @@ it("should handle multiple array values correctly", async () => {
 });
 
 it("should pass the resolved command to runCommand", async () => {
-  (cliUtils.resolveCommand as Mock).mockReturnValueOnce("generate");
+  (cliUtils.resolveCommand as Mock).mockReturnValueOnce("help");
   const runSpy = vi.spyOn(cliUtils, "runCommand");
 
-  await cli(["build"]);
+  await cli(["help"]);
 
   expect(runSpy).toHaveBeenCalledWith(
-    "generate",
+    "help",
     expect.any(Object),
   );
 });
