@@ -12,7 +12,6 @@ import { green, yellow } from "farver/fast";
 import fs from "fs-extra";
 import semver from "semver";
 import { printHelp } from "../cli-utils";
-import { readLockfile } from "../lockfile";
 
 interface GenerateOptions {
   flags: CLIArguments<{
@@ -45,14 +44,6 @@ export async function runGenerate({ versions: providedVersions, flags }: Generat
   const existingEmojiVersions = await getAllEmojiVersions();
 
   const generators = (Array.isArray(flags.generators) ? flags.generators : [flags.generators]) as string[];
-
-  const lockfile = await readLockfile();
-
-  if (lockfile == null) {
-    console.error("no lockfile found, run `mojis emoji-versions --write-lockfile` to generate one");
-    // eslint-disable-next-line node/prefer-global/process
-    process.exit(1);
-  }
 
   function isGeneratorEnabled(generator: string): boolean {
     return generators.includes(generator);
@@ -109,7 +100,7 @@ export async function runGenerate({ versions: providedVersions, flags }: Generat
       if (previousVersion != null && previousVersion.emoji_version != null) {
         found.fallback = previousVersion.emoji_version;
       } else {
-        const latest = getLatestEmojiVersion(existingEmojiVersions);
+        const latest = getLatestEmojiVersion(existingEmojiVersions, false);
 
         if (latest == null) {
           throw new Error("no latest version found");

@@ -1,10 +1,9 @@
 import type { EmojiSpecRecord } from "@mojis/internal-utils";
 import type { CLIArguments } from "../cli-utils";
 import { getAllEmojiVersions, getLatestEmojiVersion } from "@mojis/internal-utils";
-import { green } from "farver";
-import { red, yellow } from "farver/fast";
-import fs from "fs-extra";
+import { green, red, yellow } from "farver/fast";
 import { printHelp } from "../cli-utils";
+import { writeFileSafe } from "../files";
 
 export interface VersionOptions {
   flags: CLIArguments<{ drafts: boolean; force: boolean; format?: "table" | "json"; output?: string }>;
@@ -57,20 +56,6 @@ export async function runEmojiVersions(subcommand: string, { flags }: VersionOpt
   }
 }
 
-async function writeOutput(output: string, data: string, force?: boolean) {
-  if (output == null) {
-    throw new Error("Output file not provided.");
-  }
-
-  if (await fs.pathExists(output) && !force) {
-    throw new Error(`Output file already exists: ${output}`);
-  }
-
-  await fs.writeFile(output, data);
-  // eslint-disable-next-line no-console
-  console.log(`${green("Successfully wrote to")} ${output}`);
-}
-
 function formatEmojiSpec(spec: EmojiSpecRecord): string {
   return ` ${yellow(spec.emoji_version).padEnd(15)}${spec.draft ? red("draft") : green("release")}`;
 }
@@ -100,7 +85,9 @@ async function printLatestVersion(version: EmojiSpecRecord | null, format: "tabl
   const formatted = transformOutput(version, output != null ? "json" : format);
 
   if (output != null) {
-    await writeOutput(output, formatted, force);
+    await writeFileSafe(output, formatted, { force, encoding: "utf-8" });
+    // eslint-disable-next-line no-console
+    console.info(`${green("Successfully wrote to")} ${output}`);
     return;
   }
 
@@ -120,7 +107,9 @@ async function printAllVersions(versions: EmojiSpecRecord[], includeDrafts: bool
   const formatted = transformOutput(filtered, output != null ? "json" : format);
 
   if (output != null) {
-    await writeOutput(output, formatted, force);
+    await writeFileSafe(output, formatted, { force, encoding: "utf-8" });
+    // eslint-disable-next-line no-console
+    console.info(`${green("Successfully wrote to")} ${output}`);
     return;
   }
 
