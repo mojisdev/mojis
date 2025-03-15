@@ -8,7 +8,9 @@ import {
   dim,
   green,
 } from "farver/fast";
+import yargs from "yargs-parser";
 import pkg from "../package.json" with { type: "json" };
+import { DEFAULT_GENERATORS, DEFAULT_SHORTCODE_PROVIDERS } from "./constants";
 
 type CLICommand =
   | "help"
@@ -170,5 +172,32 @@ export async function runCommand(cmd: CLICommand, flags: Arguments): Promise<voi
     }
     default:
       throw new Error(`Error running ${cmd} -- no command found.`);
+  }
+}
+
+export function parseFlags(args: string[]) {
+  return yargs(args, {
+    configuration: {
+      "parse-positional-numbers": false,
+    },
+    array: ["generators", "shortcode-providers"],
+    boolean: ["force", "drafts"],
+    default: {
+      "generators": DEFAULT_GENERATORS,
+      "shortcode-providers": DEFAULT_SHORTCODE_PROVIDERS,
+      "force": false,
+    },
+  });
+}
+
+export async function runCLI(args: string[]): Promise<void> {
+  try {
+    const flags = parseFlags(args);
+
+    const cmd = resolveCommand(flags);
+    await runCommand(cmd, flags);
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
   }
 }
