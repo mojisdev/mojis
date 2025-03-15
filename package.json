@@ -6,7 +6,7 @@
     "node": ">=22.13",
     "pnpm": "10.x"
   },
-  "packageManager": "pnpm@10.5.2",
+  "packageManager": "pnpm@10.6.3",
   "workspaces": [
     "packages/*"
   ],
@@ -27,10 +27,10 @@
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
     "eslint": "catalog:",
+    "msw": "catalog:",
     "turbo": "catalog:",
     "typescript": "catalog:",
-    "vitest": "catalog:",
-    "msw": "catalog:"
+    "vitest": "catalog:"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
