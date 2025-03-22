@@ -15,3 +15,7 @@
 "pkg: cli":
   - changed-files:
       - any-glob-to-any-file: packages/cli/**
+
+"pkg: json-schemas":
+  - changed-files:
+      - any-glob-to-any-file: packages/json-schemas/**

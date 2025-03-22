@@ -1,0 +1,48 @@
+{
+  "name": "@mojis/json-schemas",
+  "version": "0.0.1",
+  "type": "module",
+  "author": {
+    "name": "Lucas Nørgård",
+    "email": "lucasnrgaard@gmail.com",
+    "url": "https://luxass.dev"
+  },
+  "packageManager": "pnpm@10.6.3",
+  "license": "MIT",
+  "homepage": "https://github.com/mojisdev/mojis",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mojisdev/mojis.git",
+    "directory": "packages/json-schemas"
+  },
+  "bugs": {
+    "url": "https://github.com/mojisdev/mojis/issues"
+  },
+  "exports": {
+    "./groups.json": "./schemas/groups.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "schemas"
+  ],
+  "scripts": {
+    "build": "pnpm run write-schemas",
+    "dev": "pnpm run write-schemas --watch",
+    "write-schemas": "tsx ./scripts/write-json-schemas.ts",
+    "clean": "git clean -xdf dist node_modules json-schemas",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@luxass/eslint-config": "catalog:dev",
+    "@mojis/internal-utils": "workspace:*",
+    "eslint": "catalog:dev",
+    "tsx": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vitest-testdirs": "catalog:dev",
+    "zod-to-json-schema": "catalog:dev"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
