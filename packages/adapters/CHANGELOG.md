@@ -1,5 +1,19 @@
 # @mojis/adapters
 
+## 0.0.9
+
+### Patch Changes
+
+- [#59](https://github.com/mojisdev/mojis/pull/59) [`c9e0c6d`](https://github.com/mojisdev/mojis/commit/c9e0c6d0977d2a72e999a4686913cd97d6162f41) Thanks [@luxass](https://github.com/luxass)! - refactor: use unicode-proxy
+
+- [`696f086`](https://github.com/mojisdev/mojis/commit/696f0861d44cbb604d41581801e68bd4209cd646) Thanks [@luxass](https://github.com/luxass)! - fix: use correct url for unicode names for version 3.0
+
+- [#57](https://github.com/mojisdev/mojis/pull/57) [`0fa9ba7`](https://github.com/mojisdev/mojis/commit/0fa9ba754840984030e5955c3d4fe289cd5d3851) Thanks [@luxass](https://github.com/luxass)! - feat: add error handling for adapters
+
+- Updated dependencies [[`9c7901e`](https://github.com/mojisdev/mojis/commit/9c7901ee12ae6b5310abe651e01da5c00e8e29ed), [`c9e0c6d`](https://github.com/mojisdev/mojis/commit/c9e0c6d0977d2a72e999a4686913cd97d6162f41), [`9e79462`](https://github.com/mojisdev/mojis/commit/9e79462ec286f4d4d73727297db5e4f9d904a8a9)]:
+  - @mojis/internal-utils@0.0.6
+  - @mojis/parsers@0.0.2
+
 ## 0.0.8
 
 ### Patch Changes
