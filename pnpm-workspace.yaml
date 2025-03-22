@@ -29,6 +29,7 @@ catalogs:
     vitest: ^3.0.8
     vitest-testdirs: ^2.2.0
     zod-to-json-schema: ^3.24.5
+    tsx: ^4.19.3
 
 onlyBuiltDependencies:
   - esbuild
