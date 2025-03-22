@@ -1,5 +1,15 @@
 # @mojis/internal-utils
 
+## 0.0.6
+
+### Patch Changes
+
+- [#62](https://github.com/mojisdev/mojis/pull/62) [`9c7901e`](https://github.com/mojisdev/mojis/commit/9c7901ee12ae6b5310abe651e01da5c00e8e29ed) Thanks [@luxass](https://github.com/luxass)! - feat!: add versions as a submodule
+
+- [#59](https://github.com/mojisdev/mojis/pull/59) [`c9e0c6d`](https://github.com/mojisdev/mojis/commit/c9e0c6d0977d2a72e999a4686913cd97d6162f41) Thanks [@luxass](https://github.com/luxass)! - refactor: use unicode-proxy
+
+- [#58](https://github.com/mojisdev/mojis/pull/58) [`9e79462`](https://github.com/mojisdev/mojis/commit/9e79462ec286f4d4d73727297db5e4f9d904a8a9) Thanks [@luxass](https://github.com/luxass)! - feat: implement subcommands for emoji-version cmd
+
 ## 0.0.5
 
 ### Patch Changes
