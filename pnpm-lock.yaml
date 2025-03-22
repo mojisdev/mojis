@@ -36,6 +36,9 @@ catalogs:
     vitest-testdirs:
       specifier: ^2.2.0
       version: 2.2.0
+    zod-to-json-schema:
+      specifier: ^3.24.5
+      version: 3.24.5
   monorepo:
     '@changesets/changelog-github':
       specifier: ^0.5.1
@@ -217,6 +220,27 @@ importers:
       vitest-testdirs:
         specifier: catalog:dev
         version: 2.2.0(vitest@3.0.8)
+
+  packages/json-schemas:
+    devDependencies:
+      '@luxass/eslint-config':
+        specifier: catalog:dev
+        version: 4.17.1(@typescript-eslint/utils@8.26.1(eslint@9.22.0)(typescript@5.8.2))(@vue/compiler-sfc@3.5.13)(eslint@9.22.0)(typescript@5.8.2)(vitest@3.0.8)
+      '@mojis/internal-utils':
+        specifier: workspace:*
+        version: link:../internal-utils
+      eslint:
+        specifier: catalog:dev
+        version: 9.22.0
+      typescript:
+        specifier: catalog:dev
+        version: 5.8.2
+      vitest-testdirs:
+        specifier: catalog:dev
+        version: 2.2.0(vitest@3.0.8)
+      zod-to-json-schema:
+        specifier: catalog:dev
+        version: 3.24.5(zod@3.24.2)
 
   packages/parsers:
     devDependencies:
@@ -2771,6 +2795,11 @@ packages:
   yoctocolors-cjs@2.1.2:
     resolution: {integrity: sha512-cYVsTjKl8b+FrnidjibDWskAv7UKOfcwaVZdp/it9n1s9fU3IkgDbhdIRKCW4JDsAlECJY0ytoVPT3sK6kideA==}
     engines: {node: '>=18'}
+
+  zod-to-json-schema@3.24.5:
+    resolution: {integrity: sha512-/AuWwMP+YqiPbsJx5D6TfgRTc4kTLjsh5SOcd4bLsfUg2RcEXrFMJl1DGgdHy2aCfsIA/cr/1JM0xcB2GZji8g==}
+    peerDependencies:
+      zod: ^3.24.1
 
   zod@3.24.2:
     resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
@@ -5548,6 +5577,10 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   yoctocolors-cjs@2.1.2: {}
+
+  zod-to-json-schema@3.24.5(zod@3.24.2):
+    dependencies:
+      zod: 3.24.2
 
   zod@3.24.2: {}
 
