@@ -1,10 +1,6 @@
-import type {
-  WriteCacheOptions,
-} from "@mojis/internal-utils";
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
 import type { BUILTIN_PARSERS } from "./utils";
 
-type MaybePromise<T> = T | Promise<T>;
 export type MaybeArray<T> = T | T[];
 
 export type JsonValue = string | number | boolean | null | undefined;
@@ -92,7 +88,10 @@ export interface AnyHandleVersionParams {
     in: any;
     out: any;
   };
-  _parser: any;
+  _parser: {
+    parser: any;
+    out: any;
+  };
   _parserOptions: any;
   _output: any;
 }
@@ -103,11 +102,22 @@ export type GetParseOutputFromBuiltInParser<TParser extends string> =
   TParser extends "generic" ? GenericParseResult :
     never;
 
+export type InferParseOutput<TContext extends AdapterContext, TParser extends string | ParserFn<TContext, any>> =
+    TParser extends ParserFn<AdapterContext, infer TOutput> ? TOutput :
+      TParser extends BuiltinParser ? GetParseOutputFromBuiltInParser<TParser> :
+        never;
+
 export type TransformFn<
   TContext extends AdapterContext,
-  TParseInput,
-  TTransformOutput,
-> = (ctx: TContext, data: TParseInput) => TTransformOutput;
+  TIn,
+  TOut,
+> = (ctx: TContext, data: TIn) => TOut;
+
+export type OutputFn<
+  TContext extends AdapterContext,
+  TIn,
+  TOut,
+> = (ctx: TContext, data: TIn) => TOut;
 
 export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
   urls: <TUrls extends AdapterUrls>(
@@ -123,25 +133,41 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _output: TParams["_output"];
   }>;
   parser: <TParser extends BuiltinParser | ParserFn<AdapterContext, any>, TParserOptions extends GetParseOptionsFromParser<TParser>>(
-    parser: TParams["_parser"] extends UnsetMarker ? TParser : ErrorMessage<"parser is already set">,
+    parser: TParams["_parser"]["parser"] extends UnsetMarker ? TParser : ErrorMessage<"parser is already set">,
     options?: TParserOptions
   ) => HandleVersionBuilder<{
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
     _transform: TParams["_transform"];
-    _parser: TParser;
+    _parser: {
+      parser: TParser;
+      out: InferParseOutput<AdapterContext, TParser>;
+    };
     _parserOptions: TParserOptions;
     _output: TParams["_output"];
   }>;
-  transform: <TIn extends GetParseOutputFromBuiltInParser<TParams["_parser"]>, TOut>(
+  transform: <TIn extends TParams["_parser"]["out"], TOut>(
     transform: TParams["_transform"]["in"] extends UnsetMarker ? TransformFn<AdapterContext, TIn, TOut> : ErrorMessage<"transform is already set">,
   ) => HandleVersionBuilder<{
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
-    _transform: TParams["_transform"];
+    _transform: {
+      in: TIn;
+      out: TOut;
+    };
     _parser: TParams["_parser"];
     _parserOptions: TParams["_parserOptions"];
     _output: TParams["_output"];
+  }>;
+  output: <TIn extends TParams["_transform"]["out"], TOut>(
+    output: TParams["_output"]["in"] extends UnsetMarker ? OutputFn<AdapterContext, TIn, TOut> : ErrorMessage<"output is already set">,
+  ) => HandleVersionBuilder<{
+    _aggregate: TParams["_aggregate"];
+    _transform: TParams["_transform"];
+    _parser: TParams["_parser"];
+    _parserOptions: TParams["_parserOptions"];
+    _urls: TParams["_urls"];
+    _output: TOut;
   }>;
 }
 
