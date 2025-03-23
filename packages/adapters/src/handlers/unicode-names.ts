@@ -42,4 +42,4 @@ export const handler = builder
       .output((_, transformed) => {
         return transformed;
       }),
-  );
+  ).build();

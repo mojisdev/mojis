@@ -60,4 +60,4 @@ export const handler = builder
       .parser("generic")
       .transform(() => undefined)
       .output(() => []),
-  );
+  ).build();

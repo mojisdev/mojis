@@ -1,12 +1,12 @@
-import type { AdapterHandlerBuilder, AdapterHandlerType, AnyHandleVersionParams, AnyVersionHandler, HandleVersionBuilder, Json, PredicateFn, UnsetMarker } from "./types";
+import type { AdapterHandlerBuilder, AdapterHandlerType, AnyAdapterHandler, AnyHandleVersionParams, HandleVersionBuilder, Json, PredicateFn, UnsetMarker } from "./types";
 
 function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandlerType>(
-  initDef: Partial<AnyVersionHandler> = {},
+  initDef: Partial<AnyAdapterHandler> = {},
 ): AdapterHandlerBuilder<{
     _type: TAdapterType;
     _versionHandlers: [PredicateFn, HandleVersionBuilder<AnyHandleVersionParams>][];
   }> {
-  const _def: AnyVersionHandler = {
+  const _def: AnyAdapterHandler = {
     adapterType: initDef.adapterType as AdapterHandlerType,
     versionHandlers: [],
     // Overload with properties passed in
@@ -22,6 +22,9 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
           [userPredicate, userBuilder as unknown as HandleVersionBuilder<AnyHandleVersionParams>],
         ],
       });
+    },
+    build() {
+      return _def;
     },
   };
 }

@@ -139,4 +139,4 @@ export const handler = builder
     .output(() => ({
       groups: [],
       emojis: {},
-    })));
+    }))).build();

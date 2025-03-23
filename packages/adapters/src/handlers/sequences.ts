@@ -113,4 +113,4 @@ export const handler = builder
       .output((_, sequences) => {
         return sequences;
       }),
-  );
+  ).build();

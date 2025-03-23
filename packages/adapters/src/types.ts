@@ -71,13 +71,6 @@ export type UnsetMarker = "unsetMarker" & {
   __brand: "unsetMarker";
 };
 
-export interface VersionHandler {
-  adapterType: AdapterHandlerType;
-  versionHandlers: [PredicateFn, HandleVersionBuilder<AnyHandleVersionParams>][];
-}
-
-export type AnyVersionHandler = VersionHandler;
-
 export interface AnyHandleVersionParams {
   _urls: any;
   _aggregate: {
@@ -216,4 +209,12 @@ export interface AdapterHandlerBuilder<TParams extends AnyAdapterHandlerParams> 
       [TPredicate, TBuilder],
     ];
   }>;
+  build: () => AdapterHandler;
 }
+
+export interface AdapterHandler {
+  adapterType: AdapterHandlerType;
+  versionHandlers: [PredicateFn, HandleVersionBuilder<AnyHandleVersionParams>][];
+}
+
+export type AnyAdapterHandler = AdapterHandler;
