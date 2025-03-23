@@ -113,6 +113,12 @@ export type TransformFn<
   TOut,
 > = (ctx: TContext, data: TIn) => TOut;
 
+export type AggregateFn<
+  TContext extends AdapterContext,
+  TIn,
+  TOut,
+> = (ctx: TContext, data: [TIn, ...TIn[]]) => TOut;
+
 export type OutputFn<
   TContext extends AdapterContext,
   TIn,
@@ -157,6 +163,19 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     };
     _parser: TParams["_parser"];
     _parserOptions: TParams["_parserOptions"];
+    _output: TParams["_output"];
+  }>;
+  aggregate: <TIn extends TParams["_transform"]["out"], TOut>(
+    aggregate: TParams["_aggregate"]["in"] extends UnsetMarker ? AggregateFn<AdapterContext, TIn, TOut> : ErrorMessage<"aggregate is already set">,
+  ) => HandleVersionBuilder<{
+    _aggregate: TParams["_aggregate"];
+    _transform: {
+      in: TIn;
+      out: TParams["_transform"]["out"];
+    };
+    _parser: TParams["_parser"];
+    _parserOptions: TParams["_parserOptions"];
+    _urls: TParams["_urls"];
     _output: TParams["_output"];
   }>;
   output: <TIn extends TParams["_transform"]["out"], TOut>(
