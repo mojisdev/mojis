@@ -77,8 +77,9 @@ export type UnsetMarker = "unsetMarker" & {
 
 export interface VersionHandler {
   adapterType: AdapterHandlerType;
-  // versionHandlers: HandleVersionBuilder<AnyHandleVersionParams>[];
+  versionHandlers: [PredicateFn, HandleVersionBuilder<AnyHandleVersionParams>][];
 }
+
 export type AnyVersionHandler = VersionHandler;
 
 export interface AnyHandleVersionParams {
@@ -126,20 +127,20 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
 
 export interface AnyAdapterHandlerParams {
   _type: AdapterHandlerType;
-  // _versionHandlers: HandleVersionBuilder<AnyHandleVersionParams>[];
+  _versionHandlers: [PredicateFn, HandleVersionBuilder<AnyHandleVersionParams>][];
 }
 
 export type PredicateFn = (version: string) => boolean;
 
 export interface AdapterHandlerBuilder<TParams extends AnyAdapterHandlerParams> {
-  onVersion: <TPredicate extends PredicateFn, TBuilder extends HandleVersionBuilder<any>>(
+  onVersion: <TPredicate extends PredicateFn, TBuilderParams extends AnyHandleVersionParams, TBuilder extends HandleVersionBuilder<TBuilderParams>>(
     predicate: TPredicate,
-    builder: TBuilder,
+    builder: (builder: TBuilder) => TBuilder,
   ) => AdapterHandlerBuilder<{
     _type: TParams["_type"];
-    // _versionHandlers: [
-    //   ...TParams["_versionHandlers"],
-    //   [TPredicate, TBuilder],
-    // ];
+    _versionHandlers: [
+      ...TParams["_versionHandlers"],
+      [TPredicate, TBuilder],
+    ];
   }>;
 }
