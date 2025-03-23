@@ -11,7 +11,7 @@ export type Json = JsonValue | JsonObject | JsonArray;
 /**
  * The type of the adapter handler.
  */
-export type AdapterHandlerType = "metadata";
+export type AdapterHandlerType = "metadata" | "variations" | "unicode-names" | "sequences";
 
 export type AdapterUrls = MaybeArray<string> | MaybeArray<undefined> | MaybeArray<UrlWithCache>;
 
