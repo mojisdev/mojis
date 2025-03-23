@@ -125,6 +125,12 @@ export type OutputFn<
   TOut,
 > = (ctx: TContext, data: TIn) => TOut;
 
+export type WrapContextFn<
+  TContext extends AdapterContext,
+  TExtraContext extends Record<string, unknown>,
+  TReturn,
+> = ((ctx: TContext & TExtraContext) => TReturn) | TReturn;
+
 export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
   urls: <TUrls extends AdapterUrls>(
     urls: TParams["_urls"] extends UnsetMarker
@@ -140,7 +146,9 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
   }>;
   parser: <TParser extends BuiltinParser | ParserFn<AdapterContext, any>, TParserOptions extends GetParseOptionsFromParser<TParser>>(
     parser: TParams["_parser"]["parser"] extends UnsetMarker ? TParser : ErrorMessage<"parser is already set">,
-    options?: TParserOptions
+    options?: TParserOptions | WrapContextFn<AdapterContext, {
+      key: string;
+    }, TParserOptions>
   ) => HandleVersionBuilder<{
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
