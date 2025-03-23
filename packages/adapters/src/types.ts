@@ -1,3 +1,4 @@
+import type { WriteCacheOptions } from "@mojis/internal-utils";
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
 import type { BUILTIN_PARSERS } from "./utils";
 
@@ -80,6 +81,10 @@ export interface AnyHandleVersionParams {
     parser: any;
     out: any;
   };
+  _options: {
+    cacheOptions: Omit<WriteCacheOptions<unknown>, "transform">;
+    fetchOptions: RequestInit;
+  };
   _parserOptions: any;
   _output: any;
 }
@@ -126,6 +131,8 @@ export interface NormalizedVersionHandler<TParams extends AnyHandleVersionParams
   aggregate: (ctx: AdapterContext, data: TParams["_transform"]["out"]) => TParams["_aggregate"]["out"];
   transform: (ctx: AdapterContext, data: TParams["_parser"]["out"]) => TParams["_transform"]["out"];
   output: (ctx: AdapterContext, data: TParams["_aggregate"]["out"]) => TParams["_output"];
+  cacheOptions: TParams["_options"]["cacheOptions"];
+  fetchOptions: TParams["_options"]["fetchOptions"];
 }
 
 export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
@@ -140,6 +147,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _parser: TParams["_parser"];
     _parserOptions: TParams["_parserOptions"];
     _output: TParams["_output"];
+    _options: TParams["_options"];
   }>;
   parser: <TParser extends BuiltinParser | ParserFn<AdapterContext, any>, TParserOptions extends GetParseOptionsFromParser<TParser>>(
     parser: TParams["_parser"]["parser"] extends UnsetMarker ? TParser : ErrorMessage<"parser is already set">,
@@ -150,6 +158,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
     _transform: TParams["_transform"];
+    _options: TParams["_options"];
     _parser: {
       parser: TParser;
       out: InferParseOutput<AdapterContext, TParser>;
@@ -162,6 +171,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
   ) => HandleVersionBuilder<{
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
+    _options: TParams["_options"];
     _transform: {
       in: TIn;
       out: TOut;
@@ -177,10 +187,8 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
       in: TIn;
       out: TOut;
     };
-    _transform: {
-      in: TIn;
-      out: TParams["_transform"]["out"];
-    };
+    _transform: TParams["_transform"];
+    _options: TParams["_options"];
     _parser: TParams["_parser"];
     _parserOptions: TParams["_parserOptions"];
     _urls: TParams["_urls"];
@@ -191,6 +199,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
   ) => NormalizedVersionHandler<{
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
+    _options: TParams["_options"];
     _transform: TParams["_transform"];
     _parser: TParams["_parser"];
     _parserOptions: TParams["_parserOptions"];

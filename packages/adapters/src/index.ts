@@ -2,9 +2,19 @@ import type { AdapterContext, AdapterHandler } from "./types";
 import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
 import { AdapterError } from "./errors";
+import { metadata, sequences, unicodeNames, variations } from "./handlers";
 import { buildContext, getHandlerUrls, isBuiltinParser } from "./utils";
 
-export async function runAdapterHandler(handler: AdapterHandler, ctx: AdapterContext) {
+const HANDLERS = {
+  metadata,
+  sequences,
+  unicodeNames,
+  variations,
+} satisfies Record<string, AdapterHandler>;
+
+export async function runAdapterHandler(type: keyof typeof HANDLERS, ctx: AdapterContext): Promise<any> {
+  const handler = HANDLERS[type];
+
   for (const [predicate, versionHandler] of handler.versionHandlers) {
     if (!predicate(ctx.emoji_version)) {
       continue;
