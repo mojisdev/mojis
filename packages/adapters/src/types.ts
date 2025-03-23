@@ -3,11 +3,6 @@ import type { BUILTIN_PARSERS } from "./utils";
 
 export type MaybeArray<T> = T | T[];
 
-export type JsonValue = string | number | boolean | null | undefined;
-export interface JsonObject { [key: string]: JsonValue | JsonObject | JsonArray }
-export type JsonArray = (JsonValue | JsonObject)[];
-export type Json = JsonValue | JsonObject | JsonArray;
-
 /**
  * The type of the adapter handler.
  */

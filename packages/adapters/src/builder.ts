@@ -1,4 +1,12 @@
-import type { AdapterHandlerBuilder, AdapterHandlerType, AnyAdapterHandler, AnyHandleVersionParams, HandleVersionBuilder, Json, PredicateFn, UnsetMarker } from "./types";
+import type {
+  AdapterHandlerBuilder,
+  AdapterHandlerType,
+  AnyAdapterHandler,
+  AnyHandleVersionParams,
+  HandleVersionBuilder,
+  PredicateFn,
+  UnsetMarker,
+} from "./types";
 
 function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandlerType>(
   initDef: Partial<AnyAdapterHandler> = {},
