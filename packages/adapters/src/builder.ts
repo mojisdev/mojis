@@ -19,7 +19,7 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
         ..._def,
         versionHandlers: [
           ..._def.versionHandlers,
-          [userPredicate, userBuilder],
+          [userPredicate, userBuilder as unknown as HandleVersionBuilder<AnyHandleVersionParams>],
         ],
       });
     },

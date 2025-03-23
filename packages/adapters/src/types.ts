@@ -99,6 +99,16 @@ export interface AnyHandleVersionParams {
 
 export type ErrorMessage<TError extends string> = TError;
 
+export type GetParseOutputFromBuiltInParser<TParser extends string> =
+  TParser extends "generic" ? GenericParseResult :
+    never;
+
+export type TransformFn<
+  TContext extends AdapterContext,
+  TParseInput,
+  TTransformOutput,
+> = (ctx: TContext, data: TParseInput) => TTransformOutput;
+
 export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
   urls: <TUrls extends AdapterUrls>(
     urls: TParams["_urls"] extends UnsetMarker
@@ -121,6 +131,16 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _transform: TParams["_transform"];
     _parser: TParser;
     _parserOptions: TParserOptions;
+    _output: TParams["_output"];
+  }>;
+  transform: <TIn extends GetParseOutputFromBuiltInParser<TParams["_parser"]>, TOut>(
+    transform: TParams["_transform"]["in"] extends UnsetMarker ? TransformFn<AdapterContext, TIn, TOut> : ErrorMessage<"transform is already set">,
+  ) => HandleVersionBuilder<{
+    _urls: TParams["_urls"];
+    _aggregate: TParams["_aggregate"];
+    _transform: TParams["_transform"];
+    _parser: TParams["_parser"];
+    _parserOptions: TParams["_parserOptions"];
     _output: TParams["_output"];
   }>;
 }
