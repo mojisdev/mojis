@@ -2,17 +2,15 @@ import type {
   AdapterHandlerBuilder,
   AdapterHandlerType,
   AnyAdapterHandler,
-  AnyHandleVersionParams,
-  HandleVersionBuilder,
+  NormalizedVersionHandler,
   PredicateFn,
-  UnsetMarker,
 } from "./types";
 
 function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandlerType>(
   initDef: Partial<AnyAdapterHandler> = {},
 ): AdapterHandlerBuilder<{
     _type: TAdapterType;
-    _versionHandlers: [PredicateFn, HandleVersionBuilder<AnyHandleVersionParams>][];
+    _versionHandlers: [PredicateFn, NormalizedVersionHandler<any, any>][];
   }> {
   const _def: AnyAdapterHandler = {
     adapterType: initDef.adapterType as AdapterHandlerType,
@@ -27,7 +25,7 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
         ..._def,
         versionHandlers: [
           ..._def.versionHandlers,
-          [userPredicate, userBuilder as unknown as HandleVersionBuilder<AnyHandleVersionParams>],
+          [userPredicate, userBuilder as unknown as NormalizedVersionHandler<any, any>],
         ],
       });
     },
@@ -45,7 +43,7 @@ export function createAdapterHandlerBuilder<TAdapterType extends AdapterHandlerT
   opts?: CreateBuilderOptions<TAdapterType>,
 ): AdapterHandlerBuilder<{
     _type: TAdapterType;
-    _versionHandlers: [PredicateFn, HandleVersionBuilder<AnyHandleVersionParams>][];
+    _versionHandlers: [PredicateFn, NormalizedVersionHandler<any, any>][];
   }> {
   return internalCreateAdapterHandlerBuilder<TAdapterType>({
     adapterType: opts?.type,

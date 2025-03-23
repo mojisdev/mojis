@@ -119,6 +119,11 @@ export type WrapContextFn<
   TReturn,
 > = ((ctx: TContext & TExtraContext) => TReturn) | TReturn;
 
+export interface NormalizedVersionHandler<TUrls extends AdapterUrls, TOutput> {
+  urls: (ctx: AdapterContext) => TUrls;
+  output: TOutput;
+}
+
 export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
   urls: <TUrls extends AdapterUrls>(
     urls: TParams["_urls"] extends UnsetMarker
@@ -164,7 +169,10 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
   aggregate: <TIn extends TParams["_transform"]["out"], TOut>(
     aggregate: TParams["_aggregate"]["in"] extends UnsetMarker ? AggregateFn<AdapterContext, TIn, TOut> : ErrorMessage<"aggregate is already set">,
   ) => HandleVersionBuilder<{
-    _aggregate: TParams["_aggregate"];
+    _aggregate: {
+      in: TIn;
+      out: TOut;
+    };
     _transform: {
       in: TIn;
       out: TParams["_transform"]["out"];
@@ -174,21 +182,14 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _urls: TParams["_urls"];
     _output: TParams["_output"];
   }>;
-  output: <TIn extends TParams["_transform"]["out"], TOut>(
-    output: TParams["_output"]["in"] extends UnsetMarker ? OutputFn<AdapterContext, TIn, TOut> : ErrorMessage<"output is already set">,
-  ) => HandleVersionBuilder<{
-    _aggregate: TParams["_aggregate"];
-    _transform: TParams["_transform"];
-    _parser: TParams["_parser"];
-    _parserOptions: TParams["_parserOptions"];
-    _urls: TParams["_urls"];
-    _output: TOut;
-  }>;
+  output: <TIn extends TParams["_aggregate"]["out"], TOut>(
+    output: TParams["_output"] extends UnsetMarker ? OutputFn<AdapterContext, TIn, TOut> : ErrorMessage<"output is already set">,
+  ) => NormalizedVersionHandler<TParams["_urls"], TOut>;
 }
 
 export interface AnyAdapterHandlerParams {
   _type: AdapterHandlerType;
-  _versionHandlers: [PredicateFn, HandleVersionBuilder<AnyHandleVersionParams>][];
+  _versionHandlers: [PredicateFn, NormalizedVersionHandler<any, any>][];
 }
 
 export type PredicateFn = (version: string) => boolean;
@@ -196,12 +197,12 @@ export type PredicateFn = (version: string) => boolean;
 export interface AdapterHandlerBuilder<TParams extends AnyAdapterHandlerParams> {
   onVersion: <TPredicate extends PredicateFn, TBuilderParams extends AnyHandleVersionParams, TBuilder extends HandleVersionBuilder<TBuilderParams>>(
     predicate: TPredicate,
-    builder: (builder: TBuilder) => TBuilder,
+    builder: (builder: TBuilder) => NormalizedVersionHandler<TBuilderParams["_urls"], TBuilderParams["_output"]>,
   ) => AdapterHandlerBuilder<{
     _type: TParams["_type"];
     _versionHandlers: [
       ...TParams["_versionHandlers"],
-      [TPredicate, TBuilder],
+      [TPredicate, NormalizedVersionHandler<TBuilderParams["_urls"], TBuilderParams["_output"]>],
     ];
   }>;
   build: () => AdapterHandler;
@@ -209,7 +210,7 @@ export interface AdapterHandlerBuilder<TParams extends AnyAdapterHandlerParams> 
 
 export interface AdapterHandler {
   adapterType: AdapterHandlerType;
-  versionHandlers: [PredicateFn, HandleVersionBuilder<AnyHandleVersionParams>][];
+  versionHandlers: [PredicateFn, NormalizedVersionHandler<any, any>][];
 }
 
 export type AnyAdapterHandler = AdapterHandler;
