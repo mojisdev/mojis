@@ -2,13 +2,22 @@ import type {
   WriteCacheOptions,
 } from "@mojis/internal-utils";
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
-import type { METADATA_HANDLERS, SEQUENCE_HANDLERS, UNICODE_NAME_HANDLERS, VARIATION_HANDLERS } from "./handlers";
 import type { BUILTIN_PARSERS } from "./utils";
 
-type Promisable<T> = T | Promise<T>;
-export type Arrayable<T> = T | T[];
+type MaybePromise<T> = T | Promise<T>;
+export type MaybeArray<T> = T | T[];
 
-export type AdapterUrls = Arrayable<string> | Arrayable<undefined> | Arrayable<UrlWithCache>;
+export type JsonValue = string | number | boolean | null | undefined;
+export interface JsonObject { [key: string]: JsonValue | JsonObject | JsonArray }
+export type JsonArray = (JsonValue | JsonObject)[];
+export type Json = JsonValue | JsonObject | JsonArray;
+
+/**
+ * The type of the adapter handler.
+ */
+export type AdapterHandlerType = "metadata";
+
+export type AdapterUrls = MaybeArray<string> | MaybeArray<undefined> | MaybeArray<UrlWithCache>;
 
 export interface AdapterContext {
   /**
@@ -27,14 +36,6 @@ export interface AdapterContext {
    */
   force: boolean;
 }
-
-export type AdapterHandlerType = "metadata" | "sequences" | "variations" | "unicode-names";
-
-export type UrlBuilder = (ctx: AdapterContext) => Promisable<AdapterUrls>;
-
-export type ShouldExecute<
-  TContext extends AdapterContext,
-> = (ctx: TContext) => Promisable<boolean>;
 
 export interface UrlWithCache {
   /**
@@ -56,24 +57,6 @@ export interface UrlWithCache {
   key?: string;
 }
 
-export type TransformFn<
-  TContext extends AdapterContext,
-  TParseInput,
-  TTransformOutput,
-> = (ctx: TContext, data: TParseInput) => TTransformOutput;
-
-export type AggregateFn<
-  TContext extends AdapterContext,
-  TTransformOutput,
-  TAggregateOutput,
-> = (ctx: TContext, data: [TTransformOutput, ...TTransformOutput[]]) => TAggregateOutput;
-
-export type OutputFn<
-  TContext extends AdapterContext,
-  TTransformOutput,
-  TOutput,
-> = (ctx: TContext, data: TTransformOutput) => TOutput;
-
 export type BuiltinParser = typeof BUILTIN_PARSERS[number];
 
 export type ParserFn<
@@ -81,97 +64,82 @@ export type ParserFn<
   TOutput,
 > = (ctx: TContext, data: string) => TOutput;
 
-export type GetParseOutputFromBuiltInParser<TParser extends string> =
-  TParser extends "generic" ? GenericParseResult :
-    never;
+export type GetParseOptionsFromParser<TParser extends string | ParserFn<AdapterContext, any>> =
+  TParser extends string ?
+    TParser extends "generic"
+      ? GenericParseOptions
+      : never
+    : never;
 
-export type GetParseOptionsFromParser<TParser extends string> =
-  TParser extends "generic" ? GenericParseOptions :
-    never;
+export type UnsetMarker = "unsetMarker" & {
+  __brand: "unsetMarker";
+};
 
-export type WrapContextFn<
-  TContext extends AdapterContext,
-  TExtraContext extends Record<string, unknown>,
-  TReturn,
-> = ((ctx: TContext & TExtraContext) => TReturn) | TReturn;
+export interface VersionHandler {
+  adapterType: AdapterHandlerType;
+  // versionHandlers: HandleVersionBuilder<AnyHandleVersionParams>[];
+}
+export type AnyVersionHandler = VersionHandler;
 
-export interface AdapterHandler<
-  TType extends AdapterHandlerType,
-  TContext extends AdapterContext,
-  TParser extends string | ParserFn<TContext, any>,
-  TTransformOutput,
-  TParseOutput = InferParseOutput<TContext, TParser>,
-  TAggregateOutput = TTransformOutput,
-  TOutput = TTransformOutput | TAggregateOutput,
-> {
-  /**
-   * The type of the handler, this is used to identify the handler.
-   */
-  type: TType;
-
-  /**
-   * The urls that will be fetched.
-   */
-  urls: AdapterUrls | UrlBuilder;
-
-  /**
-   * Options that will be passed to the fetch function.
-   */
-  fetchOptions?: RequestInit;
-
-  /**
-   * Options that will be passed to the cache function.
-   */
-  cacheOptions?: Omit<WriteCacheOptions<unknown>, "transform">;
-
-  /**
-   * Whether or not that this handler should handle the request.
-   */
-  shouldExecute: boolean | ShouldExecute<TContext>;
-
-  /**
-   * A parse function or a reference to a builtin parser.
-   *
-   */
-  parser: TParser;
-
-  /**
-   * Options that will be passed to the parser.
-   * This will only be used if the parser is a builtin parser.
-   */
-  parserOptions?: TParser extends BuiltinParser ? WrapContextFn<TContext, {
-    key: string;
-  }, GetParseOptionsFromParser<TParser>> : never;
-
-  /**
-   * A transform function that will run for each of the urls.
-   * It will pass the returned type downwards to either the aggregate function or the output.
-   */
-  transform: TransformFn<TContext & {
-    key: string;
-  }, TParseOutput, TTransformOutput>;
-
-  /**
-   * An aggregate function that will run if defined.
-   * It will receive all the transformed results as parameters, which it can then aggregate the results into a final output.
-   */
-  aggregate?: AggregateFn<TContext, TTransformOutput, TAggregateOutput>;
-
-  /**
-   * Output function which will receive the transformed result from the transform function, or from the aggregate function.
-   * It will then output the result.
-   */
-  output: OutputFn<TContext, TAggregateOutput extends TTransformOutput ? TTransformOutput : TAggregateOutput, TOutput>;
+export interface AnyHandleVersionParams {
+  _urls: any;
+  _aggregate: {
+    in: any;
+    out: any;
+  };
+  _transform: {
+    in: any;
+    out: any;
+  };
+  _parser: any;
+  _parserOptions: any;
+  _output: any;
 }
 
-export type InferOutputFromAdapterHandlerType<THandlerType extends AdapterHandlerType> =
-   THandlerType extends "metadata" ? ReturnType<typeof METADATA_HANDLERS[number]["output"]> :
-     THandlerType extends "sequences" ? ReturnType<typeof SEQUENCE_HANDLERS[number]["output"]> :
-       THandlerType extends "variations" ? ReturnType<typeof VARIATION_HANDLERS[number]["output"]> :
-         THandlerType extends "unicode-names" ? ReturnType<typeof UNICODE_NAME_HANDLERS[number]["output"]> :
-           unknown;
+export type ErrorMessage<TError extends string> = TError;
 
-export type InferParseOutput<TContext extends AdapterContext, TParser extends string | ParserFn<TContext, any>> =
-  TParser extends ParserFn<AdapterContext, infer TOutput> ? TOutput :
-    TParser extends BuiltinParser ? GetParseOutputFromBuiltInParser<TParser> :
-      never;
+export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
+  urls: <TUrls extends AdapterUrls>(
+    urls: TParams["_urls"] extends UnsetMarker
+      ? (ctx: AdapterContext) => TUrls
+      : ErrorMessage<"urls is already set">,
+  ) => HandleVersionBuilder<{
+    _urls: TUrls;
+    _aggregate: TParams["_aggregate"];
+    _transform: TParams["_transform"];
+    _parser: TParams["_parser"];
+    _parserOptions: TParams["_parserOptions"];
+    _output: TParams["_output"];
+  }>;
+  parser: <TParser extends BuiltinParser | ParserFn<AdapterContext, any>, TParserOptions extends GetParseOptionsFromParser<TParser>>(
+    parser: TParams["_parser"] extends UnsetMarker ? TParser : ErrorMessage<"parser is already set">,
+    options?: TParserOptions
+  ) => HandleVersionBuilder<{
+    _urls: TParams["_urls"];
+    _aggregate: TParams["_aggregate"];
+    _transform: TParams["_transform"];
+    _parser: TParser;
+    _parserOptions: TParserOptions;
+    _output: TParams["_output"];
+  }>;
+}
+
+export interface AnyAdapterHandlerParams {
+  _type: AdapterHandlerType;
+  // _versionHandlers: HandleVersionBuilder<AnyHandleVersionParams>[];
+}
+
+export type PredicateFn = (version: string) => boolean;
+
+export interface AdapterHandlerBuilder<TParams extends AnyAdapterHandlerParams> {
+  onVersion: <TPredicate extends PredicateFn, TBuilder extends HandleVersionBuilder<any>>(
+    predicate: TPredicate,
+    builder: TBuilder,
+  ) => AdapterHandlerBuilder<{
+    _type: TParams["_type"];
+    // _versionHandlers: [
+    //   ...TParams["_versionHandlers"],
+    //   [TPredicate, TBuilder],
+    // ];
+  }>;
+}

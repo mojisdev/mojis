@@ -1,4 +1,4 @@
-import type { AdapterContext, Arrayable, BuiltinParser, UrlBuilder, UrlWithCache } from "./types";
+import type { AdapterContext, MaybeArray, BuiltinParser, UrlBuilder, UrlWithCache } from "./types";
 import { createCacheKeyFromUrl } from "@mojis/internal-utils";
 
 /**
@@ -51,7 +51,7 @@ function createUrlWithCache(url: string): UrlWithCache {
  * - URL builder function that returns URLs based on context
  * - Null/undefined values (returns empty array)
  *
- * @param {Arrayable<string> | Arrayable<undefined> | Arrayable<UrlWithCache> | UrlBuilder} urls - The URL(s) to process, which can be:
+ * @param {MaybeArray<string> | MaybeArray<undefined> | MaybeArray<UrlWithCache> | UrlBuilder} urls - The URL(s) to process, which can be:
  *               - A single string URL
  *               - An array of string URLs
  *               - A single {@link UrlWithCache} object
@@ -64,7 +64,7 @@ function createUrlWithCache(url: string): UrlWithCache {
  * @template TContext - The type of context passed to URL builder functions
  */
 export async function getHandlerUrls<TContext extends AdapterContext>(
-  urls: Arrayable<string> | Arrayable<undefined> | Arrayable<UrlWithCache> | UrlBuilder,
+  urls: MaybeArray<string> | MaybeArray<undefined> | MaybeArray<UrlWithCache> | UrlBuilder,
   ctx: TContext,
 ): Promise<UrlWithCache[]> {
   const result: UrlWithCache[] = [];

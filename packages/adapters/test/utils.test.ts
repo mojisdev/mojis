@@ -1,4 +1,4 @@
-import type { AdapterContext, Arrayable } from "../src/types";
+import type { AdapterContext, MaybeArray } from "../src/types";
 import { describe, expect, it, vi } from "vitest";
 import { buildContext, BUILTIN_PARSERS, getHandlerUrls, isBuiltinParser, isUrlBuilder } from "../src/utils";
 
@@ -80,7 +80,7 @@ describe("getHandlerUrls", () => {
         "https://example.com",
         null,
         "https://test.com",
-      ] as Arrayable<string>,
+      ] as MaybeArray<string>,
       ctx,
     );
     expect(result).toEqual([
