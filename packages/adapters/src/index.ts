@@ -1,4 +1,8 @@
-import type { AdapterContext, AdapterHandler } from "./types";
+import type {
+  AdapterContext,
+  AdapterHandler,
+  AdapterHandlerType,
+} from "./types";
 import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
 import { AdapterError } from "./errors";
@@ -8,11 +12,16 @@ import { buildContext, getHandlerUrls, isBuiltinParser } from "./utils";
 const HANDLERS = {
   metadata,
   sequences,
-  unicodeNames,
+  "unicode-names": unicodeNames,
   variations,
-} satisfies Record<string, AdapterHandler>;
+} satisfies Record<AdapterHandlerType, AdapterHandler>;
 
-export async function runAdapterHandler(type: keyof typeof HANDLERS, ctx: AdapterContext): Promise<any> {
+export async function runAdapterHandler<
+  TAdapterHandlerType extends AdapterHandlerType,
+>(
+  type: TAdapterHandlerType,
+  ctx: AdapterContext,
+): Promise<any> {
   const handler = HANDLERS[type];
 
   for (const [predicate, versionHandler] of handler.versionHandlers) {
