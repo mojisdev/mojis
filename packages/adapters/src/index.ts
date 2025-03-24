@@ -29,6 +29,8 @@ export async function runAdapterHandler<
       continue;
     }
 
+    console.log(versionHandler);
+
     const urls = await getHandlerUrls(versionHandler.urls(ctx), ctx);
 
     if (urls.length === 0) {

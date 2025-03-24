@@ -34,12 +34,13 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
   };
 
   return {
-    onVersion(userPredicate, userBuilder) {
+    onVersion(predicate, builder) {
+      const versionHandler = builder(createVersionHandlerBuilder());
       return internalCreateAdapterHandlerBuilder({
         ..._def,
         versionHandlers: [
           ..._def.versionHandlers,
-          [userPredicate, userBuilder as unknown as NormalizedVersionHandler<AnyHandleVersionParams>],
+          [predicate, versionHandler as NormalizedVersionHandler<AnyHandleVersionParams>],
         ],
       });
     },
@@ -65,46 +66,47 @@ function internalCreateVersionHandlerBuilder<TParams extends AnyHandleVersionPar
   };
 
   return {
-    urls(userUrls) {
+    urls(urls) {
       return internalCreateVersionHandlerBuilder({
         ..._def,
-        urls: userUrls,
+        urls,
       });
     },
-    parser(userParser) {
+    parser(parser, options) {
       return internalCreateVersionHandlerBuilder({
         ..._def,
-        parser: userParser,
+        parser,
+        parserOptions: options,
       });
     },
-    transform(userTransform) {
+    transform(transform) {
       return internalCreateVersionHandlerBuilder({
         ..._def,
-        transform: userTransform,
+        transform,
       });
     },
-    aggregate(userAggregate) {
+    aggregate(aggregate) {
       return internalCreateVersionHandlerBuilder({
         ..._def,
-        aggregate: userAggregate,
+        aggregate,
       });
     },
-    output(userOutput) {
+    output(output) {
+      return {
+        ..._def,
+        output,
+      };
+    },
+    cacheOptions(cacheOptions) {
       return internalCreateVersionHandlerBuilder({
         ..._def,
-        output: userOutput,
+        cacheOptions,
       });
     },
-    cacheOptions(userCacheOptions) {
+    fetchOptions(fetchOptions) {
       return internalCreateVersionHandlerBuilder({
         ..._def,
-        cacheOptions: userCacheOptions,
-      });
-    },
-    fetchOptions(userFetchOptions) {
-      return internalCreateVersionHandlerBuilder({
-        ..._def,
-        fetchOptions: userFetchOptions,
+        fetchOptions,
       });
     },
   };
