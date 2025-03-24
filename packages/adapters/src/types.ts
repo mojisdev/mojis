@@ -87,6 +87,9 @@ export interface AnyHandleVersionParams {
   };
   _parserOptions: any;
   _output: any;
+  // used to infer the output type based on if
+  // the handler is using aggregate or not
+  _outputType: any;
 }
 
 export type ErrorMessage<TError extends string> = TError;
@@ -128,9 +131,9 @@ export interface NormalizedVersionHandler<TParams extends AnyHandleVersionParams
   urls: (ctx: AdapterContext) => TParams["_urls"];
   parser: TParams["_parser"]["parser"];
   parserOptions: TParams["_parserOptions"];
-  aggregate: (ctx: AdapterContext, data: TParams["_transform"]["out"]) => TParams["_aggregate"]["out"];
   transform: (ctx: AdapterContext, data: TParams["_parser"]["out"]) => TParams["_transform"]["out"];
-  output: (ctx: AdapterContext, data: TParams["_aggregate"]["out"]) => TParams["_output"];
+  aggregate: (ctx: AdapterContext, data: TParams["_transform"]["out"]) => TParams["_aggregate"]["out"];
+  output: (ctx: AdapterContext, data: TParams["_outputType"]["out"]) => TParams["_output"];
   cacheOptions: TParams["_options"]["cacheOptions"];
   fetchOptions: TParams["_options"]["fetchOptions"];
 }
@@ -148,8 +151,9 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _parserOptions: TParams["_parserOptions"];
     _output: TParams["_output"];
     _options: TParams["_options"];
+    _outputType: TParams["_outputType"];
   }>;
-  parser: <TParser extends BuiltinParser | ParserFn<AdapterContext, any>, TParserOptions extends GetParseOptionsFromParser<TParser>>(
+  parser: <TParser extends BuiltinParser | ParserFn<AdapterContext, unknown>, TParserOptions extends GetParseOptionsFromParser<TParser>>(
     parser: TParams["_parser"]["parser"] extends UnsetMarker ? TParser : ErrorMessage<"parser is already set">,
     options?: TParserOptions | WrapContextFn<AdapterContext, {
       key: string;
@@ -161,10 +165,11 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _options: TParams["_options"];
     _parser: {
       parser: TParser;
-      out: InferParseOutput<AdapterContext, TParser>;
+      out: TParser extends BuiltinParser ? GetParseOutputFromBuiltInParser<TParser> : TParser extends ParserFn<AdapterContext, infer TOut> ? TOut : never;
     };
     _parserOptions: TParserOptions;
     _output: TParams["_output"];
+    _outputType: TParams["_outputType"];
   }>;
   transform: <TIn extends TParams["_parser"]["out"], TOut>(
     transform: TParams["_transform"]["in"] extends UnsetMarker ? TransformFn<AdapterContext, TIn, TOut> : ErrorMessage<"transform is already set">,
@@ -179,6 +184,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _parser: TParams["_parser"];
     _parserOptions: TParams["_parserOptions"];
     _output: TParams["_output"];
+    _outputType: TOut;
   }>;
   aggregate: <TIn extends TParams["_transform"]["out"], TOut>(
     aggregate: TParams["_aggregate"]["in"] extends UnsetMarker ? AggregateFn<AdapterContext, TIn, TOut> : ErrorMessage<"aggregate is already set">,
@@ -193,8 +199,9 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _parserOptions: TParams["_parserOptions"];
     _urls: TParams["_urls"];
     _output: TParams["_output"];
+    _outputType: TOut;
   }>;
-  output: <TIn extends TParams["_aggregate"]["out"], TOut>(
+  output: <TIn extends TParams["_outputType"], TOut>(
     output: TParams["_output"] extends UnsetMarker ? OutputFn<AdapterContext, TIn, TOut> : ErrorMessage<"output is already set">,
   ) => NormalizedVersionHandler<{
     _urls: TParams["_urls"];
@@ -204,6 +211,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _parser: TParams["_parser"];
     _parserOptions: TParams["_parserOptions"];
     _output: TOut;
+    _outputType: TParams["_outputType"];
   }>;
 }
 
