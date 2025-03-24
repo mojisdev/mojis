@@ -227,6 +227,43 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _output: TParams["_output"];
     _outputType: TOut;
   }>;
+
+  cacheOptions: <TOptions extends Omit<WriteCacheOptions<unknown>, "transform">>(
+    cacheOptions: TParams["_options"]["cacheOptions"] extends UnsetMarker
+      ? TOptions
+      : ErrorMessage<"cacheOptions is already set">,
+  ) => HandleVersionBuilder<{
+    _urls: TParams["_urls"];
+    _aggregate: TParams["_aggregate"];
+    _transform: TParams["_transform"];
+    _parser: TParams["_parser"];
+    _parserOptions: TParams["_parserOptions"];
+    _output: TParams["_output"];
+    _options: {
+      cacheOptions: TOptions;
+      fetchOptions: TParams["_options"]["fetchOptions"];
+    };
+    _outputType: TParams["_outputType"];
+  }>;
+
+  fetchOptions: <TOptions extends RequestInit>(
+    fetchOptions: TParams["_options"]["fetchOptions"] extends UnsetMarker
+      ? TOptions
+      : ErrorMessage<"fetchOptions is already set">,
+  ) => HandleVersionBuilder<{
+    _urls: TParams["_urls"];
+    _aggregate: TParams["_aggregate"];
+    _transform: TParams["_transform"];
+    _parser: TParams["_parser"];
+    _parserOptions: TParams["_parserOptions"];
+    _output: TParams["_output"];
+    _options: {
+      cacheOptions: TParams["_options"]["cacheOptions"];
+      fetchOptions: TOptions;
+    };
+    _outputType: TParams["_outputType"];
+  }>;
+
   output: <TIn extends TParams["_outputType"], TOut>(
     output: TParams["_output"] extends UnsetMarker
       ? OutputFn<AdapterContext, TIn, TOut>
