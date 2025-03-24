@@ -70,10 +70,10 @@ export type GetParseOutputFromBuiltInParser<TParser extends BuiltinParser> =
   TParser extends "generic" ? GenericParseResult : never;
 
 export type InferParseOutput<TContext extends AdapterContext, TParser> =
-  TParser extends ParserFn<TContext, infer TOutput>
-    ? TOutput
-    : TParser extends BuiltinParser
-      ? GetParseOutputFromBuiltInParser<TParser>
+  TParser extends BuiltinParser
+    ? GetParseOutputFromBuiltInParser<TParser>
+    : TParser extends ParserFn<TContext, infer TOutput>
+      ? TOutput
       : never;
 
 export type UnsetMarker = "unsetMarker" & {
@@ -81,6 +81,7 @@ export type UnsetMarker = "unsetMarker" & {
 };
 
 export interface AnyHandleVersionParams {
+  _context: AdapterContext;
   _urls: any;
   _aggregate: {
     in: any;
@@ -122,6 +123,12 @@ export type OutputFn<TContext extends AdapterContext, TIn, TOut> = (
   data: TIn,
 ) => TOut;
 
+export type WrapInContextFn<
+  TContext extends AdapterContext,
+  TExtraContext extends Record<string, unknown>,
+  TReturn,
+> = (ctx: TContext & TExtraContext) => TReturn;
+
 export type WrapContextFn<
   TContext extends AdapterContext,
   TExtraContext extends Record<string, unknown>,
@@ -156,6 +163,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
       ? (ctx: AdapterContext) => TUrls
       : ErrorMessage<"urls is already set">,
   ) => HandleVersionBuilder<{
+    _context: TParams["_context"];
     _urls: TUrls;
     _aggregate: TParams["_aggregate"];
     _transform: TParams["_transform"];
@@ -165,39 +173,39 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _options: TParams["_options"];
     _outputType: TParams["_outputType"];
   }>;
-  parser: <TParser extends BuiltinParser | ParserFn<AdapterContext, unknown>>(
+
+  parser: <TParser extends BuiltinParser | ParserFn<AdapterContext, any>>(
     parser: TParams["_parser"]["parser"] extends UnsetMarker
       ? TParser
       : ErrorMessage<"parser is already set">,
     options?: TParser extends BuiltinParser
       ?
       | GetParseOptionsFromParser<TParser>
-      | WrapContextFn<
-        AdapterContext,
-        { key: string },
-        GetParseOptionsFromParser<TParser>
-      >
+      | WrapInContextFn<AdapterContext, { key: string }, GetParseOptionsFromParser<TParser>>
       : never,
   ) => HandleVersionBuilder<{
+    _context: TParams["_context"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
     _transform: TParams["_transform"];
     _options: TParams["_options"];
     _parser: {
       parser: TParser;
-      out: InferParseOutput<AdapterContext, TParser>;
+      out: TParser extends ParserFn<AdapterContext, infer TOut> ? TOut : TParser extends BuiltinParser ? GetParseOutputFromBuiltInParser<TParser> : never;
     };
     _parserOptions: TParser extends BuiltinParser
       ? GetParseOptionsFromParser<TParser>
-      : never;
+      : undefined;
     _output: TParams["_output"];
     _outputType: TParams["_outputType"];
   }>;
+
   transform: <TIn extends TParams["_parser"]["out"], TOut>(
     transform: TParams["_transform"]["in"] extends UnsetMarker
       ? TransformFn<AdapterContext, TIn, TOut>
       : ErrorMessage<"transform is already set">,
   ) => HandleVersionBuilder<{
+    _context: TParams["_context"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
     _options: TParams["_options"];
@@ -210,11 +218,13 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _output: TParams["_output"];
     _outputType: TOut;
   }>;
+
   aggregate: <TIn extends TParams["_transform"]["out"], TOut>(
     aggregate: TParams["_aggregate"]["in"] extends UnsetMarker
       ? AggregateFn<AdapterContext, TIn, TOut>
       : ErrorMessage<"aggregate is already set">,
   ) => HandleVersionBuilder<{
+    _context: TParams["_context"];
     _aggregate: {
       in: TIn;
       out: TOut;
@@ -233,6 +243,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
       ? TOptions
       : ErrorMessage<"cacheOptions is already set">,
   ) => HandleVersionBuilder<{
+    _context: TParams["_context"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
     _transform: TParams["_transform"];
@@ -251,6 +262,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
       ? TOptions
       : ErrorMessage<"fetchOptions is already set">,
   ) => HandleVersionBuilder<{
+    _context: TParams["_context"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
     _transform: TParams["_transform"];
@@ -269,6 +281,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
       ? OutputFn<AdapterContext, TIn, TOut>
       : ErrorMessage<"output is already set">,
   ) => NormalizedVersionHandler<{
+    _context: TParams["_context"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
     _options: TParams["_options"];
