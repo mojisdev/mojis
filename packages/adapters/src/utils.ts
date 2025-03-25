@@ -1,16 +1,35 @@
-import type { AdapterContext, MaybeArray, BuiltinParser, UrlBuilder, UrlWithCache } from "./types";
+import type { AdapterContext, BuiltinParser, MaybeArray, PossibleUrls, UrlFn, UrlWithCache } from "./types";
 import { createCacheKeyFromUrl } from "@mojis/internal-utils";
 
 /**
- * Type predicate function that checks if the given value is a UrlBuilder.
+ * Type guard to check if a value is a UrlWithCache object.
  *
- * A UrlBuilder is expected to be a callable function.
+ * A UrlWithCache object must be a non-null object with 'url' and 'cacheKey' properties.
  *
- * @param {unknown} fn - The value to check
- * @returns {boolean} True if the value is a function (and thus potentially a UrlBuilder), false otherwise
+ * @param {unknown} url - The value to check
+ * @returns {boolean} True if the value is a UrlWithCache object, false otherwise
+ *
+ * @example
+ * ```ts
+ * const url = { url: "https://example.com", cacheKey: "example" };
+ * if (isUrlWithCache(url)) {
+ *   // url is typed as UrlWithCache
+ * }
+ * ```
  */
-export function isUrlBuilder(fn: unknown): fn is UrlBuilder {
-  return typeof fn === "function";
+export function isUrlWithCache(url: unknown): url is UrlWithCache {
+  return typeof url === "object" && url !== null && "url" in url && "cacheKey" in url;
+}
+
+/**
+ * Creates a URL object with associated cache key.
+ *
+ * @param {string} url - The URL string.
+ * @returns {UrlWithCache} An object containing the original URL, a cache key derived from the URL, and the cache key itself (aliased as 'key').
+ */
+function createUrlWithCache(url: string): UrlWithCache {
+  const cacheKey = createCacheKeyFromUrl(url);
+  return { url, cacheKey, key: cacheKey };
 }
 
 export const BUILTIN_PARSERS = [
@@ -30,83 +49,63 @@ export function isBuiltinParser(parser: unknown): parser is BuiltinParser {
 }
 
 /**
- * Creates a URL object with associated cache key.
+ * Gets the URLs for a handler by executing the URL function with the provided context.
+ * Ensures all URLs have valid key and cacheKey properties.
  *
- * @param {string} url - The URL string.
- * @returns {UrlWithCache} An object containing the original URL, a cache key derived from the URL, and the cache key itself (aliased as 'key').
- */
-function createUrlWithCache(url: string): UrlWithCache {
-  const cacheKey = createCacheKeyFromUrl(url);
-  return { url, cacheKey, key: cacheKey };
-}
-
-/**
- * Processes various URL formats into a standardized array of URL objects with cache keys.
+ * @param {UrlFn<PossibleUrls>} urls - A function that returns URL(s) with cache configuration
+ * @param {TContext} ctx - The adapter context to pass to the URL function
+ * @returns {Promise<UrlWithCache[]>} A promise that resolves to an array of URL objects with cache configuration
  *
- * This utility function handles multiple input formats:
- * - Single string URL
- * - Array of string URLs
- * - URL object with cache information
- * - Array of URL objects
- * - URL builder function that returns URLs based on context
- * - Null/undefined values (returns empty array)
+ * @template {AdapterContext} TContext - The type of the adapter context
  *
- * @param {MaybeArray<string> | MaybeArray<undefined> | MaybeArray<UrlWithCache> | UrlBuilder} urls - The URL(s) to process, which can be:
- *               - A single string URL
- *               - An array of string URLs
- *               - A single {@link UrlWithCache} object
- *               - An array of {@link UrlWithCache} objects
- *               - A {@link UrlBuilder} function that generates URLs from context
- *               - null or undefined (returns empty array)
- * @param {TContext} ctx - The adapter context object used when resolving URL builder functions
- * @returns {Promise<UrlWithCache[]>} A promise that resolves to an array of {@link UrlWithCache} objects with normalized structure
+ * @example
+ * ```ts
+ * const urls = (ctx) => ({
+ *   url: "https://example.com",
+ *   cacheKey: "example"
+ * });
  *
- * @template TContext - The type of context passed to URL builder functions
+ * const result = await getHandlerUrls(urls, context);
+ * // Returns: [{url: "https://example.com", cacheKey: "example", key: "example"}]
+ * ```
  */
 export async function getHandlerUrls<TContext extends AdapterContext>(
-  urls: MaybeArray<string> | MaybeArray<undefined> | MaybeArray<UrlWithCache> | UrlBuilder,
+  urls: UrlFn<PossibleUrls>,
   ctx: TContext,
 ): Promise<UrlWithCache[]> {
-  const result: UrlWithCache[] = [];
-
   if (urls == null) {
-    return result;
+    return [];
   }
 
-  if (isUrlBuilder(urls)) {
-    const urlsResults = await urls(ctx);
+  if (typeof urls !== "function") {
+    return [];
+  }
 
-    if (urlsResults == null) {
-      return result;
+  const urlsResults = urls(ctx);
+
+  if (urlsResults == null) {
+    return [];
+  }
+
+  const result = Array.isArray(urlsResults) ? urlsResults : [urlsResults];
+
+  return result.filter((url) => url != null).map((url) => {
+    if (typeof url === "string") {
+      return createUrlWithCache(url);
     }
 
-    if (!Array.isArray(urlsResults)) {
-      if (typeof urlsResults === "string") {
-        return [createUrlWithCache(urlsResults)];
-      }
-
-      return [urlsResults];
+    // if the url object is missing a key, or cacheKey.
+    // we need to create a new url object with a key.
+    if (!("key" in url) || typeof url.key !== "string" || url.key == null) {
+      url.key = createCacheKeyFromUrl(url.url);
     }
 
-    return urlsResults
-      .filter((url) => url != null)
-      .map((url) => typeof url === "string" ? createUrlWithCache(url) : url);
-  }
-
-  if (Array.isArray(urls)) {
-    for (const url of urls) {
-      if (url != null) {
-        result.push(typeof url === "string" ? createUrlWithCache(url) : url);
-      }
+    if (!("cacheKey" in url) || typeof url.cacheKey !== "string" || url.cacheKey == null) {
+      url.cacheKey = createCacheKeyFromUrl(url.url);
     }
-    return result;
-  }
 
-  if (typeof urls === "string") {
-    return [createUrlWithCache(urls)];
-  }
-
-  return [urls];
+    return url;
+  });
 }
 
 /**

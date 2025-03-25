@@ -146,8 +146,6 @@ export async function buildEmojiGenerateRequest(
       unicode_version: version.unicode_version,
     });
 
-    console.log(groups, emojis);
-
     await fs.ensureDir(join(baseDir, "metadata"));
 
     await fs.writeFile(

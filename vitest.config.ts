@@ -16,7 +16,7 @@ const aliases = readdirSync(new URL("./packages", import.meta.url).pathname)
 
 const hiddenLogs = [
   "[shortcodes]",
-  "[versions]"
+  "[versions]",
 ]
 
 export default defineConfig({
