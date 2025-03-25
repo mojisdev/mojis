@@ -2,6 +2,9 @@ import type { WriteCacheOptions } from "@mojis/internal-utils";
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
 import type { BUILTIN_PARSERS } from "./utils";
 
+/**
+ * A type that can be an array or a single value.
+ */
 export type MaybeArray<T> = T | T[];
 
 /**
@@ -55,6 +58,10 @@ export interface UrlWithCache {
    */
   key?: string;
 }
+
+export type PossibleUrls = MaybeArray<UrlWithCache> | MaybeArray<string> | MaybeArray<undefined>;
+
+export type UrlFn<TOut extends PossibleUrls> = (ctx: AdapterContext) => TOut;
 
 export type BuiltinParser = (typeof BUILTIN_PARSERS)[number];
 
@@ -158,9 +165,9 @@ export interface NormalizedVersionHandler<
 }
 
 export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
-  urls: <TUrls extends AdapterUrls>(
+  urls: <TUrls extends PossibleUrls>(
     urls: TParams["_urls"] extends UnsetMarker
-      ? (ctx: AdapterContext) => TUrls
+      ? UrlFn<TUrls>
       : ErrorMessage<"urls is already set">,
   ) => HandleVersionBuilder<{
     _context: TParams["_context"];

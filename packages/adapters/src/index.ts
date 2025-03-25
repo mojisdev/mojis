@@ -9,6 +9,8 @@ import { AdapterError } from "./errors";
 import { metadata, sequences, unicodeNames, variations } from "./handlers";
 import { buildContext, getHandlerUrls, isBuiltinParser } from "./utils";
 
+export type { AdapterHandlerType } from "./types";
+
 const HANDLERS = {
   metadata,
   sequences,
