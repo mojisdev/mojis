@@ -29,8 +29,6 @@ export async function runAdapterHandler<
       continue;
     }
 
-    console.log(versionHandler);
-
     const urls = await getHandlerUrls(versionHandler.urls(ctx), ctx);
 
     if (urls.length === 0) {
@@ -100,6 +98,6 @@ export async function runAdapterHandler<
     // run output
     const output = versionHandler.output(ctx, aggregatedData);
 
-    return output;
+    return output[0];
   }
 }

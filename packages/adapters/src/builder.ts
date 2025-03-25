@@ -1,23 +1,13 @@
-import type { WriteCacheOptions } from "@mojis/internal-utils";
 import type {
   AdapterContext,
   AdapterHandlerBuilder,
   AdapterHandlerType,
-  AdapterUrls,
-  AggregateFn,
   AnyAdapterHandler,
   AnyHandleVersionParams,
-  BuiltinParser,
-  GetParseOptionsFromParser,
-  GetParseOutputFromBuiltInParser,
   HandleVersionBuilder,
   NormalizedVersionHandler,
-  OutputFn,
-  ParserFn,
   PredicateFn,
-  TransformFn,
   UnsetMarker,
-  WrapInContextFn,
 } from "./types";
 
 function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandlerType>(
@@ -35,7 +25,7 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
 
   return {
     onVersion(predicate, builder) {
-      const versionHandler = builder(createVersionHandlerBuilder());
+      const versionHandler = builder(createVersionHandlerBuilder() as any);
       return internalCreateAdapterHandlerBuilder({
         ..._def,
         versionHandlers: [
@@ -48,6 +38,21 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
       return _def;
     },
   };
+}
+
+export interface CreateBuilderOptions<TAdapterType extends AdapterHandlerType> {
+  type: TAdapterType;
+}
+
+export function createAdapterHandlerBuilder<TAdapterType extends AdapterHandlerType>(
+  opts?: CreateBuilderOptions<TAdapterType>,
+): AdapterHandlerBuilder<{
+    _type: TAdapterType;
+    _versionHandlers: [PredicateFn, NormalizedVersionHandler<AnyHandleVersionParams>][];
+  }> {
+  return internalCreateAdapterHandlerBuilder<TAdapterType>({
+    adapterType: opts?.type,
+  });
 }
 
 function internalCreateVersionHandlerBuilder<TParams extends AnyHandleVersionParams>(
@@ -70,26 +75,26 @@ function internalCreateVersionHandlerBuilder<TParams extends AnyHandleVersionPar
       return internalCreateVersionHandlerBuilder({
         ..._def,
         urls,
-      });
+      }) as HandleVersionBuilder<any>;
     },
     parser(parser, options) {
       return internalCreateVersionHandlerBuilder({
         ..._def,
         parser,
         parserOptions: options,
-      });
+      }) as HandleVersionBuilder<any>;
     },
     transform(transform) {
       return internalCreateVersionHandlerBuilder({
         ..._def,
         transform,
-      });
+      }) as HandleVersionBuilder<any>;
     },
     aggregate(aggregate) {
       return internalCreateVersionHandlerBuilder({
         ..._def,
         aggregate,
-      });
+      }) as HandleVersionBuilder<any>;
     },
     output(output) {
       return {
@@ -101,34 +106,39 @@ function internalCreateVersionHandlerBuilder<TParams extends AnyHandleVersionPar
       return internalCreateVersionHandlerBuilder({
         ..._def,
         cacheOptions,
-      });
+      }) as HandleVersionBuilder<any>;
     },
     fetchOptions(fetchOptions) {
       return internalCreateVersionHandlerBuilder({
         ..._def,
         fetchOptions,
-      });
+      }) as HandleVersionBuilder<any>;
     },
   };
 }
 
-export interface CreateBuilderOptions<TAdapterType extends AdapterHandlerType> {
-  type: TAdapterType;
-}
-
-export function createAdapterHandlerBuilder<TAdapterType extends AdapterHandlerType>(
-  opts?: CreateBuilderOptions<TAdapterType>,
-): AdapterHandlerBuilder<{
-    _type: TAdapterType;
-    _versionHandlers: [PredicateFn, NormalizedVersionHandler<AnyHandleVersionParams>][];
-  }> {
-  return internalCreateAdapterHandlerBuilder<TAdapterType>({
-    adapterType: opts?.type,
-  });
-}
-
-export function createVersionHandlerBuilder<TParams extends AnyHandleVersionParams>(
-  initDef: Partial<NormalizedVersionHandler<TParams>> = {},
-): HandleVersionBuilder<TParams> {
-  return internalCreateVersionHandlerBuilder<TParams>(initDef);
+export function createVersionHandlerBuilder(): HandleVersionBuilder<{
+  _aggregate: {
+    in: UnsetMarker;
+    out: UnsetMarker;
+  };
+  _context: AdapterContext;
+  _urls: UnsetMarker;
+  _output: UnsetMarker;
+  _options: {
+    cacheOptions: UnsetMarker;
+    fetchOptions: UnsetMarker;
+  };
+  _outputType: UnsetMarker;
+  _parser: {
+    parser: UnsetMarker;
+    out: UnsetMarker;
+  };
+  _parserOptions: UnsetMarker;
+  _transform: {
+    in: UnsetMarker;
+    out: UnsetMarker;
+  };
+}> {
+  return internalCreateVersionHandlerBuilder();
 }
