@@ -55,18 +55,32 @@ export function createAdapterHandlerBuilder<TAdapterType extends AdapterHandlerT
   });
 }
 
-function internalCreateVersionHandlerBuilder<TParams extends AnyHandleVersionParams>(
-  initDef: Partial<NormalizedVersionHandler<TParams>> = {},
-): HandleVersionBuilder<TParams> {
-  const _def: NormalizedVersionHandler<TParams> = {
-    urls: () => undefined,
-    parser: "generic",
-    parserOptions: undefined,
-    transform: (_, data) => data,
-    aggregate: (_, data) => data,
-    output: (_, data) => data,
-    cacheOptions: {},
-    fetchOptions: {},
+function internalCreateVersionHandlerBuilder(
+  initDef: Partial<NormalizedVersionHandler<any>> = {},
+): HandleVersionBuilder<{
+    _context: AdapterContext;
+    _urls: UnsetMarker;
+    _aggregate: {
+      in: UnsetMarker;
+      out: UnsetMarker;
+    };
+    _options: {
+      cacheOptions: UnsetMarker;
+      fetchOptions: UnsetMarker;
+    };
+    _output: UnsetMarker;
+    _outputType: UnsetMarker;
+    _parser: {
+      parser: UnsetMarker;
+      out: UnsetMarker;
+    };
+    _parserOptions: UnsetMarker;
+    _transform: {
+      in: UnsetMarker;
+      out: UnsetMarker;
+    };
+  }> {
+  const _def: Partial<NormalizedVersionHandler<any>> = {
     ...initDef,
   };
 
@@ -74,7 +88,7 @@ function internalCreateVersionHandlerBuilder<TParams extends AnyHandleVersionPar
     urls(urls) {
       return internalCreateVersionHandlerBuilder({
         ..._def,
-        urls,
+        urls: typeof urls === "function" ? urls : () => urls,
       }) as HandleVersionBuilder<any>;
     },
     parser(parser, options) {
@@ -100,7 +114,7 @@ function internalCreateVersionHandlerBuilder<TParams extends AnyHandleVersionPar
       return {
         ..._def,
         output,
-      };
+      } as NormalizedVersionHandler<any>;
     },
     cacheOptions(cacheOptions) {
       return internalCreateVersionHandlerBuilder({
