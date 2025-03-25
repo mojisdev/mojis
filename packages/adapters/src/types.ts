@@ -2,9 +2,6 @@ import type { WriteCacheOptions } from "@mojis/internal-utils";
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
 import type { BUILTIN_PARSERS } from "./utils";
 
-/**
- * A type that can be an array or a single value.
- */
 export type MaybeArray<T> = T | T[];
 
 /**
@@ -58,10 +55,6 @@ export interface UrlWithCache {
    */
   key?: string;
 }
-
-export type PossibleUrls = MaybeArray<UrlWithCache> | MaybeArray<string> | MaybeArray<undefined>;
-
-export type UrlFn<TOut extends PossibleUrls> = (ctx: AdapterContext) => TOut;
 
 export type BuiltinParser = (typeof BUILTIN_PARSERS)[number];
 
@@ -165,9 +158,9 @@ export interface NormalizedVersionHandler<
 }
 
 export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
-  urls: <TUrls extends PossibleUrls>(
+  urls: <TUrls extends AdapterUrls>(
     urls: TParams["_urls"] extends UnsetMarker
-      ? UrlFn<TUrls>
+      ? (ctx: AdapterContext) => TUrls
       : ErrorMessage<"urls is already set">,
   ) => HandleVersionBuilder<{
     _context: TParams["_context"];
@@ -302,7 +295,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
 
 export interface AnyAdapterHandlerParams {
   _type: AdapterHandlerType;
-  _versionHandlers: [
+  _handlers: [
     PredicateFn,
     NormalizedVersionHandler<AnyHandleVersionParams>,
   ][];
@@ -324,20 +317,36 @@ export interface AdapterHandlerBuilder<
     ) => NormalizedVersionHandler<AnyHandleVersionParams>,
   ) => AdapterHandlerBuilder<{
     _type: TParams["_type"];
-    _versionHandlers: [
-      ...TParams["_versionHandlers"],
+    _handlers: [
+      ...TParams["_handlers"],
       [TPredicate, NormalizedVersionHandler<AnyHandleVersionParams>],
     ];
   }>;
-  build: () => AdapterHandler;
+  build: () => AdapterHandler<{
+    type: TParams["_type"];
+    handlers: TParams["_handlers"];
+  }>;
 }
 
-export interface AdapterHandler {
-  adapterType: AdapterHandlerType;
-  versionHandlers: [
-    PredicateFn,
-    NormalizedVersionHandler<AnyHandleVersionParams>,
-  ][];
+export interface AnyBuiltAdapterHandlerParams {
+  type: AdapterHandlerType;
+  handlers: [PredicateFn, NormalizedVersionHandler<AnyHandleVersionParams>][];
 }
 
-export type AnyAdapterHandler = AdapterHandler;
+export interface AdapterHandler<TParams extends AnyBuiltAdapterHandlerParams> {
+  adapterType: TParams["type"];
+  handlers: TParams["handlers"];
+}
+
+export type AnyAdapterHandler = AdapterHandler<any>;
+
+export interface AnyBuiltVersionHandlerParams {
+  globalContext: AdapterContext;
+  fetchOptions: RequestInit;
+  cacheOptions: Omit<WriteCacheOptions<unknown>, "transform">;
+  urls: UrlWithCache[];
+}
+
+export interface VersionHandler<TParams extends AnyBuiltVersionHandlerParams> {
+  globalContext: TParams["globalContext"];
+}

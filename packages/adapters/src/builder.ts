@@ -14,11 +14,11 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
   initDef: Partial<AnyAdapterHandler> = {},
 ): AdapterHandlerBuilder<{
     _type: TAdapterType;
-    _versionHandlers: [PredicateFn, NormalizedVersionHandler<AnyHandleVersionParams>][];
+    _handlers: [PredicateFn, NormalizedVersionHandler<AnyHandleVersionParams>][];
   }> {
   const _def: AnyAdapterHandler = {
-    adapterType: initDef.adapterType as AdapterHandlerType,
-    versionHandlers: [],
+    adapterType: initDef.adapterType,
+    handlers: [],
     // Overload with properties passed in
     ...initDef,
   };
@@ -28,11 +28,11 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
       const versionHandler = builder(createVersionHandlerBuilder() as any);
       return internalCreateAdapterHandlerBuilder({
         ..._def,
-        versionHandlers: [
-          ..._def.versionHandlers,
-          [predicate, versionHandler as NormalizedVersionHandler<AnyHandleVersionParams>],
+        handlers: [
+          ..._def.handlers,
+          [predicate, versionHandler],
         ],
-      });
+      }) as AdapterHandlerBuilder<any>;
     },
     build() {
       return _def;
@@ -48,7 +48,7 @@ export function createAdapterHandlerBuilder<TAdapterType extends AdapterHandlerT
   opts?: CreateBuilderOptions<TAdapterType>,
 ): AdapterHandlerBuilder<{
     _type: TAdapterType;
-    _versionHandlers: [PredicateFn, NormalizedVersionHandler<AnyHandleVersionParams>][];
+    _handlers: [PredicateFn, NormalizedVersionHandler<AnyHandleVersionParams>][];
   }> {
   return internalCreateAdapterHandlerBuilder<TAdapterType>({
     adapterType: opts?.type,
@@ -156,3 +156,20 @@ export function createVersionHandlerBuilder(): HandleVersionBuilder<{
 }> {
   return internalCreateVersionHandlerBuilder();
 }
+
+const builder2 = createVersionHandlerBuilder()
+  .urls((ctx) => {
+    return {
+      url: "https://example.com",
+      cacheKey: "example",
+    };
+  })
+  .parser((_, data) => {
+    return data;
+  }).transform((ctx, data) => {
+    return data;
+  }).aggregate((ctx, data) => {
+    return data;
+  }).output((ctx, data) => {
+    return data;
+  });

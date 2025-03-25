@@ -26,7 +26,7 @@ export async function runAdapterHandler<
 ): Promise<any> {
   const handler = HANDLERS[type];
 
-  for (const [predicate, versionHandler] of handler.versionHandlers) {
+  for (const [predicate, versionHandler] of handler.handlers) {
     if (!predicate(ctx.emoji_version)) {
       continue;
     }
