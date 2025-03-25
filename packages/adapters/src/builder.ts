@@ -1,10 +1,13 @@
 import type {
+  AdapterContext,
   AdapterHandlerBuilder,
   AdapterHandlerType,
   AnyAdapterHandler,
   AnyHandleVersionParams,
+  HandleVersionBuilder,
   NormalizedVersionHandler,
   PredicateFn,
+  UnsetMarker,
 } from "./types";
 
 function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandlerType>(
@@ -21,12 +24,13 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
   };
 
   return {
-    onVersion(userPredicate, userBuilder) {
+    onVersion(predicate, builder) {
+      const versionHandler = builder(createVersionHandlerBuilder() as any);
       return internalCreateAdapterHandlerBuilder({
         ..._def,
         versionHandlers: [
           ..._def.versionHandlers,
-          [userPredicate, userBuilder as unknown as NormalizedVersionHandler<AnyHandleVersionParams>],
+          [predicate, versionHandler as NormalizedVersionHandler<AnyHandleVersionParams>],
         ],
       });
     },
@@ -49,4 +53,106 @@ export function createAdapterHandlerBuilder<TAdapterType extends AdapterHandlerT
   return internalCreateAdapterHandlerBuilder<TAdapterType>({
     adapterType: opts?.type,
   });
-};
+}
+
+function internalCreateVersionHandlerBuilder(
+  initDef: Partial<NormalizedVersionHandler<any>> = {},
+): HandleVersionBuilder<{
+    _context: AdapterContext;
+    _urls: UnsetMarker;
+    _aggregate: {
+      in: UnsetMarker;
+      out: UnsetMarker;
+    };
+    _options: {
+      cacheOptions: UnsetMarker;
+      fetchOptions: UnsetMarker;
+    };
+    _output: UnsetMarker;
+    _outputType: UnsetMarker;
+    _parser: {
+      parser: UnsetMarker;
+      out: UnsetMarker;
+    };
+    _parserOptions: UnsetMarker;
+    _transform: {
+      in: UnsetMarker;
+      out: UnsetMarker;
+    };
+  }> {
+  const _def: Partial<NormalizedVersionHandler<any>> = {
+    ...initDef,
+  };
+
+  return {
+    urls(urls) {
+      return internalCreateVersionHandlerBuilder({
+        ..._def,
+        urls: typeof urls === "function" ? urls : () => urls,
+      }) as HandleVersionBuilder<any>;
+    },
+    parser(parser, options) {
+      return internalCreateVersionHandlerBuilder({
+        ..._def,
+        parser,
+        parserOptions: options,
+      }) as HandleVersionBuilder<any>;
+    },
+    transform(transform) {
+      return internalCreateVersionHandlerBuilder({
+        ..._def,
+        transform,
+      }) as HandleVersionBuilder<any>;
+    },
+    aggregate(aggregate) {
+      return internalCreateVersionHandlerBuilder({
+        ..._def,
+        aggregate,
+      }) as HandleVersionBuilder<any>;
+    },
+    output(output) {
+      return {
+        ..._def,
+        output,
+      } as NormalizedVersionHandler<any>;
+    },
+    cacheOptions(cacheOptions) {
+      return internalCreateVersionHandlerBuilder({
+        ..._def,
+        cacheOptions,
+      }) as HandleVersionBuilder<any>;
+    },
+    fetchOptions(fetchOptions) {
+      return internalCreateVersionHandlerBuilder({
+        ..._def,
+        fetchOptions,
+      }) as HandleVersionBuilder<any>;
+    },
+  };
+}
+
+export function createVersionHandlerBuilder(): HandleVersionBuilder<{
+  _aggregate: {
+    in: UnsetMarker;
+    out: UnsetMarker;
+  };
+  _context: AdapterContext;
+  _urls: UnsetMarker;
+  _output: UnsetMarker;
+  _options: {
+    cacheOptions: UnsetMarker;
+    fetchOptions: UnsetMarker;
+  };
+  _outputType: UnsetMarker;
+  _parser: {
+    parser: UnsetMarker;
+    out: UnsetMarker;
+  };
+  _parserOptions: UnsetMarker;
+  _transform: {
+    in: UnsetMarker;
+    out: UnsetMarker;
+  };
+}> {
+  return internalCreateVersionHandlerBuilder();
+}

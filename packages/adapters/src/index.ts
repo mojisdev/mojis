@@ -9,6 +9,8 @@ import { AdapterError } from "./errors";
 import { metadata, sequences, unicodeNames, variations } from "./handlers";
 import { buildContext, getHandlerUrls, isBuiltinParser } from "./utils";
 
+export type { AdapterHandlerType } from "./types";
+
 const HANDLERS = {
   metadata,
   sequences,
@@ -98,6 +100,6 @@ export async function runAdapterHandler<
     // run output
     const output = versionHandler.output(ctx, aggregatedData);
 
-    return output;
+    return output[0];
   }
 }
