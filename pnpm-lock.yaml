@@ -124,6 +124,9 @@ importers:
       semver:
         specifier: catalog:prod
         version: 7.7.1
+      zod:
+        specifier: catalog:prod
+        version: 3.24.2
     devDependencies:
       '@luxass/eslint-config':
         specifier: catalog:dev

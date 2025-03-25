@@ -78,6 +78,7 @@ function internalCreateVersionHandlerBuilder(
       in: UnsetMarker;
       out: UnsetMarker;
     };
+    _validation: UnsetMarker;
   }> {
   const _def: Partial<AnyVersionHandler> = {
     ...initDef,
@@ -121,6 +122,12 @@ function internalCreateVersionHandlerBuilder(
         fetchOptions: userFetchOptions,
       }) as HandleVersionBuilder<any>;
     },
+    validation(userValidation) {
+      return internalCreateVersionHandlerBuilder({
+        ..._def,
+        validation: userValidation,
+      }) as HandleVersionBuilder<any>;
+    },
     output(userOutput) {
       return {
         ..._def,
@@ -152,6 +159,7 @@ export function createVersionHandlerBuilder(): HandleVersionBuilder<{
     in: UnsetMarker;
     out: UnsetMarker;
   };
+  _validation: UnsetMarker;
 }> {
   return internalCreateVersionHandlerBuilder();
 }

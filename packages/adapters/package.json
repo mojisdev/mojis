@@ -38,7 +38,8 @@
   "dependencies": {
     "@mojis/internal-utils": "workspace:*",
     "@mojis/parsers": "workspace:*",
-    "semver": "catalog:prod"
+    "semver": "catalog:prod",
+    "zod": "catalog:prod"
   },
   "devDependencies": {
     "@luxass/eslint-config": "catalog:dev",

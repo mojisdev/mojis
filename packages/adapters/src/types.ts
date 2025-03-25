@@ -1,5 +1,6 @@
 import type { WriteCacheOptions } from "@mojis/internal-utils";
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
+import type { z } from "zod";
 import type { BUILTIN_PARSERS } from "./utils";
 
 /**
@@ -111,6 +112,9 @@ export interface AnyHandleVersionParams {
   // used to infer the output type based on if
   // the handler is using aggregate or not
   _outputType: any;
+
+  // zod validation
+  _validation: any;
 }
 
 export type ErrorMessage<TError extends string> = TError;
@@ -179,6 +183,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _output: TParams["_output"];
     _options: TParams["_options"];
     _outputType: TParams["_outputType"];
+    _validation: TParams["_validation"];
   }>;
 
   parser: <TParser extends BuiltinParser | ParserFn<AdapterContext, any>>(
@@ -198,6 +203,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _context: TParams["_context"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
+    _validation: TParams["_validation"];
     _transform: TParams["_transform"];
     _options: TParams["_options"];
     _parser: {
@@ -223,6 +229,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _context: TParams["_context"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
+    _validation: TParams["_validation"];
     _options: TParams["_options"];
     _transform: {
       in: TIn;
@@ -240,6 +247,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
       : ErrorMessage<"aggregate is already set">,
   ) => HandleVersionBuilder<{
     _context: TParams["_context"];
+    _validation: TParams["_validation"];
     _aggregate: {
       in: TIn;
       out: TOut;
@@ -261,6 +269,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
       : ErrorMessage<"cacheOptions is already set">,
   ) => HandleVersionBuilder<{
     _context: TParams["_context"];
+    _validation: TParams["_validation"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
     _transform: TParams["_transform"];
@@ -280,6 +289,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
       : ErrorMessage<"fetchOptions is already set">,
   ) => HandleVersionBuilder<{
     _context: TParams["_context"];
+    _validation: TParams["_validation"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
     _transform: TParams["_transform"];
@@ -293,7 +303,24 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _outputType: TParams["_outputType"];
   }>;
 
-  output: <TIn extends TParams["_outputType"], TOut>(
+  validation: <TValidation extends z.ZodType>(
+    validation: TParams["_validation"] extends UnsetMarker
+      ? TValidation
+      : ErrorMessage<"validation is already set">,
+  ) => HandleVersionBuilder<{
+    _context: TParams["_context"];
+    _validation: TValidation["_input"];
+    _urls: TParams["_urls"];
+    _aggregate: TParams["_aggregate"];
+    _transform: TParams["_transform"];
+    _parser: TParams["_parser"];
+    _parserOptions: TParams["_parserOptions"];
+    _output: TParams["_output"];
+    _options: TParams["_options"];
+    _outputType: TParams["_outputType"];
+  }>;
+
+  output: <TIn extends TParams["_outputType"], TOut extends TParams["_validation"]>(
     output: TParams["_output"] extends UnsetMarker
       ? OutputFn<AdapterContext, TIn, TOut>
       : ErrorMessage<"output is already set">,
@@ -306,6 +333,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     parser: TParams["_parser"]["parser"];
     transform: TParams["_transform"]["out"];
     aggregate: TParams["_aggregate"]["out"];
+    validation: TParams["_validation"];
     output: TParams["_outputType"];
   }>;
 }
@@ -359,6 +387,7 @@ export interface AnyBuiltVersionHandlerParams {
   transform: TransformFn<AdapterContext, any, any>;
   parser: ParserFn<AdapterContext, any>;
   parserOptions: GetParseOptionsFromParser<any>;
+  validation: z.ZodType;
 }
 
 export interface VersionHandler<TParams extends AnyBuiltVersionHandlerParams> {
@@ -371,6 +400,7 @@ export interface VersionHandler<TParams extends AnyBuiltVersionHandlerParams> {
   transform: TParams["transform"];
   parser: TParams["parser"];
   parserOptions: TParams["parserOptions"];
+  validation: TParams["validation"];
 }
 
 export type AnyVersionHandler = VersionHandler<any>;
