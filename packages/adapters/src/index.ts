@@ -31,7 +31,7 @@ export async function runAdapterHandler<
       continue;
     }
 
-    const urls = await getHandlerUrls(versionHandler.urls(ctx), ctx);
+    const urls = await getHandlerUrls(versionHandler.urls, ctx);
 
     if (urls.length === 0) {
       throw new AdapterError(`No urls found for handler: ${handler.adapterType}`);

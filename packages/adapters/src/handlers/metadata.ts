@@ -2,7 +2,7 @@ import type { EmojiGroup, GroupedEmojiMetadata } from "@mojis/internal-utils";
 import { extractEmojiVersion, extractUnicodeVersion, isBefore } from "@mojis/internal-utils";
 import { EMOJI_GROUP_SCHEMA, GROUPED_EMOJI_METADATA_SCHEMA } from "@mojis/internal-utils/schemas";
 import { z } from "zod";
-import { createAdapterHandlerBuilder } from "../builder";
+import { createAdapterHandlerBuilder, createVersionHandlerBuilder } from "../builder";
 
 function slugify(val: string): string {
   return val.normalize("NFD")
@@ -152,3 +152,12 @@ export const handler = builder
       emojis: {},
     })))
   .build();
+
+const b = createVersionHandlerBuilder().urls(() => {
+  return [
+    {
+      url: "https://unicode-proxy.mojis.dev/proxy/emoji/15.0/emoji-test.txt",
+      cacheKey: "v15.0/metadata",
+    },
+  ];
+}).output((ctx, transformed) => {});

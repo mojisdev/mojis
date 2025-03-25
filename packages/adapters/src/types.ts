@@ -146,28 +146,6 @@ export type WrapContextFn<
   TReturn,
 > = ((ctx: TContext & TExtraContext) => TReturn) | TReturn;
 
-export interface NormalizedVersionHandler<
-  TParams extends AnyHandleVersionParams,
-> {
-  urls: (ctx: AdapterContext) => TParams["_urls"];
-  parser: TParams["_parser"]["parser"];
-  parserOptions: TParams["_parserOptions"];
-  transform: (
-    ctx: AdapterContext,
-    data: TParams["_parser"]["out"],
-  ) => TParams["_transform"]["out"];
-  aggregate: (
-    ctx: AdapterContext,
-    data: TParams["_transform"]["out"],
-  ) => TParams["_aggregate"]["out"];
-  output: (
-    ctx: AdapterContext,
-    data: TParams["_outputType"],
-  ) => TParams["_output"];
-  cacheOptions: TParams["_options"]["cacheOptions"];
-  fetchOptions: TParams["_options"]["fetchOptions"];
-}
-
 export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
   urls: <TUrls extends PossibleUrls>(
     urls: TParams["_urls"] extends UnsetMarker
@@ -328,7 +306,6 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     globalContext: TParams["_context"];
     cacheOptions: TParams["_options"]["cacheOptions"];
     fetchOptions: TParams["_options"]["fetchOptions"];
-    urls: TParams["_urls"];
     parserOptions: TParams["_parserOptions"];
     parser: TParams["_parser"]["parser"];
     transform: TParams["_transform"]["out"];
@@ -381,7 +358,6 @@ export interface AnyBuiltVersionHandlerParams {
   globalContext: AdapterContext;
   fetchOptions: RequestInit;
   cacheOptions: Omit<WriteCacheOptions<unknown>, "transform">;
-  urls: PossibleUrls;
   output: OutputFn<AdapterContext, any, any>;
   aggregate: AggregateFn<AdapterContext, any, any>;
   transform: TransformFn<AdapterContext, any, any>;
@@ -394,7 +370,7 @@ export interface VersionHandler<TParams extends AnyBuiltVersionHandlerParams> {
   globalContext: TParams["globalContext"];
   fetchOptions: TParams["fetchOptions"];
   cacheOptions: TParams["cacheOptions"];
-  urls: UrlFn<TParams["urls"]>;
+  urls: UrlFn<PossibleUrls>;
   output: TParams["output"];
   aggregate: TParams["aggregate"];
   transform: TParams["transform"];
