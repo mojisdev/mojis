@@ -1,6 +1,6 @@
-import type { AdapterContext, MaybeArray, PossibleUrls, UrlFn } from "../src/types";
+import type { AdapterContext, PossibleUrls, UrlFn } from "../src/types";
 import { createCacheKeyFromUrl } from "@mojis/internal-utils";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   buildContext,
   BUILTIN_PARSERS,
