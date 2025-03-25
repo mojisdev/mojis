@@ -3,9 +3,8 @@ import type {
   AdapterHandlerBuilder,
   AdapterHandlerType,
   AnyAdapterHandler,
-  AnyHandleVersionParams,
+  AnyVersionHandler,
   HandleVersionBuilder,
-  NormalizedVersionHandler,
   PredicateFn,
   UnsetMarker,
 } from "./types";
@@ -14,11 +13,11 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
   initDef: Partial<AnyAdapterHandler> = {},
 ): AdapterHandlerBuilder<{
     _type: TAdapterType;
-    _versionHandlers: [PredicateFn, NormalizedVersionHandler<AnyHandleVersionParams>][];
+    _handlers: [PredicateFn, AnyVersionHandler][];
   }> {
   const _def: AnyAdapterHandler = {
-    adapterType: initDef.adapterType as AdapterHandlerType,
-    versionHandlers: [],
+    adapterType: initDef.adapterType,
+    handlers: [],
     // Overload with properties passed in
     ...initDef,
   };
@@ -28,11 +27,11 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
       const versionHandler = builder(createVersionHandlerBuilder() as any);
       return internalCreateAdapterHandlerBuilder({
         ..._def,
-        versionHandlers: [
-          ..._def.versionHandlers,
-          [predicate, versionHandler as NormalizedVersionHandler<AnyHandleVersionParams>],
+        handlers: [
+          ..._def.handlers,
+          [predicate, versionHandler],
         ],
-      });
+      }) as AdapterHandlerBuilder<any>;
     },
     build() {
       return _def;
@@ -48,7 +47,7 @@ export function createAdapterHandlerBuilder<TAdapterType extends AdapterHandlerT
   opts?: CreateBuilderOptions<TAdapterType>,
 ): AdapterHandlerBuilder<{
     _type: TAdapterType;
-    _versionHandlers: [PredicateFn, NormalizedVersionHandler<AnyHandleVersionParams>][];
+    _handlers: [PredicateFn, AnyVersionHandler][];
   }> {
   return internalCreateAdapterHandlerBuilder<TAdapterType>({
     adapterType: opts?.type,
@@ -56,7 +55,7 @@ export function createAdapterHandlerBuilder<TAdapterType extends AdapterHandlerT
 }
 
 function internalCreateVersionHandlerBuilder(
-  initDef: Partial<NormalizedVersionHandler<any>> = {},
+  initDef: Partial<AnyVersionHandler> = {},
 ): HandleVersionBuilder<{
     _context: AdapterContext;
     _urls: UnsetMarker;
@@ -80,53 +79,53 @@ function internalCreateVersionHandlerBuilder(
       out: UnsetMarker;
     };
   }> {
-  const _def: Partial<NormalizedVersionHandler<any>> = {
+  const _def: Partial<AnyVersionHandler> = {
     ...initDef,
   };
 
   return {
-    urls(urls) {
+    urls(userUrls) {
       return internalCreateVersionHandlerBuilder({
         ..._def,
-        urls: typeof urls === "function" ? urls : () => urls,
+        urls: userUrls,
       }) as HandleVersionBuilder<any>;
     },
-    parser(parser, options) {
+    parser(userParser, userParserOptions) {
       return internalCreateVersionHandlerBuilder({
         ..._def,
-        parser,
-        parserOptions: options,
+        parser: userParser,
+        parserOptions: userParserOptions,
       }) as HandleVersionBuilder<any>;
     },
-    transform(transform) {
+    transform(userTransform) {
       return internalCreateVersionHandlerBuilder({
         ..._def,
-        transform,
+        transform: userTransform,
       }) as HandleVersionBuilder<any>;
     },
-    aggregate(aggregate) {
+    aggregate(userAggregate) {
       return internalCreateVersionHandlerBuilder({
         ..._def,
-        aggregate,
+        aggregate: userAggregate,
       }) as HandleVersionBuilder<any>;
     },
-    output(output) {
+    cacheOptions(userCacheOptions) {
+      return internalCreateVersionHandlerBuilder({
+        ..._def,
+        cacheOptions: userCacheOptions,
+      }) as HandleVersionBuilder<any>;
+    },
+    fetchOptions(userFetchOptions) {
+      return internalCreateVersionHandlerBuilder({
+        ..._def,
+        fetchOptions: userFetchOptions,
+      }) as HandleVersionBuilder<any>;
+    },
+    output(userOutput) {
       return {
         ..._def,
-        output,
-      } as NormalizedVersionHandler<any>;
-    },
-    cacheOptions(cacheOptions) {
-      return internalCreateVersionHandlerBuilder({
-        ..._def,
-        cacheOptions,
-      }) as HandleVersionBuilder<any>;
-    },
-    fetchOptions(fetchOptions) {
-      return internalCreateVersionHandlerBuilder({
-        ..._def,
-        fetchOptions,
-      }) as HandleVersionBuilder<any>;
+        output: userOutput,
+      } as AnyVersionHandler;
     },
   };
 }

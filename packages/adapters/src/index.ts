@@ -1,7 +1,7 @@
 import type {
   AdapterContext,
-  AdapterHandler,
   AdapterHandlerType,
+  AnyAdapterHandler,
 } from "./types";
 import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
@@ -16,7 +16,7 @@ const HANDLERS = {
   sequences,
   "unicode-names": unicodeNames,
   variations,
-} satisfies Record<AdapterHandlerType, AdapterHandler>;
+} satisfies Record<AdapterHandlerType, AnyAdapterHandler>;
 
 export async function runAdapterHandler<
   TAdapterHandlerType extends AdapterHandlerType,
@@ -26,7 +26,7 @@ export async function runAdapterHandler<
 ): Promise<any> {
   const handler = HANDLERS[type];
 
-  for (const [predicate, versionHandler] of handler.versionHandlers) {
+  for (const [predicate, versionHandler] of handler.handlers) {
     if (!predicate(ctx.emoji_version)) {
       continue;
     }

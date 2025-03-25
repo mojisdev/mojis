@@ -32,9 +32,12 @@ export const handler = builder
       };
     })
       .parser((_, data) => {
+        //        ^?
         return data.split("\n");
       })
       .transform((ctx, lines) => {
+        //              ^?
+
         let currentGroup: EmojiGroup | undefined;
 
         const groups: EmojiGroup[] = [];
@@ -130,6 +133,7 @@ export const handler = builder
         };
       })
       .output((ctx, transformed) => {
+        //            ^?
         return transformed;
       }),
   )

@@ -16,11 +16,6 @@ export type AdapterHandlerType =
   | "unicode-names"
   | "sequences";
 
-export type AdapterUrls =
-  | MaybeArray<string>
-  | MaybeArray<undefined>
-  | MaybeArray<UrlWithCache>;
-
 export interface AdapterContext {
   /**
    * The emoji version.
@@ -59,7 +54,10 @@ export interface UrlWithCache {
   key?: string;
 }
 
-export type PossibleUrls = MaybeArray<UrlWithCache> | MaybeArray<string> | MaybeArray<undefined>;
+export type PossibleUrls =
+  | MaybeArray<UrlWithCache>
+  | MaybeArray<string>
+  | MaybeArray<undefined>;
 
 export type UrlFn<TOut extends PossibleUrls> = (ctx: AdapterContext) => TOut;
 
@@ -76,12 +74,14 @@ export type GetParseOptionsFromParser<TParser extends string> =
 export type GetParseOutputFromBuiltInParser<TParser extends BuiltinParser> =
   TParser extends "generic" ? GenericParseResult : never;
 
-export type InferParseOutput<TContext extends AdapterContext, TParser> =
-  TParser extends BuiltinParser
-    ? GetParseOutputFromBuiltInParser<TParser>
-    : TParser extends ParserFn<TContext, infer TOutput>
-      ? TOutput
-      : never;
+export type InferParseOutput<
+  TContext extends AdapterContext,
+  TParser,
+> = TParser extends BuiltinParser
+  ? GetParseOutputFromBuiltInParser<TParser>
+  : TParser extends ParserFn<TContext, infer TOutput>
+    ? TOutput
+    : never;
 
 export type UnsetMarker = "unsetMarker" & {
   __brand: "unsetMarker";
@@ -122,7 +122,7 @@ export type TransformFn<TContext extends AdapterContext, TIn, TOut> = (
 
 export type AggregateFn<TContext extends AdapterContext, TIn, TOut> = (
   ctx: TContext,
-  data: [TIn, ...TIn[]],
+  data: TIn[],
 ) => TOut;
 
 export type OutputFn<TContext extends AdapterContext, TIn, TOut> = (
@@ -188,7 +188,11 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     options?: TParser extends BuiltinParser
       ?
       | GetParseOptionsFromParser<TParser>
-      | WrapInContextFn<AdapterContext, { key: string }, GetParseOptionsFromParser<TParser>>
+      | WrapInContextFn<
+        AdapterContext,
+        { key: string },
+        GetParseOptionsFromParser<TParser>
+      >
       : never,
   ) => HandleVersionBuilder<{
     _context: TParams["_context"];
@@ -198,7 +202,11 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _options: TParams["_options"];
     _parser: {
       parser: TParser;
-      out: TParser extends ParserFn<AdapterContext, infer TOut> ? TOut : TParser extends BuiltinParser ? GetParseOutputFromBuiltInParser<TParser> : never;
+      out: TParser extends ParserFn<AdapterContext, infer TOut>
+        ? TOut
+        : TParser extends BuiltinParser
+          ? GetParseOutputFromBuiltInParser<TParser>
+          : never;
     };
     _parserOptions: TParser extends BuiltinParser
       ? GetParseOptionsFromParser<TParser>
@@ -245,7 +253,9 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _outputType: TOut;
   }>;
 
-  cacheOptions: <TOptions extends Omit<WriteCacheOptions<unknown>, "transform">>(
+  cacheOptions: <
+    TOptions extends Omit<WriteCacheOptions<unknown>, "transform">,
+  >(
     cacheOptions: TParams["_options"]["cacheOptions"] extends UnsetMarker
       ? TOptions
       : ErrorMessage<"cacheOptions is already set">,
@@ -287,25 +297,22 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     output: TParams["_output"] extends UnsetMarker
       ? OutputFn<AdapterContext, TIn, TOut>
       : ErrorMessage<"output is already set">,
-  ) => NormalizedVersionHandler<{
-    _context: TParams["_context"];
-    _urls: TParams["_urls"];
-    _aggregate: TParams["_aggregate"];
-    _options: TParams["_options"];
-    _transform: TParams["_transform"];
-    _parser: TParams["_parser"];
-    _parserOptions: TParams["_parserOptions"];
-    _output: TOut;
-    _outputType: TParams["_outputType"];
+  ) => VersionHandler<{
+    globalContext: TParams["_context"];
+    cacheOptions: TParams["_options"]["cacheOptions"];
+    fetchOptions: TParams["_options"]["fetchOptions"];
+    urls: TParams["_urls"];
+    parserOptions: TParams["_parserOptions"];
+    parser: TParams["_parser"]["parser"];
+    transform: TParams["_transform"]["out"];
+    aggregate: TParams["_aggregate"]["out"];
+    output: TParams["_outputType"];
   }>;
 }
 
 export interface AnyAdapterHandlerParams {
   _type: AdapterHandlerType;
-  _versionHandlers: [
-    PredicateFn,
-    NormalizedVersionHandler<AnyHandleVersionParams>,
-  ][];
+  _handlers: [PredicateFn, AnyVersionHandler][];
 }
 
 export type PredicateFn = (version: string) => boolean;
@@ -319,25 +326,51 @@ export interface AdapterHandlerBuilder<
     TBuilder extends HandleVersionBuilder<TBuilderParams>,
   >(
     predicate: TPredicate,
-    builder: (
-      builder: TBuilder,
-    ) => NormalizedVersionHandler<AnyHandleVersionParams>,
+    builder: (builder: TBuilder) => AnyVersionHandler,
   ) => AdapterHandlerBuilder<{
     _type: TParams["_type"];
-    _versionHandlers: [
-      ...TParams["_versionHandlers"],
-      [TPredicate, NormalizedVersionHandler<AnyHandleVersionParams>],
-    ];
+    _handlers: [...TParams["_handlers"], [TPredicate, AnyVersionHandler]];
   }>;
-  build: () => AdapterHandler;
+  build: () => AdapterHandler<{
+    type: TParams["_type"];
+    handlers: TParams["_handlers"];
+  }>;
 }
 
-export interface AdapterHandler {
-  adapterType: AdapterHandlerType;
-  versionHandlers: [
-    PredicateFn,
-    NormalizedVersionHandler<AnyHandleVersionParams>,
-  ][];
+export interface AnyBuiltAdapterHandlerParams {
+  type: AdapterHandlerType;
+  handlers: [PredicateFn, AnyVersionHandler][];
 }
 
-export type AnyAdapterHandler = AdapterHandler;
+export interface AdapterHandler<TParams extends AnyBuiltAdapterHandlerParams> {
+  adapterType: TParams["type"];
+  handlers: TParams["handlers"];
+}
+
+export type AnyAdapterHandler = AdapterHandler<any>;
+
+export interface AnyBuiltVersionHandlerParams {
+  globalContext: AdapterContext;
+  fetchOptions: RequestInit;
+  cacheOptions: Omit<WriteCacheOptions<unknown>, "transform">;
+  urls: PossibleUrls;
+  output: OutputFn<AdapterContext, any, any>;
+  aggregate: AggregateFn<AdapterContext, any, any>;
+  transform: TransformFn<AdapterContext, any, any>;
+  parser: ParserFn<AdapterContext, any>;
+  parserOptions: GetParseOptionsFromParser<any>;
+}
+
+export interface VersionHandler<TParams extends AnyBuiltVersionHandlerParams> {
+  globalContext: TParams["globalContext"];
+  fetchOptions: TParams["fetchOptions"];
+  cacheOptions: TParams["cacheOptions"];
+  urls: UrlFn<TParams["urls"]>;
+  output: TParams["output"];
+  aggregate: TParams["aggregate"];
+  transform: TParams["transform"];
+  parser: TParams["parser"];
+  parserOptions: TParams["parserOptions"];
+}
+
+export type AnyVersionHandler = VersionHandler<any>;
