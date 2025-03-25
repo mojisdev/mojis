@@ -1,6 +1,5 @@
 import type {
   AdapterContext,
-  AdapterHandler,
   AdapterHandlerType,
   AnyAdapterHandler,
 } from "./types";
