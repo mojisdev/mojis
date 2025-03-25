@@ -41,3 +41,11 @@ export const EMOJI_METADATA_SCHEMA = z.object({
   emoji: z.string().nullable(),
   hexcodes: z.array(z.string()),
 });
+
+export const GROUPED_EMOJI_METADATA_SCHEMA = z.record(
+  z.string(),
+  z.record(
+    z.string(),
+    EMOJI_METADATA_SCHEMA,
+  ),
+);

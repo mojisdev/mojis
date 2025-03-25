@@ -1,13 +1,11 @@
 import type { z } from "zod";
-import type { EMOJI_SPEC_RECORD_SCHEMA, SHORTCODE_PROVIDER_SCHEMA } from "./schemas";
+import type { EMOJI_GROUP_SCHEMA, EMOJI_SPEC_RECORD_SCHEMA, GROUPED_EMOJI_METADATA_SCHEMA, SHORTCODE_PROVIDER_SCHEMA } from "./schemas";
 
 export type EmojiSpecRecord = z.infer<typeof EMOJI_SPEC_RECORD_SCHEMA>;
 
-export interface EmojiGroup {
-  name: string;
-  slug: string;
-  subgroups: string[];
-}
+export type EmojiGroup = z.infer<typeof EMOJI_GROUP_SCHEMA>;
+
+export type GroupedEmojiMetadata = z.infer<typeof GROUPED_EMOJI_METADATA_SCHEMA>;
 
 export interface EmojiMetadata {
   group: string;

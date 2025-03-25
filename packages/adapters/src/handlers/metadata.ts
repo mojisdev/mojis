@@ -1,5 +1,7 @@
-import type { EmojiGroup, EmojiMetadata } from "@mojis/internal-utils";
+import type { EmojiGroup, EmojiMetadata, GroupedEmojiMetadata } from "@mojis/internal-utils";
 import { extractEmojiVersion, extractUnicodeVersion, isBefore } from "@mojis/internal-utils";
+import { EMOJI_GROUP_SCHEMA, GROUPED_EMOJI_METADATA_SCHEMA } from "@mojis/internal-utils/schemas";
+import { z } from "zod";
 import { createAdapterHandlerBuilder } from "../builder";
 
 function slugify(val: string): string {
@@ -25,12 +27,17 @@ const builder = createAdapterHandlerBuilder({
 export const handler = builder
   .onVersion(
     (emoji_version) => !DISALLOWED_EMOJI_VERSIONS.includes(emoji_version),
-    (builder) => builder.urls((ctx) => {
-      return {
-        url: `https://unicode-proxy.mojis.dev/proxy/emoji/${ctx.emoji_version}/emoji-test.txt`,
-        cacheKey: `v${ctx.emoji_version}/metadata`,
-      };
-    })
+    (builder) => builder
+      .validation(z.object({
+        groups: z.array(EMOJI_GROUP_SCHEMA),
+        emojis: GROUPED_EMOJI_METADATA_SCHEMA,
+      }))
+      .urls((ctx) => {
+        return {
+          url: `https://unicode-proxy.mojis.dev/proxy/emoji/${ctx.emoji_version}/emoji-test.txt`,
+          cacheKey: `v${ctx.emoji_version}/metadata`,
+        };
+      })
       .parser((_, data) => {
         //        ^?
         return data.split("\n");
@@ -43,7 +50,7 @@ export const handler = builder
         const groups: EmojiGroup[] = [];
 
         // [group-subgroup][hexcode] = metadata
-        const emojis: Record<string, Record<string, EmojiMetadata>> = {};
+        const emojis: GroupedEmojiMetadata = {};
 
         for (const line of lines) {
           if (line.trim() === "") {
