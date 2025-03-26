@@ -94,14 +94,15 @@ export async function getHandlerUrls<TContext extends AdapterContext>(
       return createUrlWithCache(url);
     }
 
-    // if the url object is missing a key, or cacheKey.
-    // we need to create a new url object with a key.
-    if (!("key" in url) || typeof url.key !== "string" || url.key == null) {
-      url.key = createCacheKeyFromUrl(url.url);
-    }
-
+    // generate cacheKey if not provided
     if (!("cacheKey" in url) || typeof url.cacheKey !== "string" || url.cacheKey == null) {
       url.cacheKey = createCacheKeyFromUrl(url.url);
+    }
+
+    // generate key if not provided
+    // use cacheKey as key, if provided
+    if (!("key" in url) || typeof url.key !== "string" || url.key == null) {
+      url.key = url.cacheKey;
     }
 
     return url;
