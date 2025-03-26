@@ -1,6 +1,7 @@
 import type { GenericParseResult } from "@mojis/parsers";
 import type { AdapterContext } from "../src/types";
 import { describe, expect, it } from "vitest";
+import { z } from "zod";
 import { createVersionHandlerBuilder } from "../src/builder";
 
 describe("version handler builder", () => {
@@ -148,5 +149,19 @@ describe("version handler builder", () => {
       step1: true,
       step2: true,
     });
+  });
+
+  it("validates data", () => {
+    const handler = createVersionHandlerBuilder()
+      .urls(() => "https://example.com")
+      .parser("generic")
+      .validation(z.object({ id: z.string() }))
+      .transform(() => ({
+        id: "hello-world",
+      }))
+      .output((_, data) => data);
+
+    const result = handler.transform(emptyContext, { totalLines: 1, lines: [{ comment: "", fields: ["id: hello-world"], property: "" }] });
+    expect(result).toEqual({ id: "hello-world" });
   });
 });
