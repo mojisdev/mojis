@@ -2,6 +2,8 @@ import type {
   AdapterContext,
   AdapterHandlerType,
   AnyAdapterHandler,
+  AnyVersionHandler,
+  PredicateFn,
 } from "./types";
 import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
@@ -26,80 +28,92 @@ export async function runAdapterHandler<
 ): Promise<any> {
   const handler = HANDLERS[type];
 
+  const promises = [];
+
   for (const [predicate, versionHandler] of handler.handlers) {
     if (!predicate(ctx.emoji_version)) {
       continue;
     }
 
-    const urls = await getHandlerUrls(versionHandler.urls, ctx);
+    promises.push(runVersionHandler(ctx, versionHandler, handler.adapterType));
+  }
 
-    if (urls.length === 0) {
-      throw new AdapterError(`No urls found for handler: ${handler.adapterType}`);
-    }
+  const result = await Promise.all(promises);
+  return result[0];
+}
 
-    // fetch all the data from the urls
-    const dataRequests = urls.map(async (url) => {
-      const key = url.cacheKey;
-      const result = await fetchCache(url.url, {
-        cacheKey: url.cacheKey,
-        parser(data) {
-          if (isBuiltinParser(versionHandler.parser)) {
-            if (versionHandler.parser === "generic") {
-              const parserOptions = typeof versionHandler.parserOptions === "function"
-                ? versionHandler.parserOptions(
-                    buildContext(ctx, {
-                      key,
-                    }),
-                  )
-                : versionHandler.parserOptions;
+export async function runVersionHandler<THandler extends AnyVersionHandler>(
+  ctx: AdapterContext,
+  handler: THandler,
+  adapterHandlerType: AdapterHandlerType,
+): Promise<THandler["output"]> {
+  const urls = await getHandlerUrls(handler.urls, ctx);
 
-              return genericParse(data, {
-                separator: parserOptions?.separator ?? ";",
-                commentPrefix: parserOptions?.commentPrefix ?? "#",
-                defaultProperty: parserOptions?.defaultProperty ?? "",
-                propertyMap: parserOptions?.propertyMap ?? {},
-              });
-            }
+  if (urls.length === 0) {
+    throw new AdapterError(`no urls found for handler: ${adapterHandlerType}`);
+  }
 
-            throw new AdapterError(`Parser "${versionHandler.parser}" is not implemented.`);
+  // fetch all the data from the urls
+  const dataRequests = urls.map(async (url) => {
+    const key = url.cacheKey;
+    const result = await fetchCache(url.url, {
+      cacheKey: url.cacheKey,
+      parser(data) {
+        if (isBuiltinParser(handler.parser)) {
+          if (handler.parser === "generic") {
+            const parserOptions = typeof handler.parserOptions === "function"
+              ? handler.parserOptions(
+                  buildContext(ctx, {
+                    key,
+                  }),
+                )
+              : handler.parserOptions;
+
+            return genericParse(data, {
+              separator: parserOptions?.separator ?? ";",
+              commentPrefix: parserOptions?.commentPrefix ?? "#",
+              defaultProperty: parserOptions?.defaultProperty ?? "",
+              propertyMap: parserOptions?.propertyMap ?? {},
+            });
           }
 
-          return versionHandler.parser(ctx, data);
-        },
-        ttl: versionHandler.cacheOptions?.ttl,
-        cacheFolder: versionHandler.cacheOptions?.cacheFolder,
-        encoding: versionHandler.cacheOptions?.encoding,
-        options: versionHandler.fetchOptions,
-        bypassCache: ctx.force,
-      });
-      return [key, result] as [string, typeof result];
+          throw new AdapterError(`Parser "${handler.parser}" is not implemented.`);
+        }
+
+        return handler.parser(ctx, data);
+      },
+      ttl: handler.cacheOptions?.ttl,
+      cacheFolder: handler.cacheOptions?.cacheFolder,
+      encoding: handler.cacheOptions?.encoding,
+      options: handler.fetchOptions,
+      bypassCache: ctx.force,
     });
+    return [key, result] as [string, typeof result];
+  });
 
-    const dataResults = await Promise.all(dataRequests);
+  const dataResults = await Promise.all(dataRequests);
 
-    const transformedDataList = [];
+  const transformedDataList = [];
 
-    // run transform for each data in list
-    for (const [key, data] of dataResults) {
-      // Narrow the type of data based on the parser type
-      const transformedData = versionHandler.transform(buildContext(ctx, {
-        key,
-      }), data as any);
+  // run transform for each data in list
+  for (const [key, data] of dataResults) {
+    // Narrow the type of data based on the parser type
+    const transformedData = handler.transform(buildContext(ctx, {
+      key,
+    }), data as any);
 
-      transformedDataList.push(transformedData);
-    }
-
-    // only run aggregate if defined, but still call output
-    if (!versionHandler.aggregate) {
-      const data = transformedDataList.length === 1 ? transformedDataList[0] : transformedDataList;
-      return versionHandler.output(ctx, data);
-    }
-
-    const aggregatedData = versionHandler.aggregate(ctx, transformedDataList);
-
-    // run output
-    const output = versionHandler.output(ctx, aggregatedData);
-
-    return output[0];
+    transformedDataList.push(transformedData);
   }
+
+  let output: THandler["output"];
+
+  if (!handler.aggregate) {
+    const data = transformedDataList.length === 1 ? transformedDataList[0] : transformedDataList;
+    output = handler.output(ctx, data);
+  } else {
+    const aggregatedData = handler.aggregate(ctx, transformedDataList);
+    output = handler.output(ctx, aggregatedData);
+  }
+
+  return output;
 }
