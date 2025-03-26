@@ -1,4 +1,4 @@
-import type { AdapterContext, AdapterHandlerType, AnyAdapterHandler, AnyVersionHandler, PredicateFn } from "../src/types";
+import type { AdapterContext, AdapterHandlerType } from "../src/types";
 import { describe, expect, it, vi } from "vitest";
 import { HttpResponse, mockFetch } from "../../../test/msw-utils/msw";
 import { createVersionHandlerBuilder } from "../src/builder";

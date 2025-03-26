@@ -3,7 +3,6 @@ import type {
   AdapterHandlerType,
   AnyAdapterHandler,
   AnyVersionHandler,
-  PredicateFn,
 } from "./types";
 import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
