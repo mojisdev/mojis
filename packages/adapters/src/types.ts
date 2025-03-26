@@ -298,7 +298,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _outputType: TParams["_outputType"];
   }>;
 
-  output: <TIn extends TParams["_outputType"], TOut extends TParams["_validation"]>(
+  output: <TIn extends TParams["_outputType"], TOut extends TParams["_validation"] extends UnsetMarker ? any : TParams["_validation"]>(
     output: TParams["_output"] extends UnsetMarker
       ? OutputFn<AdapterContext, TIn, TOut>
       : ErrorMessage<"output is already set">,
@@ -308,6 +308,8 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     fetchOptions: TParams["_options"]["fetchOptions"];
     parserOptions: TParams["_parserOptions"];
     parser: TParams["_parser"]["parser"];
+    parserOutput: TParams["_parser"]["out"];
+    urls: TParams["_urls"];
     transform: TParams["_transform"]["out"];
     aggregate: TParams["_aggregate"]["out"];
     validation: TParams["_validation"];
@@ -358,25 +360,27 @@ export interface AnyBuiltVersionHandlerParams {
   globalContext: AdapterContext;
   fetchOptions: RequestInit;
   cacheOptions: Omit<WriteCacheOptions<unknown>, "transform">;
-  output: OutputFn<AdapterContext, any, any>;
-  aggregate: AggregateFn<AdapterContext, any, any>;
-  transform: TransformFn<AdapterContext, any, any>;
-  parser: ParserFn<AdapterContext, any>;
+  parser: any;
   parserOptions: GetParseOptionsFromParser<any>;
+  parserOutput: any;
   validation: z.ZodType;
+  urls: PossibleUrls;
+  transform: any;
+  aggregate: any;
+  output: any;
 }
 
 export interface VersionHandler<TParams extends AnyBuiltVersionHandlerParams> {
   globalContext: TParams["globalContext"];
   fetchOptions: TParams["fetchOptions"];
   cacheOptions: TParams["cacheOptions"];
-  urls: UrlFn<PossibleUrls>;
-  output: TParams["output"];
-  aggregate: TParams["aggregate"];
-  transform: TParams["transform"];
   parser: TParams["parser"];
   parserOptions: TParams["parserOptions"];
   validation: TParams["validation"];
+  urls: UrlFn<TParams["urls"]>;
+  transform: TransformFn<TParams["globalContext"], TParams["parserOutput"], TParams["transform"]>;
+  aggregate: AggregateFn<TParams["globalContext"], TParams["transform"], TParams["aggregate"]>;
+  output: TParams["output"];
 }
 
 export type AnyVersionHandler = VersionHandler<any>;

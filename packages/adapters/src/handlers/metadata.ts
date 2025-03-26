@@ -152,12 +152,3 @@ export const handler = builder
       emojis: {},
     })))
   .build();
-
-const b = createVersionHandlerBuilder().urls(() => {
-  return [
-    {
-      url: "https://unicode-proxy.mojis.dev/proxy/emoji/15.0/emoji-test.txt",
-      cacheKey: "v15.0/metadata",
-    },
-  ];
-}).output((ctx, transformed) => {});
