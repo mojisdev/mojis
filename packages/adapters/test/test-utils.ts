@@ -1,24 +1,24 @@
 /* eslint-disable ts/explicit-function-return-type */
-import type { AdapterHandlerType, AnyAdapterHandler } from "../src/types";
+import type { AdapterHandlerType, AnyVersionHandler, PredicateFn } from "../src/types";
 import { vi } from "vitest";
 
 export function createMockHandlers() {
   return {
     metadata: {
       adapterType: "metadata",
-      handlers: [] as AnyAdapterHandler[],
+      handlers: [] as [PredicateFn, AnyVersionHandler][],
     },
     sequences: {
       adapterType: "sequences",
-      handlers: [] as AnyAdapterHandler[],
+      handlers: [] as [PredicateFn, AnyVersionHandler][],
     },
     unicodeNames: {
       adapterType: "unicode-names",
-      handlers: [] as AnyAdapterHandler[],
+      handlers: [] as [PredicateFn, AnyVersionHandler][],
     },
     variations: {
       adapterType: "variations",
-      handlers: [] as AnyAdapterHandler[],
+      handlers: [] as [PredicateFn, AnyVersionHandler][],
     },
   } as const;
 }
@@ -40,12 +40,17 @@ export async function setupAdapterTest() {
 }
 
 export function addHandlerToMock(
-  mockHandlers: any,
+  mockHandlers: ReturnType<typeof createMockHandlers>,
   type: AdapterHandlerType,
   versionPredicate: (version: string) => boolean,
-  handler: any,
+  handler: AnyVersionHandler,
 ): void {
-  mockHandlers[type].handlers.push([versionPredicate, handler]);
+  let _type: string = type;
+  if (type === "unicode-names") {
+    _type = "unicodeNames";
+  }
+
+  mockHandlers[_type as keyof typeof mockHandlers].handlers.push([versionPredicate, handler]);
 }
 
 export function cleanupAdapterTest(): void {
