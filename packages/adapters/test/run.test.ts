@@ -1,29 +1,8 @@
 import type { AdapterContext, AdapterHandlerType } from "../src/types";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { HttpResponse, mockFetch } from "../../../test/msw-utils/msw";
 import { createVersionHandlerBuilder } from "../src/builder";
-import * as handlers from "../src/handlers";
-import { runAdapterHandler } from "../src/index";
-
-// mock the handlers module
-vi.mock("../src/handlers", () => ({
-  metadata: {
-    adapterType: "metadata",
-    handlers: [],
-  },
-  sequences: {
-    adapterType: "sequences",
-    handlers: [],
-  },
-  unicodeNames: {
-    adapterType: "unicode-names",
-    handlers: [],
-  },
-  variations: {
-    adapterType: "variations",
-    handlers: [],
-  },
-}));
+import { addHandlerToMock, cleanupAdapterTest, setupAdapterTest } from "./test-utils";
 
 describe("runAdapterHandler", () => {
   const mockContext: AdapterContext = {
@@ -32,39 +11,59 @@ describe("runAdapterHandler", () => {
     force: false,
   };
 
+  // Clean up after each test to ensure isolation
+  afterEach(() => {
+    cleanupAdapterTest();
+  });
+
   it("should throw error for invalid handler type", async () => {
+    const { runAdapterHandler } = await setupAdapterTest();
+
     await expect(runAdapterHandler("invalid" as AdapterHandlerType, mockContext))
       .rejects
       .toThrow();
   });
 
   it("should return undefined when no handlers match version", async () => {
+    const { runAdapterHandler } = await setupAdapterTest();
+
     const result = await runAdapterHandler("metadata", mockContext);
     expect(result).toBeUndefined();
   });
 
   it("should run matching version handler", async () => {
     mockFetch([
-      ["GET https://mojis.dev/1", () => HttpResponse.text("mojis.dev/1")],
-      ["GET https://mojis.dev/2", () => HttpResponse.text("mojis.dev/2")],
+      ["GET https://mojis.dev/run-matching-version-handler/1", () => HttpResponse.text("mojis.dev/run-matching-version-handler/1")],
+      ["GET https://mojis.dev/run-matching-version-handler/2", () => HttpResponse.text("mojis.dev/run-matching-version-handler/2")],
     ]);
 
+    const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
+
     const mockHandler = createVersionHandlerBuilder()
-      .urls(() => "https://mojis.dev/1")
+      .urls(() => "https://mojis.dev/run-matching-version-handler/1")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler1" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
     const mockHandler2 = createVersionHandlerBuilder()
-      .urls(() => "https://mojis.dev/2")
+      .urls(() => "https://mojis.dev/run-matching-version-handler/2")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler2" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    // mock the handlers module with a matching version handler
-    vi.mocked(handlers.metadata).handlers.push(
-      [(version: string) => version === "15.0", mockHandler],
-      [(version: string) => version === "14.0", mockHandler2],
+    // add handlers to the mock handlers
+    addHandlerToMock(
+      mockHandlers,
+      "metadata",
+      (version: string) => version === "15.0",
+      mockHandler,
+    );
+
+    addHandlerToMock(
+      mockHandlers,
+      "metadata",
+      (version: string) => version === "14.0",
+      mockHandler2,
     );
 
     const result = await runAdapterHandler("metadata", mockContext);
@@ -74,34 +73,51 @@ describe("runAdapterHandler", () => {
 
   it("should run first matching version handler when multiple match", async () => {
     mockFetch([
-      ["GET https://mojis.dev/1", () => HttpResponse.text("mojis.dev/1")],
-      ["GET https://mojis.dev/2", () => HttpResponse.text("mojis.dev/2")],
-      ["GET https://mojis.dev/3", () => HttpResponse.text("mojis.dev/3")],
+      ["GET https://mojis.dev/run-first-matching-version-handler/1", () => HttpResponse.text("mojis.dev/run-first-matching-version-handler/1")],
+      ["GET https://mojis.dev/run-first-matching-version-handler/2", () => HttpResponse.text("mojis.dev/run-first-matching-version-handler/2")],
+      ["GET https://mojis.dev/run-first-matching-version-handler/3", () => HttpResponse.text("mojis.dev/run-first-matching-version-handler/3")],
     ]);
 
+    const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
+
     const mockHandler1 = createVersionHandlerBuilder()
-      .urls(() => "https://mojis.dev/1")
+      .urls(() => "https://mojis.dev/run-first-matching-version-handler/1")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler1" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
     const mockHandler2 = createVersionHandlerBuilder()
-      .urls(() => "https://mojis.dev/2")
+      .urls(() => "https://mojis.dev/run-first-matching-version-handler/2")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler2" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
     const mockHandler3 = createVersionHandlerBuilder()
-      .urls(() => "https://mojis.dev/3")
+      .urls(() => "https://mojis.dev/run-first-matching-version-handler/3")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler3" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    // mock the handlers module with multiple matching version handlers
-    vi.mocked(handlers.metadata).handlers.push(
-      [(version: string) => version === "15.0", mockHandler1],
-      [(version: string) => version === "15.0", mockHandler2],
-      [(version: string) => version === "14.0", mockHandler3],
+    // add multiple matching handlers
+    addHandlerToMock(
+      mockHandlers,
+      "metadata",
+      (version: string) => version === "15.0",
+      mockHandler1,
+    );
+
+    addHandlerToMock(
+      mockHandlers,
+      "metadata",
+      (version: string) => version === "15.0",
+      mockHandler2,
+    );
+
+    addHandlerToMock(
+      mockHandlers,
+      "metadata",
+      (version: string) => version === "14.0",
+      mockHandler3,
     );
 
     const result = await runAdapterHandler("metadata", mockContext);
@@ -111,26 +127,37 @@ describe("runAdapterHandler", () => {
 
   it("should handle multiple URLs", async () => {
     mockFetch([
-      ["GET https://mojis.dev/1", () => HttpResponse.text("mojis.dev/1")],
-      ["GET https://mojis.dev/2", () => HttpResponse.text("mojis.dev/2")],
-      ["GET https://mojis.dev/3", () => HttpResponse.text("mojis.dev/3")],
+      ["GET https://mojis.dev/run-multiple-urls/1", () => HttpResponse.text("mojis.dev/run-multiple-urls/1")],
+      ["GET https://mojis.dev/run-multiple-urls/2", () => HttpResponse.text("mojis.dev/run-multiple-urls/2")],
+      ["GET https://mojis.dev/run-multiple-urls/3", () => HttpResponse.text("mojis.dev/run-multiple-urls/3")],
     ]);
 
+    const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
+
     const mockHandler = createVersionHandlerBuilder()
-      .urls(() => ["https://mojis.dev/1", "https://mojis.dev/2"])
+      .urls(() => ["https://mojis.dev/run-multiple-urls/1", "https://mojis.dev/run-multiple-urls/2"])
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler1" }))
-      .output((_, data) => ({ processedBy: data.processed }));
+      .output((_, data) => ({ processedBy: data[0].processed }));
 
     const mockHandler2 = createVersionHandlerBuilder()
-      .urls(() => "https://mojis.dev/3")
+      .urls(() => "https://mojis.dev/run-multiple-urls/3")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler2" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    vi.mocked(handlers.metadata).handlers.push(
-      [(version: string) => version === "15.0", mockHandler],
-      [(version: string) => version === "14.0", mockHandler2],
+    addHandlerToMock(
+      mockHandlers,
+      "metadata",
+      (version: string) => version === "15.0",
+      mockHandler,
+    );
+
+    addHandlerToMock(
+      mockHandlers,
+      "metadata",
+      (version: string) => version === "14.0",
+      mockHandler2,
     );
 
     const result = await runAdapterHandler("metadata", mockContext);
@@ -140,27 +167,38 @@ describe("runAdapterHandler", () => {
 
   it("should handle transformation and aggregation", async () => {
     mockFetch([
-      ["GET https://mojis.dev/1", () => HttpResponse.text("mojis.dev/1")],
-      ["GET https://mojis.dev/2", () => HttpResponse.text("mojis.dev/2")],
+      ["GET https://mojis.dev/run-transformation-and-aggregation/1", () => HttpResponse.text("mojis.dev/run-transformation-and-aggregation/1")],
+      ["GET https://mojis.dev/run-transformation-and-aggregation/2", () => HttpResponse.text("mojis.dev/run-transformation-and-aggregation/2")],
     ]);
 
+    const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
+
     const mockHandler = createVersionHandlerBuilder()
-      .urls(() => "https://mojis.dev/1")
+      .urls(() => "https://mojis.dev/run-transformation-and-aggregation/1")
       .parser("generic")
       .transform((_, data) => ({ ...data, transformed: true }))
       .aggregate((_, data) => ({ ...data[0], aggregated: true }))
       .output((_, data) => data);
 
     const mockHandler2 = createVersionHandlerBuilder()
-      .urls(() => "https://mojis.dev/2")
+      .urls(() => "https://mojis.dev/run-transformation-and-aggregation/2")
       .parser("generic")
       .transform((_, data) => ({ ...data, transformed: true }))
       .aggregate((_, data) => ({ ...data[0], aggregated: true }))
       .output((_, data) => data);
 
-    vi.mocked(handlers.metadata).handlers.push(
-      [(version: string) => version === "15.0", mockHandler],
-      [(version: string) => version === "14.0", mockHandler2],
+    addHandlerToMock(
+      mockHandlers,
+      "metadata",
+      (version: string) => version === "15.0",
+      mockHandler,
+    );
+
+    addHandlerToMock(
+      mockHandlers,
+      "metadata",
+      (version: string) => version === "14.0",
+      mockHandler2,
     );
 
     const result = await runAdapterHandler("metadata", mockContext);
@@ -168,18 +206,21 @@ describe("runAdapterHandler", () => {
     expect(result).toEqual({
       transformed: true,
       aggregated: true,
-      expect: expect.any(Object),
+      lines: expect.any(Array),
+      totalLines: expect.any(Number),
     });
   });
 
   it("should handle cache and fetch options", async () => {
     mockFetch([
-      ["GET https://mojis.dev/1", () => HttpResponse.text("mojis.dev/1")],
-      ["GET https://mojis.dev/2", () => HttpResponse.text("mojis.dev/2")],
+      ["GET https://mojis.dev/run-cache-and-fetch-options/1", () => HttpResponse.text("mojis.dev/run-cache-and-fetch-options/1")],
+      ["GET https://mojis.dev/run-cache-and-fetch-options/2", () => HttpResponse.text("mojis.dev/run-cache-and-fetch-options/2")],
     ]);
 
+    const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
+
     const mockHandler = createVersionHandlerBuilder()
-      .urls(() => "https://mojis.dev/1")
+      .urls(() => "https://mojis.dev/run-cache-and-fetch-options/1")
       .parser("generic")
       .cacheOptions({ ttl: 3600 })
       .fetchOptions({ method: "GET" })
@@ -187,14 +228,23 @@ describe("runAdapterHandler", () => {
       .output((_, data) => ({ processedBy: data.processed }));
 
     const mockHandler2 = createVersionHandlerBuilder()
-      .urls(() => "https://mojis.dev/2")
+      .urls(() => "https://mojis.dev/run-cache-and-fetch-options/2")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler2" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    vi.mocked(handlers.metadata).handlers.push(
-      [(version: string) => version === "15.0", mockHandler],
-      [(version: string) => version === "14.0", mockHandler2],
+    addHandlerToMock(
+      mockHandlers,
+      "metadata",
+      (version: string) => version === "15.0",
+      mockHandler,
+    );
+
+    addHandlerToMock(
+      mockHandlers,
+      "metadata",
+      (version: string) => version === "14.0",
+      mockHandler2,
     );
 
     const result = await runAdapterHandler("metadata", mockContext);
@@ -204,29 +254,101 @@ describe("runAdapterHandler", () => {
 
   it("should handle force mode", async () => {
     mockFetch([
-      ["GET https://mojis.dev/1", () => HttpResponse.text("mojis.dev/1")],
-      ["GET https://mojis.dev/2", () => HttpResponse.text("mojis.dev/2")],
+      ["GET https://mojis.dev/run-force-mode/1", () => HttpResponse.text("mojis.dev/run-force-mode/1")],
+      ["GET https://mojis.dev/run-force-mode/2", () => HttpResponse.text("mojis.dev/run-force-mode/2")],
     ]);
 
-    const mockHandler = createVersionHandlerBuilder()
-      .urls(() => "https://mojis.dev/1")
+    const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
+
+    const mockHandler1 = createVersionHandlerBuilder()
+      .urls(() => "https://mojis.dev/run-force-mode/1")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler1" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
     const mockHandler2 = createVersionHandlerBuilder()
-      .urls(() => "https://mojis.dev/2")
+      .urls(() => "https://mojis.dev/run-force-mode/2")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler2" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    vi.mocked(handlers.metadata).handlers.push(
-      [(version: string) => version === "15.0", mockHandler],
-      [(version: string) => version === "14.0", mockHandler2],
+    // add two handlers for different versions
+    // only the first one should match the normal context
+    addHandlerToMock(
+      mockHandlers,
+      "metadata",
+      (version: string) => version === "15.0",
+      mockHandler1,
     );
 
-    const result = await runAdapterHandler("metadata", { ...mockContext, force: true });
-    expect(result).toBeDefined();
-    expect(result).toEqual({ processedBy: "handler2" });
+    // add a second handler that will only be used when forcing
+    addHandlerToMock(
+      mockHandlers,
+      "metadata",
+      (version: string) => version === "14.0",
+      mockHandler2,
+    );
+
+    // test normal behavior (without force)
+    const normalResult = await runAdapterHandler("metadata", mockContext);
+    expect(normalResult).toBeDefined();
+    expect(normalResult).toEqual({ processedBy: "handler1" });
+
+    // test with force - this should still use handler1 as it's the first match for our version,
+    // but we need to check that it's actually hit the network instead of using cache
+    // we can't test the cache bypassing directly in this test, but we can verify the right handler was used
+    const forceResult = await runAdapterHandler("metadata", { ...mockContext, force: true });
+    expect(forceResult).toBeDefined();
+    expect(forceResult).toEqual({ processedBy: "handler1" });
+  });
+
+  it("should bypass cache in force mode", async () => {
+    // setup fetch with different responses for the same URL
+    // first call returns one value, second call returns another
+    let fetchCounter = 0;
+    mockFetch([
+      ["GET https://mojis.dev/test", () => {
+        fetchCounter++;
+        console.error("fetchCounter", fetchCounter);
+        return HttpResponse.text(`Response ${fetchCounter}`);
+      }],
+    ]);
+
+    const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
+
+    const mockHandler = createVersionHandlerBuilder()
+      .urls(() => "https://mojis.dev/test")
+      .parser("generic")
+      .cacheOptions({ ttl: 3600 })
+      .transform((_, data) => data.lines[0]?.fields[0])
+      .output((_, data) => data);
+
+    addHandlerToMock(
+      mockHandlers,
+      "metadata",
+      (version: string) => version === "15.0",
+      mockHandler,
+    );
+
+    // first request should get "Response 1"
+    const result1 = await runAdapterHandler("metadata", mockContext);
+    expect(result1).toBeDefined();
+    expect(result1).toContain("Response 1");
+
+    // second request with normal context should get cached "Response 1"
+    const result2 = await runAdapterHandler("metadata", mockContext);
+    expect(result2).toBeDefined();
+    expect(result2).toContain("Response 1");
+
+    // request with force=true should bypass cache and get "Response 2"
+    const forceResult = await runAdapterHandler("metadata", {
+      ...mockContext,
+      force: true,
+    });
+    expect(forceResult).toBeDefined();
+    expect(forceResult).toContain("Response 2");
+
+    // verify we actually made 2 requests, not 3 (as one was cached)
+    expect(fetchCounter).toBe(2);
   });
 });
