@@ -216,7 +216,10 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _parser: TParams["_parser"];
     _parserOptions: TParams["_parserOptions"];
     _output: TParams["_output"];
-    _outputType: TOut;
+
+    // if there are multiple urls, we set it to an array,
+    // because we don't know if aggregate is there or not
+    _outputType: TParams["_urls"] extends any[] ? TOut[] : TOut;
   }>;
 
   aggregate: <TIn extends TParams["_transform"]["out"], TOut>(

@@ -138,7 +138,7 @@ describe("runAdapterHandler", () => {
       .urls(() => ["https://mojis.dev/run-multiple-urls/1", "https://mojis.dev/run-multiple-urls/2"])
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler1" }))
-      .output((_, data) => ({ processedBy: data[0].processed }));
+      .output((_, data) => ({ processedBy: data[0]?.processed }));
 
     const mockHandler2 = createVersionHandlerBuilder()
       .urls(() => "https://mojis.dev/run-multiple-urls/3")
