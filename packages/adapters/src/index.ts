@@ -128,5 +128,15 @@ export async function runVersionHandler<THandler extends AnyVersionHandler>(
     output = handler.output(ctx, aggregatedData);
   }
 
+  if (handler.validation != null) {
+    const result = handler.validation.safeParse(output);
+
+    if (!result.success) {
+      throw new AdapterError(`Invalid output for handler: ${adapterHandlerType}`);
+    }
+
+    output = result.data;
+  }
+
   return output;
 }
