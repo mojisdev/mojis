@@ -19,15 +19,15 @@ function parseEndpoint(pattern: `${MethodUpper} ${string}`): [Method, string] {
 
 export function mockFetch(
   urlPattern: `${MethodUpper} ${string}`,
-  resolver: HttpResponseResolver,
+  resolver: HttpResponseResolver<any, any, undefined>,
 ): void;
 export function mockFetch(
-  endpoints: [`${MethodUpper} ${string}`, HttpResponseResolver][],
+  endpoints: [`${MethodUpper} ${string}`, HttpResponseResolver<any, any, undefined>][],
 ): void;
 export function mockFetch(
   urlOrList:
     | `${MethodUpper} ${string}`
-    | [`${MethodUpper} ${string}`, HttpResponseResolver][],
+    | [`${MethodUpper} ${string}`, HttpResponseResolver<any, any, undefined>][],
   resolver?: HttpResponseResolver,
 ): void {
   if (Array.isArray(urlOrList)) {

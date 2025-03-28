@@ -1,9 +1,9 @@
 import type { CacheMeta } from "../src/cache";
+import { mockFetch } from "#msw-utils";
 import fs from "fs-extra";
 import { HttpResponse } from "msw";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { testdir } from "vitest-testdirs";
-import { mockFetch } from "../../../test/msw-utils/msw";
 import { createCacheKeyFromUrl, fetchCache, readCache, readCacheMeta, writeCache } from "../src/cache";
 
 vi.mock("fs-extra", {

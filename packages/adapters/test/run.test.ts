@@ -1,6 +1,6 @@
 import type { AdapterContext, AdapterHandlerType } from "../src/types";
+import { HttpResponse, mockFetch } from "#msw-utils";
 import { afterEach, describe, expect, it } from "vitest";
-import { HttpResponse, mockFetch } from "../../../test/msw-utils/msw";
 import { createVersionHandlerBuilder } from "../src/builder";
 import { addHandlerToMock, cleanupAdapterTest, setupAdapterTest } from "./test-utils";
 
