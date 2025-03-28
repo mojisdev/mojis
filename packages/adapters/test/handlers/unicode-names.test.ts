@@ -20,7 +20,7 @@ describe("unicode-names adapter handler", () => {
     addHandlerToMock(mockHandlers, "unicode-names", () => true, handler.handlers[0][1]);
 
     mockFetch([
-      ["GET https://unicode-proxy.mojis.dev/proxy/15.0/ucd/UnicodeData.txt", () => HttpResponse.text("1F600;GRINNING FACE")],
+      ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/UnicodeData.txt", () => HttpResponse.text("1F600;GRINNING FACE")],
     ]);
 
     const result = await runAdapterHandler("unicode-names", mockContext);
