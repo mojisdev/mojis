@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  EMOJI_GROUP_SCHEMA,
+  EMOJI_METADATA_SCHEMA,
+  EMOJI_SEQUENCE_SCHEMA,
   EMOJI_SPEC_RECORD_SCHEMA,
+  EMOJI_VARIATION_SCHEMA,
 } from "../src/emojis";
 
 describe("zod: EMOJI_SPEC_RECORD_SCHEMA", () => {
@@ -41,5 +45,109 @@ describe("zod: EMOJI_SPEC_RECORD_SCHEMA", () => {
     };
 
     expect(() => EMOJI_SPEC_RECORD_SCHEMA.parse(invalidObject)).toThrow();
+  });
+});
+
+describe("zod: EMOJI_GROUP_SCHEMA", () => {
+  it("should validate a valid object", () => {
+    const validObject = {
+      name: "smileys-and-people",
+
+    };
+    expect(() => EMOJI_GROUP_SCHEMA.parse(validObject)).not.toThrow();
+  });
+
+  it("should invalidate an object with missing fields", () => {
+    const invalidObject = {
+      name: "smileys-and-people",
+    };
+
+    expect(() => EMOJI_GROUP_SCHEMA.parse(invalidObject)).toThrow();
+  });
+
+  it("should invalidate an object with incorrect types", () => {
+    const invalidObject = {
+      name: 123,
+    };
+
+    expect(() => EMOJI_GROUP_SCHEMA.parse(invalidObject)).toThrow();
+  });
+});
+
+describe("zod: EMOJI_METADATA_SCHEMA", () => {
+  it("should validate a valid object", () => {
+    const validObject = {
+      name: "smileys-and-people",
+    };
+
+    expect(() => EMOJI_METADATA_SCHEMA.parse(validObject)).not.toThrow();
+  });
+
+  it("should invalidate an object with missing fields", () => {
+    const invalidObject = {
+      name: "smileys-and-people",
+    };
+
+    expect(() => EMOJI_METADATA_SCHEMA.parse(invalidObject)).toThrow();
+  });
+
+  it("should invalidate an object with incorrect types", () => {
+    const invalidObject = {
+      name: 123,
+    };
+
+    expect(() => EMOJI_METADATA_SCHEMA.parse(invalidObject)).toThrow();
+  });
+});
+
+describe("zod: EMOJI_SEQUENCE_SCHEMA", () => {
+  it("should validate a valid object", () => {
+    const validObject = {
+      name: "smileys-and-people",
+    };
+
+    expect(() => EMOJI_SEQUENCE_SCHEMA.parse(validObject)).not.toThrow();
+  });
+
+  it("should invalidate an object with missing fields", () => {
+    const invalidObject = {
+      name: "smileys-and-people",
+    };
+
+    expect(() => EMOJI_SEQUENCE_SCHEMA.parse(invalidObject)).toThrow();
+  });
+
+  it("should invalidate an object with incorrect types", () => {
+    const invalidObject = {
+      name: 123,
+    };
+
+    expect(() => EMOJI_SEQUENCE_SCHEMA.parse(invalidObject)).toThrow();
+  });
+});
+
+describe("zod: EMOJI_VARIATION_SCHEMA", () => {
+  it("should validate a valid object", () => {
+    const validObject = {
+      name: "smileys-and-people",
+    };
+
+    expect(() => EMOJI_VARIATION_SCHEMA.parse(validObject)).not.toThrow();
+  });
+
+  it("should invalidate an object with missing fields", () => {
+    const invalidObject = {
+      name: "smileys-and-people",
+    };
+
+    expect(() => EMOJI_VARIATION_SCHEMA.parse(invalidObject)).toThrow();
+  });
+
+  it("should invalidate an object with incorrect types", () => {
+    const invalidObject = {
+      name: 123,
+    };
+
+    expect(() => EMOJI_VARIATION_SCHEMA.parse(invalidObject)).toThrow();
   });
 });

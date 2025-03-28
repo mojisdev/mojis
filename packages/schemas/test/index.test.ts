@@ -3,7 +3,7 @@ import {
   GENERATOR_SCHEMA,
   SHORTCODE_PROVIDER_SCHEMA,
   SHORTCODE_PROVIDERS_SCHEMA,
-} from "../src";
+} from "../src/index";
 
 describe("zod: SHORTCODE_PROVIDER_SCHEMA", () => {
   it("should validate 'github'", () => {
