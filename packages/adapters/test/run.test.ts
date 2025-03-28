@@ -307,13 +307,11 @@ describe("runAdapterHandler", () => {
     // setup fetch with different responses for the same URL
     // first call returns one value, second call returns another
     let fetchCounter = 0;
-    mockFetch([
-      ["GET https://mojis.dev/test", () => {
-        fetchCounter++;
-        console.error("fetchCounter", fetchCounter);
-        return HttpResponse.text(`Response ${fetchCounter}`);
-      }],
-    ]);
+    mockFetch("GET https://mojis.dev/test", () => {
+      fetchCounter++;
+      console.error("fetchCounter", fetchCounter);
+      return HttpResponse.text(`Response ${fetchCounter}`);
+    });
 
     const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
 
@@ -357,9 +355,7 @@ describe("runAdapterHandler", () => {
   });
 
   it("should handle validation", async () => {
-    mockFetch([
-      ["GET https://mojis.dev/handle-validation", () => HttpResponse.text("mojis.dev/handle-validation")],
-    ]);
+    mockFetch("GET https://mojis.dev/handle-validation", () => HttpResponse.text("mojis.dev/handle-validation"));
 
     const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
 
@@ -379,5 +375,28 @@ describe("runAdapterHandler", () => {
     const result = await runAdapterHandler("metadata", mockContext);
     expect(result).toBeDefined();
     expect(result).toEqual({ page: "mojis.dev/handle-validation" });
+  });
+
+  it("should throw if validation fails", async () => {
+    mockFetch("GET https://mojis.dev/handle-validation-fail", () => HttpResponse.text("mojis.dev/handle-validation-fail"));
+    const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
+
+    const mockHandler = createVersionHandlerBuilder()
+      .urls(() => "https://mojis.dev/handle-validation-fail")
+      .parser("generic")
+      .validation(z.object({
+        page1: z.string(),
+      }).strict())
+      .transform((_, data) => ({
+        page: data.lines[0]?.fields[0],
+      }))
+      // @ts-expect-error - we are intentionally testing the validation failure
+      .output((_, data) => data);
+
+    addHandlerToMock(mockHandlers, "metadata", (version: string) => version === "15.0", mockHandler);
+
+    await expect(runAdapterHandler("metadata", mockContext))
+      .rejects
+      .toThrow();
   });
 });
