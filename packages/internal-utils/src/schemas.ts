@@ -49,3 +49,16 @@ export const GROUPED_EMOJI_METADATA_SCHEMA = z.record(
     EMOJI_METADATA_SCHEMA,
   ),
 );
+
+export const EMOJI_SEQUENCE_SCHEMA = z.object({
+  property: z.string(),
+  hex: z.string(),
+  description: z.string().nullable(),
+  gender: z.string().nullable(),
+});
+
+export const EMOJI_VARIATION_SCHEMA = z.object({
+  text: z.string().nullable(),
+  emoji: z.string().nullable(),
+  property: z.array(z.string()).nullable(),
+});
