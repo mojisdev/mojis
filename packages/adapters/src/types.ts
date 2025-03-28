@@ -243,7 +243,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
   }>;
 
   cacheOptions: <
-    TOptions extends Omit<WriteCacheOptions<unknown>, "transform">,
+    TOptions extends Omit<WriteCacheOptions, "transform">,
   >(
     cacheOptions: TParams["_options"]["cacheOptions"] extends UnsetMarker
       ? TOptions
@@ -334,12 +334,13 @@ export interface AdapterHandlerBuilder<
     TPredicate extends PredicateFn,
     TBuilderParams extends AnyHandleVersionParams,
     TBuilder extends HandleVersionBuilder<TBuilderParams>,
+    THandler extends AnyVersionHandler,
   >(
     predicate: TPredicate,
-    builder: (builder: TBuilder) => AnyVersionHandler,
+    builder: (builder: TBuilder) => THandler,
   ) => AdapterHandlerBuilder<{
     _type: TParams["_type"];
-    _handlers: [...TParams["_handlers"], [TPredicate, AnyVersionHandler]];
+    _handlers: [...TParams["_handlers"], [TPredicate, THandler]];
   }>;
   build: () => AdapterHandler<{
     type: TParams["_type"];
@@ -362,7 +363,7 @@ export type AnyAdapterHandler = AdapterHandler<any>;
 export interface AnyBuiltVersionHandlerParams {
   globalContext: AdapterContext;
   fetchOptions: RequestInit;
-  cacheOptions: Omit<WriteCacheOptions<unknown>, "transform">;
+  cacheOptions: Omit<WriteCacheOptions, "transform">;
   parser: any;
   parserOptions: GetParseOptionsFromParser<any>;
   parserOutput: any;

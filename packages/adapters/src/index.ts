@@ -1,3 +1,4 @@
+import type { WriteCacheOptions } from "@mojis/internal-utils";
 import type {
   AdapterContext,
   AdapterHandlerType,
@@ -6,11 +7,17 @@ import type {
 } from "./types";
 import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
+import { defu } from "defu";
 import { AdapterError } from "./errors";
 import { metadata, sequences, unicodeNames, variations } from "./handlers";
 import { buildContext, getHandlerUrls, isBuiltinParser } from "./utils";
 
 export type { AdapterHandlerType } from "./types";
+
+interface RunOverrides {
+  cacheKey?: string;
+  cacheOptions?: Omit<WriteCacheOptions, "transform">;
+}
 
 const HANDLERS = {
   metadata,
@@ -24,6 +31,8 @@ export async function runAdapterHandler<
 >(
   type: TAdapterHandlerType,
   ctx: AdapterContext,
+  __overrides?: RunOverrides,
+  // TODO(luxass): fix return type
 ): Promise<any> {
   const handler = HANDLERS[type];
 
@@ -34,10 +43,11 @@ export async function runAdapterHandler<
       continue;
     }
 
-    promises.push(runVersionHandler(ctx, versionHandler, handler.adapterType));
+    promises.push(runVersionHandler(ctx, versionHandler, handler.adapterType, __overrides));
   }
 
   const result = await Promise.all(promises);
+  // TODO: what if we want to return multiple handlers?
   return result[0];
 }
 
@@ -45,6 +55,7 @@ export async function runVersionHandler<THandler extends AnyVersionHandler>(
   ctx: AdapterContext,
   handler: THandler,
   adapterHandlerType: AdapterHandlerType,
+  __overrides?: RunOverrides,
 ): Promise<THandler["output"]> {
   const urls = await getHandlerUrls(handler.urls, ctx);
 
@@ -55,6 +66,9 @@ export async function runVersionHandler<THandler extends AnyVersionHandler>(
   // fetch all the data from the urls
   const dataRequests = urls.map(async (url) => {
     const key = url.cacheKey;
+
+    const mergedCacheOptions = defu(__overrides?.cacheOptions, handler.cacheOptions);
+
     const result = await fetchCache(url.url, {
       cacheKey: url.cacheKey,
       parser(data) {
@@ -81,9 +95,9 @@ export async function runVersionHandler<THandler extends AnyVersionHandler>(
 
         return handler.parser(ctx, data);
       },
-      ttl: handler.cacheOptions?.ttl,
-      cacheFolder: handler.cacheOptions?.cacheFolder,
-      encoding: handler.cacheOptions?.encoding,
+      ttl: mergedCacheOptions.ttl,
+      encoding: mergedCacheOptions.encoding,
+      cacheFolder: mergedCacheOptions.cacheFolder,
       options: handler.fetchOptions,
       bypassCache: ctx.force,
     });
