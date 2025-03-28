@@ -3,7 +3,6 @@ import { HttpResponse, mockFetch } from "#msw-utils";
 import { afterEach, describe, expect, it } from "vitest";
 import { z } from "zod";
 import { createVersionHandlerBuilder } from "../src/builder";
-import { AdapterError } from "../src/errors";
 import { addHandlerToMock, cleanupAdapterTest, setupAdapterTest } from "./test-utils";
 
 describe("runAdapterHandler", () => {
