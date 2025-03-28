@@ -35,6 +35,7 @@
   "dependencies": {
     "@mojis/adapters": "workspace:*",
     "@mojis/internal-utils": "workspace:*",
+    "@mojis/schemas": "workspace:*",
     "farver": "catalog:prod",
     "fs-extra": "catalog:prod",
     "semver": "catalog:prod",

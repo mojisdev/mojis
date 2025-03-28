@@ -20,7 +20,6 @@
   },
   "exports": {
     ".": "./dist/index.js",
-    "./schemas": "./dist/schemas.js",
     "./shortcodes": "./dist/shortcodes.js",
     "./constants": "./dist/constants.js",
     "./versions": "./dist/versions.js",
@@ -40,6 +39,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@mojis/schemas": "workspace:*",
     "fs-extra": "catalog:prod",
     "semver": "catalog:prod",
     "zod": "catalog:prod"

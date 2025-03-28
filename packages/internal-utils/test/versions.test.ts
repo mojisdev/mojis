@@ -1,4 +1,4 @@
-import type { EmojiSpecRecord } from "../src/types";
+import type { EmojiSpecRecord } from "@mojis/schemas/emojis";
 import fs from "node:fs";
 import { mockFetch } from "#msw-utils";
 import { HttpResponse } from "msw";

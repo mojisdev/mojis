@@ -124,6 +124,9 @@ importers:
       '@mojis/parsers':
         specifier: workspace:*
         version: link:../parsers
+      '@mojis/schemas':
+        specifier: workspace:*
+        version: link:../schemas
       defu:
         specifier: catalog:prod
         version: 6.1.4
@@ -161,6 +164,9 @@ importers:
       '@mojis/internal-utils':
         specifier: workspace:*
         version: link:../internal-utils
+      '@mojis/schemas':
+        specifier: workspace:*
+        version: link:../schemas
       farver:
         specifier: catalog:prod
         version: 0.4.2
@@ -204,6 +210,9 @@ importers:
 
   packages/internal-utils:
     dependencies:
+      '@mojis/schemas':
+        specifier: workspace:*
+        version: link:../schemas
       fs-extra:
         specifier: catalog:prod
         version: 11.3.0
@@ -241,9 +250,9 @@ importers:
       '@luxass/eslint-config':
         specifier: catalog:dev
         version: 4.17.1(@typescript-eslint/utils@8.26.1(eslint@9.22.0)(typescript@5.8.2))(@vue/compiler-sfc@3.5.13)(eslint@9.22.0)(typescript@5.8.2)(vitest@3.0.8)
-      '@mojis/internal-utils':
+      '@mojis/schemas':
         specifier: workspace:*
-        version: link:../internal-utils
+        version: link:../schemas
       eslint:
         specifier: catalog:dev
         version: 9.22.0
@@ -261,6 +270,28 @@ importers:
         version: 3.24.5(zod@3.24.2)
 
   packages/parsers:
+    devDependencies:
+      '@luxass/eslint-config':
+        specifier: catalog:dev
+        version: 4.17.1(@typescript-eslint/utils@8.26.1(eslint@9.22.0)(typescript@5.8.2))(@vue/compiler-sfc@3.5.13)(eslint@9.22.0)(typescript@5.8.2)(vitest@3.0.8)
+      eslint:
+        specifier: catalog:dev
+        version: 9.22.0
+      tsup:
+        specifier: catalog:dev
+        version: 8.4.0(postcss@8.5.3)(tsx@4.19.3)(typescript@5.8.2)(yaml@2.7.0)
+      typescript:
+        specifier: catalog:dev
+        version: 5.8.2
+      vitest-testdirs:
+        specifier: catalog:dev
+        version: 2.2.0(vitest@3.0.8)
+
+  packages/schemas:
+    dependencies:
+      zod:
+        specifier: catalog:prod
+        version: 3.24.2
     devDependencies:
       '@luxass/eslint-config':
         specifier: catalog:dev

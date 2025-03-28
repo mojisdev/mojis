@@ -1,4 +1,4 @@
-import type { EmojiSpecRecord } from "./types";
+import type { EmojiSpecRecord } from "@mojis/schemas/emojis";
 import semver from "semver";
 import { NON_EXISTING_VERSIONS } from "./constants";
 

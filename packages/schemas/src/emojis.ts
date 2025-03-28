@@ -7,27 +7,15 @@ export const EMOJI_SPEC_RECORD_SCHEMA = z.object({
   fallback: z.string().optional().nullable(),
 });
 
-export const SHORTCODE_PROVIDER_SCHEMA = z.union([
-  z.literal("github"),
-  z.literal("slack"),
-]);
-
-export const SHORTCODE_PROVIDERS_SCHEMA = z.array(SHORTCODE_PROVIDER_SCHEMA);
-
-export const GENERATOR_SCHEMA = z.union([
-  z.literal("metadata"),
-  z.literal("sequences"),
-  z.literal("emojis"),
-  z.literal("variations"),
-  z.literal("shortcodes"),
-  z.literal("unicode-names"),
-]);
+export type EmojiSpecRecord = z.infer<typeof EMOJI_SPEC_RECORD_SCHEMA>;
 
 export const EMOJI_GROUP_SCHEMA = z.object({
   name: z.string(),
   slug: z.string(),
   subgroups: z.array(z.string()),
 });
+
+export type EmojiGroup = z.infer<typeof EMOJI_GROUP_SCHEMA>;
 
 export const EMOJI_GROUPS_SCHEMA = z.array(EMOJI_GROUP_SCHEMA);
 
@@ -42,6 +30,8 @@ export const EMOJI_METADATA_SCHEMA = z.object({
   hexcodes: z.array(z.string()),
 });
 
+export type EmojiMetadata = z.infer<typeof EMOJI_METADATA_SCHEMA>;
+
 export const GROUPED_EMOJI_METADATA_SCHEMA = z.record(
   z.string(),
   z.record(
@@ -50,6 +40,8 @@ export const GROUPED_EMOJI_METADATA_SCHEMA = z.record(
   ),
 );
 
+export type GroupedEmojiMetadata = z.infer<typeof GROUPED_EMOJI_METADATA_SCHEMA>;
+
 export const EMOJI_SEQUENCE_SCHEMA = z.object({
   property: z.string(),
   hex: z.string(),
@@ -57,8 +49,12 @@ export const EMOJI_SEQUENCE_SCHEMA = z.object({
   gender: z.string().nullable(),
 });
 
+export type EmojiSequence = z.infer<typeof EMOJI_SEQUENCE_SCHEMA>;
+
 export const EMOJI_VARIATION_SCHEMA = z.object({
   text: z.string().nullable(),
   emoji: z.string().nullable(),
   property: z.array(z.string()).nullable(),
 });
+
+export type EmojiVariation = z.infer<typeof EMOJI_VARIATION_SCHEMA>;
