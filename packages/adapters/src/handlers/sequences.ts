@@ -1,5 +1,7 @@
 import type { EmojiSequence } from "@mojis/internal-utils";
 import { expandHexRange, FEMALE_SIGN, MALE_SIGN } from "@mojis/internal-utils";
+import { EMOJI_SEQUENCE_SCHEMA } from "@mojis/internal-utils/schemas";
+import { z } from "zod";
 import { createAdapterHandlerBuilder } from "../builder";
 
 const NOT_AVAILABLE_SEQUENCES = ["1.0"];
@@ -36,20 +38,25 @@ const builder = createAdapterHandlerBuilder({
 export const handler = builder
   .onVersion(
     (version) => !NOT_AVAILABLE_SEQUENCES.includes(version),
-    (builder) => builder.urls(({ emoji_version }) => {
-      return [
-        {
-          key: "sequences",
-          url: `https://unicode-proxy.mojis.dev/proxy/emoji/${emoji_version}/emoji-sequences.txt`,
-          cacheKey: `v${emoji_version}/sequences`,
-        },
-        {
-          key: "zwj",
-          url: `https://unicode-proxy.mojis.dev/proxy/emoji/${emoji_version}/emoji-zwj-sequences.txt`,
-          cacheKey: `v${emoji_version}/zwj-sequences`,
-        },
-      ];
-    })
+    (builder) => builder
+      .validation(z.object({
+        sequences: z.array(EMOJI_SEQUENCE_SCHEMA).optional(),
+        zwj: z.array(EMOJI_SEQUENCE_SCHEMA).optional(),
+      }))
+      .urls(({ emoji_version }) => {
+        return [
+          {
+            key: "sequences",
+            url: `https://unicode-proxy.mojis.dev/proxy/emoji/${emoji_version}/emoji-sequences.txt`,
+            cacheKey: `v${emoji_version}/sequences`,
+          },
+          {
+            key: "zwj",
+            url: `https://unicode-proxy.mojis.dev/proxy/emoji/${emoji_version}/emoji-zwj-sequences.txt`,
+            cacheKey: `v${emoji_version}/zwj-sequences`,
+          },
+        ];
+      })
       .parser("generic", ({ key }) => {
         let defaultProperty = "Emoji";
 
@@ -111,6 +118,7 @@ export const handler = builder
         };
       })
       .output((_, sequences) => {
+        //          ^?
         return sequences;
       }),
   ).build();

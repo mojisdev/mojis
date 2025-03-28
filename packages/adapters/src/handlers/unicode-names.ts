@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { createAdapterHandlerBuilder } from "../builder";
 
 const MAPPINGS = {
@@ -15,12 +16,14 @@ const builder = createAdapterHandlerBuilder({
 export const handler = builder
   .onVersion(
     () => true,
-    (builder) => builder.urls((ctx) => {
-      return {
-        url: MAPPINGS[ctx.emoji_version] || `https://unicode-proxy.mojis.dev/proxy/${ctx.emoji_version}.0/ucd/UnicodeData.txt`,
-        cacheKey: `v${ctx.emoji_version}/unicode-names`,
-      };
-    })
+    (builder) => builder
+      .validation(z.record(z.string(), z.string()))
+      .urls((ctx) => {
+        return {
+          url: MAPPINGS[ctx.emoji_version] || `https://unicode-proxy.mojis.dev/proxy/${ctx.emoji_version}.0/ucd/UnicodeData.txt`,
+          cacheKey: `v${ctx.emoji_version}/unicode-names`,
+        };
+      })
       .parser("generic", {
         separator: ";",
       })
@@ -40,6 +43,7 @@ export const handler = builder
         return result;
       })
       .output((_, transformed) => {
+        //          ^?
         return transformed;
       }),
   ).build();
