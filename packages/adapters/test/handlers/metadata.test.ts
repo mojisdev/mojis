@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { HttpResponse, mockFetch } from "../../../../test/msw-utils/msw";
 import { handler } from "../../src/handlers/metadata";
 
 describe("metadata adapter handler", () => {

@@ -1,8 +1,8 @@
 import type { EmojiSpecRecord } from "../src/types";
 import fs from "node:fs";
+import { mockFetch } from "#msw-utils";
 import { HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
-import { mockFetch } from "../../../test/msw-utils/msw";
 import {
   extractEmojiVersion,
   extractUnicodeVersion,

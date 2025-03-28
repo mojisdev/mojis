@@ -1,6 +1,6 @@
+import { HttpResponse, mockFetch } from "#msw-utils";
 import { afterEach, describe, expect, it } from "vitest";
 import { testdir } from "vitest-testdirs";
-import { HttpResponse, mockFetch } from "../../../../test/msw-utils/msw";
 import { handler } from "../../src/handlers/unicode-names";
 import { addHandlerToMock, cleanupAdapterTest, setupAdapterTest } from "../test-utils";
 
