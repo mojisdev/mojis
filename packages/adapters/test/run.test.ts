@@ -1,6 +1,7 @@
 import type { AdapterContext, AdapterHandlerType } from "../src/types";
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { afterEach, describe, expect, it } from "vitest";
+import { z } from "zod";
 import { createVersionHandlerBuilder } from "../src/builder";
 import { addHandlerToMock, cleanupAdapterTest, setupAdapterTest } from "./test-utils";
 
@@ -11,7 +12,7 @@ describe("runAdapterHandler", () => {
     force: false,
   };
 
-  // Clean up after each test to ensure isolation
+  // clean up after each test to ensure isolation
   afterEach(() => {
     cleanupAdapterTest();
   });
@@ -306,13 +307,11 @@ describe("runAdapterHandler", () => {
     // setup fetch with different responses for the same URL
     // first call returns one value, second call returns another
     let fetchCounter = 0;
-    mockFetch([
-      ["GET https://mojis.dev/test", () => {
-        fetchCounter++;
-        console.error("fetchCounter", fetchCounter);
-        return HttpResponse.text(`Response ${fetchCounter}`);
-      }],
-    ]);
+    mockFetch("GET https://mojis.dev/test", () => {
+      fetchCounter++;
+      console.error("fetchCounter", fetchCounter);
+      return HttpResponse.text(`Response ${fetchCounter}`);
+    });
 
     const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
 
@@ -353,5 +352,51 @@ describe("runAdapterHandler", () => {
 
     // verify we actually made 2 requests, not 3 (as one was cached)
     expect(fetchCounter).toBe(2);
+  });
+
+  it("should handle validation", async () => {
+    mockFetch("GET https://mojis.dev/handle-validation", () => HttpResponse.text("mojis.dev/handle-validation"));
+
+    const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
+
+    const mockHandler = createVersionHandlerBuilder()
+      .urls(() => "https://mojis.dev/handle-validation")
+      .parser("generic")
+      .validation(z.object({
+        page: z.string().optional(),
+      }))
+      .transform((_, data) => ({
+        page: data.lines[0]?.fields[0],
+      }))
+      .output((_, data) => data);
+
+    addHandlerToMock(mockHandlers, "metadata", (version: string) => version === "15.0", mockHandler);
+
+    const result = await runAdapterHandler("metadata", mockContext);
+    expect(result).toBeDefined();
+    expect(result).toEqual({ page: "mojis.dev/handle-validation" });
+  });
+
+  it("should throw if validation fails", async () => {
+    mockFetch("GET https://mojis.dev/handle-validation-fail", () => HttpResponse.text("mojis.dev/handle-validation-fail"));
+    const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
+
+    const mockHandler = createVersionHandlerBuilder()
+      .urls(() => "https://mojis.dev/handle-validation-fail")
+      .parser("generic")
+      .validation(z.object({
+        page1: z.string(),
+      }).strict())
+      .transform((_, data) => ({
+        page: data.lines[0]?.fields[0],
+      }))
+      // @ts-expect-error - we are intentionally testing the validation failure
+      .output((_, data) => data);
+
+    addHandlerToMock(mockHandlers, "metadata", (version: string) => version === "15.0", mockHandler);
+
+    await expect(runAdapterHandler("metadata", mockContext))
+      .rejects
+      .toThrow("Invalid output for handler: metadata");
   });
 });

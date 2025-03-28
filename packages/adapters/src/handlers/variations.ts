@@ -1,5 +1,7 @@
 import type { EmojiVariation } from "@mojis/internal-utils";
+import { EMOJI_VARIATION_SCHEMA } from "@mojis/internal-utils/schemas";
 import semver from "semver";
+import { z } from "zod";
 import { createAdapterHandlerBuilder } from "../builder";
 
 const UNSUPPORTED_VARIATION_VERSIONS = ["1.0", "2.0", "3.0", "4.0"];
@@ -11,19 +13,21 @@ const builder = createAdapterHandlerBuilder({
 export const handler = builder
   .onVersion(
     (version) => !UNSUPPORTED_VARIATION_VERSIONS.includes(version),
-    (builder) => builder.urls((ctx) => {
-      if (semver.lte(`${ctx.unicode_version}.0`, "12.1.0")) {
+    (builder) => builder
+      .validation(z.array(EMOJI_VARIATION_SCHEMA))
+      .urls((ctx) => {
+        if (semver.lte(`${ctx.unicode_version}.0`, "12.1.0")) {
+          return {
+            url: `https://unicode-proxy.mojis.dev/proxy/emoji/${ctx.emoji_version}/emoji-variation-sequences.txt`,
+            cacheKey: `v${ctx.emoji_version}/variations`,
+          };
+        }
+
         return {
-          url: `https://unicode-proxy.mojis.dev/proxy/emoji/${ctx.emoji_version}/emoji-variation-sequences.txt`,
+          url: `https://unicode-proxy.mojis.dev/proxy/${ctx.unicode_version}.0/ucd/emoji/emoji-variation-sequences.txt`,
           cacheKey: `v${ctx.emoji_version}/variations`,
         };
-      }
-
-      return {
-        url: `https://unicode-proxy.mojis.dev/proxy/${ctx.unicode_version}.0/ucd/emoji/emoji-variation-sequences.txt`,
-        cacheKey: `v${ctx.emoji_version}/variations`,
-      };
-    })
+      })
       .parser("generic")
       .transform((_, data) => {
         const variations: EmojiVariation[] = [];
@@ -52,6 +56,7 @@ export const handler = builder
         return variations;
       })
       .output((_, transformed) => {
+        //          ^?
         return transformed;
       }),
   ).onVersion(
