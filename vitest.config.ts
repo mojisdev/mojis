@@ -1,6 +1,8 @@
 import { existsSync, readdirSync } from "node:fs";
 import { defineConfig } from "vitest/config";
 
+const root = new URL("./", import.meta.url).pathname;
+
 const pkgRoot = (pkg: string) =>
   new URL(`./packages/${pkg}`, import.meta.url).pathname;
 const alias = (pkg: string) => `${pkgRoot(pkg)}/src`;
@@ -12,7 +14,9 @@ const aliases = readdirSync(new URL("./packages", import.meta.url).pathname)
       acc[`@mojis/${pkg}`] = alias(pkg);
       return acc;
     },
-    {});
+    {
+      "#msw-utils": `${root}/test/msw-utils/msw.ts`,
+    });
 
 const hiddenLogs = [
   "[shortcodes]",
