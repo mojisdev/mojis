@@ -1,5 +1,5 @@
-import type { EmojiVariation } from "@mojis/internal-utils";
-import { EMOJI_VARIATION_SCHEMA } from "@mojis/internal-utils/schemas";
+import type { EmojiVariation } from "@mojis/schemas/emojis";
+import { EMOJI_VARIATION_SCHEMA } from "@mojis/schemas/emojis";
 import semver from "semver";
 import { z } from "zod";
 import { createAdapterHandlerBuilder } from "../builder";

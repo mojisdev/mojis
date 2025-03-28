@@ -1,6 +1,6 @@
-import type { EmojiGroup, GroupedEmojiMetadata } from "@mojis/internal-utils";
+import type { EmojiGroup, GroupedEmojiMetadata } from "@mojis/schemas/emojis";
 import { extractEmojiVersion, extractUnicodeVersion, isBefore } from "@mojis/internal-utils";
-import { EMOJI_GROUP_SCHEMA, GROUPED_EMOJI_METADATA_SCHEMA } from "@mojis/internal-utils/schemas";
+import { EMOJI_GROUPS_SCHEMA, GROUPED_EMOJI_METADATA_SCHEMA } from "@mojis/schemas/emojis";
 import { z } from "zod";
 import { createAdapterHandlerBuilder } from "../builder";
 
@@ -29,7 +29,7 @@ export const handler = builder
     (emoji_version) => !DISALLOWED_EMOJI_VERSIONS.includes(emoji_version),
     (builder) => builder
       .validation(z.object({
-        groups: z.array(EMOJI_GROUP_SCHEMA),
+        groups: EMOJI_GROUPS_SCHEMA,
         emojis: GROUPED_EMOJI_METADATA_SCHEMA,
       }))
       .urls((ctx) => {

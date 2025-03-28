@@ -38,6 +38,7 @@
   "dependencies": {
     "@mojis/internal-utils": "workspace:*",
     "@mojis/parsers": "workspace:*",
+    "@mojis/schemas": "workspace:*",
     "defu": "catalog:prod",
     "semver": "catalog:prod",
     "zod": "catalog:prod"

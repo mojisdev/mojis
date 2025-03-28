@@ -1,6 +1,6 @@
-import type { EmojiSequence } from "@mojis/internal-utils";
+import type { EmojiSequence } from "@mojis/schemas/emojis";
 import { expandHexRange, FEMALE_SIGN, MALE_SIGN } from "@mojis/internal-utils";
-import { EMOJI_SEQUENCE_SCHEMA } from "@mojis/internal-utils/schemas";
+import { EMOJI_SEQUENCE_SCHEMA } from "@mojis/schemas/emojis";
 import { z } from "zod";
 import { createAdapterHandlerBuilder } from "../builder";
 

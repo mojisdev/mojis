@@ -3,9 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
   entry: [
     "./src/index.ts",
-    "./src/shortcodes.ts",
-    "./src/constants.ts",
-    "./src/versions.ts",
+    "./src/emojis.ts",
   ],
   format: ["esm"],
   clean: true,
