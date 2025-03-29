@@ -4,6 +4,7 @@ import type {
   AdapterHandlerType,
   AnyAdapterHandler,
   AnyVersionHandler,
+  InferHandlerOutput,
 } from "./types";
 import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
@@ -28,12 +29,12 @@ const HANDLERS = {
 
 export async function runAdapterHandler<
   TAdapterHandlerType extends AdapterHandlerType,
+  THandler extends AnyAdapterHandler = typeof HANDLERS[TAdapterHandlerType],
 >(
   type: TAdapterHandlerType,
   ctx: AdapterContext,
   __overrides?: RunOverrides,
-  // TODO(luxass): fix return type
-): Promise<any> {
+): Promise<InferHandlerOutput<THandler>> {
   const handler = HANDLERS[type];
 
   const promises = [];
@@ -48,7 +49,7 @@ export async function runAdapterHandler<
 
   const result = await Promise.all(promises);
   // TODO: what if we want to return multiple handlers?
-  return result[0];
+  return result[0] as InferHandlerOutput<THandler>;
 }
 
 export async function runVersionHandler<THandler extends AnyVersionHandler>(

@@ -401,3 +401,7 @@ export interface VersionHandler<TParams extends AnyBuiltVersionHandlerParams> {
 }
 
 export type AnyVersionHandler = VersionHandler<any>;
+
+export type InferHandlerOutput<TAdapterHandler extends AnyAdapterHandler> = TAdapterHandler extends AdapterHandler<infer TParams>
+  ? TParams["handlers"][number]["1"]["output"]
+  : never;
