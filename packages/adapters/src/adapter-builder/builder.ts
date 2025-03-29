@@ -1,11 +1,13 @@
 import type {
-  AdapterHandlerBuilder,
   AdapterHandlerType,
+} from "../global-types";
+import type { AnyVersionHandler } from "../version-builder/types";
+import type {
+  AdapterHandlerBuilder,
   AnyAdapterHandler,
-  AnyVersionHandler,
   PredicateFn,
 } from "./types";
-import { createVersionHandlerBuilder } from "./version-builder";
+import { createVersionHandlerBuilder } from "../version-builder/builder";
 
 function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandlerType>(
   initDef: Partial<AnyAdapterHandler> = {},

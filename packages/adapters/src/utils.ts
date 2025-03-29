@@ -1,4 +1,4 @@
-import type { AdapterContext, BuiltinParser, PossibleUrls, UrlFn, UrlWithCache } from "./types";
+import type { AdapterContext, BuiltinParser, PossibleUrls, UrlFn, UrlWithCache } from "./global-types";
 import { createCacheKeyFromUrl } from "@mojis/internal-utils";
 
 /**

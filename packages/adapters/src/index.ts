@@ -5,7 +5,7 @@ import type {
   AnyAdapterHandler,
   AnyVersionHandler,
   InferHandlerOutput,
-} from "./types";
+} from "./global-types";
 import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
 import { defu } from "defu";
@@ -13,7 +13,7 @@ import { AdapterError } from "./errors";
 import { metadata, sequences, unicodeNames, variations } from "./handlers";
 import { buildContext, getHandlerUrls, isBuiltinParser } from "./utils";
 
-export type { AdapterHandlerType } from "./types";
+export type { AdapterHandlerType } from "./global-types";
 
 interface RunOverrides {
   cacheKey?: string;

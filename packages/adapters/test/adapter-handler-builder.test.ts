@@ -1,6 +1,6 @@
-import type { AdapterContext } from "../src/types";
+import type { AdapterContext } from "../src/global-types";
 import { describe, expect, it } from "vitest";
-import { createAdapterHandlerBuilder } from "../src/adapter-builder";
+import { createAdapterHandlerBuilder } from "../src/adapter-builder/builder";
 
 describe("adapter handler builder", () => {
   const emptyContext = {} as AdapterContext;

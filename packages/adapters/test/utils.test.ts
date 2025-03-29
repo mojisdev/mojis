@@ -1,4 +1,4 @@
-import type { AdapterContext, PossibleUrls, UrlFn } from "../src/types";
+import type { AdapterContext, PossibleUrls, UrlFn } from "../src/global-types";
 import { createCacheKeyFromUrl } from "@mojis/internal-utils";
 import { describe, expect, it } from "vitest";
 import {

@@ -1,9 +1,8 @@
 import type {
   AdapterContext,
-  AnyVersionHandler,
-  HandleVersionBuilder,
   UnsetMarker,
-} from "./types";
+} from "../global-types";
+import type { AnyVersionHandler, HandleVersionBuilder } from "./types";
 
 function internalCreateVersionHandlerBuilder(
   initDef: Partial<AnyVersionHandler> = {},

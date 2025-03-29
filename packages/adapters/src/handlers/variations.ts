@@ -2,7 +2,7 @@ import type { EmojiVariation } from "@mojis/schemas/emojis";
 import { EMOJI_VARIATION_SCHEMA } from "@mojis/schemas/emojis";
 import semver from "semver";
 import { z } from "zod";
-import { createAdapterHandlerBuilder } from "../adapter-builder";
+import { createAdapterHandlerBuilder } from "../adapter-builder/builder";
 
 const UNSUPPORTED_VARIATION_VERSIONS = ["1.0", "2.0", "3.0", "4.0"];
 
