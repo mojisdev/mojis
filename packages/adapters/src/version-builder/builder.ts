@@ -76,12 +76,6 @@ function internalCreateVersionHandlerBuilder<
         fetchOptions: userFetchOptions,
       }) as HandleVersionBuilder<any>;
     },
-    validation(userValidation) {
-      return internalCreateVersionHandlerBuilder({
-        ..._def,
-        validation: userValidation,
-      }) as HandleVersionBuilder<any>;
-    },
     output(userOutput) {
       return {
         ..._def,
