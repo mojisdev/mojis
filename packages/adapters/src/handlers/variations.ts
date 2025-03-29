@@ -59,10 +59,6 @@ export const handler = builder
         //          ^?
         return transformed;
       }),
-  ).onVersion(
-    (version) => UNSUPPORTED_VARIATION_VERSIONS.includes(version),
-    (builder) => builder.urls(() => undefined)
-      .parser("generic")
-      .transform(() => undefined)
-      .output(() => []),
-  ).build();
+  ).fallback(() => {
+    return [];
+  }).build();

@@ -121,4 +121,12 @@ export const handler = builder
         //          ^?
         return sequences;
       }),
-  ).build();
+  )
+  .fallback(() => {
+    return {
+      sequences: [],
+      zwj: [],
+    };
+  })
+
+  .build();

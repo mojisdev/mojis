@@ -46,4 +46,8 @@ export const handler = builder
         //          ^?
         return transformed;
       }),
-  ).build();
+  )
+  .fallback(() => {
+    return {};
+  })
+  .build();
