@@ -4,7 +4,9 @@ import type {
 } from "../global-types";
 import type { AnyVersionHandler, HandleVersionBuilder } from "./types";
 
-function internalCreateVersionHandlerBuilder(
+function internalCreateVersionHandlerBuilder<
+  TOutputSchema,
+>(
   initDef: Partial<AnyVersionHandler> = {},
 ): HandleVersionBuilder<{
     _context: AdapterContext;
@@ -29,8 +31,10 @@ function internalCreateVersionHandlerBuilder(
       out: UnsetMarker;
     };
     _validation: UnsetMarker;
+    _outputSchema: TOutputSchema;
   }> {
   const _def: Partial<AnyVersionHandler> = {
+    outputSchema: initDef.outputSchema,
     ...initDef,
   };
 
@@ -72,12 +76,6 @@ function internalCreateVersionHandlerBuilder(
         fetchOptions: userFetchOptions,
       }) as HandleVersionBuilder<any>;
     },
-    validation(userValidation) {
-      return internalCreateVersionHandlerBuilder({
-        ..._def,
-        validation: userValidation,
-      }) as HandleVersionBuilder<any>;
-    },
     output(userOutput) {
       return {
         ..._def,
@@ -87,7 +85,7 @@ function internalCreateVersionHandlerBuilder(
   };
 }
 
-export function createVersionHandlerBuilder(): HandleVersionBuilder<{
+export function createVersionHandlerBuilder<TOutputSchema>(): HandleVersionBuilder<{
   _aggregate: {
     in: UnsetMarker;
     out: UnsetMarker;
@@ -110,6 +108,7 @@ export function createVersionHandlerBuilder(): HandleVersionBuilder<{
     out: UnsetMarker;
   };
   _validation: UnsetMarker;
+  _outputSchema: TOutputSchema;
 }> {
-  return internalCreateVersionHandlerBuilder();
+  return internalCreateVersionHandlerBuilder<TOutputSchema>();
 }

@@ -1,7 +1,6 @@
 import type { GenericParseResult } from "@mojis/parsers";
 import type { AdapterContext } from "../src/global-types";
 import { describe, expect, it } from "vitest";
-import { z } from "zod";
 import { createVersionHandlerBuilder } from "../src/version-builder/builder";
 
 describe("version handler builder", () => {
@@ -152,10 +151,11 @@ describe("version handler builder", () => {
   });
 
   it("validates data", () => {
-    const handler = createVersionHandlerBuilder()
+    const handler = createVersionHandlerBuilder<{
+      id: string;
+    }>()
       .urls(() => "https://example.com")
       .parser("generic")
-      .validation(z.object({ id: z.string() }))
       .transform(() => ({
         id: "hello-world",
       }))

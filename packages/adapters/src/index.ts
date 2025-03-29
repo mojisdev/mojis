@@ -47,9 +47,20 @@ export async function runAdapterHandler<
   }
 
   const result = await Promise.all(promises);
+  // TODO: what if we have multiple handlers for the same predicate?
+  const output = result[0];
 
-  // TODO: what if we want to return multiple handlers?
-  return result[0] as InferHandlerOutput<THandler>;
+  if (handler.outputSchema == null) {
+    return output as InferHandlerOutput<THandler>;
+  }
+
+  const validationResult = handler.outputSchema.safeParse(output);
+
+  if (!validationResult.success) {
+    throw new AdapterError(`Invalid output for handler: ${type}`);
+  }
+
+  return validationResult.data as InferHandlerOutput<THandler>;
 }
 
 export async function runVersionHandler<THandler extends AnyVersionHandler>(
@@ -127,16 +138,6 @@ export async function runVersionHandler<THandler extends AnyVersionHandler>(
   } else {
     const aggregatedData = handler.aggregate(ctx, transformedDataList);
     output = handler.output(ctx, aggregatedData);
-  }
-
-  if (handler.validation != null) {
-    const result = handler.validation.safeParse(output);
-
-    if (!result.success) {
-      throw new AdapterError(`Invalid output for handler: ${adapterHandlerType}`);
-    }
-
-    output = result.data;
   }
 
   return output;
