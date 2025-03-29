@@ -354,49 +354,49 @@ describe("runAdapterHandler", () => {
     expect(fetchCounter).toBe(2);
   });
 
-  // it("should handle validation", async () => {
-  //   mockFetch("GET https://mojis.dev/handle-validation", () => HttpResponse.text("mojis.dev/handle-validation"));
+  it("should handle validation", async () => {
+    mockFetch("GET https://mojis.dev/handle-validation", () => HttpResponse.text("mojis.dev/handle-validation"));
 
-  //   const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
+    const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
 
-  //   const mockHandler = createVersionHandlerBuilder()
-  //     .urls(() => "https://mojis.dev/handle-validation")
-  //     .parser("generic")
-  //     .validation(z.object({
-  //       page: z.string().optional(),
-  //     }))
-  //     .transform((_, data) => ({
-  //       page: data.lines[0]?.fields[0],
-  //     }))
-  //     .output((_, data) => data);
+    const mockHandler = createVersionHandlerBuilder<{
+      page?: string;
+    }>()
+      .urls(() => "https://mojis.dev/handle-validation")
+      .parser("generic")
+      .transform((_, data) => ({
+        page: data.lines[0]?.fields[0],
+      }))
+      .output((_, data) => data);
 
-  //   addHandlerToMock(mockHandlers, "metadata", (version: string) => version === "15.0", mockHandler);
+    addHandlerToMock(mockHandlers, "metadata", (version: string) => version === "15.0", mockHandler);
 
-  //   const result = await runAdapterHandler("metadata", mockContext);
-  //   expect(result).toBeDefined();
-  //   expect(result).toEqual({ page: "mojis.dev/handle-validation" });
-  // });
+    const result = await runAdapterHandler("metadata", mockContext);
+    expect(result).toBeDefined();
+    expect(result).toEqual({ page: "mojis.dev/handle-validation" });
+  });
 
-  // it("should throw if validation fails", async () => {
-  //   mockFetch("GET https://mojis.dev/handle-validation-fail", () => HttpResponse.text("mojis.dev/handle-validation-fail"));
-  //   const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
+  it("should throw if validation fails", async () => {
+    mockFetch("GET https://mojis.dev/handle-validation-fail", () => HttpResponse.text("mojis.dev/handle-validation-fail"));
+    const { runAdapterHandler, mockHandlers } = await setupAdapterTest();
 
-  //   const mockHandler = createVersionHandlerBuilder()
-  //     .urls(() => "https://mojis.dev/handle-validation-fail")
-  //     .parser("generic")
-  //     .validation(z.object({
-  //       page1: z.string(),
-  //     }).strict())
-  //     .transform((_, data) => ({
-  //       page: data.lines[0]?.fields[0],
-  //     }))
-  //     // @ts-expect-error - we are intentionally testing the validation failure
-  //     .output((_, data) => data);
+    const mockHandler = createVersionHandlerBuilder<{
+      page1: string;
+    }>()
+      .urls(() => "https://mojis.dev/handle-validation-fail")
+      .parser("generic")
+      .transform((_, data) => ({
+        page: data.lines[0]?.fields[0],
+      }))
+      // @ts-expect-error - we are intentionally testing the validation failure
+      .output((_, data) => data);
 
-  //   addHandlerToMock(mockHandlers, "metadata", (version: string) => version === "15.0", mockHandler);
+    addHandlerToMock(mockHandlers, "metadata", (version: string) => version === "15.0", mockHandler, z.object({
+      page1: z.string(),
+    }));
 
-  //   await expect(runAdapterHandler("metadata", mockContext))
-  //     .rejects
-  //     .toThrow("Invalid output for handler: metadata");
-  // });
+    await expect(runAdapterHandler("metadata", mockContext))
+      .rejects
+      .toThrow("Invalid output for handler: metadata");
+  });
 });

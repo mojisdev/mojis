@@ -151,17 +151,18 @@ describe("version handler builder", () => {
     });
   });
 
-  // it("validates data", () => {
-  //   const handler = createVersionHandlerBuilder()
-  //     .urls(() => "https://example.com")
-  //     .parser("generic")
-  //     .validation(z.object({ id: z.string() }))
-  //     .transform(() => ({
-  //       id: "hello-world",
-  //     }))
-  //     .output((_, data) => data);
+  it("validates data", () => {
+    const handler = createVersionHandlerBuilder<{
+      id: string;
+    }>()
+      .urls(() => "https://example.com")
+      .parser("generic")
+      .transform(() => ({
+        id: "hello-world",
+      }))
+      .output((_, data) => data);
 
-  //   const result = handler.transform(emptyContext, { totalLines: 1, lines: [{ comment: "", fields: ["id: hello-world"], property: "" }] });
-  //   expect(result).toEqual({ id: "hello-world" });
-  // });
+    const result = handler.transform(emptyContext, { totalLines: 1, lines: [{ comment: "", fields: ["id: hello-world"], property: "" }] });
+    expect(result).toEqual({ id: "hello-world" });
+  });
 });

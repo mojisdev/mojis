@@ -1,4 +1,5 @@
 /* eslint-disable ts/explicit-function-return-type */
+import type { z } from "zod";
 import type { PredicateFn } from "../src/adapter-builder/types";
 import type { AdapterHandlerType } from "../src/global-types";
 import type { AnyVersionHandler } from "../src/version-builder/types";
@@ -8,21 +9,25 @@ export function createMockHandlers() {
   return {
     metadata: {
       adapterType: "metadata",
+      outputSchema: null as z.ZodType | null,
       handlers: [] as [PredicateFn, AnyVersionHandler][],
     },
     sequences: {
       adapterType: "sequences",
+      outputSchema: null as z.ZodType | null,
       handlers: [] as [PredicateFn, AnyVersionHandler][],
     },
     unicodeNames: {
       adapterType: "unicode-names",
+      outputSchema: null as z.ZodType | null,
       handlers: [] as [PredicateFn, AnyVersionHandler][],
     },
     variations: {
       adapterType: "variations",
+      outputSchema: null as z.ZodType | null,
       handlers: [] as [PredicateFn, AnyVersionHandler][],
     },
-  } as const;
+  };
 }
 
 export async function setupAdapterTest() {
@@ -46,10 +51,15 @@ export function addHandlerToMock(
   type: AdapterHandlerType,
   versionPredicate: (version: string) => boolean,
   handler: AnyVersionHandler,
+  outputSchema?: z.ZodType,
 ): void {
   let _type: string = type;
   if (type === "unicode-names") {
     _type = "unicodeNames";
+  }
+
+  if (outputSchema != null) {
+    mockHandlers[_type as keyof typeof mockHandlers].outputSchema = outputSchema;
   }
 
   mockHandlers[_type as keyof typeof mockHandlers].handlers.push([versionPredicate, handler]);
