@@ -150,23 +150,12 @@ export const handler = builder
         });
     },
   )
-  .onVersion(
-    (emoji_version) => DISALLOWED_EMOJI_VERSIONS.includes(emoji_version),
-    (builder) => {
-      return builder.urls(() => undefined)
-        .parser("generic")
-        .transform(() => {
-          throw new Error("not implemented");
-        })
-        .output(() => ({
-          groups: [],
-          emojis: {},
-        }));
-    },
-  )
-  // .fallback(() => {
-  //   return [];
-  // })
+  .fallback(() => {
+    return {
+      emojis: {},
+      groups: [],
+    };
+  })
   // .onError((err) => {
   //   console.error(err);
   // })

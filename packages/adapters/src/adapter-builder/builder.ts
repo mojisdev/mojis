@@ -6,6 +6,7 @@ import type { AnyVersionHandler } from "../version-builder/types";
 import type {
   AdapterHandlerBuilder,
   AnyAdapterHandler,
+  FallbackFn,
   PredicateFn,
 } from "./types";
 import { createVersionHandlerBuilder } from "../version-builder/builder";
@@ -16,11 +17,13 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
     _type: TAdapterType;
     _handlers: [PredicateFn, AnyVersionHandler][];
     _outputSchema: TOutputSchema;
+    _fallback: FallbackFn<TOutputSchema["_input"]>;
   }> {
   const _def: AnyAdapterHandler = {
     adapterType: initDef.adapterType,
     outputSchema: initDef.outputSchema,
     handlers: [],
+    fallback: () => {},
 
     // overload with properties passed in
     ...initDef,
@@ -36,6 +39,12 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
           [userPredicate, versionHandler],
         ],
       }) as AdapterHandlerBuilder<any>;
+    },
+    fallback(userFn) {
+      return internalCreateAdapterHandlerBuilder({
+        ..._def,
+        fallback: userFn,
+      });
     },
     build() {
       return _def;
