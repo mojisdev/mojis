@@ -21,7 +21,8 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
     adapterType: initDef.adapterType,
     outputSchema: initDef.outputSchema,
     handlers: [],
-    // Overload with properties passed in
+
+    // overload with properties passed in
     ...initDef,
   };
 
@@ -44,7 +45,7 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
 
 export interface CreateBuilderOptions<TAdapterType extends AdapterHandlerType, TOutputSchema extends z.ZodType> {
   type: TAdapterType;
-  outputSchema: TOutputSchema;
+  outputSchema?: TOutputSchema;
 }
 
 export function createAdapterHandlerBuilder<TAdapterType extends AdapterHandlerType, TOutputSchema extends z.ZodType>(

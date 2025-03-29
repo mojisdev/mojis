@@ -15,7 +15,7 @@ export interface AdapterHandlerBuilder<
   onVersion: <
     TPredicate extends PredicateFn,
     TBuilderParams extends Omit<AnyHandleVersionParams, "_outputSchema"> & {
-      _outputSchema: TParams["_outputSchema"]["_input"];
+      _outputSchema: TParams["_outputSchema"] extends z.ZodType ? TParams["_outputSchema"]["_input"] : any;
     },
     TBuilder extends HandleVersionBuilder<TBuilderParams>,
     THandler extends AnyVersionHandler,
@@ -32,7 +32,7 @@ export interface AdapterHandlerBuilder<
 
 export interface AnyAdapterHandlerParams {
   _type: AdapterHandlerType;
-  _outputSchema: z.ZodType;
+  _outputSchema?: z.ZodType;
   _handlers: [PredicateFn, AnyVersionHandler][];
 }
 
@@ -41,13 +41,13 @@ export type PredicateFn = (version: string) => boolean;
 export interface AnyBuiltAdapterHandlerParams {
   type: AdapterHandlerType;
   handlers: [PredicateFn, AnyVersionHandler][];
-  outputSchema: z.ZodType;
+  outputSchema?: z.ZodType;
 }
 
 export interface AdapterHandler<TParams extends AnyBuiltAdapterHandlerParams> {
   adapterType: TParams["type"];
   handlers: TParams["handlers"];
-  outputSchema: TParams["outputSchema"];
+  outputSchema?: TParams["outputSchema"];
 }
 
 export type AnyAdapterHandler = AdapterHandler<any>;
