@@ -1,5 +1,5 @@
 import type { GenericParseOptions } from "@mojis/parsers";
-import type { GetParseOptionsFromParser } from "../src/global-types";
+import type { GetParseOptionsFromParser } from "../src/version-builder/types";
 import { describe, expectTypeOf, it } from "vitest";
 
 describe("GetParseOptionsFromParser", () => {

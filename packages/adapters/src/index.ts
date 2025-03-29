@@ -1,11 +1,10 @@
 import type { WriteCacheOptions } from "@mojis/internal-utils";
+import type { AnyAdapterHandler, InferHandlerOutput } from "./adapter-builder/types";
 import type {
   AdapterContext,
   AdapterHandlerType,
-  AnyAdapterHandler,
-  AnyVersionHandler,
-  InferHandlerOutput,
 } from "./global-types";
+import type { AnyVersionHandler } from "./version-builder/types";
 import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
 import { defu } from "defu";

@@ -1,5 +1,7 @@
 /* eslint-disable ts/explicit-function-return-type */
-import type { AdapterHandlerType, AnyVersionHandler, PredicateFn } from "../src/global-types";
+import type { PredicateFn } from "../src/adapter-builder/types";
+import type { AdapterHandlerType } from "../src/global-types";
+import type { AnyVersionHandler } from "../src/version-builder/types";
 import { vi } from "vitest";
 
 export function createMockHandlers() {
