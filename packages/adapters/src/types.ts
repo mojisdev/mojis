@@ -340,13 +340,26 @@ export interface AdapterHandlerBuilder<
     builder: (builder: TBuilder) => THandler,
   ) => AdapterHandlerBuilder<{
     _type: TParams["_type"];
-    _handlers: [...TParams["_handlers"], [TPredicate, THandler]];
+    _handlers: Join<TParams["_handlers"], [[TPredicate, THandler]]>;
   }>;
   build: () => AdapterHandler<{
     type: TParams["_type"];
     handlers: TParams["_handlers"];
   }>;
 }
+
+type Join<
+  T extends readonly unknown[],
+  U extends readonly unknown[],
+> = T extends []
+  ? U
+  : U extends []
+    ? T
+    : T extends readonly [infer THead, ...infer TRest]
+      ? U extends readonly [infer UHead, ...infer URest]
+        ? [THead, UHead, ...Join<TRest, URest>]
+        : T
+      : U;
 
 export interface AnyBuiltAdapterHandlerParams {
   type: AdapterHandlerType;
