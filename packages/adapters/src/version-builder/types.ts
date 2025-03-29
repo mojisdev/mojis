@@ -50,8 +50,8 @@ export interface AnyHandleVersionParams {
   // the handler is using aggregate or not
   _outputType: any;
 
-  // zod validation
-  _validation: any;
+  // schema for output validation
+  _outputSchema: any;
 }
 
 export type TransformFn<TContext extends AdapterContext, TIn, TOut> = (
@@ -96,7 +96,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _output: TParams["_output"];
     _options: TParams["_options"];
     _outputType: TParams["_outputType"];
-    _validation: TParams["_validation"];
+    _outputSchema: TParams["_outputSchema"];
   }>;
 
   parser: <TParser extends BuiltinParser | ParserFn<AdapterContext, any>>(
@@ -116,7 +116,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _context: TParams["_context"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
-    _validation: TParams["_validation"];
+    _outputSchema: TParams["_outputSchema"];
     _transform: TParams["_transform"];
     _options: TParams["_options"];
     _parser: {
@@ -142,7 +142,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _context: TParams["_context"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
-    _validation: TParams["_validation"];
+    _outputSchema: TParams["_outputSchema"];
     _options: TParams["_options"];
     _transform: {
       in: TIn;
@@ -163,7 +163,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
       : ErrorMessage<"aggregate is already set">,
   ) => HandleVersionBuilder<{
     _context: TParams["_context"];
-    _validation: TParams["_validation"];
+    _outputSchema: TParams["_outputSchema"];
     _aggregate: {
       in: TIn;
       out: TOut;
@@ -185,7 +185,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
       : ErrorMessage<"cacheOptions is already set">,
   ) => HandleVersionBuilder<{
     _context: TParams["_context"];
-    _validation: TParams["_validation"];
+    _outputSchema: TParams["_outputSchema"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
     _transform: TParams["_transform"];
@@ -205,7 +205,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
       : ErrorMessage<"fetchOptions is already set">,
   ) => HandleVersionBuilder<{
     _context: TParams["_context"];
-    _validation: TParams["_validation"];
+    _outputSchema: TParams["_outputSchema"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
     _transform: TParams["_transform"];
@@ -219,24 +219,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     _outputType: TParams["_outputType"];
   }>;
 
-  validation: <TValidation extends z.ZodType>(
-    validation: TParams["_validation"] extends UnsetMarker
-      ? TValidation
-      : ErrorMessage<"validation is already set">,
-  ) => HandleVersionBuilder<{
-    _context: TParams["_context"];
-    _validation: TValidation["_input"];
-    _urls: TParams["_urls"];
-    _aggregate: TParams["_aggregate"];
-    _transform: TParams["_transform"];
-    _parser: TParams["_parser"];
-    _parserOptions: TParams["_parserOptions"];
-    _output: TParams["_output"];
-    _options: TParams["_options"];
-    _outputType: TParams["_outputType"];
-  }>;
-
-  output: <TIn extends TParams["_outputType"], TOut extends TParams["_validation"] extends UnsetMarker ? any : TParams["_validation"]>(
+  output: <TIn extends TParams["_outputType"], TOut extends TParams["_outputSchema"] extends UnsetMarker ? any : TParams["_outputSchema"]>(
     output: TParams["_output"] extends UnsetMarker
       ? OutputFn<AdapterContext, TIn, TOut>
       : ErrorMessage<"output is already set">,
@@ -250,7 +233,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     urls: TParams["_urls"];
     transform: TParams["_transform"]["out"];
     aggregate: TParams["_aggregate"]["out"];
-    validation: TParams["_validation"];
+    outputSchema: TParams["_outputSchema"];
     output: TParams["_outputType"];
   }>;
 }
@@ -262,7 +245,7 @@ export interface AnyBuiltVersionHandlerParams {
   parser: any;
   parserOptions: GetParseOptionsFromParser<any>;
   parserOutput: any;
-  validation: z.ZodType;
+  outputSchema: z.ZodType;
   urls: PossibleUrls;
   transform: any;
   aggregate: any;
@@ -275,11 +258,11 @@ export interface VersionHandler<TParams extends AnyBuiltVersionHandlerParams> {
   cacheOptions: TParams["cacheOptions"];
   parser: TParams["parser"];
   parserOptions: TParams["parserOptions"];
-  validation: TParams["validation"];
   urls: UrlFn<TParams["urls"]>;
   transform: TransformFn<TParams["globalContext"], TParams["parserOutput"], TParams["transform"]>;
   aggregate: AggregateFn<TParams["globalContext"], TParams["transform"], TParams["aggregate"]>;
   output: TParams["output"];
+  outputSchema: TParams["outputSchema"];
 }
 
 export type AnyVersionHandler = VersionHandler<any>;

@@ -8,13 +8,13 @@ const UNSUPPORTED_VARIATION_VERSIONS = ["1.0", "2.0", "3.0", "4.0"];
 
 const builder = createAdapterHandlerBuilder({
   type: "variations",
+  outputSchema: z.array(EMOJI_VARIATION_SCHEMA),
 });
 
 export const handler = builder
   .onVersion(
     (version) => !UNSUPPORTED_VARIATION_VERSIONS.includes(version),
     (builder) => builder
-      .validation(z.array(EMOJI_VARIATION_SCHEMA))
       .urls((ctx) => {
         if (semver.lte(`${ctx.unicode_version}.0`, "12.1.0")) {
           return {

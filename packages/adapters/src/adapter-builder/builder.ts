@@ -1,3 +1,4 @@
+import type { z } from "zod";
 import type {
   AdapterHandlerType,
 } from "../global-types";
@@ -9,27 +10,29 @@ import type {
 } from "./types";
 import { createVersionHandlerBuilder } from "../version-builder/builder";
 
-function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandlerType>(
+function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandlerType, TOutputSchema extends z.ZodType>(
   initDef: Partial<AnyAdapterHandler> = {},
 ): AdapterHandlerBuilder<{
     _type: TAdapterType;
     _handlers: [PredicateFn, AnyVersionHandler][];
+    _outputSchema: TOutputSchema;
   }> {
   const _def: AnyAdapterHandler = {
     adapterType: initDef.adapterType,
+    outputSchema: initDef.outputSchema,
     handlers: [],
     // Overload with properties passed in
     ...initDef,
   };
 
   return {
-    onVersion(predicate, builder) {
-      const versionHandler = builder(createVersionHandlerBuilder() as any);
+    onVersion(userPredicate, userBuilder) {
+      const versionHandler = userBuilder(createVersionHandlerBuilder<TOutputSchema["_input"]>() as any);
       return internalCreateAdapterHandlerBuilder({
         ..._def,
         handlers: [
           ..._def.handlers,
-          [predicate, versionHandler],
+          [userPredicate, versionHandler],
         ],
       }) as AdapterHandlerBuilder<any>;
     },
@@ -39,17 +42,20 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
   };
 }
 
-export interface CreateBuilderOptions<TAdapterType extends AdapterHandlerType> {
+export interface CreateBuilderOptions<TAdapterType extends AdapterHandlerType, TOutputSchema extends z.ZodType> {
   type: TAdapterType;
+  outputSchema: TOutputSchema;
 }
 
-export function createAdapterHandlerBuilder<TAdapterType extends AdapterHandlerType>(
-  opts?: CreateBuilderOptions<TAdapterType>,
+export function createAdapterHandlerBuilder<TAdapterType extends AdapterHandlerType, TOutputSchema extends z.ZodType>(
+  opts: CreateBuilderOptions<TAdapterType, TOutputSchema>,
 ): AdapterHandlerBuilder<{
     _type: TAdapterType;
     _handlers: [PredicateFn, AnyVersionHandler][];
+    _outputSchema: TOutputSchema;
   }> {
-  return internalCreateAdapterHandlerBuilder<TAdapterType>({
-    adapterType: opts?.type,
+  return internalCreateAdapterHandlerBuilder<TAdapterType, TOutputSchema>({
+    adapterType: opts.type,
+    outputSchema: opts.outputSchema,
   });
 }

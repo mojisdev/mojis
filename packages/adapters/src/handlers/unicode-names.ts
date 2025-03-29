@@ -11,13 +11,13 @@ const MAPPINGS = {
 
 const builder = createAdapterHandlerBuilder({
   type: "unicode-names",
+  outputSchema: z.record(z.string(), z.string()),
 });
 
 export const handler = builder
   .onVersion(
     () => true,
     (builder) => builder
-      .validation(z.record(z.string(), z.string()))
       .urls((ctx) => {
         return {
           url: MAPPINGS[ctx.emoji_version] || `https://unicode-proxy.mojis.dev/proxy/${ctx.emoji_version}.0/ucd/UnicodeData.txt`,

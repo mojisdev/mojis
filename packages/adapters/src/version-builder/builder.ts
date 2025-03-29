@@ -1,10 +1,13 @@
+import type { z } from "zod";
 import type {
   AdapterContext,
   UnsetMarker,
 } from "../global-types";
 import type { AnyVersionHandler, HandleVersionBuilder } from "./types";
 
-function internalCreateVersionHandlerBuilder(
+function internalCreateVersionHandlerBuilder<
+  TOutputSchema,
+>(
   initDef: Partial<AnyVersionHandler> = {},
 ): HandleVersionBuilder<{
     _context: AdapterContext;
@@ -29,8 +32,10 @@ function internalCreateVersionHandlerBuilder(
       out: UnsetMarker;
     };
     _validation: UnsetMarker;
+    _outputSchema: TOutputSchema;
   }> {
   const _def: Partial<AnyVersionHandler> = {
+    outputSchema: initDef.outputSchema,
     ...initDef,
   };
 
@@ -87,7 +92,7 @@ function internalCreateVersionHandlerBuilder(
   };
 }
 
-export function createVersionHandlerBuilder(): HandleVersionBuilder<{
+export function createVersionHandlerBuilder<TOutputSchema>(): HandleVersionBuilder<{
   _aggregate: {
     in: UnsetMarker;
     out: UnsetMarker;
@@ -110,6 +115,7 @@ export function createVersionHandlerBuilder(): HandleVersionBuilder<{
     out: UnsetMarker;
   };
   _validation: UnsetMarker;
+  _outputSchema: TOutputSchema;
 }> {
-  return internalCreateVersionHandlerBuilder();
+  return internalCreateVersionHandlerBuilder<TOutputSchema>();
 }

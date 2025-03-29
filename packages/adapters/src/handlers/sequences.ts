@@ -33,16 +33,16 @@ const DEFAULT_PROPERTY_MAP = {
 
 const builder = createAdapterHandlerBuilder({
   type: "sequences",
+  outputSchema: z.object({
+    sequences: z.array(EMOJI_SEQUENCE_SCHEMA).optional(),
+    zwj: z.array(EMOJI_SEQUENCE_SCHEMA).optional(),
+  }),
 });
 
 export const handler = builder
   .onVersion(
     (version) => !NOT_AVAILABLE_SEQUENCES.includes(version),
     (builder) => builder
-      .validation(z.object({
-        sequences: z.array(EMOJI_SEQUENCE_SCHEMA).optional(),
-        zwj: z.array(EMOJI_SEQUENCE_SCHEMA).optional(),
-      }))
       .urls(({ emoji_version }) => {
         return [
           {
