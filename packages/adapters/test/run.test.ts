@@ -1,8 +1,8 @@
-import type { AdapterContext, AdapterHandlerType } from "../src/types";
+import type { AdapterContext, AdapterHandlerType } from "../src/global-types";
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { afterEach, describe, expect, it } from "vitest";
 import { z } from "zod";
-import { createVersionHandlerBuilder } from "../src/builder";
+import { createVersionHandlerBuilder } from "../src/version-builder/builder";
 import { addHandlerToMock, cleanupAdapterTest, setupAdapterTest } from "./test-utils";
 
 describe("runAdapterHandler", () => {

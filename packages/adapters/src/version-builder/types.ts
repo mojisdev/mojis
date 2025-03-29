@@ -1,68 +1,9 @@
 import type { WriteCacheOptions } from "@mojis/internal-utils";
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
 import type { z } from "zod";
-import type { BUILTIN_PARSERS } from "./utils";
-
-/**
- * A type that can be an array or a single value.
- */
-export type MaybeArray<T> = T | T[];
-
-/**
- * The type of the adapter handler.
- */
-export type AdapterHandlerType =
-  | "metadata"
-  | "variations"
-  | "unicode-names"
-  | "sequences";
-
-export interface AdapterContext {
-  /**
-   * The emoji version.
-   */
-  emoji_version: string;
-
-  /**
-   * The unicode version.
-   * This will correspond to the emoji version.
-   */
-  unicode_version: string;
-
-  /**
-   * Whether or not the force mode was enabled.
-   */
-  force: boolean;
-}
-
-export interface UrlWithCache {
-  /**
-   * The url to fetch the data.
-   */
-  url: string;
-
-  /**
-   * The cache key for the data.
-   */
-  cacheKey: string;
-
-  /**
-   * The key to identify the data.
-   *
-   * NOTE:
-   * If not set it will be generated from the cache key.
-   */
-  key?: string;
-}
-
-export type PossibleUrls =
-  | MaybeArray<UrlWithCache>
-  | MaybeArray<string>
-  | MaybeArray<undefined>;
+import type { AdapterContext, BuiltinParser, ErrorMessage, PossibleUrls, UnsetMarker } from "../global-types";
 
 export type UrlFn<TOut extends PossibleUrls> = (ctx: AdapterContext) => TOut;
-
-export type BuiltinParser = (typeof BUILTIN_PARSERS)[number];
 
 export type ParserFn<TContext extends AdapterContext, TOutput> = (
   ctx: TContext,
@@ -83,10 +24,6 @@ export type InferParseOutput<
   : TParser extends ParserFn<TContext, infer TOutput>
     ? TOutput
     : never;
-
-export type UnsetMarker = "unsetMarker" & {
-  __brand: "unsetMarker";
-};
 
 export interface AnyHandleVersionParams {
   _context: AdapterContext;
@@ -116,8 +53,6 @@ export interface AnyHandleVersionParams {
   // zod validation
   _validation: any;
 }
-
-export type ErrorMessage<TError extends string> = TError;
 
 export type TransformFn<TContext extends AdapterContext, TIn, TOut> = (
   ctx: TContext,
@@ -319,46 +254,6 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     output: TParams["_outputType"];
   }>;
 }
-
-export interface AnyAdapterHandlerParams {
-  _type: AdapterHandlerType;
-  _handlers: [PredicateFn, AnyVersionHandler][];
-}
-
-export type PredicateFn = (version: string) => boolean;
-
-export interface AdapterHandlerBuilder<
-  TParams extends AnyAdapterHandlerParams,
-> {
-  onVersion: <
-    TPredicate extends PredicateFn,
-    TBuilderParams extends AnyHandleVersionParams,
-    TBuilder extends HandleVersionBuilder<TBuilderParams>,
-    THandler extends AnyVersionHandler,
-  >(
-    predicate: TPredicate,
-    builder: (builder: TBuilder) => THandler,
-  ) => AdapterHandlerBuilder<{
-    _type: TParams["_type"];
-    _handlers: [...TParams["_handlers"], [TPredicate, THandler]];
-  }>;
-  build: () => AdapterHandler<{
-    type: TParams["_type"];
-    handlers: TParams["_handlers"];
-  }>;
-}
-
-export interface AnyBuiltAdapterHandlerParams {
-  type: AdapterHandlerType;
-  handlers: [PredicateFn, AnyVersionHandler][];
-}
-
-export interface AdapterHandler<TParams extends AnyBuiltAdapterHandlerParams> {
-  adapterType: TParams["type"];
-  handlers: TParams["handlers"];
-}
-
-export type AnyAdapterHandler = AdapterHandler<any>;
 
 export interface AnyBuiltVersionHandlerParams {
   globalContext: AdapterContext;
