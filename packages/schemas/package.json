@@ -1,6 +1,6 @@
 {
-  "name": "@mojis/json-schemas",
-  "version": "0.0.2",
+  "name": "@mojis/schemas",
+  "version": "0.0.0",
   "type": "module",
   "author": {
     "name": "Lucas Nørgård",
@@ -13,34 +13,38 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mojisdev/mojis.git",
-    "directory": "packages/json-schemas"
+    "directory": "packages/schemas"
   },
   "bugs": {
     "url": "https://github.com/mojisdev/mojis/issues"
   },
   "exports": {
-    "./groups.json": "./schemas/groups.json",
+    ".": "./dist/index.js",
+    "./emojis": "./dist/emojis.js",
     "./package.json": "./package.json"
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
-    "schemas"
+    "dist"
   ],
   "scripts": {
-    "build": "pnpm run write-schemas",
-    "dev": "pnpm run write-schemas --watch",
-    "write-schemas": "tsx ./scripts/write-json-schemas.ts",
-    "clean": "git clean -xdf dist node_modules json-schemas",
+    "build": "tsup --tsconfig tsconfig.build.json",
+    "dev": "tsup --tsconfig tsconfig.build.json --watch",
+    "clean": "git clean -xdf dist node_modules",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "zod": "catalog:prod"
+  },
   "devDependencies": {
     "@luxass/eslint-config": "catalog:dev",
-    "@mojis/schemas": "workspace:*",
     "eslint": "catalog:dev",
-    "tsx": "catalog:dev",
+    "tsup": "catalog:dev",
     "typescript": "catalog:dev",
-    "vitest-testdirs": "catalog:dev",
-    "zod-to-json-schema": "catalog:dev"
+    "vitest-testdirs": "catalog:dev"
   },
   "publishConfig": {
     "access": "public"

@@ -1,4 +1,4 @@
-import type { EmojiSpecRecord } from "@mojis/internal-utils";
+import type { EmojiSpecRecord } from "@mojis/schemas/emojis";
 import type { CLIArguments } from "../cli-utils";
 import { join } from "node:path";
 import { runAdapterHandler } from "@mojis/adapters";

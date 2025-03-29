@@ -1,34 +1,3 @@
-import type { z } from "zod";
-import type { EMOJI_SPEC_RECORD_SCHEMA, SHORTCODE_PROVIDER_SCHEMA } from "./schemas";
-
-export type EmojiSpecRecord = z.infer<typeof EMOJI_SPEC_RECORD_SCHEMA>;
-
-export interface EmojiGroup {
-  name: string;
-  slug: string;
-  subgroups: string[];
-}
-
-export interface EmojiMetadata {
-  group: string;
-  subgroup: string;
-  qualifier: string;
-  unicodeVersion: string | null;
-  emojiVersion: string | null;
-  description: string;
-  emoji: string | null;
-  hexcodes: string[];
-}
-
-export interface EmojiSequence {
-  property: string;
-  hex: string;
-  description: string | null;
-  gender: string | null;
-}
-
-export type ShortcodeProvider = z.infer<typeof SHORTCODE_PROVIDER_SCHEMA>;
-
 export type Property =
   // An emoji character.
   | "Basic_Emoji"
@@ -66,9 +35,3 @@ export type Property =
   | "RGI_Emoji_Modifier_Sequence"
   | "RGI_Emoji_Tag_Sequence"
   | "RGI_Emoji_ZWJ_Sequence";
-
-export interface EmojiVariation {
-  text: string | null;
-  emoji: string | null;
-  property?: Property[];
-}

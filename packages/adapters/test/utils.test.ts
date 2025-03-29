@@ -1,160 +1,167 @@
-import type { AdapterContext, Arrayable } from "../src/types";
-import { describe, expect, it, vi } from "vitest";
-import { buildContext, BUILTIN_PARSERS, getHandlerUrls, isBuiltinParser, isUrlBuilder } from "../src/utils";
+import type { AdapterContext, PossibleUrls } from "../src/global-types";
+import type { UrlFn } from "../src/version-builder/types";
+import { createCacheKeyFromUrl } from "@mojis/internal-utils";
+import { describe, expect, it } from "vitest";
+import {
+  buildContext,
+  BUILTIN_PARSERS,
+  getHandlerUrls,
+  isBuiltinParser,
+  isUrlWithCache,
+} from "../src/utils";
 
-describe("is url builder", () => {
+describe("is url with cache", () => {
   it.each([
-    [
-      () => "https://example.com",
-      true,
-    ],
-    [
-      "https://example.com",
-      false,
-    ],
-  ])("should return %p for %p", (value, expected) => {
-    expect(isUrlBuilder(value)).toBe(expected);
+    { value: { url: "https://example.com", cacheKey: "example" }, expected: true },
+    { value: { url: "https://example.com" }, expected: false },
+    { value: null, expected: false },
+    { value: undefined, expected: false },
+    { value: "not an object", expected: false },
+    { value: 0, expected: false },
+    { value: true, expected: false },
+    { value: {}, expected: false },
+  ])("should return $expected for $value", ({ value, expected }) => {
+    expect(isUrlWithCache(value)).toBe(expected);
   });
 });
 
 describe("is builtin parser", () => {
   it.each([
-    ...(BUILTIN_PARSERS.map((parser) => [parser, true] as [string, boolean])),
+    ...BUILTIN_PARSERS.map((parser) => ({ value: parser, expected: true })),
 
     // not valid parser
-    [
-      "not a builtin parser",
-      false,
-    ],
-    [
-      () => "generic",
-      false,
-    ],
-    [
-      null,
-      false,
-    ],
-    [
-      undefined,
-      false,
-    ],
-    [
-      0,
-      false,
-    ],
-  ])("should return %p for %p", (value, expected) => {
+    { value: "not a builtin parser", expected: false },
+    { value: () => "generic", expected: false },
+    { value: null, expected: false },
+    { value: undefined, expected: false },
+    { value: 0, expected: false },
+  ])("should return $expected for $value", ({ value, expected }) => {
     expect(isBuiltinParser(value)).toBe(expected);
   });
 });
 
 describe("getHandlerUrls", () => {
-  const ctx = {} as AdapterContext;
+  const emptyContext = {} as AdapterContext;
 
-  it("should handle null or undefined inputs", async () => {
-    expect(await getHandlerUrls(
-      // @ts-expect-error null is not a valid input type
-      null,
-      ctx,
-    )).toEqual([]);
-    expect(await getHandlerUrls(undefined, ctx)).toEqual([]);
-  });
+  function makeUrlFn(obj: unknown) {
+    return obj as UrlFn<PossibleUrls>;
+  }
 
-  it("should handle single string URL", async () => {
-    const result = await getHandlerUrls("https://example.com", ctx);
-    expect(result).toEqual([
-      { url: "https://example.com", cacheKey: "example_com", key: "example_com" },
-    ]);
-  });
-
-  it("should handle array of string URLs", async () => {
-    const result = await getHandlerUrls(["https://example.com", "https://test.com"], ctx);
-    expect(result).toEqual([
-      { url: "https://example.com", cacheKey: "example_com", key: "example_com" },
-      { url: "https://test.com", cacheKey: "test_com", key: "test_com" },
-    ]);
-  });
-
-  it("should handle array with null values", async () => {
+  it.each([
+    [null],
+    [undefined],
+  ])("should return an empty array for %s input", async (input) => {
     const result = await getHandlerUrls(
-      [
-        "https://example.com",
-        null,
-        "https://test.com",
-      ] as Arrayable<string>,
-      ctx,
+      makeUrlFn(input),
+      emptyContext,
     );
-    expect(result).toEqual([
-      { url: "https://example.com", cacheKey: "example_com", key: "example_com" },
-      { url: "https://test.com", cacheKey: "test_com", key: "test_com" },
-    ]);
-  });
-
-  it("should handle UrlWithCache object", async () => {
-    const urlObj = { url: "https://example.com", cacheKey: "custom-cache-key", key: "custom-cache-key" };
-    const result = await getHandlerUrls(urlObj, ctx);
-    expect(result).toEqual([urlObj]);
-  });
-
-  it("should handle array of UrlWithCache objects", async () => {
-    const urlObj1 = { url: "https://example.com", cacheKey: "key-1", key: "key-1" };
-    const urlObj2 = { url: "https://test.com", cacheKey: "key-2", key: "key-2" };
-    const result = await getHandlerUrls([urlObj1, urlObj2], ctx);
-    expect(result).toEqual([urlObj1, urlObj2]);
-  });
-
-  it("should handle UrlBuilder returning string", async () => {
-    const urlBuilder = vi.fn().mockResolvedValue("https://example.com");
-    const result = await getHandlerUrls(urlBuilder, ctx);
-    expect(urlBuilder).toHaveBeenCalledWith(ctx);
-    expect(result).toEqual([
-      { url: "https://example.com", cacheKey: "example_com", key: "example_com" },
-    ]);
-  });
-
-  it("should handle UrlBuilder returning null/undefined", async () => {
-    const urlBuilder = vi.fn().mockResolvedValue(null);
-    const result = await getHandlerUrls(urlBuilder, ctx);
-    expect(urlBuilder).toHaveBeenCalledWith(ctx);
     expect(result).toEqual([]);
   });
 
-  it("should handle UrlBuilder returning UrlWithCache", async () => {
-    const urlObj = { url: "https://example.com", cacheKey: "builder-key", key: "builder-key" };
-    const urlBuilder = vi.fn().mockResolvedValue(urlObj);
-    const result = await getHandlerUrls(urlBuilder, ctx);
-    expect(urlBuilder).toHaveBeenCalledWith(ctx);
-    expect(result).toEqual([urlObj]);
+  it.each([
+    [123],
+    ["string"],
+    [{}],
+    [[]],
+  ])("should return an empty array for non-function input %s", async (input) => {
+    const result = await getHandlerUrls(
+      makeUrlFn(input),
+      emptyContext,
+    );
+    expect(result).toEqual([]);
   });
 
-  it("should handle UrlBuilder returning array of URLs", async () => {
-    const urlBuilder = vi.fn().mockResolvedValue(["https://example.com", "https://test.com"]);
-    const result = await getHandlerUrls(urlBuilder, ctx);
-    expect(urlBuilder).toHaveBeenCalledWith(ctx);
-    expect(result).toEqual([
-      { url: "https://example.com", cacheKey: "example_com", key: "example_com" },
-      { url: "https://test.com", cacheKey: "test_com", key: "test_com" },
-    ]);
+  it.each([
+    [() => null],
+    [() => undefined],
+  ])("should return an empty array when function returns %s", async (input) => {
+    const result = await getHandlerUrls(
+      makeUrlFn(input),
+      emptyContext,
+    );
+    expect(result).toEqual([]);
   });
 
-  it("should handle UrlBuilder returning array of UrlWithCache", async () => {
-    const urlList = [
-      { url: "https://example.com", cacheKey: "builder-key", key: "builder-key" },
-      { url: "https://test.com", cacheKey: "builder-key-2", key: "builder-key-2" },
+  it.each([
+    ["https://example.com"],
+    ["http://test.com"],
+  ])("should create UrlWithCache for string URL %s", async (url) => {
+    const result = await getHandlerUrls(
+      makeUrlFn(() => url),
+      emptyContext,
+    );
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual({
+      url,
+      cacheKey: expect.any(String),
+      key: expect.any(String),
+    });
+  });
+
+  it("should handle array of string URLs", async () => {
+    const urls = ["https://example1.com", "https://example2.com"];
+    const urlFn = () => urls;
+    const result = await getHandlerUrls(urlFn, emptyContext);
+
+    expect(result).toHaveLength(2);
+    result.forEach((item, index) => {
+      expect(item).toEqual({
+        url: urls[index],
+        cacheKey: expect.any(String),
+        key: expect.any(String),
+      });
+    });
+  });
+
+  it.each([
+    [{ url: "https://example.com" }],
+    [{ url: "https://example.com", key: null }],
+    [{ url: "https://example.com", cacheKey: null }],
+    [{ url: "https://example.com", key: undefined }],
+    [{ url: "https://example.com", cacheKey: undefined }],
+  ])("should generate key and cacheKey for URL object with missing properties %#", async (urlObj) => {
+    const result = await getHandlerUrls(
+      makeUrlFn(() => urlObj),
+      emptyContext,
+    );
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual({
+      url: urlObj.url,
+      cacheKey: expect.any(String),
+      key: expect.any(String),
+    });
+
+    const generatedCacheKey = createCacheKeyFromUrl(urlObj.url);
+
+    expect(result[0]?.cacheKey).toBe(generatedCacheKey);
+    expect(result[0]?.key).toBe(generatedCacheKey);
+  });
+
+  it("should handle mixed input types in array", async () => {
+    const urls = [
+      "https://example1.com",
+      { url: "https://example2.com" },
+      null,
+      undefined,
     ];
-    const urlBuilder = vi.fn().mockResolvedValue(urlList);
-    const result = await getHandlerUrls(urlBuilder, ctx);
-    expect(urlBuilder).toHaveBeenCalledWith(ctx);
-    expect(result).toEqual(urlList);
-  });
+    const result = await getHandlerUrls(
+      makeUrlFn(() => urls),
+      emptyContext,
+    );
 
-  it("should handle UrlBuilder returning array with null values", async () => {
-    const urlBuilder = vi.fn().mockResolvedValue(["https://example.com", null, "https://test.com"]);
-    const result = await getHandlerUrls(urlBuilder, ctx);
-    expect(urlBuilder).toHaveBeenCalledWith(ctx);
-    expect(result).toEqual([
-      { url: "https://example.com", cacheKey: "example_com", key: "example_com" },
-      { url: "https://test.com", cacheKey: "test_com", key: "test_com" },
-    ]);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toEqual({
+      url: "https://example1.com",
+      cacheKey: expect.any(String),
+      key: expect.any(String),
+    });
+    expect(result[1]).toEqual({
+      url: "https://example2.com",
+      cacheKey: expect.any(String),
+      key: expect.any(String),
+    });
   });
 });
 

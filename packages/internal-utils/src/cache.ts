@@ -9,7 +9,7 @@ export interface CacheMeta {
   ttl: number;
 }
 
-export interface WriteCacheOptions<TData> {
+export interface WriteCacheOptions<TData = any> {
   /**
    * The folder to write the cache file to
    * @default "<cwd>/.cache"

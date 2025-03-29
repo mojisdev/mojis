@@ -1,6 +1,6 @@
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import process from "node:process";
-import { EMOJI_GROUPS_SCHEMA } from "@mojis/internal-utils/schemas";
+import { EMOJI_GROUPS_SCHEMA } from "@mojis/schemas/emojis";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
 const root = new URL("../", import.meta.url);

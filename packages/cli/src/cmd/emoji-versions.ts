@@ -1,4 +1,4 @@
-import type { EmojiSpecRecord } from "@mojis/internal-utils";
+import type { EmojiSpecRecord } from "@mojis/schemas/emojis";
 import type { CLIArguments } from "../cli-utils";
 import { getAllEmojiVersions, getLatestEmojiVersion } from "@mojis/internal-utils";
 import { green, red, yellow } from "farver/fast";
