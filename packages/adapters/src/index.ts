@@ -48,6 +48,7 @@ export async function runAdapterHandler<
   }
 
   const result = await Promise.all(promises);
+
   // TODO: what if we want to return multiple handlers?
   return result[0] as InferHandlerOutput<THandler>;
 }
