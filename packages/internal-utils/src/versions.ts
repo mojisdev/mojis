@@ -221,7 +221,7 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
   }
 
   if (rootResult.status === "rejected" || emojiResult.status === "rejected") {
-    console.error({
+    console.error("[versions]", {
       root: rootResult.status === "rejected" ? rootResult.reason : "ok",
       emoji: emojiResult.status === "rejected" ? emojiResult.reason : "ok",
     });
