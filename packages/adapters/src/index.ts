@@ -8,6 +8,7 @@ import type { AnyVersionHandler } from "./version-builder/types";
 import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
 import { defu } from "defu";
+import { getCurrentTest } from "vitest/suite";
 import { AdapterError } from "./errors";
 import { metadata, sequences, unicodeNames, variations } from "./handlers";
 import { buildContext, getHandlerUrls, isBuiltinParser } from "./utils";
@@ -38,10 +39,11 @@ export async function runAdapterHandler<
 
   const promises = [];
 
-  let output = (typeof handler.fallback == "function" && handler.fallback != null) ? handler.fallback() : null;
+  let output = (typeof handler.fallback == "function" && handler.fallback != null) ? handler.fallback() : undefined;
 
   for (const [predicate, versionHandler] of handler.handlers) {
     if (!predicate(ctx.emoji_version)) {
+      console.error(`skipping handler ${type} because predicate returned false`);
       continue;
     }
 
@@ -49,8 +51,11 @@ export async function runAdapterHandler<
   }
 
   const result = await Promise.all(promises);
-  // TODO: what if we have multiple handlers for the same predicate?
-  output = result[0];
+
+  if (result.length > 0 && result[0] != null) {
+    // TODO: what if we have multiple handlers for the same predicate?
+    output = result[0];
+  }
 
   if (handler.outputSchema == null) {
     return output as InferHandlerOutput<THandler>;
@@ -82,6 +87,13 @@ export async function runVersionHandler<THandler extends AnyVersionHandler>(
     const key = url.cacheKey;
 
     const mergedCacheOptions = defu(__overrides?.cacheOptions, handler.cacheOptions);
+
+    // check if vitest is running, so we can set the cache key to a different value.
+    // @ts-expect-error haven't added this to the types yet
+    if (import.meta.isVitest) {
+      const currentTest = getCurrentTest();
+      url.cacheKey = `${currentTest?.name.replace(/[^\w\-]+/g, "-")}-${url.cacheKey}`;
+    }
 
     const result = await fetchCache(url.url, {
       cacheKey: url.cacheKey,

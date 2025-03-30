@@ -25,8 +25,8 @@ describe("metadata adapter handler", () => {
     const mockEmojiTest = `
 # group: Smileys & Emotion
 # subgroup: face-smiling
-1F600 ; fully-qualified     # 😀 grinning face
-1F601 ; fully-qualified     # 😁 grinning face with smiling eyes
+1F600 ; fully-qualified # 😀 E1.0 grinning face
+1F601 ; fully-qualified # 😁 E0.6 beaming face with smiling eyes
 `;
 
     mockFetch([
@@ -48,8 +48,8 @@ describe("metadata adapter handler", () => {
             group: "smileys-emotion",
             subgroup: "face-smiling",
             qualifier: "fully-qualified",
-            emojiVersion: null,
-            unicodeVersion: null,
+            emojiVersion: "1.0",
+            unicodeVersion: "8.0",
             description: "grinning face",
             emoji: "😀",
             hexcodes: ["1F600"],
@@ -58,9 +58,9 @@ describe("metadata adapter handler", () => {
             group: "smileys-emotion",
             subgroup: "face-smiling",
             qualifier: "fully-qualified",
-            emojiVersion: null,
-            unicodeVersion: null,
-            description: "grinning face with smiling eyes",
+            emojiVersion: "0.6",
+            unicodeVersion: "6.0",
+            description: "beaming face with smiling eyes",
             emoji: "😁",
             hexcodes: ["1F601"],
           },
@@ -93,11 +93,14 @@ describe("metadata adapter handler", () => {
   it("should handle disallowed emoji versions", async () => {
     const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
     addHandlerToMock("metadata", {
-      predicate: () => true,
+      predicate: handler.handlers[0][0],
       handler: handler.handlers[0][1],
+      fallback: handler.fallback,
+      outputSchema: handler.outputSchema,
     });
 
     const result = await runAdapterHandler("metadata", { ...mockContext, emoji_version: "1.0" });
+
     expect(result).toEqual({
       emojis: {},
       groups: [],
