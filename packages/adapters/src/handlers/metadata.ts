@@ -33,10 +33,6 @@ export const handler = builder
     (emoji_version) => !DISALLOWED_EMOJI_VERSIONS.includes(emoji_version),
     (builder) => {
       return builder
-        // .validation(z.object({
-        //   groups: EMOJI_GROUPS_SCHEMA,
-        //   emojis: GROUPED_EMOJI_METADATA_SCHEMA,
-        // }))
         .urls((ctx) => {
           return {
             url: `https://unicode-proxy.mojis.dev/proxy/emoji/${ctx.emoji_version}/emoji-test.txt`,
@@ -44,7 +40,7 @@ export const handler = builder
           };
         })
         .parser((_, data) => {
-        //           ^?
+          //          ^?
           return data.split("\n");
         })
         .transform((ctx, lines) => {
