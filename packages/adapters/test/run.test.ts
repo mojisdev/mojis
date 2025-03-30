@@ -336,7 +336,6 @@ describe("runAdapterHandler", () => {
     let fetchCounter = 0;
     mockFetch("GET https://mojis.dev/test", () => {
       fetchCounter++;
-      console.error("fetchCounter", fetchCounter);
       return HttpResponse.text(`Response ${fetchCounter}`);
     });
 

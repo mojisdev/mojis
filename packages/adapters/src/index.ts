@@ -38,6 +38,8 @@ export async function runAdapterHandler<
 
   const promises = [];
 
+  let output = (typeof handler.fallback == "function" && handler.fallback != null) ? handler.fallback() : null;
+
   for (const [predicate, versionHandler] of handler.handlers) {
     if (!predicate(ctx.emoji_version)) {
       continue;
@@ -48,7 +50,7 @@ export async function runAdapterHandler<
 
   const result = await Promise.all(promises);
   // TODO: what if we have multiple handlers for the same predicate?
-  const output = result[0];
+  output = result[0];
 
   if (handler.outputSchema == null) {
     return output as InferHandlerOutput<THandler>;
