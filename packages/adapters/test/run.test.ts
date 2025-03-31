@@ -1,6 +1,5 @@
 import type { AdapterContext, AdapterHandlerType } from "../src/global-types";
 import { HttpResponse, mockFetch } from "#msw-utils";
-import { createCache } from "@mojis/internal-utils";
 import { afterEach, describe, expect, it } from "vitest";
 import { z } from "zod";
 import { createVersionHandlerBuilder } from "../src/version-builder/builder";
