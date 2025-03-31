@@ -1,4 +1,4 @@
-import type { WriteCacheOptions } from "@mojis/internal-utils";
+import type { Cache, CacheOptions } from "@mojis/internal-utils";
 import type { AnyAdapterHandler, InferHandlerOutput } from "./adapter-builder/types";
 import type {
   AdapterContext,
@@ -8,16 +8,16 @@ import type { AnyVersionHandler } from "./version-builder/types";
 import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
 import { defu } from "defu";
-import { getCurrentTest } from "vitest/suite";
 import { AdapterError } from "./errors";
 import { metadata, sequences, unicodeNames, variations } from "./handlers";
 import { buildContext, getHandlerUrls, isBuiltinParser } from "./utils";
 
 export type { AdapterHandlerType } from "./global-types";
 
-interface RunOverrides {
+export interface RunOverrides {
   cacheKey?: string;
-  cacheOptions?: Omit<WriteCacheOptions, "transform">;
+  cacheOptions?: CacheOptions;
+  cache?: Cache<string>;
 }
 
 const HANDLERS = {
@@ -88,14 +88,8 @@ export async function runVersionHandler<THandler extends AnyVersionHandler>(
 
     const mergedCacheOptions = defu(__overrides?.cacheOptions, handler.cacheOptions);
 
-    // check if vitest is running, so we can set the cache key to a different value.
-    // @ts-expect-error haven't added this to the types yet
-    if (import.meta.isVitest) {
-      const currentTest = getCurrentTest();
-      url.cacheKey = `${currentTest?.name.replace(/[^\w\-]+/g, "-")}-${url.cacheKey}`;
-    }
-
     const result = await fetchCache(url.url, {
+      cache: __overrides?.cache,
       cacheKey: url.cacheKey,
       parser(data) {
         if (isBuiltinParser(handler.parser)) {
@@ -121,9 +115,7 @@ export async function runVersionHandler<THandler extends AnyVersionHandler>(
 
         return handler.parser(ctx, data);
       },
-      ttl: mergedCacheOptions.ttl,
-      encoding: mergedCacheOptions.encoding,
-      cacheFolder: mergedCacheOptions.cacheFolder,
+      cacheOptions: mergedCacheOptions,
       options: handler.fetchOptions,
       bypassCache: ctx.force,
     });

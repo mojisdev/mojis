@@ -1,4 +1,4 @@
-import type { WriteCacheOptions } from "@mojis/internal-utils";
+import type { CacheOptions } from "@mojis/internal-utils";
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
 import type { z } from "zod";
 import type { AdapterContext, BuiltinParser, ErrorMessage, PossibleUrls, UnsetMarker } from "../global-types";
@@ -178,7 +178,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
   }>;
 
   cacheOptions: <
-    TOptions extends Omit<WriteCacheOptions, "transform">,
+    TOptions extends CacheOptions,
   >(
     cacheOptions: TParams["_options"]["cacheOptions"] extends UnsetMarker
       ? TOptions
@@ -241,7 +241,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
 export interface AnyBuiltVersionHandlerParams {
   globalContext: AdapterContext;
   fetchOptions: RequestInit;
-  cacheOptions: Omit<WriteCacheOptions, "transform">;
+  cacheOptions: CacheOptions;
   parser: any;
   parserOptions: GetParseOptionsFromParser<any>;
   parserOutput: any;
