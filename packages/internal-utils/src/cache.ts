@@ -2,137 +2,219 @@ import path from "node:path";
 import process from "node:process";
 import fs from "fs-extra";
 
-const CACHE_DIR = path.resolve(process.cwd(), ".cache");
-
 export interface CacheMeta {
   encoding?: BufferEncoding | null;
   ttl: number;
 }
 
-export interface WriteCacheOptions<TData = any> {
+export interface CacheOptions {
   /**
-   * The folder to write the cache file to
-   * @default "<cwd>/.cache"
-   */
-  cacheFolder?: string;
-
-  /**
-   * The encoding of the cache file
-   * @default "utf-8"
-   */
-  encoding?: BufferEncoding | null;
-
-  /**
-   * Time-to-live of the cache file in seconds
+   * Time-to-live of the cache entry in seconds
    * @default -1 (never expires)
    */
   ttl?: number;
+}
+
+export interface CacheEntry<TData> {
+  data: TData;
+  meta: CacheMeta;
+}
+
+export interface CacheStore<TData> {
+  /**
+   * Get a value from the cache
+   */
+  get: (key: string) => Promise<CacheEntry<TData> | undefined>;
 
   /**
-   * Transform data before caching
-   * @param {TData} data - The data to transform
-   * @returns {TData} The transformed data
+   * Set a value in the cache
    */
-  transform?: (data: TData) => TData;
+  set: (key: string, entry: CacheEntry<TData>) => Promise<void>;
+
+  /**
+   * Delete a value from the cache
+   */
+  delete: (key: string) => Promise<void>;
+
+  /**
+   * Clear all values from the cache
+   */
+  clear: () => Promise<void>;
 }
 
 /**
- * Writes data to a cache file.
- *
- * @param {string} cacheKey - The cacheKey of the cache file to write to
- * @param {TData} data - The data to write to the cache file
- * @param {WriteCacheOptions} options - Configuration options for writing the cache file
- * @template TData - The type of data being cached
- * @returns {Promise<TData>} A promise that resolves with the cached data
+ * In-memory cache implementation
  */
-export async function writeCache<TData extends string | Uint8Array>(cacheKey: string, data: TData, options?: WriteCacheOptions<TData>): Promise<TData> {
-  const filePath = path.join(options?.cacheFolder ?? CACHE_DIR, cacheKey);
+export class MemoryCacheStore<TData> implements CacheStore<TData> {
+  private store = new Map<string, CacheEntry<TData>>();
 
-  await fs.ensureDir(path.dirname(filePath));
+  async get(key: string): Promise<CacheEntry<TData> | undefined> {
+    const entry = this.store.get(key);
+    if (!entry) return undefined;
 
-  if (options?.transform) {
-    data = options.transform(data);
+    if (entry.meta.ttl !== -1 && Date.now() > entry.meta.ttl) {
+      await this.delete(key);
+      return undefined;
+    }
+
+    return entry;
   }
 
-  const encoding = options?.encoding === null ? undefined : options?.encoding ?? "utf-8";
-
-  await fs.writeFile(filePath, data, encoding);
-
-  let ttl = -1;
-
-  if (options?.ttl) {
-    const date = new Date();
-    date.setSeconds(date.getSeconds() + options.ttl);
-    ttl = date.getTime();
+  async set(key: string, entry: CacheEntry<TData>): Promise<void> {
+    this.store.set(key, entry);
   }
 
-  await fs.writeFile(`${filePath}.meta`, JSON.stringify({
-    encoding,
-    ttl,
-  } satisfies CacheMeta), "utf-8");
+  async delete(key: string): Promise<void> {
+    this.store.delete(key);
+  }
 
-  return data;
+  async clear(): Promise<void> {
+    this.store.clear();
+  }
 }
 
 /**
- * Reads and returns the cache metadata for a given cache key.
- *
- * @param {string} cacheKey - The unique identifier for the cache entry
- * @param {string?} cacheFolder - The directory where cache data is stored (defaults to CACHE_DIR)
- * @returns {Promise<CacheMeta | undefined>} A promise that resolves to the parsed CacheMeta object, or undefined if the metadata file doesn't exist
- * @throws {Error} If the metadata file exists but cannot be read or parsed
+ * Filesystem cache implementation
  */
-export async function readCacheMeta(cacheKey: string, cacheFolder: string = CACHE_DIR): Promise<CacheMeta | undefined> {
-  const filePath = path.join(cacheFolder, `${cacheKey}.meta`);
+export class FileSystemCacheStore<TData extends string | Uint8Array> implements CacheStore<TData> {
+  constructor(private readonly cacheDir: string = path.resolve(process.cwd(), ".cache")) { }
 
-  if (!(await fs.pathExists(filePath))) {
-    return undefined;
+  private getFilePath(key: string): string {
+    return path.join(this.cacheDir, key);
   }
 
-  const data = await fs.readFile(filePath, "utf-8");
-
-  return JSON.parse(data) as CacheMeta;
-}
-
-/**
- * Reads and parses JSON data from a cache file.
- *
- * @param {string} cacheKey - The name of the cache file to read
- * @param {(data: TData) => TData} transform - A function to transform the cache data before returning it
- * @param {string?} cacheFolder - The directory where cache data is stored (defaults to CACHE_DIR)
- * @template TData - The type of data stored in the cache file
- * @returns {Promise<T>} A promise that resolves to the parsed cache data of type T, or undefined if the file doesn't exist
- */
-export async function readCache<TData extends string | Uint8Array>(cacheKey: string, transform?: (data: TData) => TData, cacheFolder: string = CACHE_DIR): Promise<TData | undefined> {
-  const filePath = path.join(cacheFolder, cacheKey);
-
-  if (!(await fs.pathExists(filePath))) {
-    return undefined;
+  private getMetaFilePath(key: string): string {
+    return `${this.getFilePath(key)}.meta`;
   }
 
-  // read metadata
-  const meta = await readCacheMeta(cacheKey, cacheFolder);
+  async get(key: string): Promise<CacheEntry<TData> | undefined> {
+    const filePath = this.getFilePath(key);
+    const metaPath = this.getMetaFilePath(key);
 
-  if (!meta) {
-    return undefined;
+    try {
+      if (!(await fs.pathExists(filePath)) || !(await fs.pathExists(metaPath))) {
+        return undefined;
+      }
+
+      const metaData = await fs.readFile(metaPath, "utf-8");
+      const meta = JSON.parse(metaData) as CacheMeta;
+
+      if (meta.ttl !== -1 && Date.now() > meta.ttl) {
+        await this.delete(key);
+        return undefined;
+      }
+
+      const data = await fs.readFile(filePath, meta.encoding);
+      return {
+        data: data as TData,
+        meta,
+      };
+    } catch {
+      return undefined;
+    }
   }
 
-  if (meta.ttl !== -1 && Date.now() > meta.ttl) {
-    // delete cache if expired
+  async set(key: string, entry: CacheEntry<TData>): Promise<void> {
+    const filePath = this.getFilePath(key);
+    const metaPath = this.getMetaFilePath(key);
+
+    await fs.ensureDir(path.dirname(filePath));
+
+    await Promise.all([
+      fs.writeFile(filePath, entry.data, entry.meta.encoding),
+      fs.writeFile(metaPath, JSON.stringify(entry.meta), "utf-8"),
+    ]);
+  }
+
+  async delete(key: string): Promise<void> {
+    const filePath = this.getFilePath(key);
+    const metaPath = this.getMetaFilePath(key);
+
     await Promise.all([
       fs.remove(filePath),
-      fs.remove(`${filePath}.meta`),
+      fs.remove(metaPath),
     ]);
-    return undefined;
   }
 
-  const data = await fs.readFile(filePath, meta.encoding);
+  async clear(): Promise<void> {
+    await fs.remove(this.cacheDir);
+    await fs.ensureDir(this.cacheDir);
+  }
+}
 
-  if (transform) {
-    return transform(data as TData);
+export interface Cache<TData> {
+  /**
+   * Get a value from the cache
+   */
+  get: (key: string) => Promise<TData | undefined>;
+
+  /**
+   * Set a value in the cache
+   */
+  set: (key: string, data: TData, options?: CacheOptions) => Promise<void>;
+
+  /**
+   * Delete a value from the cache
+   */
+  delete: (key: string) => Promise<void>;
+
+  /**
+   * Clear all values from the cache
+   */
+  clear: () => Promise<void>;
+}
+
+export class CacheImpl<TData> implements Cache<TData> {
+  constructor(
+    private readonly store: CacheStore<TData>,
+    private readonly encoding: BufferEncoding | null = "utf-8",
+  ) { }
+
+  async get(key: string): Promise<TData | undefined> {
+    const entry = await this.store.get(key);
+    return entry?.data;
   }
 
-  return data as TData;
+  async set(key: string, data: TData, options?: CacheOptions): Promise<void> {
+    const ttl = options?.ttl ? new Date(Date.now() + options.ttl * 1000).getTime() : -1;
+
+    await this.store.set(key, {
+      data,
+      meta: {
+        encoding: this.encoding,
+        ttl,
+      },
+    });
+  }
+
+  async delete(key: string): Promise<void> {
+    await this.store.delete(key);
+  }
+
+  async clear(): Promise<void> {
+    await this.store.clear();
+  }
+}
+
+export interface CreateCacheOptions {
+  store?: "memory" | "filesystem";
+  cacheDir?: string;
+  encoding?: BufferEncoding | null;
+}
+
+/**
+ * Creates a new cache instance
+ * @param {CreateCacheOptions} options Configuration options for the cache
+ * @returns A new cache instance
+ */
+export function createCache<TData extends string | Uint8Array>(options: CreateCacheOptions = {}): Cache<TData> {
+  const { store = "filesystem", cacheDir, encoding } = options;
+
+  const cacheStore: CacheStore<TData> = store === "memory"
+    ? new MemoryCacheStore<TData>()
+    : new FileSystemCacheStore<TData>(cacheDir);
+
+  return new CacheImpl<TData>(cacheStore, encoding);
 }
 
 export interface FetchCacheOptions<TData = unknown> {
@@ -158,22 +240,30 @@ export interface FetchCacheOptions<TData = unknown> {
    * Bypass the cache and fetch fresh data
    */
   bypassCache?: boolean;
+
+  /**
+   * Cache options
+   */
+  cacheOptions?: CacheOptions;
+
+  /**
+   * Cache instance to use. If not provided, a new filesystem cache will be created.
+   */
+  cache?: Cache<string>;
 }
 
 /**
  * Fetches data from a URL and caches it, or retrieves it from the cache if it exists.
- *
- * @param {string} url - The URL to fetch data from
- * @param {FetchCacheOptions<TData>} options - Configuration options for fetching and caching
- * @template TData - The type of data being fetched and cached
- * @returns {Promise<TData>} A promise that resolves with the fetched and parsed data
  */
-export async function fetchCache<TData>(url: string, options: FetchCacheOptions<TData> & Omit<WriteCacheOptions<string>, "transform">): Promise<TData> {
-  const { cacheKey, parser, options: fetchOptions, bypassCache, ...cacheOptions } = options;
+export async function fetchCache<TData>(
+  url: string,
+  options: FetchCacheOptions<TData>,
+): Promise<TData> {
+  const { cacheKey, parser, options: fetchOptions, bypassCache, cacheOptions } = options;
+  const cache = options.cache ?? createCache<string>({ store: "filesystem" });
 
   if (!bypassCache) {
-    const cachedData = await readCache<string>(cacheKey, undefined, cacheOptions.cacheFolder);
-
+    const cachedData = await cache.get(cacheKey);
     if (cachedData) {
       return parser(cachedData);
     }
@@ -185,29 +275,16 @@ export async function fetchCache<TData>(url: string, options: FetchCacheOptions<
     throw new Error(`failed to fetch: url=(${url}) status=(${response.status})`);
   }
 
-  // TODO: don't use .text if encoding is binary or something like that
   const data = await response.text();
   const parsedData = parser(data);
 
-  await writeCache(cacheKey, data, cacheOptions as WriteCacheOptions<string>);
+  await cache.set(cacheKey, data, cacheOptions);
 
   return parsedData;
 }
 
 /**
  * Creates a cache key from a URL by replacing all file system unfriendly characters with underscores.
- *
- * This function ensures that the returned string can be safely used as a file name by replacing
- * any characters that are not alphanumeric with underscores.
- *
- * @param {string} url - The URL to convert into a cache key
- * @returns {string} A string that can be safely used as a file name or cache key
- *
- * @example
- * ```ts
- * createCacheKeyFromUrl("https://mojis.dev"); // "mojis_dev"
- * createCacheKeyFromUrl("https://mojis.dev/emojis"); // "mojis_dev_emojis"
- * ```
  */
 export function createCacheKeyFromUrl(url: string): string {
   const _url = new URL(url);
