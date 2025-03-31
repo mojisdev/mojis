@@ -28,7 +28,7 @@ catalogs:
     tsup: ^8.4.0
     typescript: ^5.8.2
     vitest: ^3.0.9
-    vitest-testdirs: ^2.2.0
+    vitest-testdirs: ^3.0.1
     zod-to-json-schema: ^3.24.5
     tsx: ^4.19.3
 
