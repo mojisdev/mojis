@@ -30,10 +30,14 @@ describe("cache", () => {
 
     it("should handle ttl expiration", async () => {
       const cache = createCache<string>({ store: "memory" });
+      const now = Date.now();
+
+      // set initial time
+      vi.setSystemTime(now);
       await cache.set("key", "value", { ttl: 1 });
 
-      // wait for ttl to expire
-      await new Promise((resolve) => setTimeout(resolve, 1100));
+      // advance time by 2 seconds
+      vi.setSystemTime(now + 2000);
 
       const result = await cache.get("key");
       expect(result).toBeUndefined();
@@ -92,11 +96,14 @@ describe("cache", () => {
     it("should handle ttl expiration", async () => {
       const testdirPath = await testdir({});
       const cache = createCache<string>({ store: "filesystem", cacheDir: testdirPath });
+      const now = Date.now();
 
+      // set initial time
+      vi.setSystemTime(now);
       await cache.set("key", "value", { ttl: 1 });
 
-      // wait for ttl to expire
-      await new Promise((resolve) => setTimeout(resolve, 1100));
+      // advance time by 2 seconds
+      vi.setSystemTime(now + 2000);
 
       const result = await cache.get("key");
       expect(result).toBeUndefined();
@@ -193,10 +200,18 @@ describe("cache", () => {
 
     it("should handle rapid ttl updates", async () => {
       const cache = createCache<string>({ store: "memory" });
+      const now = Date.now();
 
-      // set multiple ttls in quick succession
+      // set initial time
+      vi.setSystemTime(now);
       await cache.set("key", "value1", { ttl: 1 });
+
+      // advance time by 0.5 seconds
+      vi.setSystemTime(now + 500);
       await cache.set("key", "value2", { ttl: 2 });
+
+      // advance time by 0.5 seconds
+      vi.setSystemTime(now + 1000);
       await cache.set("key", "value3", { ttl: 3 });
 
       const result = await cache.get("key");
@@ -295,10 +310,12 @@ describe("fetchCache", () => {
       cache,
     };
 
+    const now = Date.now();
+    vi.setSystemTime(now);
     await cache.set("test-cache", JSON.stringify(testData), { ttl: 1 });
 
-    // wait for ttl to expire
-    await new Promise((resolve) => setTimeout(resolve, 1100));
+    // advance time by 2 seconds
+    vi.setSystemTime(now + 2000);
 
     mockFetch("GET https://mojis.dev", () => {
       return HttpResponse.text(JSON.stringify({ foo: "new" }), { status: 200 });
