@@ -1,7 +1,6 @@
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { createCache } from "@mojis/internal-utils";
 import { afterEach, describe, expect, it } from "vitest";
-import { testdir } from "vitest-testdirs";
 import { handler } from "../../src/handlers/metadata";
 import { cleanupAdapterTest, setupAdapterTest } from "../test-utils";
 
