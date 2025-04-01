@@ -1,4 +1,5 @@
 import { HttpResponse, mockFetch } from "#msw-utils";
+import { createCache } from "@mojis/internal-utils";
 import { afterEach, describe, expect, it } from "vitest";
 import { testdir } from "vitest-testdirs";
 import { handler } from "../../src/handlers/unicode-names";
@@ -50,8 +51,6 @@ describe("unicode-names adapter handler", () => {
   });
 
   it("should handle multiple entries", async () => {
-    const testdirPath = await testdir({});
-
     const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
     addHandlerToMock("unicode-names", {
       predicate: () => true,
@@ -66,11 +65,7 @@ describe("unicode-names adapter handler", () => {
       )],
     ]);
 
-    const result = await runAdapterHandler("unicode-names", mockContext, {
-      cacheOptions: {
-        cacheFolder: testdirPath,
-      },
-    });
+    const result = await runAdapterHandler("unicode-names", mockContext);
     expect(result).toEqual({
       "1F600": "GRINNING FACE",
       "1F601": "GRINNING FACE WITH SMILING EYES",
@@ -79,8 +74,6 @@ describe("unicode-names adapter handler", () => {
   });
 
   it("should throw error for invalid line format", async () => {
-    const testdirPath = await testdir({});
-
     const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
     addHandlerToMock("unicode-names", {
       predicate: () => true,
@@ -91,18 +84,12 @@ describe("unicode-names adapter handler", () => {
       ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/UnicodeData.txt", () => HttpResponse.text("1F600")],
     ]);
 
-    await expect(runAdapterHandler("unicode-names", mockContext, {
-      cacheOptions: {
-        cacheFolder: testdirPath,
-      },
-    }))
+    await expect(runAdapterHandler("unicode-names", mockContext))
       .rejects
       .toThrow("Invalid line");
   });
 
   it("should handle empty response", async () => {
-    const testdirPath = await testdir({});
-
     const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
     addHandlerToMock("unicode-names", {
       predicate: () => true,
@@ -113,17 +100,11 @@ describe("unicode-names adapter handler", () => {
       ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/UnicodeData.txt", () => HttpResponse.text("")],
     ]);
 
-    const result = await runAdapterHandler("unicode-names", mockContext, {
-      cacheOptions: {
-        cacheFolder: testdirPath,
-      },
-    });
+    const result = await runAdapterHandler("unicode-names", mockContext);
     expect(result).toEqual({});
   });
 
   it("should handle network errors", async () => {
-    const testdirPath = await testdir({});
-
     const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
     addHandlerToMock("unicode-names", {
       predicate: () => true,
@@ -134,19 +115,15 @@ describe("unicode-names adapter handler", () => {
       return HttpResponse.error();
     });
 
-    await expect(() => runAdapterHandler("unicode-names", mockContext, {
-      cacheOptions: {
-        cacheFolder: testdirPath,
-      },
-    }))
+    await expect(() => runAdapterHandler("unicode-names", mockContext))
       .rejects
       .toThrow("Failed to fetch");
   });
 
   it("should handle force mode", async () => {
-    const testdirPath = await testdir({});
+    const cache = createCache<string>({ store: "memory" });
+    const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest({ cache });
 
-    const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
     addHandlerToMock("unicode-names", {
       predicate: () => true,
       handler: handler.handlers[0][1],
@@ -161,18 +138,10 @@ describe("unicode-names adapter handler", () => {
     ]);
 
     // first request
-    await runAdapterHandler("unicode-names", mockContext, {
-      cacheOptions: {
-        cacheFolder: testdirPath,
-      },
-    });
+    await runAdapterHandler("unicode-names", mockContext);
 
     // second request with force=true should bypass cache
-    await runAdapterHandler("unicode-names", { ...mockContext, force: true }, {
-      cacheOptions: {
-        cacheFolder: testdirPath,
-      },
-    });
+    await runAdapterHandler("unicode-names", { ...mockContext, force: true });
 
     expect(fetchCount).toBe(2);
   });
