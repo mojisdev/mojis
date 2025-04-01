@@ -1,6 +1,6 @@
 import { HttpResponse, mockFetch } from "#msw-utils";
+import { createCache } from "@mojis/internal-utils";
 import { afterEach, describe, expect, it } from "vitest";
-import { testdir } from "vitest-testdirs";
 import { handler } from "../../src/handlers/metadata";
 import { cleanupAdapterTest, setupAdapterTest } from "../test-utils";
 
@@ -142,9 +142,8 @@ describe("metadata adapter handler", () => {
   });
 
   it("should handle force mode", async () => {
-    const testdirPath = await testdir({});
-
-    const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
+    const cache = createCache<string>({ store: "memory" });
+    const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest({ cache });
     addHandlerToMock("metadata", {
       predicate: () => true,
       handler: handler.handlers[0][1],
@@ -159,18 +158,10 @@ describe("metadata adapter handler", () => {
     ]);
 
     // first request
-    await runAdapterHandler("metadata", mockContext, {
-      cacheOptions: {
-        cacheFolder: testdirPath,
-      },
-    });
+    await runAdapterHandler("metadata", mockContext);
 
     // second request with force=true should bypass cache
-    await runAdapterHandler("metadata", { ...mockContext, force: true }, {
-      cacheOptions: {
-        cacheFolder: testdirPath,
-      },
-    });
+    await runAdapterHandler("metadata", { ...mockContext, force: true });
 
     expect(fetchCount).toBe(2);
   });

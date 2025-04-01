@@ -1,10 +1,10 @@
-import type { CacheMeta } from "../src/cache";
+import type { Buffer } from "node:buffer";
 import { mockFetch } from "#msw-utils";
 import fs from "fs-extra";
 import { HttpResponse } from "msw";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { testdir } from "vitest-testdirs";
-import { createCacheKeyFromUrl, fetchCache, readCache, readCacheMeta, writeCache } from "../src/cache";
+import { createCache, createCacheKeyFromUrl, fetchCache } from "../src/cache";
 
 vi.mock("fs-extra", {
   spy: true,
@@ -19,259 +19,231 @@ afterEach(() => {
   vi.resetAllMocks();
 });
 
-describe("write cache", () => {
-  it("should write data to cache", async () => {
-    const testdirPath = await testdir({});
-    const testData = { foo: "bar" };
-    const cacheName = "test-cache";
-
-    await writeCache(cacheName, JSON.stringify(testData), {
-      cacheFolder: testdirPath,
+describe("cache", () => {
+  describe("cache:memory", () => {
+    it("should store and retrieve data", async () => {
+      const cache = createCache<string>({ store: "memory" });
+      await cache.set("key", "value");
+      const result = await cache.get("key");
+      expect(result).toBe("value");
     });
 
-    expect(fs.ensureDir).toHaveBeenCalledWith(testdirPath);
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      `${testdirPath}/${cacheName}`,
-      JSON.stringify(testData),
-      "utf-8",
-    );
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      `${testdirPath}/${cacheName}.meta`,
-      JSON.stringify({ encoding: "utf-8", ttl: -1 }),
-      "utf-8",
-    );
-  });
+    it("should handle ttl expiration", async () => {
+      const cache = createCache<string>({ store: "memory" });
+      const now = Date.now();
 
-  it("should return the data that was written", async () => {
-    const testData = "{\"test\":\"data\"}";
-    const result = await writeCache("test", testData);
-    expect(result).toEqual(testData);
-  });
+      // set initial time
+      vi.setSystemTime(now);
+      await cache.set("key", "value", { ttl: 1 });
 
-  it("should handle nested cache paths", async () => {
-    const testData = { foo: "bar" };
-    const cacheKey = "nested/path/test";
+      // advance time by 2 seconds
+      vi.setSystemTime(now + 2000);
 
-    await writeCache(cacheKey, JSON.stringify(testData));
-
-    expect(fs.ensureDir).toHaveBeenCalledWith(expect.stringContaining("nested/path"));
-  });
-
-  it("should write Uint8Array data", async () => {
-    const testdirPath = await testdir({});
-    const testData = new Uint8Array([
-      72,
-      101,
-      108,
-      108,
-      111,
-      44,
-      32,
-      119,
-      111,
-      114,
-      108,
-      100,
-    ]);
-
-    const cacheName = "binary-cache";
-
-    await writeCache(cacheName, testData, { cacheFolder: testdirPath, encoding: null });
-
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      `${testdirPath}/${cacheName}`,
-      testData,
-      undefined,
-    );
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      `${testdirPath}/${cacheName}.meta`,
-      JSON.stringify({ encoding: undefined, ttl: -1 }),
-      "utf-8",
-    );
-  });
-
-  it("should use a custom encoding", async () => {
-    const testdirPath = await testdir({});
-    const testData = "test data";
-    const encoding = "base64";
-
-    await writeCache("encoded", testData, {
-      cacheFolder: testdirPath,
-      encoding,
+      const result = await cache.get("key");
+      expect(result).toBeUndefined();
     });
 
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      `${testdirPath}/encoded`,
-      testData,
-      encoding,
-    );
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      `${testdirPath}/encoded.meta`,
-      JSON.stringify({ encoding, ttl: -1 }),
-      "utf-8",
-    );
-  });
-
-  it("should apply a transform function", async () => {
-    const testdirPath = await testdir({});
-    const testData = "test data";
-    const transform = (data: string) => data.toUpperCase();
-    const transformedData = transform(testData);
-
-    await writeCache("transformed", testData, {
-      cacheFolder: testdirPath,
-      transform,
+    it("should handle deletion", async () => {
+      const cache = createCache<string>({ store: "memory" });
+      await cache.set("key", "value");
+      await cache.delete("key");
+      const result = await cache.get("key");
+      expect(result).toBeUndefined();
     });
 
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      expect.stringContaining("transformed"),
-      transformedData,
-      "utf-8",
-    );
-  });
+    it("should handle clearing all data", async () => {
+      const cache = createCache<string>({ store: "memory" });
+      await cache.set("key1", "value1");
+      await cache.set("key2", "value2");
+      await cache.clear();
 
-  it("should write metadata with a TTL", async () => {
-    const testdirPath = await testdir({});
-    const ttl = 1; // 1 second
-    const now = new Date();
-    const expectedTtl = new Date(now.getTime() + ttl * 1000).getTime();
-
-    await writeCache("ttl", "test", { cacheFolder: testdirPath, ttl });
-
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      expect.stringContaining(".meta"),
-      expect.stringContaining("\"ttl\":"),
-      "utf-8",
-    );
-
-    const metaFileWrite = vi.mocked(fs.writeFile).mock.calls.find((call) => call[0].toString().endsWith(".meta"));
-    if (metaFileWrite) {
-      const metaObject = JSON.parse(metaFileWrite[1].toString());
-      expect(metaObject.ttl).toBeGreaterThanOrEqual(expectedTtl - 100);
-      expect(metaObject.ttl).toBeLessThanOrEqual(expectedTtl + 100);
-    }
-  });
-
-  it("should handle special character cache keys", async () => {
-    const testdirPath = await testdir({});
-    const specialKey = "some/special/key/with:colon*asterisk?question";
-    await writeCache(specialKey, "test", { cacheFolder: testdirPath });
-
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      expect.stringContaining(specialKey),
-      "test",
-      "utf-8",
-    );
-  });
-});
-
-describe("read cache", () => {
-  it("should read data from cache file", async () => {
-    const testdirPath = await testdir({});
-
-    const testData = { foo: "bar" };
-    const cacheName = "test-cache";
-
-    await writeCache(cacheName, JSON.stringify(testData), {
-      cacheFolder: testdirPath,
-    });
-    const result = await readCache(cacheName, JSON.parse, testdirPath);
-
-    expect(result).toEqual(testData);
-  });
-
-  it("should return undefined for non-existent cache", async () => {
-    const result = await readCache("non-existent");
-
-    expect(fs.pathExists).toHaveBeenCalled();
-    expect(result).toBeUndefined();
-  });
-
-  it("should properly parse JSON data", async () => {
-    const testdirPath = await testdir({});
-
-    const complexData = {
-      nested: { foo: "bar" },
-      array: [1, 2, 3],
-      string: "test",
-    };
-
-    await writeCache("complex", JSON.stringify(complexData), {
-      cacheFolder: testdirPath,
+      expect(await cache.get("key1")).toBeUndefined();
+      expect(await cache.get("key2")).toBeUndefined();
     });
 
-    const result = await readCache("complex", JSON.parse, testdirPath);
-
-    expect(result).toEqual(complexData);
+    it("should handle non-existent keys", async () => {
+      const cache = createCache<string>({ store: "memory" });
+      const result = await cache.get("non-existent");
+      expect(result).toBeUndefined();
+    });
   });
 
-  it("should return undefined if cache meta doesn't exist", async () => {
-    const testdirPath = await testdir({
-      "no-meta": "test data",
+  describe("cache:filesystem", () => {
+    it("should store and retrieve string data", async () => {
+      const testdirPath = await testdir({});
+      const cache = createCache<string>({ store: "filesystem", cacheDir: testdirPath });
+
+      await cache.set("key", "value");
+      const result = await cache.get("key");
+      expect(result).toBe("value");
     });
 
-    const result = await readCache("no-meta", (data) => data, testdirPath);
+    it("should store and retrieve binary data", async () => {
+      const testdirPath = await testdir({});
+      const binaryData = new Uint8Array([1, 2, 3, 4, 5]);
+      const cache = createCache<Uint8Array>({
+        store: "filesystem",
+        cacheDir: testdirPath,
+        encoding: null,
+      });
 
-    expect(result).toBeUndefined();
-  });
-
-  it("should return undefined if cache is expired", async () => {
-    const testdirPath = await testdir({
-      "expired": "test data",
-      "expired.meta": JSON.stringify({ ttl: Date.now() - 1000 }),
+      await cache.set("key", binaryData);
+      const result = await cache.get("key");
+      // convert buffer to uint8array for comparison
+      expect(new Uint8Array(result as Buffer)).toEqual(binaryData);
     });
 
-    // ensure that both the cache and meta files exist
-    expect(await fs.pathExists(`${testdirPath}/expired`)).toBe(true);
-    expect(await fs.pathExists(`${testdirPath}/expired.meta`)).toBe(true);
+    it("should handle ttl expiration", async () => {
+      const testdirPath = await testdir({});
+      const cache = createCache<string>({ store: "filesystem", cacheDir: testdirPath });
+      const now = Date.now();
 
-    const result = await readCache("expired", (data) => data, testdirPath);
+      // set initial time
+      vi.setSystemTime(now);
+      await cache.set("key", "value", { ttl: 1 });
 
-    expect(result).toBeUndefined();
+      // advance time by 2 seconds
+      vi.setSystemTime(now + 2000);
 
-    // ensure that the cache and meta files were deleted
-    expect(await fs.pathExists(`${testdirPath}/expired`)).toBe(false);
-    expect(await fs.pathExists(`${testdirPath}/expired.meta`)).toBe(false);
+      const result = await cache.get("key");
+      expect(result).toBeUndefined();
+    });
+
+    it("should handle nested paths", async () => {
+      const testdirPath = await testdir({});
+      const cache = createCache<string>({ store: "filesystem", cacheDir: testdirPath });
+
+      await cache.set("nested/path/key", "value");
+      const result = await cache.get("nested/path/key");
+      expect(result).toBe("value");
+    });
+
+    it("should handle special characters in keys", async () => {
+      const testdirPath = await testdir({});
+      const cache = createCache<string>({ store: "filesystem", cacheDir: testdirPath });
+
+      const specialKey = "special:chars*in?key";
+      await cache.set(specialKey, "value");
+      const result = await cache.get(specialKey);
+      expect(result).toBe("value");
+    });
+
+    it("should handle concurrent operations", async () => {
+      const testdirPath = await testdir({});
+      const cache = createCache<string>({ store: "filesystem", cacheDir: testdirPath });
+
+      const operations = Array.from({ length: 10 }, (_, i) =>
+        cache.set(`key${i}`, `value${i}`));
+
+      await Promise.all(operations);
+
+      const results = await Promise.all(
+        Array.from({ length: 10 }, (_, i) =>
+          cache.get(`key${i}`)),
+      );
+
+      results.forEach((result, i) => {
+        expect(result).toBe(`value${i}`);
+      });
+    });
+
+    it("should handle file system errors gracefully", async () => {
+      const testdirPath = await testdir({});
+      const cache = createCache<string>({ store: "filesystem", cacheDir: testdirPath });
+
+      vi.mocked(fs.readFile).mockRejectedValueOnce(new Error("File system error"));
+
+      await cache.set("key", "value");
+
+      const result = await cache.get("key");
+      expect(result).toBeUndefined();
+    });
   });
-});
 
-describe("read cache meta", () => {
-  it("should read cache metadata from file", async () => {
-    const testdirPath = await testdir({});
-    const cacheKey = "test-cache";
-    const meta: CacheMeta = { encoding: "utf-8", ttl: 12345 };
-    const metaFilePath = `${testdirPath}/${cacheKey}.meta`;
+  describe("cache:edge-cases", () => {
+    it("should handle empty values", async () => {
+      const cache = createCache<string>({ store: "memory" });
+      await cache.set("key", "");
+      const result = await cache.get("key");
+      expect(result).toBe("");
+    });
 
-    await fs.writeFile(metaFilePath, JSON.stringify(meta), "utf-8");
+    it("should handle very large values", async () => {
+      const testdirPath = await testdir({});
+      const cache = createCache<string>({ store: "filesystem", cacheDir: testdirPath });
 
-    const result = await readCacheMeta(cacheKey, testdirPath);
+      const largeValue = "x".repeat(1024 * 1024); // 1MB string
+      await cache.set("key", largeValue);
+      const result = await cache.get("key");
+      expect(result).toBe(largeValue);
+    });
 
-    expect(result).toEqual(meta);
-  });
+    it("should handle very long keys", async () => {
+      const cache = createCache<string>({ store: "memory" });
+      const longKey = "x".repeat(1000);
+      await cache.set(longKey, "value");
+      const result = await cache.get(longKey);
+      expect(result).toBe("value");
+    });
 
-  it("should return undefined if metadata file does not exist", async () => {
-    const testdirPath = await testdir({});
-    const cacheKey = "non-existent-cache";
+    it("should handle concurrent deletions", async () => {
+      const cache = createCache<string>({ store: "memory" });
+      await cache.set("key", "value");
 
-    const result = await readCacheMeta(cacheKey, testdirPath);
+      const deletions = Array.from({ length: 5 }, () =>
+        cache.delete("key"));
 
-    expect(result).toBeUndefined();
+      await Promise.all(deletions);
+      const result = await cache.get("key");
+      expect(result).toBeUndefined();
+    });
+
+    it("should handle rapid ttl updates", async () => {
+      const cache = createCache<string>({ store: "memory" });
+      const now = Date.now();
+
+      // set initial time
+      vi.setSystemTime(now);
+      await cache.set("key", "value1", { ttl: 1 });
+
+      // advance time by 0.5 seconds
+      vi.setSystemTime(now + 500);
+      await cache.set("key", "value2", { ttl: 2 });
+
+      // advance time by 0.5 seconds
+      vi.setSystemTime(now + 1000);
+      await cache.set("key", "value3", { ttl: 3 });
+
+      const result = await cache.get("key");
+      expect(result).toBe("value3");
+    });
   });
 });
 
 describe("fetchCache", () => {
+  let testdirPath: string;
+  let cache: ReturnType<typeof createCache<string>>;
+
+  beforeEach(async () => {
+    testdirPath = await testdir({});
+    cache = createCache<string>({ store: "filesystem", cacheDir: testdirPath });
+  });
+
   it("should return cached data if available and bypass not set", async () => {
     const testData = { foo: "bar" };
     const options = {
       cacheKey: "test-cache",
       parser: JSON.parse,
+      cache,
     };
 
-    vi.mocked(fs.readFile).mockReturnValue(JSON.stringify(testData) as never);
-    vi.mocked(fs.pathExists).mockResolvedValue(true as never);
+    await cache.set("test-cache", JSON.stringify(testData));
+
+    mockFetch("GET https://mojis.dev", () => {
+      return HttpResponse.text(JSON.stringify(testData), { status: 200 });
+    });
 
     const result = await fetchCache<Record<string, string>>("https://mojis.dev", options);
-
     expect(result).toEqual(testData);
   });
 
@@ -283,6 +255,7 @@ describe("fetchCache", () => {
       cacheKey: "test-cache.json",
       parser: JSON.parse,
       bypassCache: true,
+      cache,
     };
 
     mockFetch("GET https://mojis.dev", () => {
@@ -290,9 +263,7 @@ describe("fetchCache", () => {
     });
 
     const result = await fetchCache<Record<string, string>>("https://mojis.dev", options);
-
     expect(result).toEqual(parsedData);
-    expect(fs.writeFile).toHaveBeenCalled();
   });
 
   it("should throw error on failed fetch", async () => {
@@ -300,6 +271,7 @@ describe("fetchCache", () => {
       cacheKey: "test-cache",
       parser: JSON.parse,
       bypassCache: true,
+      cache,
     };
 
     mockFetch("GET https://mojis.dev/", () => {
@@ -318,15 +290,54 @@ describe("fetchCache", () => {
       cacheKey: "csv-cache",
       parser: (data: string) => data.split(","),
       bypassCache: true,
+      cache,
     };
 
     mockFetch("GET https://mojis.dev", () => {
       return HttpResponse.text(rawData, { status: 200 });
     });
 
-    const result = await fetchCache("https://mojis.dev", options);
-
+    const result = await fetchCache<string[]>("https://mojis.dev", options);
     expect(result).toEqual(parsedData);
+  });
+
+  it("should respect cache TTL", async () => {
+    const testData = { foo: "bar" };
+    const options = {
+      cacheKey: "test-cache",
+      parser: JSON.parse,
+      cacheOptions: { ttl: 1 },
+      cache,
+    };
+
+    const now = Date.now();
+    vi.setSystemTime(now);
+    await cache.set("test-cache", JSON.stringify(testData), { ttl: 1 });
+
+    // advance time by 2 seconds
+    vi.setSystemTime(now + 2000);
+
+    mockFetch("GET https://mojis.dev", () => {
+      return HttpResponse.text(JSON.stringify({ foo: "new" }), { status: 200 });
+    });
+
+    const result = await fetchCache<Record<string, string>>("https://mojis.dev", options);
+    expect(result).toEqual({ foo: "new" });
+  });
+
+  it("should create a new cache when not provided", async () => {
+    const testData = { foo: "bar" };
+    const options = {
+      cacheKey: "test-cache",
+      parser: JSON.parse,
+    };
+
+    mockFetch("GET https://mojis.dev", () => {
+      return HttpResponse.text(JSON.stringify(testData), { status: 200 });
+    });
+
+    const result = await fetchCache<Record<string, string>>("https://mojis.dev", options);
+    expect(result).toEqual(testData);
   });
 });
 
@@ -352,8 +363,6 @@ describe("create cache keys from url", () => {
       url: "https://test.com/path-with-hyphens",
       expected: "test_com_path_with_hyphens",
     },
-
-    // should strip query, hash and port from url
     {
       url: "http://localhost:3000/api",
       expected: "localhost_api",

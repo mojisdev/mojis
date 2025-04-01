@@ -354,10 +354,7 @@ describe("runAdapterHandler", () => {
     });
 
     // first request should get "Response 1"
-    const result1 = await runAdapterHandler("metadata", {
-      ...mockContext,
-      force: true,
-    });
+    const result1 = await runAdapterHandler("metadata", mockContext);
     expect(result1).toBeDefined();
     expect(result1).toContain("Response 1");
 
