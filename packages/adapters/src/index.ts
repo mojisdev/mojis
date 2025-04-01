@@ -1,4 +1,4 @@
-import type { WriteCacheOptions } from "@mojis/internal-utils";
+import type { Cache, CacheOptions } from "@mojis/internal-utils";
 import type { AnyAdapterHandler, InferHandlerOutput } from "./adapter-builder/types";
 import type {
   AdapterContext,
@@ -14,9 +14,10 @@ import { buildContext, getHandlerUrls, isBuiltinParser } from "./utils";
 
 export type { AdapterHandlerType } from "./global-types";
 
-interface RunOverrides {
+export interface RunOverrides {
   cacheKey?: string;
-  cacheOptions?: Omit<WriteCacheOptions, "transform">;
+  cacheOptions?: CacheOptions;
+  cache?: Cache<string>;
 }
 
 const HANDLERS = {
@@ -38,10 +39,11 @@ export async function runAdapterHandler<
 
   const promises = [];
 
-  let output = (typeof handler.fallback == "function" && handler.fallback != null) ? handler.fallback() : null;
+  let output = (typeof handler.fallback == "function" && handler.fallback != null) ? handler.fallback() : undefined;
 
   for (const [predicate, versionHandler] of handler.handlers) {
     if (!predicate(ctx.emoji_version)) {
+      console.error(`skipping handler ${type} because predicate returned false`);
       continue;
     }
 
@@ -49,8 +51,11 @@ export async function runAdapterHandler<
   }
 
   const result = await Promise.all(promises);
-  // TODO: what if we have multiple handlers for the same predicate?
-  output = result[0];
+
+  if (result.length > 0 && result[0] != null) {
+    // TODO: what if we have multiple handlers for the same predicate?
+    output = result[0];
+  }
 
   if (handler.outputSchema == null) {
     return output as InferHandlerOutput<THandler>;
@@ -84,6 +89,7 @@ export async function runVersionHandler<THandler extends AnyVersionHandler>(
     const mergedCacheOptions = defu(__overrides?.cacheOptions, handler.cacheOptions);
 
     const result = await fetchCache(url.url, {
+      cache: __overrides?.cache,
       cacheKey: url.cacheKey,
       parser(data) {
         if (isBuiltinParser(handler.parser)) {
@@ -109,9 +115,7 @@ export async function runVersionHandler<THandler extends AnyVersionHandler>(
 
         return handler.parser(ctx, data);
       },
-      ttl: mergedCacheOptions.ttl,
-      encoding: mergedCacheOptions.encoding,
-      cacheFolder: mergedCacheOptions.cacheFolder,
+      cacheOptions: mergedCacheOptions,
       options: handler.fetchOptions,
       bypassCache: ctx.force,
     });

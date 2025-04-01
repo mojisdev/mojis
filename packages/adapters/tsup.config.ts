@@ -7,4 +7,7 @@ export default defineConfig({
   dts: true,
   treeshake: true,
   bundle: true,
+  define: {
+    "import.meta.isVitest": "false",
+  },
 });

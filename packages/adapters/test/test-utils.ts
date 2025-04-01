@@ -1,8 +1,10 @@
 /* eslint-disable ts/explicit-function-return-type */
+import type { Cache } from "@mojis/internal-utils";
 import type { z } from "zod";
-import type { PredicateFn } from "../src/adapter-builder/types";
+import type { FallbackFn, PredicateFn } from "../src/adapter-builder/types";
 import type { AdapterHandlerType } from "../src/global-types";
 import type { AnyVersionHandler } from "../src/version-builder/types";
+import { createCache } from "@mojis/internal-utils";
 import { vi } from "vitest";
 
 type ORIGINAL_HANDLERS = Awaited<typeof import("../src/handlers/index")>;
@@ -10,8 +12,9 @@ type ORIGINAL_HANDLERS = Awaited<typeof import("../src/handlers/index")>;
 type HANDLER_MAP = {
   [K in keyof ORIGINAL_HANDLERS]: {
     adapterType: ORIGINAL_HANDLERS[K]["adapterType"];
-    outputSchema: ORIGINAL_HANDLERS[K]["outputSchema"];
+    outputSchema?: ORIGINAL_HANDLERS[K]["outputSchema"];
     handlers: ORIGINAL_HANDLERS[K]["handlers"];
+    fallback?: ORIGINAL_HANDLERS[K]["fallback"];
   };
 };
 
@@ -19,46 +22,49 @@ export function createMockHandlers(): HANDLER_MAP {
   return {
     metadata: {
       adapterType: "metadata",
-      outputSchema: null,
       handlers: [],
     },
     sequences: {
       adapterType: "sequences",
-      outputSchema: null,
       handlers: [],
     },
     unicodeNames: {
       adapterType: "unicode-names",
-      outputSchema: null,
       handlers: [],
     },
     variations: {
       adapterType: "variations",
-      outputSchema: null,
       handlers: [],
     },
   };
 }
 
-export interface AddHandlerToMockOptions {
-  outputSchema?: z.ZodType;
+export interface AddHandlerToMockOptions<TOutputSchema extends z.ZodType> {
+  outputSchema?: TOutputSchema;
   predicate: PredicateFn;
   handler: AnyVersionHandler;
+  fallback?: FallbackFn<TOutputSchema["_input"]>;
 }
 
-export async function setupAdapterTest() {
+export interface SetupAdapterTestOptions {
+  cache?: Cache<string>;
+}
+
+export async function setupAdapterTest<TOutputSchema extends z.ZodType>(options?: SetupAdapterTestOptions) {
   const mockHandlers = createMockHandlers();
+
+  const cache = options?.cache ?? createCache<string>({ store: "memory" });
 
   // mock needs to be before the dynamic import
   vi.doMock("../src/handlers", () => mockHandlers);
 
   // use dynamic imports since we can't import from a file
   // since those imports are hoisted to the top of the file
-  const { runAdapterHandler } = await import("../src/index");
+  const { runAdapterHandler: runAdapterHandlerOriginal } = await import("../src/index");
 
   function addHandlerToMock(
     type: AdapterHandlerType,
-    opts: AddHandlerToMockOptions,
+    opts: AddHandlerToMockOptions<TOutputSchema>,
   ) {
     let _type: string = type;
     if (type === "unicode-names") {
@@ -69,10 +75,22 @@ export async function setupAdapterTest() {
       mockHandlers[_type as keyof typeof mockHandlers].outputSchema = opts.outputSchema;
     }
 
+    if (opts.fallback != null) {
+      mockHandlers[_type as keyof typeof mockHandlers].fallback = opts.fallback;
+    }
+
     mockHandlers[_type as keyof typeof mockHandlers].handlers.push([
       opts.predicate,
       opts.handler,
     ]);
+  }
+
+  function runAdapterHandler(...args: Parameters<typeof runAdapterHandlerOriginal>) {
+    const [type, ctx, opts] = args;
+    return runAdapterHandlerOriginal(type, ctx, {
+      ...opts,
+      cache: cache as Cache<string>,
+    });
   }
 
   return {
