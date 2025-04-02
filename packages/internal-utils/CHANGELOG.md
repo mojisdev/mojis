@@ -1,5 +1,20 @@
 # @mojis/internal-utils
 
+## 0.0.7
+
+### Patch Changes
+
+- [#82](https://github.com/mojisdev/mojis/pull/82) [`697a28e`](https://github.com/mojisdev/mojis/commit/697a28ed5df3949b3daf28d0e528f4f4c6c8e64a) Thanks [@luxass](https://github.com/luxass)! - refactor: rewrite caching logic
+
+- [#70](https://github.com/mojisdev/mojis/pull/70) [`ecfe8c7`](https://github.com/mojisdev/mojis/commit/ecfe8c77acdaf52dc6d9d2089847261380bebb24) Thanks [@luxass](https://github.com/luxass)! - feat: add validation to version handlers through `.validations`
+
+- [#76](https://github.com/mojisdev/mojis/pull/76) [`10cd067`](https://github.com/mojisdev/mojis/commit/10cd06723ddd4a25134821bb987599faaf524aff) Thanks [@luxass](https://github.com/luxass)! - feat: add @mojis/schemas pkg
+
+- [#75](https://github.com/mojisdev/mojis/pull/75) [`94c0078`](https://github.com/mojisdev/mojis/commit/94c007829c1b6254ba30d7d239b452524643b36c) Thanks [@luxass](https://github.com/luxass)! - feat: run validation for handlers
+
+- Updated dependencies [[`10cd067`](https://github.com/mojisdev/mojis/commit/10cd06723ddd4a25134821bb987599faaf524aff)]:
+  - @mojis/schemas@0.0.1
+
 ## 0.0.6
 
 ### Patch Changes

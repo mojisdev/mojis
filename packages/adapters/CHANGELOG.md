@@ -1,5 +1,25 @@
 # @mojis/adapters
 
+## 0.0.10
+
+### Patch Changes
+
+- [#82](https://github.com/mojisdev/mojis/pull/82) [`697a28e`](https://github.com/mojisdev/mojis/commit/697a28ed5df3949b3daf28d0e528f4f4c6c8e64a) Thanks [@luxass](https://github.com/luxass)! - refactor: rewrite caching logic
+
+- [#73](https://github.com/mojisdev/mojis/pull/73) [`a70a28d`](https://github.com/mojisdev/mojis/commit/a70a28da591bdc34a8ee491cfd6859584b3c03ba) Thanks [@luxass](https://github.com/luxass)! - fix: use correct inferred type if multiple urls defined
+
+- [#70](https://github.com/mojisdev/mojis/pull/70) [`ecfe8c7`](https://github.com/mojisdev/mojis/commit/ecfe8c77acdaf52dc6d9d2089847261380bebb24) Thanks [@luxass](https://github.com/luxass)! - feat: add validation to version handlers through `.validations`
+
+- [#76](https://github.com/mojisdev/mojis/pull/76) [`10cd067`](https://github.com/mojisdev/mojis/commit/10cd06723ddd4a25134821bb987599faaf524aff) Thanks [@luxass](https://github.com/luxass)! - feat: add @mojis/schemas pkg
+
+- [#75](https://github.com/mojisdev/mojis/pull/75) [`94c0078`](https://github.com/mojisdev/mojis/commit/94c007829c1b6254ba30d7d239b452524643b36c) Thanks [@luxass](https://github.com/luxass)! - feat: run validation for handlers
+
+- [#80](https://github.com/mojisdev/mojis/pull/80) [`d5dc5e4`](https://github.com/mojisdev/mojis/commit/d5dc5e4f1f01ea9134d25bad0919e41bb5bc791d) Thanks [@luxass](https://github.com/luxass)! - feat: add `fallback` to adapter handler
+
+- Updated dependencies [[`697a28e`](https://github.com/mojisdev/mojis/commit/697a28ed5df3949b3daf28d0e528f4f4c6c8e64a), [`ecfe8c7`](https://github.com/mojisdev/mojis/commit/ecfe8c77acdaf52dc6d9d2089847261380bebb24), [`10cd067`](https://github.com/mojisdev/mojis/commit/10cd06723ddd4a25134821bb987599faaf524aff), [`94c0078`](https://github.com/mojisdev/mojis/commit/94c007829c1b6254ba30d7d239b452524643b36c)]:
+  - @mojis/internal-utils@0.0.7
+  - @mojis/schemas@0.0.1
+
 ## 0.0.9
 
 ### Patch Changes
