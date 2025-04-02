@@ -14,7 +14,7 @@ import { createVersionHandlerBuilder } from "../version-builder/builder";
 function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandlerType, TOutputSchema extends z.ZodType>(
   initDef: Partial<AnyAdapterHandler> = {},
 ): AdapterHandlerBuilder<{
-    _type: TAdapterType;
+    _adapterType: TAdapterType;
     _handlers: [PredicateFn, AnyVersionHandler][];
     _outputSchema: TOutputSchema;
     _fallback: FallbackFn<TOutputSchema["_input"]>;
@@ -44,7 +44,7 @@ function internalCreateAdapterHandlerBuilder<TAdapterType extends AdapterHandler
       return internalCreateAdapterHandlerBuilder({
         ..._def,
         fallback: userFn,
-      });
+      }) as AdapterHandlerBuilder<any>;
     },
     build() {
       return _def;
@@ -60,7 +60,7 @@ export interface CreateBuilderOptions<TAdapterType extends AdapterHandlerType, T
 export function createAdapterHandlerBuilder<TAdapterType extends AdapterHandlerType, TOutputSchema extends z.ZodType>(
   opts: CreateBuilderOptions<TAdapterType, TOutputSchema>,
 ): AdapterHandlerBuilder<{
-    _type: TAdapterType;
+    _adapterType: TAdapterType;
     _handlers: [PredicateFn, AnyVersionHandler][];
     _outputSchema: TOutputSchema;
   }> {

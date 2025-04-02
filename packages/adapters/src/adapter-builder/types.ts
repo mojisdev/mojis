@@ -5,9 +5,12 @@ import type {
 } from "../global-types";
 import type { AnyHandleVersionParams, AnyVersionHandler, HandleVersionBuilder } from "../version-builder/types";
 
-export type InferHandlerOutput<TAdapterHandler extends AnyAdapterHandler> = TAdapterHandler extends AdapterHandler<infer TParams>
-  ? TParams["handlers"][number]["1"]["output"]
-  : never;
+export type InferHandlerOutput<TAdapterHandler extends AnyAdapterHandler> =
+  TAdapterHandler extends { handlers: Array<[any, infer THandler]> }
+    ? THandler extends AnyVersionHandler
+      ? THandler["output"]
+      : never
+    : never;
 
 export interface AdapterHandlerBuilder<
   TParams extends AnyAdapterHandlerParams,
@@ -23,7 +26,7 @@ export interface AdapterHandlerBuilder<
     predicate: TPredicate,
     builder: (builder: TBuilder) => THandler,
   ) => AdapterHandlerBuilder<{
-    _type: TParams["_type"];
+    _adapterType: TParams["_adapterType"];
     _outputSchema: TParams["_outputSchema"];
     _handlers: JoinTuples<TParams["_handlers"], [[TPredicate, THandler]]>;
     _fallback: TParams["_fallback"];
@@ -35,14 +38,19 @@ export interface AdapterHandlerBuilder<
     _fallback: TOut;
     _handlers: TParams["_handlers"];
     _outputSchema: TParams["_outputSchema"];
-    _type: TParams["_type"];
+    _adapterType: TParams["_adapterType"];
   }>;
 
-  build: () => AnyAdapterHandler;
+  build: () => AdapterHandler<{
+    fallback: TParams["_fallback"];
+    handlers: TParams["_handlers"];
+    outputSchema: TParams["_outputSchema"];
+    adapterType: TParams["_adapterType"];
+  }>;
 }
 
 export interface AnyAdapterHandlerParams {
-  _type: AdapterHandlerType;
+  _adapterType: AdapterHandlerType;
   _outputSchema?: z.ZodType;
   _handlers: [PredicateFn, AnyVersionHandler][];
   _fallback?: any;
@@ -51,7 +59,7 @@ export interface AnyAdapterHandlerParams {
 export type PredicateFn = (version: string) => boolean;
 
 export interface AnyBuiltAdapterHandlerParams {
-  type: AdapterHandlerType;
+  adapterType: AdapterHandlerType;
   handlers: [PredicateFn, AnyVersionHandler][];
   outputSchema?: z.ZodType;
   fallback?: FallbackFn<any>;
@@ -60,7 +68,7 @@ export interface AnyBuiltAdapterHandlerParams {
 export type FallbackFn<TOut> = () => TOut;
 
 export interface AdapterHandler<TParams extends AnyBuiltAdapterHandlerParams> {
-  adapterType: TParams["type"];
+  adapterType: TParams["adapterType"];
   handlers: TParams["handlers"];
   outputSchema?: TParams["outputSchema"];
   fallback?: FallbackFn<
