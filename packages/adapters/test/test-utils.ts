@@ -22,18 +22,22 @@ export function createMockHandlers(): HANDLER_MAP {
   return {
     metadata: {
       adapterType: "metadata",
+      // @ts-expect-error - we don't need to provide a handler for the metadata adapter
       handlers: [],
     },
     sequences: {
       adapterType: "sequences",
+      // @ts-expect-error - we don't need to provide a handler for the sequences adapter
       handlers: [],
     },
     unicodeNames: {
       adapterType: "unicode-names",
+      // @ts-expect-error - we don't need to provide a handler for the unicode-names adapter
       handlers: [],
     },
     variations: {
       adapterType: "variations",
+      // @ts-expect-error - we don't need to provide a handler for the variations adapter
       handlers: [],
     },
   };
@@ -70,17 +74,17 @@ export async function setupAdapterTest<TOutputSchema extends z.ZodType>(options?
     if (type === "unicode-names") {
       _type = "unicodeNames";
     }
-
     if (opts.outputSchema != null) {
-      mockHandlers[_type as keyof typeof mockHandlers].outputSchema = opts.outputSchema;
+      mockHandlers[_type as keyof typeof mockHandlers].outputSchema = opts.outputSchema as any;
     }
 
     if (opts.fallback != null) {
       mockHandlers[_type as keyof typeof mockHandlers].fallback = opts.fallback;
     }
-
     mockHandlers[_type as keyof typeof mockHandlers].handlers.push([
+      // @ts-expect-error - types are not matching, will fix later
       opts.predicate,
+      // @ts-expect-error - types are not matching, will fix later
       opts.handler,
     ]);
   }
