@@ -1,5 +1,6 @@
 import type { AdapterContext } from "../src/global-types";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { z } from "zod";
 import { createAdapterHandlerBuilder } from "../src/adapter-builder/builder";
 
 describe("adapter handler builder", () => {
@@ -137,5 +138,29 @@ describe("adapter handler builder", () => {
     expect(handler.handlers[0][0]("15.0")).toBe(true);
     expect(handler.handlers[1][0]("14.0")).toBe(true);
     expect(handler.handlers[2][0]("13.0")).toBe(true);
+  });
+
+  it("allows setting fallback data", () => {
+    const fallbackData = { defaultValue: true };
+    const builder = createAdapterHandlerBuilder({ type: "metadata" });
+    const handler = builder
+      .fallback(() => fallbackData)
+      .build();
+
+    expect(handler.fallback).toBeTypeOf("function");
+    expect(handler.fallback?.()).toEqual(fallbackData);
+  });
+
+  it("adds output schema for validation", () => {
+    const testSchema = z.object({
+      name: z.string(),
+    });
+    const builder = createAdapterHandlerBuilder({
+      type: "metadata",
+      outputSchema: testSchema,
+    });
+    const handler = builder.build();
+
+    expect(handler.outputSchema).toBe(testSchema);
   });
 });
