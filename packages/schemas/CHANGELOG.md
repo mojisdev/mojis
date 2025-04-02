@@ -1,5 +1,11 @@
 # @mojis/schemas
 
+## 0.0.2
+
+### Patch Changes
+
+- [`c3acc7c`](https://github.com/mojisdev/mojis/commit/c3acc7c6c34cb219e5d5070946745af2c305e277) Thanks [@luxass](https://github.com/luxass)! - upload again
+
 ## 0.0.1
 
 ### Patch Changes
