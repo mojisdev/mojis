@@ -1,6 +1,8 @@
 import { existsSync, readdirSync } from "node:fs";
 import { defineConfig } from "vitest/config";
 
+const root = new URL("./", import.meta.url).pathname;
+
 const pkgRoot = (pkg: string) =>
   new URL(`./packages/${pkg}`, import.meta.url).pathname;
 const alias = (pkg: string) => `${pkgRoot(pkg)}/src`;
@@ -12,11 +14,13 @@ const aliases = readdirSync(new URL("./packages", import.meta.url).pathname)
       acc[`@mojis/${pkg}`] = alias(pkg);
       return acc;
     },
-    {});
+    {
+      "#msw-utils": `${root}/test/msw-utils/msw.ts`,
+    });
 
 const hiddenLogs = [
   "[shortcodes]",
-  "[versions]"
+  "[versions]",
 ]
 
 export default defineConfig({
@@ -68,6 +72,9 @@ export default defineConfig({
             tsconfig: "./packages/adapters/tsconfig.test.json"
           }
         },
+        define: {
+          "import.meta.isVitest": "true",
+        },
         esbuild: { target: "es2020" },
         resolve: { alias: aliases },
       },
@@ -100,6 +107,23 @@ export default defineConfig({
             enabled: true,
             include: ["./packages/parsers/**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
             tsconfig: "./packages/parsers/tsconfig.test.json"
+          }
+        },
+        esbuild: { target: "es2020" },
+        resolve: { alias: aliases },
+      },
+      {
+        extends: true,
+        test: {
+          include: ["./packages/schemas/**/*.{test,spec}.?(c|m)[jt]s?(x)"],
+          name: "schemas",
+          environment: "node",
+          mockReset: true,
+          typecheck: {
+            checker: "tsc",
+            enabled: true,
+            include: ["./packages/schemas/**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
+            tsconfig: "./packages/schemas/tsconfig.test.json"
           }
         },
         esbuild: { target: "es2020" },

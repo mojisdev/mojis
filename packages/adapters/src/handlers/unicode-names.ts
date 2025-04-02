@@ -1,4 +1,5 @@
-import { defineAdapterHandler } from "../define";
+import { z } from "zod";
+import { createAdapterHandlerBuilder } from "../adapter-builder/builder";
 
 const MAPPINGS = {
   "1.0": "https://unicode-proxy.mojis.dev/proxy/1.1-Update/UnicodeData-1.1.5.txt",
@@ -8,32 +9,45 @@ const MAPPINGS = {
   "13.1": "https://unicode-proxy.mojis.dev/proxy/13.0.0/ucd/UnicodeData.txt",
 } as Record<string, string>;
 
-export const unicodeNamesHandler = defineAdapterHandler({
+const builder = createAdapterHandlerBuilder({
   type: "unicode-names",
-  shouldExecute: true,
-  parser: "generic",
-  parserOptions: {
-    separator: ";",
-  },
-  urls: ({ emoji_version }) => {
-    return MAPPINGS[emoji_version] || `https://unicode-proxy.mojis.dev/proxy/${emoji_version}.0/ucd/UnicodeData.txt`;
-  },
-  transform: (_, data) => {
-    const result: Record<string, string> = {};
-
-    for (const line of data.lines) {
-      const [hexcode, name] = line.fields;
-
-      if (hexcode == null || name == null) {
-        throw new Error(`Invalid line: ${line}`);
-      }
-
-      result[hexcode] = name;
-    }
-
-    return result;
-  },
-  output: (_, transformed) => {
-    return transformed;
-  },
+  outputSchema: z.record(z.string(), z.string()),
 });
+
+export const handler = builder
+  .onVersion(
+    () => true,
+    (builder) => builder
+      .urls((ctx) => {
+        return {
+          url: MAPPINGS[ctx.emoji_version] || `https://unicode-proxy.mojis.dev/proxy/${ctx.emoji_version}.0/ucd/UnicodeData.txt`,
+          cacheKey: `v${ctx.emoji_version}/unicode-names`,
+        };
+      })
+      .parser("generic", {
+        separator: ";",
+      })
+      .transform((_, data) => {
+        const result: Record<string, string> = {};
+
+        for (const line of data.lines) {
+          const [hexcode, name] = line.fields;
+
+          if (hexcode == null || name == null) {
+            throw new Error(`Invalid line: ${line}`);
+          }
+
+          result[hexcode] = name;
+        }
+
+        return result;
+      })
+      .output((_, transformed) => {
+        //          ^?
+        return transformed;
+      }),
+  )
+  .fallback(() => {
+    return {};
+  })
+  .build();

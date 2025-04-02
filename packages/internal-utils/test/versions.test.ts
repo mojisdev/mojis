@@ -1,8 +1,8 @@
-import type { EmojiSpecRecord } from "../src/types";
+import type { EmojiSpecRecord } from "@mojis/schemas/emojis";
 import fs from "node:fs";
+import { mockFetch } from "#msw-utils";
 import { HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
-import { mockFetch } from "../../../test/msw-utils/msw";
 import {
   extractEmojiVersion,
   extractUnicodeVersion,
@@ -312,17 +312,19 @@ describe("all emoji versions", () => {
   });
 
   it("should throw if fetch returns invalid data", async () => {
-    mockFetch("GET https://unicode-proxy.mojis.dev/proxy/", () => {
-      return HttpResponse.text("Not Found", { status: 400 });
-    });
+    mockFetch([
+      ["GET https://unicode-proxy.mojis.dev/proxy/", () => HttpResponse.text("Not Found", { status: 400 })],
+      ["GET https://unicode-proxy.mojis.dev/proxy/emoji/", () => HttpResponse.text("Not Found", { status: 400 })],
+    ]);
 
     await expect(() => getAllEmojiVersions()).rejects.toThrow("failed to fetch root or emoji page");
   });
 
   it("should throw if empty data is returned", async () => {
-    mockFetch("GET https://unicode-proxy.mojis.dev/proxy/", () => {
-      return HttpResponse.text("");
-    });
+    mockFetch([
+      ["GET https://unicode-proxy.mojis.dev/proxy/", () => HttpResponse.text("")],
+      ["GET https://unicode-proxy.mojis.dev/proxy/emoji/", () => HttpResponse.text("")],
+    ]);
 
     await expect(() => getAllEmojiVersions()).rejects.toThrow("failed to fetch root or emoji page");
   });
