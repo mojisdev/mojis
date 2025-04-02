@@ -1,6 +1,6 @@
 import type { EmojiGroup, GroupedEmojiMetadata } from "@mojis/schemas/emojis";
 import { extractEmojiVersion, extractUnicodeVersion, isBefore } from "@mojis/internal-utils";
-import { EMOJI_GROUPS_SCHEMA, GROUPED_EMOJI_METADATA_SCHEMA } from "@mojis/schemas/emojis";
+import { EMOJI_GROUPS_SCHEMA, GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA } from "@mojis/schemas/emojis";
 import { z } from "zod";
 import { createAdapterHandlerBuilder } from "../adapter-builder/builder";
 
@@ -24,7 +24,7 @@ const builder = createAdapterHandlerBuilder({
   type: "metadata",
   outputSchema: z.object({
     groups: EMOJI_GROUPS_SCHEMA,
-    emojis: GROUPED_EMOJI_METADATA_SCHEMA,
+    emojis: GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA,
   }),
 });
 

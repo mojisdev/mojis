@@ -32,15 +32,16 @@ export const EMOJI_METADATA_SCHEMA = z.object({
 
 export type EmojiMetadata = z.infer<typeof EMOJI_METADATA_SCHEMA>;
 
-export const GROUPED_EMOJI_METADATA_SCHEMA = z.record(
+export const GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA = z.record(
   z.string(),
-  z.record(
-    z.string(),
-    EMOJI_METADATA_SCHEMA,
-  ),
+  EMOJI_METADATA_SCHEMA,
+);
+export const GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA = z.record(
+  z.string(),
+  GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA,
 );
 
-export type GroupedEmojiMetadata = z.infer<typeof GROUPED_EMOJI_METADATA_SCHEMA>;
+export type GroupedEmojiMetadata = z.infer<typeof GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA>;
 
 export const EMOJI_SEQUENCE_SCHEMA = z.object({
   property: z.string(),
