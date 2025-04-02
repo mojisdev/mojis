@@ -111,6 +111,23 @@ export default defineConfig({
         },
         esbuild: { target: "es2020" },
         resolve: { alias: aliases },
+      },
+      {
+        extends: true,
+        test: {
+          include: ["./packages/schemas/**/*.{test,spec}.?(c|m)[jt]s?(x)"],
+          name: "schemas",
+          environment: "node",
+          mockReset: true,
+          typecheck: {
+            checker: "tsc",
+            enabled: true,
+            include: ["./packages/schemas/**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
+            tsconfig: "./packages/schemas/tsconfig.test.json"
+          }
+        },
+        esbuild: { target: "es2020" },
+        resolve: { alias: aliases },
       }
     ]
   }

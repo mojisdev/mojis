@@ -52,7 +52,8 @@ describe("zod: EMOJI_GROUP_SCHEMA", () => {
   it("should validate a valid object", () => {
     const validObject = {
       name: "smileys-and-people",
-
+      slug: "smileys-and-people",
+      subgroups: ["face-smiling"],
     };
     expect(() => EMOJI_GROUP_SCHEMA.parse(validObject)).not.toThrow();
   });
@@ -77,7 +78,14 @@ describe("zod: EMOJI_GROUP_SCHEMA", () => {
 describe("zod: EMOJI_METADATA_SCHEMA", () => {
   it("should validate a valid object", () => {
     const validObject = {
-      name: "smileys-and-people",
+      group: "smileys-and-people",
+      subgroup: "face-smiling",
+      qualifier: "neutral",
+      unicodeVersion: "13.0",
+      emojiVersion: "13.0",
+      description: "waving hand",
+      emoji: "👋",
+      hexcodes: ["1f44b"],
     };
 
     expect(() => EMOJI_METADATA_SCHEMA.parse(validObject)).not.toThrow();
@@ -85,7 +93,13 @@ describe("zod: EMOJI_METADATA_SCHEMA", () => {
 
   it("should invalidate an object with missing fields", () => {
     const invalidObject = {
-      name: "smileys-and-people",
+      group: "smileys-and-people",
+      subgroup: "face-smiling",
+      qualifier: "neutral",
+      unicodeVersion: "13.0",
+      emojiVersion: "13.0",
+      description: "waving hand",
+      emoji: "👋",
     };
 
     expect(() => EMOJI_METADATA_SCHEMA.parse(invalidObject)).toThrow();
@@ -103,7 +117,10 @@ describe("zod: EMOJI_METADATA_SCHEMA", () => {
 describe("zod: EMOJI_SEQUENCE_SCHEMA", () => {
   it("should validate a valid object", () => {
     const validObject = {
-      name: "smileys-and-people",
+      property: "hello",
+      hex: "1f44b",
+      description: "waving hand",
+      gender: "neutral",
     };
 
     expect(() => EMOJI_SEQUENCE_SCHEMA.parse(validObject)).not.toThrow();
@@ -111,7 +128,8 @@ describe("zod: EMOJI_SEQUENCE_SCHEMA", () => {
 
   it("should invalidate an object with missing fields", () => {
     const invalidObject = {
-      name: "smileys-and-people",
+      property: "hello",
+      hex: "1f44b",
     };
 
     expect(() => EMOJI_SEQUENCE_SCHEMA.parse(invalidObject)).toThrow();
@@ -129,23 +147,24 @@ describe("zod: EMOJI_SEQUENCE_SCHEMA", () => {
 describe("zod: EMOJI_VARIATION_SCHEMA", () => {
   it("should validate a valid object", () => {
     const validObject = {
-      name: "smileys-and-people",
+      text: "smileys-and-people",
+      emoji: "👋",
+      property: ["hello", "world"],
     };
 
     expect(() => EMOJI_VARIATION_SCHEMA.parse(validObject)).not.toThrow();
   });
 
   it("should invalidate an object with missing fields", () => {
-    const invalidObject = {
-      name: "smileys-and-people",
-    };
+    const invalidObject = {};
 
     expect(() => EMOJI_VARIATION_SCHEMA.parse(invalidObject)).toThrow();
   });
 
   it("should invalidate an object with incorrect types", () => {
     const invalidObject = {
-      name: 123,
+      text: 123,
+      property: "hello",
     };
 
     expect(() => EMOJI_VARIATION_SCHEMA.parse(invalidObject)).toThrow();
