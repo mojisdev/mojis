@@ -20,6 +20,7 @@
   },
   "exports": {
     "./groups.json": "./schemas/groups.json",
+    "./emojis.json": "./schemas/emojis.json",
     "./package.json": "./package.json"
   },
   "files": [
