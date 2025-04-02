@@ -1,5 +1,11 @@
 # @mojis/json-schemas
 
+## 0.0.4
+
+### Patch Changes
+
+- [`34aeca1`](https://github.com/mojisdev/mojis/commit/34aeca18b1b0be795890bbf3e71900b527c288e7) Thanks [@luxass](https://github.com/luxass)! - fix: export emojis json schema
+
 ## 0.0.3
 
 ### Patch Changes
