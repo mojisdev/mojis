@@ -1,8 +1,9 @@
 /* eslint-disable ts/explicit-function-return-type */
 import type { Cache } from "@mojis/internal-utils";
 import type { z } from "zod";
-import type { FallbackFn, PredicateFn } from "../src/adapter-builder/types";
+import type { AnyAdapterHandler, FallbackFn, PredicateFn } from "../src/adapter-builder/types";
 import type { AdapterHandlerType } from "../src/global-types";
+import type { HANDLERS } from "../src/index";
 import type { AnyVersionHandler } from "../src/version-builder/types";
 import { createCache } from "@mojis/internal-utils";
 import { vi } from "vitest";
@@ -89,9 +90,12 @@ export async function setupAdapterTest<TOutputSchema extends z.ZodType>(options?
     ]);
   }
 
-  function runAdapterHandler(...args: Parameters<typeof runAdapterHandlerOriginal>) {
+  function runAdapterHandler<
+    TAdapterHandlerType extends AdapterHandlerType,
+    THandler extends AnyAdapterHandler = typeof HANDLERS[TAdapterHandlerType],
+  >(...args: Parameters<typeof runAdapterHandlerOriginal<TAdapterHandlerType, THandler>>) {
     const [type, ctx, opts] = args;
-    return runAdapterHandlerOriginal(type, ctx, {
+    return runAdapterHandlerOriginal<TAdapterHandlerType, THandler>(type, ctx, {
       ...opts,
       cache: cache as Cache<string>,
     });
