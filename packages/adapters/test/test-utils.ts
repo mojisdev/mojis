@@ -90,12 +90,11 @@ export async function setupAdapterTest<TOutputSchema extends z.ZodType>(options?
     ]);
   }
 
-  function runAdapterHandler<
-    TAdapterHandlerType extends AdapterHandlerType,
-    THandler extends AnyAdapterHandler = typeof HANDLERS[TAdapterHandlerType],
-  >(...args: Parameters<typeof runAdapterHandlerOriginal<TAdapterHandlerType, THandler>>) {
+  function runAdapterHandler<TAdapterHandlerType extends AdapterHandlerType>(
+    ...args: Parameters<typeof runAdapterHandlerOriginal<TAdapterHandlerType>>
+  ) {
     const [type, ctx, opts] = args;
-    return runAdapterHandlerOriginal<TAdapterHandlerType, THandler>(type, ctx, {
+    return runAdapterHandlerOriginal(type, ctx, {
       ...opts,
       cache: cache as Cache<string>,
     });
