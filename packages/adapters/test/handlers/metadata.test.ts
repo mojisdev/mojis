@@ -1,5 +1,6 @@
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { createCache } from "@mojis/internal-utils";
+import { emojiTest } from "@mojis/loomicode";
 import { afterEach, describe, expect, it } from "vitest";
 import { handler } from "../../src/handlers/metadata";
 import { cleanupAdapterTest, setupAdapterTest } from "../test-utils";
@@ -22,12 +23,11 @@ describe("metadata adapter handler", () => {
       handler: handler.handlers[0][1],
     });
 
-    const mockEmojiTest = `
-# group: Smileys & Emotion
-# subgroup: face-smiling
-1F600 ; fully-qualified # 😀 E1.0 grinning face
-1F601 ; fully-qualified # 😁 E0.6 beaming face with smiling eyes
-`;
+    const mockEmojiTest = emojiTest.smileys({
+      separator: ";",
+      commentPrefix: "#",
+      version: "15.0",
+    });
 
     mockFetch([
       ["GET https://unicode-proxy.mojis.dev/proxy/emoji/15.0/emoji-test.txt", () => HttpResponse.text(mockEmojiTest)],
@@ -63,6 +63,78 @@ describe("metadata adapter handler", () => {
             description: "beaming face with smiling eyes",
             emoji: "😁",
             hexcodes: ["1F601"],
+          },
+          "1F602": {
+            description: "face with tears of joy",
+            emoji: "😂",
+            emojiVersion: "0.6",
+            group: "smileys-emotion",
+            hexcodes: [
+              "1F602",
+            ],
+            qualifier: "fully-qualified",
+            subgroup: "face-smiling",
+            unicodeVersion: "6.0",
+          },
+          "1F603": {
+            description: "grinning face with big eyes",
+            emoji: "😃",
+            emojiVersion: "0.6",
+            group: "smileys-emotion",
+            hexcodes: [
+              "1F603",
+            ],
+            qualifier: "fully-qualified",
+            subgroup: "face-smiling",
+            unicodeVersion: "6.0",
+          },
+          "1F604": {
+            description: "grinning face with smiling eyes",
+            emoji: "😄",
+            emojiVersion: "0.6",
+            group: "smileys-emotion",
+            hexcodes: [
+              "1F604",
+            ],
+            qualifier: "fully-qualified",
+            subgroup: "face-smiling",
+            unicodeVersion: "6.0",
+          },
+          "1F605": {
+            description: "grinning face with sweat",
+            emoji: "😅",
+            emojiVersion: "0.6",
+            group: "smileys-emotion",
+            hexcodes: [
+              "1F605",
+            ],
+            qualifier: "fully-qualified",
+            subgroup: "face-smiling",
+            unicodeVersion: "6.0",
+          },
+          "1F606": {
+            description: "grinning squinting face",
+            emoji: "😆",
+            emojiVersion: "0.6",
+            group: "smileys-emotion",
+            hexcodes: [
+              "1F606",
+            ],
+            qualifier: "fully-qualified",
+            subgroup: "face-smiling",
+            unicodeVersion: "6.0",
+          },
+          "1F923": {
+            description: "rolling on the floor laughing",
+            emoji: "🤣",
+            emojiVersion: "3.0",
+            group: "smileys-emotion",
+            hexcodes: [
+              "1F923",
+            ],
+            qualifier: "fully-qualified",
+            subgroup: "face-smiling",
+            unicodeVersion: "9.0",
           },
         },
       },
@@ -150,11 +222,17 @@ describe("metadata adapter handler", () => {
       handler: handler.handlers[0][1],
     });
 
+    const mockEmojiTest = emojiTest.smileys({
+      commentPrefix: "#",
+      separator: ";",
+      version: "15.0",
+    });
+
     let fetchCount = 0;
     mockFetch([
       ["GET https://unicode-proxy.mojis.dev/proxy/emoji/15.0/emoji-test.txt", () => {
         fetchCount++;
-        return HttpResponse.text("# group: Smileys & Emotion\n# subgroup: face-smiling\n1F600 ; fully-qualified     # 😀 grinning face");
+        return HttpResponse.text(mockEmojiTest);
       }],
     ]);
 
@@ -174,11 +252,11 @@ describe("metadata adapter handler", () => {
       handler: handler.handlers[0][1],
     });
 
-    const mockEmojiTest = `
-# group: Smileys & Emotion
-# subgroup: face-smiling
-invalid-line
-`;
+    const mockEmojiTest = emojiTest.invalid({
+      commentPrefix: "#",
+      separator: ";",
+      version: "15.0",
+    });
 
     mockFetch([
       ["GET https://unicode-proxy.mojis.dev/proxy/emoji/15.0/emoji-test.txt", () => HttpResponse.text(mockEmojiTest)],
