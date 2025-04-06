@@ -45,6 +45,7 @@
   },
   "devDependencies": {
     "@luxass/eslint-config": "catalog:dev",
+    "@mojis/loomicode": "catalog:dev",
     "@types/semver": "catalog:dev",
     "eslint": "catalog:dev",
     "tsup": "catalog:dev",

@@ -1,5 +1,6 @@
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { createCache } from "@mojis/internal-utils";
+import { variations } from "@mojis/loomicode";
 import { afterEach, describe, expect, it } from "vitest";
 import { handler } from "../../src/handlers/variations";
 import { cleanupAdapterTest, setupAdapterTest } from "../test-utils";
@@ -22,10 +23,11 @@ describe("variations adapter handler", () => {
       handler: handler.handlers[0][1],
     });
 
-    const mockVariations = `
-FE0E ; text style     # VS-15
-FE0F ; emoji style    # VS-16
-`;
+    const mockVariations = variations.commonSymbols({
+      separator: ";",
+      commentPrefix: "#",
+      version: "15.0",
+    });
 
     mockFetch([
       ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => HttpResponse.text(mockVariations)],
@@ -35,13 +37,31 @@ FE0F ; emoji style    # VS-16
     expect(result).toEqual([
       {
         emoji: null,
-        text: "FE0E",
-        property: ["Emoji"],
+        property: [
+          "Emoji",
+        ],
+        text: "2764-FE0E",
       },
       {
-        emoji: "FE0F",
+        emoji: "2764-FE0F",
+        property: [
+          "Emoji",
+        ],
         text: null,
-        property: ["Emoji"],
+      },
+      {
+        emoji: null,
+        property: [
+          "Emoji",
+        ],
+        text: "2B50-FE0E",
+      },
+      {
+        emoji: "2B50-FE0F",
+        property: [
+          "Emoji",
+        ],
+        text: null,
       },
     ]);
   });
@@ -177,9 +197,11 @@ invalid-line
       handler: handler.handlers[0][1],
     });
 
-    const mockVariations = `
-FE0E ; invalid style     # VS-15
-`;
+    const mockVariations = variations.invalid({
+      separator: ";",
+      commentPrefix: "#",
+      version: "15.0",
+    });
 
     mockFetch([
       ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => HttpResponse.text(mockVariations)],

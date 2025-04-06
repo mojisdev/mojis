@@ -88,7 +88,8 @@ export const handler = builder
 
             const [baseHexcode, trailingLine] = line.split(";");
 
-            if (baseHexcode == null || trailingLine == null) {
+            // TODO: utilize helper function to check both for null and empty string
+            if ((baseHexcode == null || baseHexcode.trim() === "") || (trailingLine == null || trailingLine.trim() === "")) {
               throw new Error(`invalid line: ${line}`);
             }
 

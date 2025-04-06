@@ -20,7 +20,7 @@ export interface RunOverrides {
   cache?: Cache<string>;
 }
 
-const HANDLERS = {
+export const HANDLERS = {
   metadata,
   sequences,
   "unicode-names": unicodeNames,
