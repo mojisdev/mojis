@@ -37,6 +37,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "arktype": "catalog:prod",
     "zod": "catalog:prod"
   },
   "devDependencies": {

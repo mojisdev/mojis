@@ -65,6 +65,9 @@ catalogs:
       specifier: ^2.4.4
       version: 2.4.4
   prod:
+    arktype:
+      specifier: ^2.1.17
+      version: 2.1.17
     defu:
       specifier: ^6.1.4
       version: 6.1.4
@@ -130,6 +133,9 @@ importers:
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
+      arktype:
+        specifier: catalog:prod
+        version: 2.1.17
       defu:
         specifier: catalog:prod
         version: 6.1.4
@@ -173,6 +179,9 @@ importers:
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
+      arktype:
+        specifier: catalog:prod
+        version: 2.1.17
       farver:
         specifier: catalog:prod
         version: 0.4.2
@@ -219,6 +228,9 @@ importers:
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
+      arktype:
+        specifier: catalog:prod
+        version: 2.1.17
       fs-extra:
         specifier: catalog:prod
         version: 11.3.0
@@ -295,6 +307,9 @@ importers:
 
   packages/schemas:
     dependencies:
+      arktype:
+        specifier: catalog:prod
+        version: 2.1.17
       zod:
         specifier: catalog:prod
         version: 3.24.2

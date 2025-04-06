@@ -36,6 +36,7 @@
     "@mojis/adapters": "workspace:*",
     "@mojis/internal-utils": "workspace:*",
     "@mojis/schemas": "workspace:*",
+    "arktype": "catalog:prod",
     "farver": "catalog:prod",
     "fs-extra": "catalog:prod",
     "semver": "catalog:prod",

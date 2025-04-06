@@ -1,61 +1,61 @@
-import z from "zod";
+import type z from "zod";
+import { type } from "arktype";
 
-export const EMOJI_SPEC_RECORD_SCHEMA = z.object({
-  emoji_version: z.string(),
-  unicode_version: z.string(),
-  draft: z.boolean(),
-  fallback: z.string().optional().nullable(),
+export const EMOJI_SPEC_RECORD_SCHEMA = type({
+  emoji_version: "string",
+  unicode_version: "string",
+  draft: "boolean",
+  fallback: "string | null",
 });
 
-export type EmojiSpecRecord = z.infer<typeof EMOJI_SPEC_RECORD_SCHEMA>;
+export type EmojiSpecRecord = typeof EMOJI_SPEC_RECORD_SCHEMA.infer;
 
-export const EMOJI_GROUP_SCHEMA = z.object({
-  name: z.string(),
-  slug: z.string(),
-  subgroups: z.array(z.string()),
+export const EMOJI_GROUP_SCHEMA = type({
+  name: "string",
+  slug: "string",
+  subgroups: "string[]",
 });
 
-export type EmojiGroup = z.infer<typeof EMOJI_GROUP_SCHEMA>;
+export type EmojiGroup = typeof EMOJI_GROUP_SCHEMA.infer;
 
-export const EMOJI_GROUPS_SCHEMA = z.array(EMOJI_GROUP_SCHEMA);
+export const EMOJI_GROUPS_SCHEMA = EMOJI_GROUP_SCHEMA.array();
 
-export const EMOJI_METADATA_SCHEMA = z.object({
-  group: z.string(),
-  subgroup: z.string(),
-  qualifier: z.string(),
-  unicodeVersion: z.string().nullable(),
-  emojiVersion: z.string().nullable(),
-  description: z.string(),
-  emoji: z.string().nullable(),
-  hexcodes: z.array(z.string()),
+export const EMOJI_METADATA_SCHEMA = type({
+  group: "string",
+  subgroup: "string",
+  qualifier: "string",
+  unicodeVersion: "string | null",
+  emojiVersion: "string | null",
+  description: "string",
+  emoji: "string | null",
+  hexcodes: "string[]",
 });
 
-export type EmojiMetadata = z.infer<typeof EMOJI_METADATA_SCHEMA>;
+export type EmojiMetadata = typeof EMOJI_METADATA_SCHEMA.infer;
 
-export const GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA = z.record(
-  z.string(),
-  EMOJI_METADATA_SCHEMA,
-);
-export const GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA = z.record(
-  z.string(),
-  GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA,
-);
-
-export type GroupedEmojiMetadata = z.infer<typeof GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA>;
-
-export const EMOJI_SEQUENCE_SCHEMA = z.object({
-  property: z.string(),
-  hex: z.string(),
-  description: z.string().nullable(),
-  gender: z.string().nullable(),
+export const GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA = type({
+  "[string]": EMOJI_METADATA_SCHEMA,
 });
 
-export type EmojiSequence = z.infer<typeof EMOJI_SEQUENCE_SCHEMA>;
-
-export const EMOJI_VARIATION_SCHEMA = z.object({
-  text: z.string().nullable(),
-  emoji: z.string().nullable(),
-  property: z.array(z.string()).nullable(),
+export const GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA = type({
+  "[string]": GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA,
 });
 
-export type EmojiVariation = z.infer<typeof EMOJI_VARIATION_SCHEMA>;
+export type GroupedEmojiMetadata = typeof GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA.infer;
+
+export const EMOJI_SEQUENCE_SCHEMA = type({
+  property: "string",
+  hex: "string",
+  description: "string | null",
+  gender: "string | null",
+});
+
+export type EmojiSequence = typeof EMOJI_SEQUENCE_SCHEMA.infer;
+
+export const EMOJI_VARIATION_SCHEMA = type({
+  text: "string | null",
+  emoji: "string | null",
+  property: "string[] | null",
+});
+
+export type EmojiVariation = typeof EMOJI_VARIATION_SCHEMA.infer;
