@@ -23,7 +23,7 @@ catalogs:
     "@types/fs-extra": ^11.0.4
     "@types/node": ^22.10.0
     "@types/semver": ^7.7.0
-    "@mojis/loomicode": 0.2.0-beta.2
+    "@mojis/loomicode": 0.2.0-beta.3
     "@types/yargs-parser": ^21.0.3
     eslint: ^9.23.0
     tsup: ^8.4.0

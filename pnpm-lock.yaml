@@ -10,8 +10,8 @@ catalogs:
       specifier: ^4.18.1
       version: 4.18.1
     '@mojis/loomicode':
-      specifier: 0.2.0-beta.2
-      version: 0.2.0-beta.2
+      specifier: 0.2.0-beta.3
+      version: 0.2.0-beta.3
     '@types/fs-extra':
       specifier: ^11.0.4
       version: 11.0.4
@@ -145,7 +145,7 @@ importers:
         version: 4.18.1(@typescript-eslint/utils@8.28.0(eslint@9.23.0)(typescript@5.8.2))(@vue/compiler-sfc@3.5.13)(eslint@9.23.0)(typescript@5.8.2)(vitest@3.0.9)
       '@mojis/loomicode':
         specifier: catalog:dev
-        version: 0.2.0-beta.2
+        version: 0.2.0-beta.3
       '@types/semver':
         specifier: catalog:dev
         version: 7.7.0
@@ -323,6 +323,12 @@ packages:
 
   '@antfu/install-pkg@1.0.0':
     resolution: {integrity: sha512-xvX6P/lo1B3ej0OsaErAjqgFYzYVcJpamjLAFLYh9vRJngBrMoUG7aVnrGTeqM7yxbyTD5p3F2+0/QUEh8Vzhw==}
+
+  '@ark/schema@0.45.7':
+    resolution: {integrity: sha512-TS8jHOkAwRLviu84a7PQGebQ8PzGfxeAznJX3AzaXbb9bOYrtCiqo52/BWBwptc7pZJxL0ejN4Yufgb9YsNALw==}
+
+  '@ark/util@0.45.7':
+    resolution: {integrity: sha512-ymzzU8C8W+tQzkOIcaLWx4lLXSe5AnF3lpmAtc2FqkxLEVwRnyeKCYPOVXuttLjMwv8R4S/0D0E2cwmUUzim2Q==}
 
   '@babel/code-frame@7.26.2':
     resolution: {integrity: sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ==}
@@ -776,8 +782,8 @@ packages:
   '@manypkg/get-packages@1.1.3':
     resolution: {integrity: sha512-fo+QhuU3qE/2TQMQmbVMqaQ6EWbMhi4ABWP+O4AM1NqPBuy0OrApV5LO6BrrgnhtAHS2NH6RrVk9OL181tTi8A==}
 
-  '@mojis/loomicode@0.2.0-beta.2':
-    resolution: {integrity: sha512-wrvaDtJ/GMl9tInLGBjTWZKzLBqosZea7xudduuiUfUFSTbmfa9hcfK0Sq+dc8RhnPZHGpxBZMi6Y6qAj36t3g==}
+  '@mojis/loomicode@0.2.0-beta.3':
+    resolution: {integrity: sha512-K2u9HX30MtPT7FTcJj92WBy0RrPngGjNiQ9BN4IwR7V2GaXbirHVKf+63331Pc4l1xel4vn/rAJwk/QLLag7BQ==}
 
   '@mswjs/interceptors@0.37.6':
     resolution: {integrity: sha512-wK+5pLK5XFmgtH3aQ2YVvA3HohS3xqV/OxuVOdNx9Wpnz7VE/fnC+e1A7ln6LFYeck7gOJ/dsZV6OLplOtAJ2w==}
@@ -1215,6 +1221,9 @@ packages:
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
+
+  arktype@2.1.17:
+    resolution: {integrity: sha512-w1uDYt+5riOWhjLV7mho7UgofiXLyVWXpHC/Y6xkqVTi9ickuF8aNmEOne7fPN5eTT4Ub4HBfDD7JKJMSa4Htw==}
 
   array-union@2.1.0:
     resolution: {integrity: sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==}
@@ -2999,6 +3008,12 @@ snapshots:
       package-manager-detector: 0.2.11
       tinyexec: 0.3.2
 
+  '@ark/schema@0.45.7':
+    dependencies:
+      '@ark/util': 0.45.7
+
+  '@ark/util@0.45.7': {}
+
   '@babel/code-frame@7.26.2':
     dependencies:
       '@babel/helper-validator-identifier': 7.25.9
@@ -3501,10 +3516,10 @@ snapshots:
       globby: 11.1.0
       read-yaml-file: 1.1.0
 
-  '@mojis/loomicode@0.2.0-beta.2':
+  '@mojis/loomicode@0.2.0-beta.3':
     dependencies:
+      arktype: 2.1.17
       compare-versions: 6.1.1
-      zod: 3.24.2
 
   '@mswjs/interceptors@0.37.6':
     dependencies:
@@ -3941,6 +3956,11 @@ snapshots:
       sprintf-js: 1.0.3
 
   argparse@2.0.1: {}
+
+  arktype@2.1.17:
+    dependencies:
+      '@ark/schema': 0.45.7
+      '@ark/util': 0.45.7
 
   array-union@2.1.0: {}
 
