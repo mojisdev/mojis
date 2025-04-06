@@ -1,7 +1,7 @@
 import type { EmojiSequence } from "@mojis/schemas/emojis";
 import { expandHexRange, FEMALE_SIGN, MALE_SIGN } from "@mojis/internal-utils";
 import { EMOJI_SEQUENCE_SCHEMA } from "@mojis/schemas/emojis";
-import { z } from "zod";
+import { type } from "arktype";
 import { createAdapterHandlerBuilder } from "../adapter-builder/builder";
 
 const NOT_AVAILABLE_SEQUENCES = ["1.0"];
@@ -33,9 +33,9 @@ const DEFAULT_PROPERTY_MAP = {
 
 const builder = createAdapterHandlerBuilder({
   type: "sequences",
-  outputSchema: z.object({
-    sequences: z.array(EMOJI_SEQUENCE_SCHEMA).optional(),
-    zwj: z.array(EMOJI_SEQUENCE_SCHEMA).optional(),
+  outputSchema: type({
+    "sequences?": EMOJI_SEQUENCE_SCHEMA.array(),
+    "zwj?": EMOJI_SEQUENCE_SCHEMA.array(),
   }),
 });
 

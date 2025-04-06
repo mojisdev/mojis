@@ -1,7 +1,7 @@
 import type { AdapterContext, AdapterHandlerType } from "../src/global-types";
 import { HttpResponse, mockFetch } from "#msw-utils";
+import { type } from "arktype";
 import { afterEach, describe, expect, it } from "vitest";
-import { z } from "zod";
 import { createVersionHandlerBuilder } from "../src/version-builder/builder";
 import { cleanupAdapterTest, setupAdapterTest } from "./test-utils";
 
@@ -420,8 +420,8 @@ describe("runAdapterHandler", () => {
     addHandlerToMock("metadata", {
       predicate: (version: string) => version === "15.0",
       handler: mockHandler,
-      outputSchema: z.object({
-        page1: z.string(),
+      outputSchema: type({
+        page1: "string",
       }),
     });
 

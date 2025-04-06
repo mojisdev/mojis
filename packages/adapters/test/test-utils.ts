@@ -1,6 +1,6 @@
 /* eslint-disable ts/explicit-function-return-type */
 import type { Cache } from "@mojis/internal-utils";
-import type { z } from "zod";
+import type { type } from "arktype";
 import type { FallbackFn, PredicateFn } from "../src/adapter-builder/types";
 import type { AdapterHandlerType } from "../src/global-types";
 import type { AnyVersionHandler } from "../src/version-builder/types";
@@ -43,18 +43,18 @@ export function createMockHandlers(): HANDLER_MAP {
   };
 }
 
-export interface AddHandlerToMockOptions<TOutputSchema extends z.ZodType> {
+export interface AddHandlerToMockOptions<TOutputSchema extends type.Any> {
   outputSchema?: TOutputSchema;
   predicate: PredicateFn;
   handler: AnyVersionHandler;
-  fallback?: FallbackFn<TOutputSchema["_input"]>;
+  fallback?: FallbackFn<TOutputSchema["infer"]>;
 }
 
 export interface SetupAdapterTestOptions {
   cache?: Cache<string>;
 }
 
-export async function setupAdapterTest<TOutputSchema extends z.ZodType>(options?: SetupAdapterTestOptions) {
+export async function setupAdapterTest<TOutputSchema extends type.Any>(options?: SetupAdapterTestOptions) {
   const mockHandlers = createMockHandlers();
 
   const cache = options?.cache ?? createCache<string>({ store: "memory" });

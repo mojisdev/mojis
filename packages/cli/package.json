@@ -40,8 +40,7 @@
     "farver": "catalog:prod",
     "fs-extra": "catalog:prod",
     "semver": "catalog:prod",
-    "yargs-parser": "catalog:prod",
-    "zod": "catalog:prod"
+    "yargs-parser": "catalog:prod"
   },
   "devDependencies": {
     "@luxass/eslint-config": "catalog:dev",
