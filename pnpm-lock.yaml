@@ -10,8 +10,8 @@ catalogs:
       specifier: ^4.18.1
       version: 4.18.1
     '@mojis/loomicode':
-      specifier: 0.2.0-beta.3
-      version: 0.2.0-beta.3
+      specifier: 0.2.0-beta.4
+      version: 0.2.0-beta.4
     '@types/fs-extra':
       specifier: ^11.0.4
       version: 11.0.4
@@ -145,7 +145,7 @@ importers:
         version: 4.18.1(@typescript-eslint/utils@8.28.0(eslint@9.23.0)(typescript@5.8.2))(@vue/compiler-sfc@3.5.13)(eslint@9.23.0)(typescript@5.8.2)(vitest@3.0.9)
       '@mojis/loomicode':
         specifier: catalog:dev
-        version: 0.2.0-beta.3
+        version: 0.2.0-beta.4
       '@types/semver':
         specifier: catalog:dev
         version: 7.7.0
@@ -782,8 +782,8 @@ packages:
   '@manypkg/get-packages@1.1.3':
     resolution: {integrity: sha512-fo+QhuU3qE/2TQMQmbVMqaQ6EWbMhi4ABWP+O4AM1NqPBuy0OrApV5LO6BrrgnhtAHS2NH6RrVk9OL181tTi8A==}
 
-  '@mojis/loomicode@0.2.0-beta.3':
-    resolution: {integrity: sha512-K2u9HX30MtPT7FTcJj92WBy0RrPngGjNiQ9BN4IwR7V2GaXbirHVKf+63331Pc4l1xel4vn/rAJwk/QLLag7BQ==}
+  '@mojis/loomicode@0.2.0-beta.4':
+    resolution: {integrity: sha512-/2QFH49YlVz0QulVlDpMrS8WjijKc6g1aeMLR3KrXQO0Ke2zz+GAGxZSmqSz5NpfEVVIypxi5TGzhEprHAYScA==}
 
   '@mswjs/interceptors@0.37.6':
     resolution: {integrity: sha512-wK+5pLK5XFmgtH3aQ2YVvA3HohS3xqV/OxuVOdNx9Wpnz7VE/fnC+e1A7ln6LFYeck7gOJ/dsZV6OLplOtAJ2w==}
@@ -3516,7 +3516,7 @@ snapshots:
       globby: 11.1.0
       read-yaml-file: 1.1.0
 
-  '@mojis/loomicode@0.2.0-beta.3':
+  '@mojis/loomicode@0.2.0-beta.4':
     dependencies:
       arktype: 2.1.17
       compare-versions: 6.1.1
