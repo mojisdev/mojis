@@ -1,9 +1,8 @@
 /* eslint-disable ts/explicit-function-return-type */
 import type { Cache } from "@mojis/internal-utils";
 import type { z } from "zod";
-import type { AnyAdapterHandler, FallbackFn, PredicateFn } from "../src/adapter-builder/types";
+import type { FallbackFn, PredicateFn } from "../src/adapter-builder/types";
 import type { AdapterHandlerType } from "../src/global-types";
-import type { HANDLERS } from "../src/index";
 import type { AnyVersionHandler } from "../src/version-builder/types";
 import { createCache } from "@mojis/internal-utils";
 import { vi } from "vitest";
