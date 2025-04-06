@@ -7,6 +7,7 @@ import type {
 import type { AnyVersionHandler } from "./version-builder/types";
 import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
+import { type } from "arktype";
 import { defu } from "defu";
 import { AdapterError } from "./errors";
 import { metadata, sequences, unicodeNames, variations } from "./handlers";
@@ -26,6 +27,14 @@ export const HANDLERS = {
   "unicode-names": unicodeNames,
   variations,
 } satisfies Record<AdapterHandlerType, AnyAdapterHandler>;
+
+function _validate<T extends type.Any>(value: T["infer"], schema: T): T["infer"] {
+  const out = schema(value);
+  if (out instanceof type.errors) {
+    throw new TypeError(out.summary);
+  }
+  return out;
+}
 
 export async function runAdapterHandler<
   TAdapterHandlerType extends AdapterHandlerType,
@@ -61,7 +70,7 @@ export async function runAdapterHandler<
     return output as InferHandlerOutput<THandler>;
   }
 
-  const validationResult = handler.outputSchema.safeParse(output);
+  const validationResult = _validate(output, handler.outputSchema);
 
   if (!validationResult.success) {
     throw new AdapterError(`Invalid output for handler: ${type}`);
