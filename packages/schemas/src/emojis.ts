@@ -1,11 +1,10 @@
-import type z from "zod";
 import { type } from "arktype";
 
 export const EMOJI_SPEC_RECORD_SCHEMA = type({
-  emoji_version: "string",
-  unicode_version: "string",
-  draft: "boolean",
-  fallback: "string | null",
+  "emoji_version": "string",
+  "unicode_version": "string",
+  "draft": "boolean",
+  "fallback?": "string | null",
 });
 
 export type EmojiSpecRecord = typeof EMOJI_SPEC_RECORD_SCHEMA.infer;
