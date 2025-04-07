@@ -7,7 +7,6 @@ import type {
 import type { AnyVersionHandler } from "./version-builder/types";
 import { arktypeParse, fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
-import { type } from "arktype";
 import { defu } from "defu";
 import { AdapterError } from "./errors";
 import { metadata, sequences, unicodeNames, variations } from "./handlers";
