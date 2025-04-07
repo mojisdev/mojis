@@ -8,25 +8,37 @@ export * from "./shortcodes";
 export type * from "./types";
 export * from "./versions";
 
-/**
- * Parses the given input against the provided ArkType schema.
- *
- * @template TSchema - The ArkType schema to parse against.
- * @template TInput - The type of the input to parse.
- * @param {TInput} input - The input to parse.
- * @param {TSchema} schema - The ArkType schema to use for parsing.
- * @returns {TSchema["infer"]} - The inferred type from the schema if parsing is successful, otherwise null.
- * @throws {Error} - If the input does not conform to the schema, an error is logged to the console.
- */
-export function arktypeParse<TSchema extends type.Any, TInput>(
-  input: TInput,
+interface ArkTypeResultError {
+  success: false;
+  errors: string[];
+  data: null;
+}
+
+interface ArkTypeResultSuccess<TValue> {
+  success: true;
+  errors: null;
+  data: TValue;
+}
+
+export type ArkTypeParseResult<TValue> = ArkTypeResultError | ArkTypeResultSuccess<TValue>;
+
+export function arktypeParse<TSchema extends type.Any>(
+  input: unknown,
   schema: TSchema,
-  // TODO: make this more like the zod safeParse
-): TSchema["infer"] {
+): ArkTypeParseResult<TSchema["infer"]> {
   const out = schema(input);
   if (out instanceof type.errors) {
     console.error(out.summary);
-    return null;
+    return {
+      success: false,
+      errors: [out.summary],
+      data: null,
+    };
   }
-  return out;
+
+  return {
+    success: true,
+    errors: null,
+    data: out,
+  };
 }

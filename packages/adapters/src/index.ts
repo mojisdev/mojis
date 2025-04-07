@@ -64,11 +64,11 @@ export async function runAdapterHandler<
 
   const validationResult = arktypeParse(output, handler.outputSchema);
 
-  if (validationResult == null) {
+  if (!validationResult.success) {
     throw new AdapterError(`Invalid output for handler: ${type}`);
   }
 
-  return validationResult as InferHandlerOutput<THandler>;
+  return validationResult.data as InferHandlerOutput<THandler>;
 }
 
 export async function runVersionHandler<THandler extends AnyVersionHandler>(
