@@ -20,22 +20,22 @@ type HANDLER_MAP = {
 
 export function createMockHandlers(): HANDLER_MAP {
   return {
-    metadata: {
+    metadataHandler: {
       adapterType: "metadata",
       // @ts-expect-error - we don't need to provide a handler for the metadata adapter
       handlers: [],
     },
-    sequences: {
+    sequencesHandler: {
       adapterType: "sequences",
       // @ts-expect-error - we don't need to provide a handler for the sequences adapter
       handlers: [],
     },
-    unicodeNames: {
+    unicodeNamesHandler: {
       adapterType: "unicode-names",
-      // @ts-expect-error - we don't need to provide a handler for the unicode-names adapter
+      // @ts-expect-error - we don't need to provide a handler for the unicode names adapter
       handlers: [],
     },
-    variations: {
+    variationsHandler: {
       adapterType: "variations",
       // @ts-expect-error - we don't need to provide a handler for the variations adapter
       handlers: [],
@@ -66,14 +66,34 @@ export async function setupAdapterTest<TOutputSchema extends type.Any>(options?:
   // since those imports are hoisted to the top of the file
   const { runAdapterHandler: runAdapterHandlerOriginal } = await import("../src/index");
 
+  function normalizeHandlerName(type: AdapterHandlerType) {
+    if (type === "metadata") {
+      return "metadataHandler";
+    }
+
+    if (type === "sequences") {
+      return "sequencesHandler";
+    }
+
+    if (type === "unicode-names") {
+      return "unicodeNamesHandler";
+    }
+
+    if (type === "variations") {
+      return "variationsHandler";
+    }
+
+    return type;
+  }
+
   function addHandlerToMock(
     type: AdapterHandlerType,
     opts: AddHandlerToMockOptions<TOutputSchema>,
   ) {
-    let _type: string = type;
-    if (type === "unicode-names") {
-      _type = "unicodeNames";
-    }
+    console.error("Adding handler to mock", type, opts);
+
+    const _type = normalizeHandlerName(type);
+
     if (opts.outputSchema != null) {
       mockHandlers[_type as keyof typeof mockHandlers].outputSchema = opts.outputSchema as any;
     }
@@ -81,6 +101,7 @@ export async function setupAdapterTest<TOutputSchema extends type.Any>(options?:
     if (opts.fallback != null) {
       mockHandlers[_type as keyof typeof mockHandlers].fallback = opts.fallback;
     }
+
     mockHandlers[_type as keyof typeof mockHandlers].handlers.push([
       // @ts-expect-error - types are not matching, will fix later
       opts.predicate,

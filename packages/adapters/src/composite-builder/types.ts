@@ -1,9 +1,10 @@
 import type { type } from "arktype";
+import type { AnyAdapterHandler } from "../adapter-builder/types";
 
 export interface CompositeHandlerBuilder<
   TParams extends AnyCompositeHandlerParams,
 > {
-  sources: (sources: string[]) => CompositeHandlerBuilder<TParams>;
+  sources: <TSources extends AnyAdapterHandler[]>(sources: TSources) => CompositeHandlerBuilder<TParams>;
 
   build: () => AnyCompositeHandler;
 }
