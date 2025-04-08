@@ -7,10 +7,12 @@ function internalCreateCompositeHandlerBuilder<TOutputSchema extends type.Any>(
 ): CompositeHandlerBuilder<{
     _outputSchema: TOutputSchema;
     _sources: UnsetMarker;
+    _adapterSources: UnsetMarker;
   }> {
   const _def: AnyCompositeHandler = {
     outputSchema: initDef.outputSchema,
     sources: [],
+    adapterSources: [],
     // overload with properties passed in
     ...initDef,
   };
@@ -22,17 +24,20 @@ function internalCreateCompositeHandlerBuilder<TOutputSchema extends type.Any>(
         sources: userSources,
       }) as CompositeHandlerBuilder<any>;
     },
+    adapterSources(userAdapterSources) {
+      return internalCreateCompositeHandlerBuilder({
+        ..._def,
+        adapterSources: userAdapterSources,
+      }) as CompositeHandlerBuilder<any>;
+    },
     build() {
       return _def;
     },
   };
 }
 
-export type PredicateFn = (version: string) => boolean;
-
 export interface CreateBuilderOptions<TOutputSchema extends type.Any> {
   outputSchema?: TOutputSchema;
-  predicate?: (version: string) => boolean;
 }
 
 export function createCompositeHandlerBuilder<TOutputSchema extends type.Any>(
@@ -40,6 +45,7 @@ export function createCompositeHandlerBuilder<TOutputSchema extends type.Any>(
 ): CompositeHandlerBuilder<{
     _outputSchema: TOutputSchema;
     _sources: UnsetMarker;
+    _adapterSources: UnsetMarker;
   }> {
   return internalCreateCompositeHandlerBuilder<TOutputSchema>({
     outputSchema: opts.outputSchema,
