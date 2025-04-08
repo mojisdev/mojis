@@ -15,8 +15,8 @@ catalogs:
     fs-extra: ^11.3.0
     semver: ^7.7.1
     yargs-parser: ^21.1.1
-    zod: ^3.24.2
     defu: ^6.1.4
+    arktype: ^2.1.17
 
   dev:
     "@luxass/eslint-config": ^4.18.1
@@ -30,7 +30,6 @@ catalogs:
     typescript: ^5.8.2
     vitest: ^3.0.9
     vitest-testdirs: ^3.0.1
-    zod-to-json-schema: ^3.24.5
     tsx: ^4.19.3
 
 onlyBuiltDependencies:

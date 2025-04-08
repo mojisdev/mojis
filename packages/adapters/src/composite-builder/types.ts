@@ -1,4 +1,4 @@
-import type { z } from "zod";
+import type { type } from "arktype";
 
 export interface CompositeHandlerBuilder<
   TParams extends AnyCompositeHandlerParams,
@@ -9,12 +9,12 @@ export interface CompositeHandlerBuilder<
 }
 
 export interface AnyCompositeHandlerParams {
-  _outputSchema: z.ZodType;
+  _outputSchema: type.Any;
   _sources: string[];
 }
 
 export interface AnyBuiltCompositeHandlerParams {
-  outputSchema: z.ZodType;
+  outputSchema: type.Any;
   sources: string[];
 }
 

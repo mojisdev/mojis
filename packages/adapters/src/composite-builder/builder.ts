@@ -1,7 +1,7 @@
-import type { z } from "zod";
+import type { type } from "arktype";
 import type { AnyCompositeHandler, CompositeHandlerBuilder } from "./types";
 
-function internalCreateCompositeHandlerBuilder<TOutputSchema extends z.ZodType>(
+function internalCreateCompositeHandlerBuilder<TOutputSchema extends type.Any>(
   initDef: Partial<AnyCompositeHandler> = {},
 ): CompositeHandlerBuilder<{
     _outputSchema: TOutputSchema;
@@ -27,11 +27,11 @@ function internalCreateCompositeHandlerBuilder<TOutputSchema extends z.ZodType>(
   };
 }
 
-export interface CreateBuilderOptions<TOutputSchema extends z.ZodType> {
+export interface CreateBuilderOptions<TOutputSchema extends type.Any> {
   outputSchema?: TOutputSchema;
 }
 
-export function createCompositeHandlerBuilder<TOutputSchema extends z.ZodType>(
+export function createCompositeHandlerBuilder<TOutputSchema extends type.Any>(
   opts: CreateBuilderOptions<TOutputSchema>,
 ): CompositeHandlerBuilder<{
     _outputSchema: TOutputSchema;

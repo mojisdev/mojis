@@ -1,8 +1,8 @@
-import { z } from "zod";
+import { type } from "arktype";
 import { createCompositeHandlerBuilder } from "../composite-builder/builder";
 
 const builder = createCompositeHandlerBuilder({
-  outputSchema: z.any(),
+  outputSchema: type({}),
 });
 
 export const handler = builder

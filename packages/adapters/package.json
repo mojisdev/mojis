@@ -39,9 +39,9 @@
     "@mojis/internal-utils": "workspace:*",
     "@mojis/parsers": "workspace:*",
     "@mojis/schemas": "workspace:*",
+    "arktype": "catalog:prod",
     "defu": "catalog:prod",
-    "semver": "catalog:prod",
-    "zod": "catalog:prod"
+    "semver": "catalog:prod"
   },
   "devDependencies": {
     "@luxass/eslint-config": "catalog:dev",

@@ -42,9 +42,6 @@ catalogs:
     vitest-testdirs:
       specifier: ^3.0.1
       version: 3.0.1
-    zod-to-json-schema:
-      specifier: ^3.24.5
-      version: 3.24.5
   monorepo:
     '@changesets/changelog-github':
       specifier: ^0.5.1
@@ -65,6 +62,9 @@ catalogs:
       specifier: ^2.4.4
       version: 2.4.4
   prod:
+    arktype:
+      specifier: ^2.1.17
+      version: 2.1.17
     defu:
       specifier: ^6.1.4
       version: 6.1.4
@@ -80,9 +80,6 @@ catalogs:
     yargs-parser:
       specifier: ^21.1.1
       version: 21.1.1
-    zod:
-      specifier: ^3.24.2
-      version: 3.24.2
 
 importers:
 
@@ -130,15 +127,15 @@ importers:
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
+      arktype:
+        specifier: catalog:prod
+        version: 2.1.17
       defu:
         specifier: catalog:prod
         version: 6.1.4
       semver:
         specifier: catalog:prod
         version: 7.7.1
-      zod:
-        specifier: catalog:prod
-        version: 3.24.2
     devDependencies:
       '@luxass/eslint-config':
         specifier: catalog:dev
@@ -173,6 +170,9 @@ importers:
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
+      arktype:
+        specifier: catalog:prod
+        version: 2.1.17
       farver:
         specifier: catalog:prod
         version: 0.4.2
@@ -185,9 +185,6 @@ importers:
       yargs-parser:
         specifier: catalog:prod
         version: 21.1.1
-      zod:
-        specifier: catalog:prod
-        version: 3.24.2
     devDependencies:
       '@luxass/eslint-config':
         specifier: catalog:dev
@@ -219,15 +216,15 @@ importers:
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
+      arktype:
+        specifier: catalog:prod
+        version: 2.1.17
       fs-extra:
         specifier: catalog:prod
         version: 11.3.0
       semver:
         specifier: catalog:prod
         version: 7.7.1
-      zod:
-        specifier: catalog:prod
-        version: 3.24.2
     devDependencies:
       '@luxass/eslint-config':
         specifier: catalog:dev
@@ -271,9 +268,6 @@ importers:
       vitest-testdirs:
         specifier: catalog:dev
         version: 3.0.1(vitest@3.0.9)
-      zod-to-json-schema:
-        specifier: catalog:dev
-        version: 3.24.5(zod@3.24.2)
 
   packages/parsers:
     devDependencies:
@@ -295,9 +289,9 @@ importers:
 
   packages/schemas:
     dependencies:
-      zod:
+      arktype:
         specifier: catalog:prod
-        version: 3.24.2
+        version: 2.1.17
     devDependencies:
       '@luxass/eslint-config':
         specifier: catalog:dev
@@ -2984,14 +2978,6 @@ packages:
   yoctocolors-cjs@2.1.2:
     resolution: {integrity: sha512-cYVsTjKl8b+FrnidjibDWskAv7UKOfcwaVZdp/it9n1s9fU3IkgDbhdIRKCW4JDsAlECJY0ytoVPT3sK6kideA==}
     engines: {node: '>=18'}
-
-  zod-to-json-schema@3.24.5:
-    resolution: {integrity: sha512-/AuWwMP+YqiPbsJx5D6TfgRTc4kTLjsh5SOcd4bLsfUg2RcEXrFMJl1DGgdHy2aCfsIA/cr/1JM0xcB2GZji8g==}
-    peerDependencies:
-      zod: ^3.24.1
-
-  zod@3.24.2:
-    resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -5912,11 +5898,5 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   yoctocolors-cjs@2.1.2: {}
-
-  zod-to-json-schema@3.24.5(zod@3.24.2):
-    dependencies:
-      zod: 3.24.2
-
-  zod@3.24.2: {}
 
   zwitch@2.0.4: {}

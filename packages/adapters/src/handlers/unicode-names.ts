@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { type } from "arktype";
 import { createAdapterHandlerBuilder } from "../adapter-builder/builder";
 
 const MAPPINGS = {
@@ -11,7 +11,9 @@ const MAPPINGS = {
 
 const builder = createAdapterHandlerBuilder({
   type: "unicode-names",
-  outputSchema: z.record(z.string(), z.string()),
+  outputSchema: type({
+    "[string]": "string",
+  }),
 });
 
 export const handler = builder

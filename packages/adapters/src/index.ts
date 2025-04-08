@@ -5,7 +5,7 @@ import type {
   AdapterHandlerType,
 } from "./global-types";
 import type { AnyVersionHandler } from "./version-builder/types";
-import { fetchCache } from "@mojis/internal-utils";
+import { arktypeParse, fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
 import { defu } from "defu";
 import { AdapterError } from "./errors";
@@ -61,7 +61,7 @@ export async function runAdapterHandler<
     return output as InferHandlerOutput<THandler>;
   }
 
-  const validationResult = handler.outputSchema.safeParse(output);
+  const validationResult = arktypeParse(output, handler.outputSchema);
 
   if (!validationResult.success) {
     throw new AdapterError(`Invalid output for handler: ${type}`);

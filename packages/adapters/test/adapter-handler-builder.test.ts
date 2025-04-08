@@ -1,6 +1,6 @@
 import type { AdapterContext } from "../src/global-types";
+import { type } from "arktype";
 import { describe, expect, it } from "vitest";
-import { z } from "zod";
 import { createAdapterHandlerBuilder } from "../src/adapter-builder/builder";
 
 describe("adapter handler builder", () => {
@@ -152,8 +152,8 @@ describe("adapter handler builder", () => {
   });
 
   it("adds output schema for validation", () => {
-    const testSchema = z.object({
-      name: z.string(),
+    const testSchema = type({
+      name: "string",
     });
     const builder = createAdapterHandlerBuilder({
       type: "metadata",
