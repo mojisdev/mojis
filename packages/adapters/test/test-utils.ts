@@ -90,8 +90,6 @@ export async function setupAdapterTest<TOutputSchema extends type.Any>(options?:
     type: AdapterHandlerType,
     opts: AddHandlerToMockOptions<TOutputSchema>,
   ) {
-    console.error("Adding handler to mock", type, opts);
-
     const _type = normalizeHandlerName(type);
 
     if (opts.outputSchema != null) {
