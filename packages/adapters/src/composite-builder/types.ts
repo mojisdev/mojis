@@ -35,6 +35,13 @@ export type MergeSources<
     : never;
 }>;
 
+type IsKeyInSources<
+  TKey extends string,
+  TSources extends Record<string, unknown>,
+> = TKey extends keyof TSources
+  ? true
+  : false;
+
 export type CompositeTransformFn<TParams extends AnyCompositeHandlerParams> = (
   ctx: AdapterContext,
   sources: MergeSources<TParams["_sources"], TParams["_adapterSources"]>,
@@ -45,7 +52,17 @@ export interface CompositeHandlerBuilder<
 > {
   sources: <TSources extends Record<string, CompositeSource>>(
     sources: TParams["_sources"] extends UnsetMarker
-      ? TSources
+      ? (
+          TParams["_adapterSources"] extends UnsetMarker
+            ? TSources
+            : {
+                [K in keyof TSources]: K extends string
+                  ? IsKeyInSources<K, Record<TParams["_adapterSources"][number]["adapterType"], any>> extends false
+                    ? TSources[K]
+                    : ErrorMessage<`Key ${K} is already in sources`>
+                  : TSources[K];
+              }
+        )
       : ErrorMessage<"sources is already set">,
   ) => CompositeHandlerBuilder<{
     _outputSchema: TParams["_outputSchema"];
@@ -55,7 +72,17 @@ export interface CompositeHandlerBuilder<
 
   adapterSources: <TSources extends AnyAdapterHandler[]>(
     sources: TParams["_adapterSources"] extends UnsetMarker
-      ? TSources
+      ? (
+          TParams["_sources"] extends UnsetMarker
+            ? TSources
+            : {
+                [K in keyof TSources]: TSources[K] extends AnyAdapterHandler
+                  ? IsKeyInSources<TSources[K]["adapterType"], TParams["_sources"]> extends false
+                    ? TSources[K]
+                    : ErrorMessage<`Key ${TSources[K]["adapterType"]} is already in sources`>
+                  : never;
+              }
+        )
       : ErrorMessage<"adapter sources is already set">
   ) => CompositeHandlerBuilder<{
     _sources: TParams["_sources"];
