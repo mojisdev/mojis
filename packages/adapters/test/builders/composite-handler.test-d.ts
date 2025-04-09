@@ -1,28 +1,11 @@
 /* eslint-disable ts/consistent-type-definitions */
 /* eslint-disable ts/no-empty-object-type */
 
-import type { AdapterHandler, AnyAdapterHandler } from "../../src/builders/adapter-builder/types";
 import type {
   MergeSources,
 } from "../../src/builders/composite-builder/types";
-import type { AnyVersionHandler, VersionHandler } from "../../src/builders/version-builder/types";
+import type { CreateAdapterVersionHandler, CreateAnyAdapterHandler } from "../test-utils";
 import { describe, expectTypeOf, it } from "vitest";
-
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-
-export type OverrideVersionHandler<
-  TBaseHandler extends AnyVersionHandler,
-  TOverrides extends Partial<{
-    [K in keyof VersionHandler<any>]: any;
-  }>,
-> = Omit<TBaseHandler, keyof TOverrides> & TOverrides;
-
-export type OverrideAdapterHandler<
-  TBaseHandler extends AnyAdapterHandler,
-  TOverrides extends Partial<{
-    [K in keyof AdapterHandler<any>]: any;
-  }>,
-> = Omit<TBaseHandler, keyof TOverrides> & TOverrides;
 
 describe("MergeSources", () => {
   it("should handle empty sources", () => {
@@ -41,25 +24,24 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      {
-        adapterType: "version";
+      CreateAnyAdapterHandler<"version", {
         handlers: [
-          [() => true, OverrideVersionHandler<AnyVersionHandler, {
+          CreateAdapterVersionHandler<{
             output: string;
-          }>],
+          }>,
         ];
-      },
-      {
-        adapterType: "world";
+      }>,
+      CreateAnyAdapterHandler<"world", {
         handlers: [
-          [() => true, OverrideVersionHandler<AnyVersionHandler, {
+          CreateAdapterVersionHandler<{
             output: string;
-          }>],
+          }>,
         ];
-      },
+      }>,
     ];
 
     type Result = MergeSources<Source1, Source2>;
+    //    ^?
 
     expectTypeOf<Result>().toEqualTypeOf<{
       version: string;

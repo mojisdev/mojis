@@ -1,9 +1,10 @@
 /* eslint-disable ts/explicit-function-return-type */
-import type { Cache } from "@mojis/internal-utils";
+import type { Cache, CacheOptions } from "@mojis/internal-utils";
+import type { GenericParseOptions } from "@mojis/parsers";
 import type { type } from "arktype";
 import type { FallbackFn, PredicateFn } from "../src/builders/adapter-builder/types";
-import type { AnyVersionHandler } from "../src/builders/version-builder/types";
-import type { AdapterHandlerType } from "../src/global-types";
+import type { AnyVersionHandler, VersionHandler } from "../src/builders/version-builder/types";
+import type { AdapterContext, AdapterHandlerType, BuiltinParser, PossibleUrls } from "../src/global-types";
 import { createCache } from "@mojis/internal-utils";
 import { vi } from "vitest";
 
@@ -17,6 +18,55 @@ type HANDLER_MAP = {
     fallback?: ORIGINAL_HANDLERS[K]["fallback"];
   };
 };
+
+export type CreateAdapterVersionHandler<TConfig extends {
+  output: any;
+  params?: Record<string, any>;
+}> = VersionHandler<{
+  globalContext: AdapterContext;
+  fetchOptions: RequestInit;
+  cacheOptions: CacheOptions;
+  parser: BuiltinParser;
+  parserOptions: GenericParseOptions;
+  parserOutput: unknown;
+  outputSchema: type.Any;
+  urls: PossibleUrls;
+  transform: unknown;
+  aggregate: unknown;
+  output: TConfig["output"];
+}>;
+
+export interface TestBuiltAdapterHandlerParams {
+  adapterType: string;
+  handlers: [PredicateFn, AnyVersionHandler][];
+  outputSchema?: type.Any;
+  fallback?: FallbackFn<any>;
+}
+
+export interface TestAdapterHandler<TParams extends TestBuiltAdapterHandlerParams> {
+  adapterType: TParams["adapterType"];
+  handlers: TParams["handlers"];
+  outputSchema?: TParams["outputSchema"];
+  fallback?: FallbackFn<
+    TParams["outputSchema"] extends type.Any
+      ? TParams["outputSchema"]["infer"]
+      : any
+  >;
+}
+
+export type CreateAnyAdapterHandler<
+  TType extends string,
+  TConfig extends {
+    handlers: CreateAdapterVersionHandler<any>[];
+    outputSchema?: type.Any;
+    fallback?: any;
+  },
+> = TestAdapterHandler<{
+  adapterType: TType;
+  handlers: Array<[PredicateFn, TConfig["handlers"][number]]>;
+  outputSchema?: TConfig["outputSchema"];
+  fallback?: FallbackFn<TConfig["handlers"][number]["output"]>;
+}>;
 
 export function createMockHandlers(): HANDLER_MAP {
   return {
