@@ -1,6 +1,6 @@
 import type { type } from "arktype";
 import type { MaybePromise } from "node_modules/msw/lib/core/typeUtils";
-import type { AdapterContext, ErrorMessage, UnsetMarker } from "../../global-types";
+import type { AdapterContext, ErrorMessage, GetAdapterHandlerFromType, Id, UnsetMarker } from "../../global-types";
 import type { AnyAdapterHandler, InferHandlerOutput } from "../adapter-builder/types";
 
 export type PrimitiveSource = string | number | boolean;
@@ -8,19 +8,6 @@ export type PrimitiveSource = string | number | boolean;
 export type CompositeSourceFn = (ctx: AdapterContext) => MaybePromise<PrimitiveSource>;
 
 export type CompositeSource = PrimitiveSource | CompositeSourceFn;
-
-export type GetAdapterHandlerFromType<
-  TAdapterType extends string,
-  TAdapterHandlers extends AnyAdapterHandler[],
-> = TAdapterHandlers extends Array<infer THandler>
-  ? THandler extends AnyAdapterHandler
-    ? THandler["adapterType"] extends TAdapterType
-      ? THandler
-      : never
-    : never
-  : never;
-
-type Id<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
 
 export type MergeSources<
   TSources extends Record<string, CompositeSource>,
