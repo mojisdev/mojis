@@ -1,11 +1,44 @@
 import type { type } from "arktype";
 import type { MaybePromise } from "node_modules/msw/lib/core/typeUtils";
-import type { AnyAdapterHandler } from "../adapter-builder/types";
+import type { AnyAdapterHandler, InferHandlerOutput } from "../adapter-builder/types";
 import type { AdapterContext, ErrorMessage, UnsetMarker } from "../global-types";
 
 export type CompositeSourceFn = (ctx: AdapterContext) => MaybePromise<string>;
 
 export type CompositeSource = string | CompositeSourceFn;
+
+export type GetAdapterHandlerFromType<
+  TAdapterType extends string,
+  TAdapterHandlers extends AnyAdapterHandler[],
+> = TAdapterHandlers extends Array<infer THandler>
+  ? THandler extends AnyAdapterHandler
+    ? THandler["adapterType"] extends TAdapterType
+      ? THandler
+      : never
+    : never
+  : never;
+
+type Id<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
+
+export type MergeSources<
+  TSources extends Record<string, CompositeSource>,
+  TAdapterSources extends AnyAdapterHandler[],
+> = Id<{
+  [K in keyof TSources]: TSources[K] extends CompositeSource
+    ? TSources[K] extends CompositeSourceFn
+      ? Awaited<ReturnType<TSources[K]>>
+      : TSources[K]
+    : never;
+} & {
+  [K in TAdapterSources[number]["adapterType"]]: GetAdapterHandlerFromType<K, TAdapterSources> extends AnyAdapterHandler
+    ? InferHandlerOutput<GetAdapterHandlerFromType<K, TAdapterSources>>
+    : never;
+}>;
+
+export type CompositeTransformFn<TParams extends AnyCompositeHandlerParams> = (
+  ctx: AdapterContext,
+  sources: MergeSources<TParams["_sources"], TParams["_adapterSources"]>,
+) => MaybePromise<any>;
 
 export interface CompositeHandlerBuilder<
   TParams extends AnyCompositeHandlerParams,
@@ -28,6 +61,14 @@ export interface CompositeHandlerBuilder<
     _sources: TParams["_sources"];
     _adapterSources: TSources;
     _outputSchema: TParams["_outputSchema"];
+  }>;
+
+  transform: (
+    fn: CompositeTransformFn<TParams>
+  ) => CompositeHandlerBuilder<{
+    _outputSchema: TParams["_outputSchema"];
+    _adapterSources: TParams["_adapterSources"];
+    _sources: TParams["_sources"];
   }>;
 
   build: () => CompositeHandler<{

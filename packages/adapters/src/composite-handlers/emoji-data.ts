@@ -24,4 +24,13 @@ export const handler = builder
     test8: async () => "test8",
     test9: async () => "test9",
   })
+  .transform((ctx, sources) => {
+    console.error("ctx", ctx);
+    console.error("sources", sources);
+
+    return {
+      test: "test",
+      sources,
+    };
+  })
   .build();
