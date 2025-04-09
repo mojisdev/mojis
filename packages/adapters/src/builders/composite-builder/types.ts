@@ -3,9 +3,11 @@ import type { MaybePromise } from "node_modules/msw/lib/core/typeUtils";
 import type { AdapterContext, ErrorMessage, UnsetMarker } from "../../global-types";
 import type { AnyAdapterHandler, InferHandlerOutput } from "../adapter-builder/types";
 
-export type CompositeSourceFn = (ctx: AdapterContext) => MaybePromise<string>;
+export type PrimitiveSource = string | number | boolean;
 
-export type CompositeSource = string | CompositeSourceFn;
+export type CompositeSourceFn = (ctx: AdapterContext) => MaybePromise<PrimitiveSource>;
+
+export type CompositeSource = PrimitiveSource | CompositeSourceFn;
 
 export type GetAdapterHandlerFromType<
   TAdapterType extends string,
@@ -23,13 +25,16 @@ type Id<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
 export type MergeSources<
   TSources extends Record<string, CompositeSource>,
   TAdapterSources extends AnyAdapterHandler[],
-> = Id<{
-  [K in keyof TSources]: TSources[K] extends CompositeSource
-    ? TSources[K] extends CompositeSourceFn
-      ? Awaited<ReturnType<TSources[K]>>
-      : TSources[K]
-    : never;
-} & {
+> = Id<Omit<
+  {
+    [K in keyof TSources]: TSources[K] extends CompositeSource
+      ? TSources[K] extends CompositeSourceFn
+        ? Awaited<ReturnType<TSources[K]>>
+        : TSources[K]
+      : never;
+  },
+  TAdapterSources[number]["adapterType"]
+> & {
   [K in TAdapterSources[number]["adapterType"]]: GetAdapterHandlerFromType<K, TAdapterSources> extends AnyAdapterHandler
     ? InferHandlerOutput<GetAdapterHandlerFromType<K, TAdapterSources>>
     : never;
