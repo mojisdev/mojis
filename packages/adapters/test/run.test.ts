@@ -2,7 +2,7 @@ import type { AdapterContext, AdapterHandlerType } from "../src/global-types";
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { type } from "arktype";
 import { afterEach, describe, expect, it } from "vitest";
-import { createVersionHandlerBuilder } from "../src/version-builder/builder";
+import { createVersionHandlerBuilder } from "../src/builders/version-builder/builder";
 import { cleanupAdapterTest, setupAdapterTest } from "./test-utils";
 
 describe("runAdapterHandler", () => {

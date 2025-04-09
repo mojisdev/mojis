@@ -1,7 +1,7 @@
 import type { CacheOptions } from "@mojis/internal-utils";
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
 import type { type } from "arktype";
-import type { AdapterContext, BuiltinParser, ErrorMessage, PossibleUrls, UnsetMarker } from "../global-types";
+import type { AdapterContext, BuiltinParser, ErrorMessage, PossibleUrls, UnsetMarker } from "../../global-types";
 
 export type UrlFn<TOut extends PossibleUrls> = (ctx: AdapterContext) => TOut;
 

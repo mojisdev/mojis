@@ -2,7 +2,7 @@ import type { EmojiGroup, GroupedEmojiMetadata } from "@mojis/schemas/emojis";
 import { extractEmojiVersion, extractUnicodeVersion, isBefore } from "@mojis/internal-utils";
 import { EMOJI_GROUPS_SCHEMA, GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA } from "@mojis/schemas/emojis";
 import { type } from "arktype";
-import { createAdapterHandlerBuilder } from "../adapter-builder/builder";
+import { createAdapterHandlerBuilder } from "../../builders/adapter-builder/builder";
 
 function slugify(val: string): string {
   return val.normalize("NFD")
@@ -44,7 +44,7 @@ export const handler = builder
           return data.split("\n");
         })
         .transform((ctx, lines) => {
-        //                ^?
+          //                ^?
 
           let currentGroup: EmojiGroup | undefined;
 
@@ -142,7 +142,7 @@ export const handler = builder
           };
         })
         .output((ctx, transformed) => {
-        //            ^?
+          //            ^?
           return transformed;
         });
     },

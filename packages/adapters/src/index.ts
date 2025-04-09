@@ -1,15 +1,15 @@
 import type { Cache, CacheOptions } from "@mojis/internal-utils";
-import type { AnyAdapterHandler, InferHandlerOutput } from "./adapter-builder/types";
+import type { AnyAdapterHandler, InferHandlerOutput } from "./builders/adapter-builder/types";
+import type { AnyVersionHandler } from "./builders/version-builder/types";
 import type {
   AdapterContext,
   AdapterHandlerType,
 } from "./global-types";
-import type { AnyVersionHandler } from "./version-builder/types";
 import { arktypeParse, fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
 import { defu } from "defu";
 import { AdapterError } from "./errors";
-import * as handlers from "./handlers";
+import * as handlers from "./handlers/adapter";
 import { buildContext, getHandlerUrls, isBuiltinParser } from "./utils";
 
 export type { AdapterHandlerType } from "./global-types";

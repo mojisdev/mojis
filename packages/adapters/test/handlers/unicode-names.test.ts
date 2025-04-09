@@ -1,7 +1,7 @@
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { createCache } from "@mojis/internal-utils";
 import { afterEach, describe, expect, it } from "vitest";
-import { handler } from "../../src/handlers/unicode-names";
+import { handler } from "../../src/handlers/adapter/unicode-names";
 import { cleanupAdapterTest, setupAdapterTest } from "../test-utils";
 
 describe("unicode-names adapter handler", () => {

@@ -1,5 +1,5 @@
+import type { UrlFn } from "./builders/version-builder/types";
 import type { AdapterContext, BuiltinParser, PossibleUrls, UrlWithCache } from "./global-types";
-import type { UrlFn } from "./version-builder/types";
 import { createCacheKeyFromUrl } from "@mojis/internal-utils";
 
 /**

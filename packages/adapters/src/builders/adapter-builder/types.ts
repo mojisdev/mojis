@@ -2,7 +2,7 @@ import type { type } from "arktype";
 import type {
   AdapterHandlerType,
   JoinTuples,
-} from "../global-types";
+} from "../../global-types";
 import type { AnyHandleVersionParams, AnyVersionHandler, HandleVersionBuilder } from "../version-builder/types";
 
 export type InferHandlerOutput<TAdapterHandler extends AnyAdapterHandler> =

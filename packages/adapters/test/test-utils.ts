@@ -1,13 +1,13 @@
 /* eslint-disable ts/explicit-function-return-type */
 import type { Cache } from "@mojis/internal-utils";
 import type { type } from "arktype";
-import type { FallbackFn, PredicateFn } from "../src/adapter-builder/types";
+import type { FallbackFn, PredicateFn } from "../src/builders/adapter-builder/types";
+import type { AnyVersionHandler } from "../src/builders/version-builder/types";
 import type { AdapterHandlerType } from "../src/global-types";
-import type { AnyVersionHandler } from "../src/version-builder/types";
 import { createCache } from "@mojis/internal-utils";
 import { vi } from "vitest";
 
-type ORIGINAL_HANDLERS = Awaited<typeof import("../src/handlers/index")>;
+type ORIGINAL_HANDLERS = Awaited<typeof import("../src/handlers/adapter/index")>;
 
 type HANDLER_MAP = {
   [K in keyof ORIGINAL_HANDLERS]: {
@@ -60,7 +60,7 @@ export async function setupAdapterTest<TOutputSchema extends type.Any>(options?:
   const cache = options?.cache ?? createCache<string>({ store: "memory" });
 
   // mock needs to be before the dynamic import
-  vi.doMock("../src/handlers", () => mockHandlers);
+  vi.doMock("../src/handlers/adapter", () => mockHandlers);
 
   // use dynamic imports since we can't import from a file
   // since those imports are hoisted to the top of the file

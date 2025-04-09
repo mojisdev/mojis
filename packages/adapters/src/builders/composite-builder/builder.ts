@@ -1,5 +1,5 @@
 import type { type } from "arktype";
-import type { UnsetMarker } from "../global-types";
+import type { UnsetMarker } from "../../global-types";
 import type { AnyCompositeHandler, CompositeHandlerBuilder } from "./types";
 
 function internalCreateCompositeHandlerBuilder<TOutputSchema extends type.Any>(
@@ -8,11 +8,13 @@ function internalCreateCompositeHandlerBuilder<TOutputSchema extends type.Any>(
     _outputSchema: TOutputSchema;
     _sources: UnsetMarker;
     _adapterSources: UnsetMarker;
+    _transform: UnsetMarker;
   }> {
   const _def: AnyCompositeHandler = {
     outputSchema: initDef.outputSchema,
     sources: [],
     adapterSources: [],
+    transform: () => null,
     // overload with properties passed in
     ...initDef,
   };
@@ -28,6 +30,12 @@ function internalCreateCompositeHandlerBuilder<TOutputSchema extends type.Any>(
       return internalCreateCompositeHandlerBuilder({
         ..._def,
         adapterSources: userAdapterSources,
+      }) as CompositeHandlerBuilder<any>;
+    },
+    transform(userTransform) {
+      return internalCreateCompositeHandlerBuilder({
+        ..._def,
+        transform: userTransform,
       }) as CompositeHandlerBuilder<any>;
     },
     build() {
@@ -46,6 +54,7 @@ export function createCompositeHandlerBuilder<TOutputSchema extends type.Any>(
     _outputSchema: TOutputSchema;
     _sources: UnsetMarker;
     _adapterSources: UnsetMarker;
+    _transform: UnsetMarker;
   }> {
   return internalCreateCompositeHandlerBuilder<TOutputSchema>({
     outputSchema: opts.outputSchema,

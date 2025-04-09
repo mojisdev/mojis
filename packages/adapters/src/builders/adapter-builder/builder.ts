@@ -1,7 +1,7 @@
 import type { type } from "arktype";
 import type {
   AdapterHandlerType,
-} from "../global-types";
+} from "../../global-types";
 import type { AnyVersionHandler } from "../version-builder/types";
 import type {
   AdapterHandlerBuilder,
