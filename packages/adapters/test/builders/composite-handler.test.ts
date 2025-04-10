@@ -109,7 +109,16 @@ describe("composite handler builder", () => {
       force: true,
     };
 
-    expect(handler.transform(ctx, handler.sources)).toEqual({
+    const sources = Object.entries(handler.sources).reduce((acc, [key, value]) => {
+      acc[key] = value(ctx);
+      return acc;
+    }, {} as {
+      hello: string;
+      world: string;
+      [key: string]: string;
+    });
+
+    expect(handler.transform(ctx, sources)).toEqual({
       hello: "world",
       world: "15.0",
       ctx,
