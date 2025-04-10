@@ -9,23 +9,45 @@ export type CompositeSourceFn = (ctx: AdapterContext) => MaybePromise<PrimitiveS
 
 export type CompositeSource = PrimitiveSource | CompositeSourceFn;
 
-export type MergeSources<
-  TSources extends Record<string, CompositeSource>,
-  TAdapterSources extends AnyAdapterHandler[],
-> = Id<Omit<
-  {
-    [K in keyof TSources]: TSources[K] extends CompositeSource
-      ? TSources[K] extends CompositeSourceFn
-        ? Awaited<ReturnType<TSources[K]>>
-        : TSources[K]
-      : never;
-  },
-  TAdapterSources[number]["adapterType"]
-> & {
+export type GetObjectFromAdapterSources<TAdapterSources extends AnyAdapterHandler[]> = Id<{
   [K in TAdapterSources[number]["adapterType"]]: GetAdapterHandlerFromType<K, TAdapterSources> extends AnyAdapterHandler
     ? InferHandlerOutput<GetAdapterHandlerFromType<K, TAdapterSources>>
     : never;
 }>;
+
+export type GetObjectFromCompositeSources<TSources extends Record<string, CompositeSource>> = Id<{
+  [K in keyof TSources]: TSources[K] extends CompositeSource
+    ? TSources[K] extends CompositeSourceFn
+      ? Awaited<ReturnType<TSources[K]>>
+      : TSources[K]
+    : never;
+}>;
+
+export type MergeSources<
+  TSources extends Record<string, CompositeSource> | UnsetMarker,
+  TAdapterSources extends AnyAdapterHandler[] | UnsetMarker,
+> = Id<
+  TSources extends UnsetMarker
+    ? TAdapterSources extends UnsetMarker
+      ? never
+      : TAdapterSources extends AnyAdapterHandler[]
+        ? GetObjectFromAdapterSources<TAdapterSources>
+        : never
+
+    : TAdapterSources extends UnsetMarker
+      ? TSources extends Record<string, CompositeSource>
+        ? GetObjectFromCompositeSources<TSources>
+        : never
+
+      : TSources extends Record<string, CompositeSource>
+        ? TAdapterSources extends AnyAdapterHandler[]
+          ? Omit<
+            GetObjectFromCompositeSources<TSources>,
+            TAdapterSources[number]["adapterType"]
+          > & GetObjectFromAdapterSources<TAdapterSources>
+          : never
+        : never
+>;
 
 type IsKeyInSources<
   TKey extends string,
