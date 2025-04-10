@@ -68,15 +68,9 @@ describe("composite handler builder", () => {
             cacheOptions: undefined,
             parser: undefined,
             parserOptions: undefined,
-            urls(ctx: AdapterContext) {
-              throw new Error("Function not implemented.");
-            },
-            transform(ctx: any, data: any) {
-              throw new Error("Function not implemented.");
-            },
-            aggregate(ctx: any, data: any[]) {
-              throw new Error("Function not implemented.");
-            },
+            urls() { throw new Error("Function not implemented."); },
+            transform() { throw new Error("Function not implemented."); },
+            aggregate() { throw new Error("Function not implemented."); },
             output: "string",
             outputSchema: undefined,
           }],
