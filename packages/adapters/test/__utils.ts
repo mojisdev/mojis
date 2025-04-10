@@ -184,3 +184,17 @@ export type CreateAnyAdapterHandler<
   outputSchema?: TConfig["outputSchema"];
   fallback?: FallbackFn<TConfig["handlers"][number]["output"]>;
 }>;
+
+export function createTestAdapterHandler(
+  type: string,
+  handlers: Array<[PredicateFn, AnyVersionHandler]>,
+  outputSchema?: type.Any,
+  fallback?: FallbackFn<any>,
+): TestAdapterHandler<any> {
+  return {
+    adapterType: type,
+    handlers,
+    outputSchema,
+    fallback,
+  };
+}
