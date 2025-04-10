@@ -1,8 +1,8 @@
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { sequences } from "@mojis/loomicode";
 import { afterEach, describe, expect, it } from "vitest";
-import { handler } from "../../src/handlers/adapter/sequences";
-import { cleanupAdapterTest, setupAdapterTest } from "../test-utils";
+import { handler } from "../../../src/handlers/adapter/sequences";
+import { cleanupAdapterTest, setupAdapterTest } from "../../test-utils";
 
 describe("sequences adapter handler", () => {
   const mockContext = {
