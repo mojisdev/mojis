@@ -1,8 +1,8 @@
-import type { AdapterContext } from "packages/adapters/src/global-types";
+import { EMOJI_GROUPS_SCHEMA, GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA } from "@mojis/schemas/emojis";
 import { type } from "arktype";
+import { metadataHandler } from "packages/adapters/src/handlers/adapter";
 import { describe, expect, it } from "vitest";
 import { createCompositeHandlerBuilder } from "../../src/builders/composite-builder/builder";
-import { createTestAdapterHandler } from "../__utils";
 
 describe("composite handler builder", () => {
   it("creates with type", () => {
@@ -61,32 +61,58 @@ describe("composite handler builder", () => {
 
     const handler = builder
       .adapterSources([
-        createTestAdapterHandler("hello", [
-          [() => true, {
-            globalContext: undefined,
-            fetchOptions: undefined,
-            cacheOptions: undefined,
-            parser: undefined,
-            parserOptions: undefined,
-            urls() { throw new Error("Function not implemented."); },
-            transform() { throw new Error("Function not implemented."); },
-            aggregate() { throw new Error("Function not implemented."); },
-            output: "string",
-            outputSchema: undefined,
-          }],
-
-        ]),
+        metadataHandler,
       ])
       .build();
 
     expect(handler.adapterSources).toStrictEqual(expect.arrayContaining([
       expect.objectContaining({
-        adapterType: "hello",
+        adapterType: "metadata",
         handlers: expect.arrayContaining([
           expect.any(Array),
         ]),
-        outputSchema: undefined,
+        outputSchema: type({
+          groups: EMOJI_GROUPS_SCHEMA,
+          emojis: GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA,
+        }),
       }),
     ]));
+  });
+
+  it("adds transform", () => {
+    const builder = createCompositeHandlerBuilder({
+      outputSchema: type({
+        version: "string",
+      }),
+    });
+
+    const handler = builder
+      .sources({
+        hello: () => "world",
+        world: (ctx) => ctx.emoji_version,
+      })
+      .transform((ctx, data) => {
+        console.error(data);
+        return {
+          ...data,
+          ctx,
+        };
+      })
+      .build();
+
+    expect(handler.transform).toBeDefined();
+    expect(handler.transform).toEqual(expect.any(Function));
+
+    const ctx = {
+      emoji_version: "15.0",
+      unicode_version: "15.0",
+      force: true,
+    };
+
+    expect(handler.transform(ctx, handler.sources)).toEqual({
+      hello: "world",
+      world: "15.0",
+      ctx,
+    });
   });
 });

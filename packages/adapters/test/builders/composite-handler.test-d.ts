@@ -4,6 +4,7 @@
 import type {
   MergeSources,
 } from "../../src/builders/composite-builder/types";
+import type { UnsetMarker } from "../../src/global-types";
 import type { CreateAdapterVersionHandler, CreateAnyAdapterHandler } from "../__utils";
 import { describe, expectTypeOf, it } from "vitest";
 
@@ -222,5 +223,41 @@ describe("MergeSources", () => {
     expectTypeOf<Result>().toEqualTypeOf<{
       same: number | string;
     }>();
+  });
+
+  describe("unset markers", () => {
+    it("should handle unset markers in sources", () => {
+      type Source1 = {
+        version: () => string;
+      };
+
+      type Source2 = UnsetMarker;
+
+      type Result = MergeSources<Source1, Source2>;
+
+      expectTypeOf<Result>().toEqualTypeOf<{
+        version: string;
+      }>();
+    });
+
+    it("should handle unset markers in adapter sources", () => {
+      type Source1 = UnsetMarker;
+
+      type Source2 = [
+        CreateAnyAdapterHandler<"version", {
+          handlers: [
+            CreateAdapterVersionHandler<{
+              output: string;
+            }>,
+          ];
+        }>,
+      ];
+
+      type Result = MergeSources<Source1, Source2>;
+
+      expectTypeOf<Result>().toEqualTypeOf<{
+        version: string;
+      }>();
+    });
   });
 });
