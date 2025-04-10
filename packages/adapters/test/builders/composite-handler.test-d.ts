@@ -4,7 +4,7 @@
 import type {
   MergeSources,
 } from "../../src/builders/composite-builder/types";
-import type { CreateAdapterVersionHandler, CreateAnyAdapterHandler } from "../test-utils";
+import type { CreateAdapterVersionHandler, CreateAnyAdapterHandler } from "../__utils";
 import { describe, expectTypeOf, it } from "vitest";
 
 describe("MergeSources", () => {

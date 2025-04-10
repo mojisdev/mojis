@@ -3,7 +3,7 @@ import { createCache } from "@mojis/internal-utils";
 import { emojiTest } from "@mojis/loomicode";
 import { afterEach, describe, expect, it } from "vitest";
 import { handler } from "../../../src/handlers/adapter/metadata";
-import { cleanupAdapterTest, setupAdapterTest } from "../../test-utils";
+import { cleanupAdapterTest, setupAdapterTest } from "../../__utils";
 
 describe("metadata adapter handler", () => {
   const mockContext = {

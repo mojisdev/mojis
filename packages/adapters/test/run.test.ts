@@ -3,7 +3,7 @@ import { HttpResponse, mockFetch } from "#msw-utils";
 import { type } from "arktype";
 import { afterEach, describe, expect, it } from "vitest";
 import { createVersionHandlerBuilder } from "../src/builders/version-builder/builder";
-import { cleanupAdapterTest, setupAdapterTest } from "./test-utils";
+import { cleanupAdapterTest, setupAdapterTest } from "./__utils";
 
 describe("runAdapterHandler", () => {
   const mockContext: AdapterContext = {
