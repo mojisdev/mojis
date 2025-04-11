@@ -37,7 +37,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "zod": "catalog:prod"
+    "arktype": "catalog:prod"
   },
   "devDependencies": {
     "@luxass/eslint-config": "catalog:dev",

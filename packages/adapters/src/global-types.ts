@@ -1,3 +1,4 @@
+import type { AnyAdapterHandler } from "./builders/adapter-builder/types";
 import type { BUILTIN_PARSERS } from "./utils";
 
 /**
@@ -77,3 +78,20 @@ export type JoinTuples<
         ? [THead, UHead, ...JoinTuples<TRest, URest>]
         : T
       : U;
+
+/**
+ * Get the correct adapter handler based
+ * on the adapter type.
+ */
+export type GetAdapterHandlerFromType<
+  TAdapterType extends string,
+  TAdapterHandlers extends AnyAdapterHandler[],
+> = TAdapterHandlers extends Array<infer THandler>
+  ? THandler extends AnyAdapterHandler
+    ? THandler["adapterType"] extends TAdapterType
+      ? THandler
+      : never
+    : never
+  : never;
+
+export type Id<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;

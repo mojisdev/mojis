@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { createAdapterHandlerBuilder } from "../adapter-builder/builder";
+import { type } from "arktype";
+import { createAdapterHandlerBuilder } from "../../builders/adapter-builder/builder";
 
 const MAPPINGS = {
   "1.0": "https://unicode-proxy.mojis.dev/proxy/1.1-Update/UnicodeData-1.1.5.txt",
@@ -11,7 +11,9 @@ const MAPPINGS = {
 
 const builder = createAdapterHandlerBuilder({
   type: "unicode-names",
-  outputSchema: z.record(z.string(), z.string()),
+  outputSchema: type({
+    "[string]": "string",
+  }),
 });
 
 export const handler = builder

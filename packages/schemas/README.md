@@ -3,7 +3,7 @@
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
 
-A collection of Zod Schemas used by Mojis. 
+Internal Schemas used by Mojis, created using ArkType 
 
 ## Installation
 

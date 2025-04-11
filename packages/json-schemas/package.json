@@ -40,8 +40,7 @@
     "eslint": "catalog:dev",
     "tsx": "catalog:dev",
     "typescript": "catalog:dev",
-    "vitest-testdirs": "catalog:dev",
-    "zod-to-json-schema": "catalog:dev"
+    "vitest-testdirs": "catalog:dev"
   },
   "publishConfig": {
     "access": "public"

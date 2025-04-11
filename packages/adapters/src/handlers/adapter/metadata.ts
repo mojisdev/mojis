@@ -1,8 +1,8 @@
 import type { EmojiGroup, GroupedEmojiMetadata } from "@mojis/schemas/emojis";
 import { extractEmojiVersion, extractUnicodeVersion, isBefore } from "@mojis/internal-utils";
 import { EMOJI_GROUPS_SCHEMA, GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA } from "@mojis/schemas/emojis";
-import { z } from "zod";
-import { createAdapterHandlerBuilder } from "../adapter-builder/builder";
+import { type } from "arktype";
+import { createAdapterHandlerBuilder } from "../../builders/adapter-builder/builder";
 
 function slugify(val: string): string {
   return val.normalize("NFD")
@@ -22,7 +22,7 @@ const DISALLOWED_EMOJI_VERSIONS = ["1.0", "2.0", "3.0"];
 
 const builder = createAdapterHandlerBuilder({
   type: "metadata",
-  outputSchema: z.object({
+  outputSchema: type({
     groups: EMOJI_GROUPS_SCHEMA,
     emojis: GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA,
   }),
@@ -44,7 +44,7 @@ export const handler = builder
           return data.split("\n");
         })
         .transform((ctx, lines) => {
-        //                ^?
+          //                ^?
 
           let currentGroup: EmojiGroup | undefined;
 
@@ -88,7 +88,8 @@ export const handler = builder
 
             const [baseHexcode, trailingLine] = line.split(";");
 
-            if (baseHexcode == null || trailingLine == null) {
+            // TODO: utilize helper function to check both for null and empty string
+            if ((baseHexcode == null || baseHexcode.trim() === "") || (trailingLine == null || trailingLine.trim() === "")) {
               throw new Error(`invalid line: ${line}`);
             }
 
@@ -141,7 +142,7 @@ export const handler = builder
           };
         })
         .output((ctx, transformed) => {
-        //            ^?
+          //            ^?
           return transformed;
         });
     },

@@ -1,15 +1,15 @@
 import type { Cache, CacheOptions } from "@mojis/internal-utils";
-import type { AnyAdapterHandler, InferHandlerOutput } from "./adapter-builder/types";
+import type { AnyAdapterHandler, InferHandlerOutput } from "./builders/adapter-builder/types";
+import type { AnyVersionHandler } from "./builders/version-builder/types";
 import type {
   AdapterContext,
   AdapterHandlerType,
 } from "./global-types";
-import type { AnyVersionHandler } from "./version-builder/types";
-import { fetchCache } from "@mojis/internal-utils";
+import { arktypeParse, fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
 import { defu } from "defu";
 import { AdapterError } from "./errors";
-import { metadata, sequences, unicodeNames, variations } from "./handlers";
+import * as handlers from "./handlers/adapter";
 import { buildContext, getHandlerUrls, isBuiltinParser } from "./utils";
 
 export type { AdapterHandlerType } from "./global-types";
@@ -20,11 +20,11 @@ export interface RunOverrides {
   cache?: Cache<string>;
 }
 
-const HANDLERS = {
-  metadata,
-  sequences,
-  "unicode-names": unicodeNames,
-  variations,
+export const HANDLERS = {
+  "metadata": handlers.metadataHandler,
+  "sequences": handlers.sequencesHandler,
+  "unicode-names": handlers.unicodeNamesHandler,
+  "variations": handlers.variationsHandler,
 } satisfies Record<AdapterHandlerType, AnyAdapterHandler>;
 
 export async function runAdapterHandler<
@@ -61,7 +61,7 @@ export async function runAdapterHandler<
     return output as InferHandlerOutput<THandler>;
   }
 
-  const validationResult = handler.outputSchema.safeParse(output);
+  const validationResult = arktypeParse(output, handler.outputSchema);
 
   if (!validationResult.success) {
     throw new AdapterError(`Invalid output for handler: ${type}`);
