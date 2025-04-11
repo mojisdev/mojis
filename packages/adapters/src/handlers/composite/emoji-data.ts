@@ -2,6 +2,7 @@ import { type } from "arktype";
 import { createCompositeHandlerBuilder } from "../../builders/composite-builder/builder";
 
 import * as handlers from "../adapter";
+import { handler } from "../adapter/metadata";
 
 const builder = createCompositeHandlerBuilder({
   outputSchema: type({
@@ -32,7 +33,12 @@ export const compositeHandler = builder
 
     return {
       version: "test",
-      sources,
+    };
+  })
+  .transform((_, sources) => {
+    return {
+      hello: "world",
+      version: sources.version,
     };
   })
   .build();

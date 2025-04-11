@@ -1,5 +1,6 @@
 import type { Cache, CacheOptions } from "@mojis/internal-utils";
 import type { AnyAdapterHandler, InferHandlerOutput } from "./builders/adapter-builder/types";
+import type { AnyCompositeHandler } from "./builders/composite-builder/types";
 import type { AnyVersionHandler } from "./builders/version-builder/types";
 import type {
   AdapterContext,
@@ -10,6 +11,7 @@ import { genericParse } from "@mojis/parsers";
 import { defu } from "defu";
 import { AdapterError } from "./errors";
 import * as handlers from "./handlers/adapter";
+import { compositeHandler } from "./handlers/composite/emoji-data";
 import { buildContext, getHandlerUrls, isBuiltinParser } from "./utils";
 
 export type { AdapterHandlerType } from "./global-types";

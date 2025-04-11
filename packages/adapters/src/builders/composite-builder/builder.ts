@@ -8,15 +8,13 @@ function internalCreateCompositeHandlerBuilder<TOutputSchema extends type.Any>(
     _outputSchema: TOutputSchema;
     _sources: UnsetMarker;
     _adapterSources: UnsetMarker;
-    _transform: UnsetMarker;
+    _transform: [];
   }> {
   const _def: AnyCompositeHandler = {
     outputSchema: initDef.outputSchema,
-    sources: [],
-    adapterSources: [],
-    transform: () => null,
-    // overload with properties passed in
-    ...initDef,
+    sources: initDef.sources ?? [],
+    adapterSources: initDef.adapterSources ?? [],
+    transform: initDef.transform ?? [],
   };
 
   return {
@@ -35,7 +33,17 @@ function internalCreateCompositeHandlerBuilder<TOutputSchema extends type.Any>(
     transform(userTransform) {
       return internalCreateCompositeHandlerBuilder({
         ..._def,
-        transform: userTransform,
+        transform: [..._def.transform, async (ctx, sources) => {
+          const result = await userTransform(ctx, sources);
+          if (_def.outputSchema) {
+            const validationResult = _def.outputSchema(result);
+            if (!validationResult.data) {
+              throw new Error(`Invalid transform output: ${validationResult.problems.join(", ")}`);
+            }
+            return validationResult.data;
+          }
+          return result;
+        }],
       }) as CompositeHandlerBuilder<any>;
     },
     build() {
@@ -54,7 +62,7 @@ export function createCompositeHandlerBuilder<TOutputSchema extends type.Any>(
     _outputSchema: TOutputSchema;
     _sources: UnsetMarker;
     _adapterSources: UnsetMarker;
-    _transform: UnsetMarker;
+    _transform: [];
   }> {
   return internalCreateCompositeHandlerBuilder<TOutputSchema>({
     outputSchema: opts.outputSchema,
