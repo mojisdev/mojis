@@ -5,6 +5,7 @@ import type {
   ErrorMessage,
   GetAdapterHandlerFromType,
   Id,
+  JoinTuples,
   UnsetMarker,
 } from "../../global-types";
 import type {
@@ -175,7 +176,7 @@ export interface CompositeHandlerBuilder<
     _outputSchema: TParams["_outputSchema"];
     _adapterSources: TParams["_adapterSources"];
     _sources: TParams["_sources"];
-    _transforms: [...TParams["_transforms"], TOut];
+    _transforms: JoinTuples<TParams["_transforms"], [TOut]>;
   }>;
 
   build: () => CompositeHandler<{

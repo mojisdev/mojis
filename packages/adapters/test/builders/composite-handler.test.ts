@@ -79,7 +79,7 @@ describe("composite handler builder", () => {
     ]));
   });
 
-  it("adds transform", () => {
+  it("adds transform", async () => {
     const builder = createCompositeHandlerBuilder({
       outputSchema: type({
         version: "string",
@@ -100,8 +100,9 @@ describe("composite handler builder", () => {
       })
       .build();
 
-    expect(handler.transform).toBeDefined();
-    expect(handler.transform).toEqual(expect.any(Function));
+    expect(handler.transforms).toBeDefined();
+    expect(handler.transforms).toHaveLength(1);
+    expect(handler.transforms[0]).toEqual(expect.any(Function));
 
     const ctx = {
       emoji_version: "15.0",
@@ -118,7 +119,9 @@ describe("composite handler builder", () => {
       [key: string]: string;
     });
 
-    expect(handler.transform(ctx, sources)).toEqual({
+    const transformed = await handler.transforms[0](ctx, sources);
+
+    expect(transformed).toEqual({
       hello: "world",
       world: "15.0",
       ctx,
