@@ -14,7 +14,7 @@ function internalCreateCompositeHandlerBuilder<TOutputSchema extends type.Any>(
     outputSchema: initDef.outputSchema,
     sources: initDef.sources ?? [],
     adapterSources: initDef.adapterSources ?? [],
-    transforms: [],
+    transforms: initDef.transforms ?? [],
   };
 
   return {
