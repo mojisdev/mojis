@@ -4,7 +4,9 @@ import { createCompositeHandlerBuilder } from "../../builders/composite-builder/
 import * as handlers from "../adapter";
 
 const builder = createCompositeHandlerBuilder({
-  outputSchema: type({}),
+  outputSchema: type({
+    version: "string",
+  }),
 });
 
 export const compositeHandler = builder
@@ -29,7 +31,7 @@ export const compositeHandler = builder
     console.error("sources", sources);
 
     return {
-      test: "test",
+      version: "test",
       sources,
     };
   })

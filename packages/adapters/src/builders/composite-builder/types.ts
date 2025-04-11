@@ -107,7 +107,7 @@ export interface CompositeHandlerBuilder<
 
   }>;
 
-  transform: <TMergedSources extends MergeSources<TParams["_sources"], TParams["_adapterSources"]>, TOut>(
+  transform: <TMergedSources extends MergeSources<TParams["_sources"], TParams["_adapterSources"]>, TOut extends TParams["_outputSchema"] extends type.Any ? type.infer<TParams["_outputSchema"]> : any>(
     fn: CompositeTransformFn<TMergedSources, TOut>
   ) => CompositeHandlerBuilder<{
     _outputSchema: TParams["_outputSchema"];
