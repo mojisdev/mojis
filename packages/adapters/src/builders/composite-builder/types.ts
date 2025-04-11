@@ -58,7 +58,7 @@ export type MergeSources<
         : never
       : TSources extends Record<string, CompositeSource>
         ? TAdapterSources extends AnyAdapterHandler[]
-          ? Omit<
+        ? Omit<
             GetObjectFromCompositeSources<TSources>,
             TAdapterSources[number]["adapterType"]
           > &
@@ -91,14 +91,28 @@ export interface AnyBuiltCompositeHandlerParams {
   transforms: any[];
 }
 
+export type TransformChain<
+  TInitialSources,
+  TTransforms extends any[],
+> = TTransforms extends []
+  ? []
+  : TTransforms extends [infer First, ...infer Rest]
+    ? [
+        CompositeTransformFn<TInitialSources, First>,
+        ...TransformChain<First, Rest>,
+      ]
+    : never;
+
 export interface CompositeHandler<
   TParams extends AnyBuiltCompositeHandlerParams,
 > {
   outputSchema: TParams["outputSchema"];
   sources: TParams["sources"];
   adapterSources: TParams["adapterSources"];
-  transforms: TParams["transforms"];
-  // transform: CompositeTransformFn<MergeSources<TParams["sources"], TParams["adapterSources"]>, TParams["transform"][number]>[];
+  transforms: TransformChain<
+    MergeSources<TParams["sources"], TParams["adapterSources"]>,
+    TParams["transforms"]
+  >;
 }
 
 export type AnyCompositeHandler = CompositeHandler<any>;
@@ -163,13 +177,16 @@ export interface CompositeHandlerBuilder<
         ? MergeSources<TParams["_sources"], TParams["_adapterSources"]>
         : GetLastTransformOutput<TParams["_transforms"]>
       : never,
-    TOut extends TParams["_transforms"] extends any[]
-      ? TParams["_transforms"]["length"] extends 0
-        ? any
-        : TParams["_outputSchema"] extends type.Any
-          ? TParams["_outputSchema"]["infer"]
-          : never
-      : never,
+    // TODO: make output required to match output schema, but only for the last
+    TOut,
+
+    // TOut extends TParams["_transforms"] extends any[]
+    // ? TParams["_transforms"]["length"] extends 0
+    //   ? any
+    //   : TParams["_outputSchema"] extends type.Any
+    //     ? TParams["_outputSchema"]["infer"]
+    //     : never
+    // : never,
   >(
     fn: CompositeTransformFn<TIn, TOut>,
   ) => CompositeHandlerBuilder<{

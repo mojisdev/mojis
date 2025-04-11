@@ -34,10 +34,19 @@ export const compositeHandler = builder
       value: "test",
     };
   })
+  .transform((ctx, sources) => {
+    console.error("ctx", ctx);
+    console.error("sources", sources);
+
+    return {
+      value2: "test2",
+    };
+  })
   .transform((_, sources) => {
+    //           ^?
     return {
       hello: "world",
-      version: sources.value,
+      version: sources.value2,
     };
   })
   .build();

@@ -1,8 +1,8 @@
 import { EMOJI_GROUPS_SCHEMA, GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA } from "@mojis/schemas/emojis";
 import { type } from "arktype";
-import { metadataHandler } from "packages/adapters/src/handlers/adapter";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { createCompositeHandlerBuilder } from "../../src/builders/composite-builder/builder";
+import { metadataHandler } from "../../src/handlers/adapter";
 
 describe("composite handler builder", () => {
   it("creates with type", () => {
@@ -82,7 +82,7 @@ describe("composite handler builder", () => {
   it("adds transform", async () => {
     const builder = createCompositeHandlerBuilder({
       outputSchema: type({
-        version: "string",
+        hello: "string",
       }),
     });
 
@@ -92,10 +92,10 @@ describe("composite handler builder", () => {
         world: (ctx) => ctx.emoji_version,
       })
       .transform((ctx, data) => {
-        console.error(data);
+        //              ^?
+
         return {
-          ...data,
-          ctx,
+          hello: data.hello,
         };
       })
       .build();
@@ -120,11 +120,11 @@ describe("composite handler builder", () => {
     });
 
     const transformed = await handler.transforms[0](ctx, sources);
+    //     ^?
 
+    expectTypeOf(transformed).not.toBeAny();
     expect(transformed).toEqual({
       hello: "world",
-      world: "15.0",
-      ctx,
     });
   });
 });

@@ -2,11 +2,19 @@
 /* eslint-disable ts/no-empty-object-type */
 
 import type {
+  CompositeTransformFn,
   MergeSources,
+  TransformChain,
 } from "../../src/builders/composite-builder/types";
 import type { UnsetMarker } from "../../src/global-types";
 import type { CreateAdapterVersionHandler, CreateAnyAdapterHandler } from "../__utils";
 import { describe, expectTypeOf, it } from "vitest";
+
+type LengthOf<T extends any[]> = T["length"] extends infer L
+  ? L extends number
+    ? L
+    : never
+  : never;
 
 describe("MergeSources", () => {
   it("should handle empty sources", () => {
@@ -259,5 +267,50 @@ describe("MergeSources", () => {
         version: string;
       }>();
     });
+  });
+});
+
+describe("TransformChain", () => {
+  it("should create a properly typed transform chain", () => {
+    type SourceData = { name: string; age: number };
+    type TransformOutputs = [string, number, boolean];
+
+    type Result = TransformChain<SourceData, TransformOutputs>;
+    //    ^?
+
+    expectTypeOf<Result>().toBeArray();
+    expectTypeOf<LengthOf<Result>>().toEqualTypeOf<3>();
+
+    // verify function signatures
+    expectTypeOf<Result[0]>().toExtend<CompositeTransformFn<SourceData, string>>();
+    expectTypeOf<Result[1]>().toExtend<CompositeTransformFn<string, number>>();
+    expectTypeOf<Result[2]>().toExtend<CompositeTransformFn<number, boolean>>();
+  });
+
+  it("should handle empty transform arrays", () => {
+    type SourceData = { name: string };
+    type EmptyTransforms = [];
+
+    type Result = TransformChain<SourceData, EmptyTransforms>;
+
+    expectTypeOf<Result>().toBeArray();
+    expectTypeOf<LengthOf<Result>>().toEqualTypeOf<0>();
+  });
+
+  it("should handle complex object types", () => {
+    interface Person { name: string; age: number }
+    interface Address { street: string; city: string }
+    interface CompleteProfile { person: Person; address: Address }
+
+    type TransformOutputs = [Person, Address, CompleteProfile];
+
+    type Result = TransformChain<{ rawData: string }, TransformOutputs>;
+
+    expectTypeOf<Result>().toBeArray();
+    expectTypeOf<LengthOf<Result>>().toEqualTypeOf<3>();
+
+    expectTypeOf<Result[0]>().toExtend<CompositeTransformFn<{ rawData: string }, Person>>();
+    expectTypeOf<Result[1]>().toExtend<CompositeTransformFn<Person, Address>>();
+    expectTypeOf<Result[2]>().toExtend<CompositeTransformFn<Address, CompleteProfile>>();
   });
 });
