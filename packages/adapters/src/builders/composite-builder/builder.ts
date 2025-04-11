@@ -14,7 +14,7 @@ function internalCreateCompositeHandlerBuilder<TOutputSchema extends type.Any>(
     outputSchema: initDef.outputSchema,
     sources: initDef.sources ?? [],
     adapterSources: initDef.adapterSources ?? [],
-    transforms: initDef.transforms ?? [],
+    transforms: [],
   };
 
   return {
@@ -33,7 +33,10 @@ function internalCreateCompositeHandlerBuilder<TOutputSchema extends type.Any>(
     transform(userTransform) {
       return internalCreateCompositeHandlerBuilder({
         ..._def,
-        transforms: [..._def.transforms, userTransform],
+        transforms: [
+          ..._def.transforms,
+          userTransform,
+        ],
       }) as CompositeHandlerBuilder<any>;
     },
     build() {
