@@ -57,7 +57,7 @@ export type MergeSources<
         : never
       : TSources extends Record<string, CompositeSource>
         ? TAdapterSources extends AnyAdapterHandler[]
-        ? Omit<
+          ? Omit<
             GetObjectFromCompositeSources<TSources>,
             TAdapterSources[number]["adapterType"]
           > &
@@ -162,7 +162,13 @@ export interface CompositeHandlerBuilder<
         ? MergeSources<TParams["_sources"], TParams["_adapterSources"]>
         : GetLastTransformOutput<TParams["_transforms"]>
       : never,
-    TOut,
+    TOut extends TParams["_transforms"] extends any[]
+      ? TParams["_transforms"]["length"] extends 0
+        ? any
+        : TParams["_outputSchema"] extends type.Any
+          ? TParams["_outputSchema"]["infer"]
+          : never
+      : never,
   >(
     fn: CompositeTransformFn<TIn, TOut>,
   ) => CompositeHandlerBuilder<{

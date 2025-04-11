@@ -31,13 +31,13 @@ export const compositeHandler = builder
     console.error("sources", sources);
 
     return {
-      version: "test",
+      value: "test",
     };
   })
   .transform((_, sources) => {
     return {
       hello: "world",
-      version: sources.version,
+      version: sources.value,
     };
   })
   .build();
