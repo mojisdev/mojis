@@ -100,6 +100,12 @@ describe("composite handler builder", () => {
       })
       .build();
 
+    console.error({
+      sources: handler.sources,
+      adapterSources: handler.adapterSources,
+      transforms: handler.transforms,
+    });
+
     expect(handler.transforms).toBeDefined();
     expect(handler.transforms).toHaveLength(1);
     expect(handler.transforms[0]).toEqual(expect.any(Function));

@@ -42,27 +42,41 @@ export type GetObjectFromCompositeSources<
     : never;
 }>;
 
+export type GetSourcesFromAdapters<
+  TAdapterSources extends AnyAdapterHandler[] | UnsetMarker,
+> = TAdapterSources extends UnsetMarker
+  ? never
+  : TAdapterSources extends AnyAdapterHandler[]
+    ? GetObjectFromAdapterSources<TAdapterSources>
+    : never;
+
+export type GetSourcesFromComposites<
+  TSources extends Record<string, CompositeSource> | UnsetMarker,
+> = TSources extends UnsetMarker
+  ? never
+  : TSources extends Record<string, CompositeSource>
+    ? GetObjectFromCompositeSources<TSources>
+    : never;
+
+export type MergeCompositeAndAdapterSources<
+  TSources extends Record<string, CompositeSource>,
+  TAdapterSources extends AnyAdapterHandler[],
+> = Omit<
+  GetObjectFromCompositeSources<TSources>,
+  TAdapterSources[number]["adapterType"]
+> & GetObjectFromAdapterSources<TAdapterSources>;
+
 export type MergeSources<
   TSources extends Record<string, CompositeSource> | UnsetMarker,
   TAdapterSources extends AnyAdapterHandler[] | UnsetMarker,
 > = Id<
   TSources extends UnsetMarker
-    ? TAdapterSources extends UnsetMarker
-      ? never
-      : TAdapterSources extends AnyAdapterHandler[]
-        ? GetObjectFromAdapterSources<TAdapterSources>
-        : never
+    ? GetSourcesFromAdapters<TAdapterSources>
     : TAdapterSources extends UnsetMarker
-      ? TSources extends Record<string, CompositeSource>
-        ? GetObjectFromCompositeSources<TSources>
-        : never
+      ? GetSourcesFromComposites<TSources>
       : TSources extends Record<string, CompositeSource>
         ? TAdapterSources extends AnyAdapterHandler[]
-          ? Omit<
-            GetObjectFromCompositeSources<TSources>,
-            TAdapterSources[number]["adapterType"]
-          > &
-          GetObjectFromAdapterSources<TAdapterSources>
+          ? MergeCompositeAndAdapterSources<TSources, TAdapterSources>
           : never
         : never
 >;
@@ -177,13 +191,13 @@ export interface CompositeHandlerBuilder<
     // TODO: make output required to match output schema, but only for the last
     TOut,
 
-    // TOut extends TParams["_transforms"] extends any[]
-    // ? TParams["_transforms"]["length"] extends 0
-    //   ? any
-    //   : TParams["_outputSchema"] extends type.Any
-    //     ? TParams["_outputSchema"]["infer"]
-    //     : never
-    // : never,
+  // TOut extends TParams["_transforms"] extends any[]
+  // ? TParams["_transforms"]["length"] extends 0
+  //   ? any
+  //   : TParams["_outputSchema"] extends type.Any
+  //     ? TParams["_outputSchema"]["infer"]
+  //     : never
+  // : never,
   >(
     fn: CompositeTransformFn<TIn, TOut>,
   ) => CompositeHandlerBuilder<{
