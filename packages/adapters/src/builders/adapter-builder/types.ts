@@ -28,7 +28,10 @@ export interface AdapterHandlerBuilder<
   ) => AdapterHandlerBuilder<{
     _adapterType: TParams["_adapterType"];
     _outputSchema: TParams["_outputSchema"];
-    _handlers: JoinTuples<TParams["_handlers"], [[TPredicate, THandler]]>;
+    _handlers: JoinTuples<[
+      TParams["_handlers"],
+      [[TPredicate, THandler]],
+    ]>;
     _fallback: TParams["_fallback"];
   }>;
 

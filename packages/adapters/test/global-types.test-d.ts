@@ -30,4 +30,17 @@ describe("JoinTuples", () => {
     type Result = JoinTuples<[[1, 2, 3], [], []]>;
     expectTypeOf<Result>().toEqualTypeOf<[1, 2, 3]>();
   });
+
+  it("should join tuples with nested tuples", () => {
+    type Result = JoinTuples<[
+      [[1, 2, 3], [4, 5, 6]],
+      [[7, 8, 9], [10, 11, 12]],
+    ]>;
+    expectTypeOf<Result>().toEqualTypeOf<[
+      [1, 2, 3],
+      [4, 5, 6],
+      [7, 8, 9],
+      [10, 11, 12],
+    ]>();
+  });
 });
