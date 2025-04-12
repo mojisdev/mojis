@@ -1,4 +1,4 @@
-import type { AnySourceAdapter } from "./builders/adapter-builder/types";
+import type { AnySourceAdapter } from "./builders/source-builder/types";
 import type { BUILTIN_PARSERS } from "./utils";
 
 /**

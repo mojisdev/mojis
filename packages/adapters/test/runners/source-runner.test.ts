@@ -1,4 +1,4 @@
-import type { AnySourceAdapter } from "../../src/builders/adapter-builder/types";
+import type { AnySourceAdapter } from "../../src/builders/source-builder/types";
 import type { AdapterContext } from "../../src/global-types";
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { type } from "arktype";

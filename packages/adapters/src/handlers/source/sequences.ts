@@ -2,7 +2,7 @@ import type { EmojiSequence } from "@mojis/schemas/emojis";
 import { expandHexRange, FEMALE_SIGN, MALE_SIGN } from "@mojis/internal-utils";
 import { EMOJI_SEQUENCE_SCHEMA } from "@mojis/schemas/emojis";
 import { type } from "arktype";
-import { createSourceAdapter } from "../../builders/adapter-builder/builder";
+import { createSourceAdapter } from "../../builders/source-builder/builder";
 
 const NOT_AVAILABLE_SEQUENCES = ["1.0"];
 

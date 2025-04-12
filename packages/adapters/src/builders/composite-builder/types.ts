@@ -11,7 +11,7 @@ import type {
 import type {
   AnySourceAdapter,
   InferHandlerOutput,
-} from "../adapter-builder/types";
+} from "../source-builder/types";
 
 export type PrimitiveSource = string | number | boolean;
 

@@ -1,7 +1,7 @@
 import type { AdapterContext } from "../../src/global-types";
 import { type } from "arktype";
 import { describe, expect, it } from "vitest";
-import { createSourceAdapter } from "../../src/builders/adapter-builder/builder";
+import { createSourceAdapter } from "../../src/builders/source-builder/builder";
 
 describe("adapter handler builder", () => {
   const emptyContext = {} as AdapterContext;

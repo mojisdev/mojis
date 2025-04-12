@@ -1,5 +1,5 @@
 import { type } from "arktype";
-import { createSourceAdapter } from "../../builders/adapter-builder/builder";
+import { createSourceAdapter } from "../../builders/source-builder/builder";
 
 const MAPPINGS = {
   "1.0": "https://unicode-proxy.mojis.dev/proxy/1.1-Update/UnicodeData-1.1.5.txt",

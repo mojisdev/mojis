@@ -2,7 +2,7 @@ import { EMOJI_GROUPS_SCHEMA, GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA } from "@mo
 import { type } from "arktype";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import { createCompositeHandlerBuilder } from "../../src/builders/composite-builder/builder";
-import { metadataHandler } from "../../src/handlers/adapter";
+import { metadataHandler } from "../../src/handlers/source";
 
 describe("composite handler builder", () => {
   it("creates with type", () => {

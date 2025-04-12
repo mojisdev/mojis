@@ -2,7 +2,7 @@ import type { EmojiGroup, GroupedEmojiMetadata } from "@mojis/schemas/emojis";
 import { extractEmojiVersion, extractUnicodeVersion, isBefore } from "@mojis/internal-utils";
 import { EMOJI_GROUPS_SCHEMA, GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA } from "@mojis/schemas/emojis";
 import { type } from "arktype";
-import { createSourceAdapter } from "../../builders/adapter-builder/builder";
+import { createSourceAdapter } from "../../builders/source-builder/builder";
 
 function slugify(val: string): string {
   return val.normalize("NFD")

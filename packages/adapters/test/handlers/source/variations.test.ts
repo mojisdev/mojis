@@ -2,7 +2,7 @@ import { HttpResponse, mockFetch } from "#msw-utils";
 import { createCache } from "@mojis/internal-utils";
 import { variations } from "@mojis/loomicode";
 import { describe, expect, it } from "vitest";
-import { variationsHandler } from "../../../src/handlers/adapter";
+import { variationsHandler } from "../../../src/handlers/source";
 import { setupAdapterTest } from "../../__utils";
 
 describe("variations adapter handler", () => {

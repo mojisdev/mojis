@@ -1,6 +1,6 @@
 import type {
   InferHandlerOutput,
-} from "../../src/builders/adapter-builder/types";
+} from "../../src/builders/source-builder/types";
 import type { CreateAdapterVersionHandler, CreateAnyAdapterHandler } from "../__utils";
 import { describe, expectTypeOf, it } from "vitest";
 

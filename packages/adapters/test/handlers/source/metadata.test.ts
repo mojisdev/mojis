@@ -2,7 +2,7 @@ import { HttpResponse, mockFetch } from "#msw-utils";
 import { createCache } from "@mojis/internal-utils";
 import { emojiTest } from "@mojis/loomicode";
 import { describe, expect, it } from "vitest";
-import { metadataHandler } from "../../../src/handlers/adapter";
+import { metadataHandler } from "../../../src/handlers/source";
 import { setupAdapterTest } from "../../__utils";
 
 describe("metadata adapter handler", () => {

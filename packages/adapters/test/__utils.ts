@@ -2,14 +2,14 @@
 import type { Cache, CacheOptions } from "@mojis/internal-utils";
 import type { GenericParseOptions } from "@mojis/parsers";
 import type { type } from "arktype";
+import type { AnyCompositeHandler } from "../src/builders/composite-builder/types";
 import type {
   AnyBuiltSourceAdapterParams,
   AnySourceAdapter,
   FallbackFn,
   PredicateFn,
   SourceAdapter,
-} from "../src/builders/adapter-builder/types";
-import type { AnyCompositeHandler } from "../src/builders/composite-builder/types";
+} from "../src/builders/source-builder/types";
 import type { AnyVersionHandler, VersionHandler } from "../src/builders/version-builder/types";
 import type {
   AdapterContext,

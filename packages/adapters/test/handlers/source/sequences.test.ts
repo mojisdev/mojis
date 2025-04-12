@@ -1,7 +1,7 @@
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { sequences } from "@mojis/loomicode";
 import { describe, expect, it } from "vitest";
-import { sequencesHandler } from "../../../src/handlers/adapter";
+import { sequencesHandler } from "../../../src/handlers/source";
 import { setupAdapterTest } from "../../__utils";
 
 describe("sequences adapter handler", () => {

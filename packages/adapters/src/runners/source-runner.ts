@@ -1,5 +1,5 @@
 import type { Cache, CacheOptions } from "@mojis/internal-utils";
-import type { AnySourceAdapter, InferHandlerOutput } from "../builders/adapter-builder/types";
+import type { AnySourceAdapter, InferHandlerOutput } from "../builders/source-builder/types";
 import type { AdapterContext } from "../global-types";
 import { arktypeParse } from "@mojis/internal-utils";
 import { AdapterError } from "../errors";
