@@ -11,7 +11,7 @@ describe("composite handler builder", () => {
         version: "string",
       }),
     });
-    const handler = builder.build();
+    const handler = builder.output(() => ({ version: "1.0" }));
     expect(handler.outputSchema).toBeDefined();
     expect(handler.outputSchema).toEqual(
       type({
@@ -26,7 +26,7 @@ describe("composite handler builder", () => {
         version: "string",
       }),
     });
-    const handler = builder.build();
+    const handler = builder.output(() => ({ version: "1.0" }));
     expect(handler.sources).toHaveLength(0);
     expect(handler.adapterSources).toHaveLength(0);
   });
@@ -43,7 +43,7 @@ describe("composite handler builder", () => {
         hello: () => "world",
         version: (ctx) => ctx.emoji_version,
       })
-      .build();
+      .output(() => ({ version: "1.0" }));
 
     expect(handler.sources).toStrictEqual({
       hello: expect.any(Function),
@@ -63,7 +63,7 @@ describe("composite handler builder", () => {
       .adapterSources([
         metadataHandler,
       ])
-      .build();
+      .output(() => ({ version: "1.0" }));
 
     expect(handler.adapterSources).toStrictEqual(expect.arrayContaining([
       expect.objectContaining({
@@ -98,7 +98,7 @@ describe("composite handler builder", () => {
           hello: data.hello,
         };
       })
-      .build();
+      .output((_, data) => ({ hello: data.hello }));
 
     console.error({
       sources: handler.sources,
