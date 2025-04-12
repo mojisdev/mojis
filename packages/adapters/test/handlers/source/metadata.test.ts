@@ -1,8 +1,8 @@
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { createCache } from "@mojis/internal-utils";
 import { emojiTest } from "@mojis/loomicode";
-import { metadataHandler } from "packages/adapters/src/handlers/adapter";
 import { describe, expect, it } from "vitest";
+import { metadataHandler } from "../../../src/handlers/adapter";
 import { setupAdapterTest } from "../../__utils";
 
 describe("metadata adapter handler", () => {

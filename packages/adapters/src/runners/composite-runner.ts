@@ -4,7 +4,7 @@ import type { AdapterContext } from "../global-types";
 import { arktypeParse } from "@mojis/internal-utils";
 import defu from "defu";
 import { AdapterError } from "../errors";
-import { runAdapterHandler } from "./adapter-runner";
+import { runSourceAdapter } from "./source-runner";
 
 export interface RunCompositeHandlerOverrides {
   cacheKey?: string;
@@ -62,7 +62,7 @@ async function getAdapterSources(
   // run all adapter handlers in parallel and process results directly
   const results = await Promise.all(
     handler.adapterSources.map(async (adapterSource) => {
-      const value = await runAdapterHandler(adapterSource, ctx, __overrides);
+      const value = await runSourceAdapter(adapterSource, ctx, __overrides);
       return [adapterSource.adapterType, value] as const;
     }),
   );

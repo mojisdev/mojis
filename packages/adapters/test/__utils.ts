@@ -3,11 +3,11 @@ import type { Cache, CacheOptions } from "@mojis/internal-utils";
 import type { GenericParseOptions } from "@mojis/parsers";
 import type { type } from "arktype";
 import type {
-  SourceAdapter,
-  AnySourceAdapter,
   AnyBuiltSourceAdapterParams,
+  AnySourceAdapter,
   FallbackFn,
   PredicateFn,
+  SourceAdapter,
 } from "../src/builders/adapter-builder/types";
 import type { AnyCompositeHandler } from "../src/builders/composite-builder/types";
 import type { AnyVersionHandler, VersionHandler } from "../src/builders/version-builder/types";
@@ -27,7 +27,7 @@ export async function setupAdapterTest(options?: SetupAdapterTestOptions) {
 
   // use dynamic imports since we can't import from a file
   // since those imports are hoisted to the top of the file
-  const { runAdapterHandler: runAdapterHandlerOriginal } = await import("../src/runners/adapter-runner");
+  const { runSourceAdapter: runAdapterHandlerOriginal } = await import("../src/runners/source-runner");
   const { runCompositeHandler: runCompositeHandlerOriginal } = await import("../src/runners/composite-runner");
 
   function runAdapterHandler<THandler extends AnySourceAdapter>(
