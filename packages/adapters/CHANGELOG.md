@@ -1,5 +1,13 @@
 # @mojis/adapters
 
+## 0.2.0
+
+### Minor Changes
+
+- [#94](https://github.com/mojisdev/mojis/pull/94) [`3d72bf2`](https://github.com/mojisdev/mojis/commit/3d72bf2cdd02f79e3316fadb881fad9b981033af) Thanks [@luxass](https://github.com/luxass)! - refactor: rename adapter handlers to source adapters
+
+- [#96](https://github.com/mojisdev/mojis/pull/96) [`859d5ad`](https://github.com/mojisdev/mojis/commit/859d5ade56d6622e1654aa7fd066c3ed4d34b6bd) Thanks [@luxass](https://github.com/luxass)! - refactor: rename version handlers to source transformers
+
 ## 0.1.0
 
 ### Minor Changes
