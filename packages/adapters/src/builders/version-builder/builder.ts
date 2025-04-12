@@ -2,13 +2,13 @@ import type {
   AdapterContext,
   UnsetMarker,
 } from "../../global-types";
-import type { AnyVersionHandler, HandleVersionBuilder } from "./types";
+import type { AnyVersionedSourceTransformer, VersionedSourceTransformerBuilder } from "./types";
 
-function internalCreateVersionHandlerBuilder<
+function internalCreateVersionedSourceTransformerBuilder<
   TOutputSchema,
 >(
-  initDef: Partial<AnyVersionHandler> = {},
-): HandleVersionBuilder<{
+  initDef: Partial<AnyVersionedSourceTransformer> = {},
+): VersionedSourceTransformerBuilder<{
     _context: AdapterContext;
     _urls: UnsetMarker;
     _aggregate: {
@@ -33,59 +33,59 @@ function internalCreateVersionHandlerBuilder<
     _validation: UnsetMarker;
     _outputSchema: TOutputSchema;
   }> {
-  const _def: Partial<AnyVersionHandler> = {
+  const _def: Partial<AnyVersionedSourceTransformer> = {
     outputSchema: initDef.outputSchema,
     ...initDef,
   };
 
   return {
     urls(userUrls) {
-      return internalCreateVersionHandlerBuilder({
+      return internalCreateVersionedSourceTransformerBuilder({
         ..._def,
         urls: userUrls,
-      }) as HandleVersionBuilder<any>;
+      }) as VersionedSourceTransformerBuilder<any>;
     },
     parser(userParser, userParserOptions) {
-      return internalCreateVersionHandlerBuilder({
+      return internalCreateVersionedSourceTransformerBuilder({
         ..._def,
         parser: userParser,
         parserOptions: userParserOptions,
-      }) as HandleVersionBuilder<any>;
+      }) as VersionedSourceTransformerBuilder<any>;
     },
     transform(userTransform) {
-      return internalCreateVersionHandlerBuilder({
+      return internalCreateVersionedSourceTransformerBuilder({
         ..._def,
         transform: userTransform,
-      }) as HandleVersionBuilder<any>;
+      }) as VersionedSourceTransformerBuilder<any>;
     },
     aggregate(userAggregate) {
-      return internalCreateVersionHandlerBuilder({
+      return internalCreateVersionedSourceTransformerBuilder({
         ..._def,
         aggregate: userAggregate,
-      }) as HandleVersionBuilder<any>;
+      }) as VersionedSourceTransformerBuilder<any>;
     },
     cacheOptions(userCacheOptions) {
-      return internalCreateVersionHandlerBuilder({
+      return internalCreateVersionedSourceTransformerBuilder({
         ..._def,
         cacheOptions: userCacheOptions,
-      }) as HandleVersionBuilder<any>;
+      }) as VersionedSourceTransformerBuilder<any>;
     },
     fetchOptions(userFetchOptions) {
-      return internalCreateVersionHandlerBuilder({
+      return internalCreateVersionedSourceTransformerBuilder({
         ..._def,
         fetchOptions: userFetchOptions,
-      }) as HandleVersionBuilder<any>;
+      }) as VersionedSourceTransformerBuilder<any>;
     },
     output(userOutput) {
       return {
         ..._def,
         output: userOutput,
-      } as AnyVersionHandler;
+      } as AnyVersionedSourceTransformer;
     },
   };
 }
 
-export function createVersionHandlerBuilder<TOutputSchema>(): HandleVersionBuilder<{
+export function createVersionedSourceTransformerBuilder<TOutputSchema>(): VersionedSourceTransformerBuilder<{
   _aggregate: {
     in: UnsetMarker;
     out: UnsetMarker;
@@ -110,5 +110,5 @@ export function createVersionHandlerBuilder<TOutputSchema>(): HandleVersionBuild
   _validation: UnsetMarker;
   _outputSchema: TOutputSchema;
 }> {
-  return internalCreateVersionHandlerBuilder<TOutputSchema>();
+  return internalCreateVersionedSourceTransformerBuilder<TOutputSchema>();
 }

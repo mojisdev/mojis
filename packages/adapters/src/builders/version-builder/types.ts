@@ -25,7 +25,7 @@ export type InferParseOutput<
     ? TOutput
     : never;
 
-export interface AnyHandleVersionParams {
+export interface AnyVersionedSourceTransformerParams {
   _context: AdapterContext;
   _urls: any;
   _aggregate: {
@@ -81,12 +81,12 @@ export type WrapContextFn<
   TReturn,
 > = ((ctx: TContext & TExtraContext) => TReturn) | TReturn;
 
-export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
+export interface VersionedSourceTransformerBuilder<TParams extends AnyVersionedSourceTransformerParams> {
   urls: <TUrls extends PossibleUrls>(
     urls: TParams["_urls"] extends UnsetMarker
       ? UrlFn<TUrls>
       : ErrorMessage<"urls is already set">,
-  ) => HandleVersionBuilder<{
+  ) => VersionedSourceTransformerBuilder<{
     _context: TParams["_context"];
     _urls: TUrls;
     _aggregate: TParams["_aggregate"];
@@ -112,7 +112,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
         GetParseOptionsFromParser<TParser>
       >
       : never,
-  ) => HandleVersionBuilder<{
+  ) => VersionedSourceTransformerBuilder<{
     _context: TParams["_context"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
@@ -138,7 +138,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     transform: TParams["_transform"]["in"] extends UnsetMarker
       ? TransformFn<AdapterContext, TIn, TOut>
       : ErrorMessage<"transform is already set">,
-  ) => HandleVersionBuilder<{
+  ) => VersionedSourceTransformerBuilder<{
     _context: TParams["_context"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
@@ -161,7 +161,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     aggregate: TParams["_aggregate"]["in"] extends UnsetMarker
       ? AggregateFn<AdapterContext, TIn, TOut>
       : ErrorMessage<"aggregate is already set">,
-  ) => HandleVersionBuilder<{
+  ) => VersionedSourceTransformerBuilder<{
     _context: TParams["_context"];
     _outputSchema: TParams["_outputSchema"];
     _aggregate: {
@@ -183,7 +183,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     cacheOptions: TParams["_options"]["cacheOptions"] extends UnsetMarker
       ? TOptions
       : ErrorMessage<"cacheOptions is already set">,
-  ) => HandleVersionBuilder<{
+  ) => VersionedSourceTransformerBuilder<{
     _context: TParams["_context"];
     _outputSchema: TParams["_outputSchema"];
     _urls: TParams["_urls"];
@@ -203,7 +203,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     fetchOptions: TParams["_options"]["fetchOptions"] extends UnsetMarker
       ? TOptions
       : ErrorMessage<"fetchOptions is already set">,
-  ) => HandleVersionBuilder<{
+  ) => VersionedSourceTransformerBuilder<{
     _context: TParams["_context"];
     _outputSchema: TParams["_outputSchema"];
     _urls: TParams["_urls"];
@@ -223,7 +223,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     output: TParams["_output"] extends UnsetMarker
       ? OutputFn<AdapterContext, TIn, TOut>
       : ErrorMessage<"output is already set">,
-  ) => VersionHandler<{
+  ) => VersionedSourceTransformer<{
     globalContext: TParams["_context"];
     cacheOptions: TParams["_options"]["cacheOptions"];
     fetchOptions: TParams["_options"]["fetchOptions"];
@@ -238,7 +238,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
   }>;
 }
 
-export interface AnyBuiltVersionHandlerParams {
+export interface AnyBuiltVersionedSourceTransformerParams {
   globalContext: AdapterContext;
   fetchOptions: RequestInit;
   cacheOptions: CacheOptions;
@@ -252,7 +252,7 @@ export interface AnyBuiltVersionHandlerParams {
   output: any;
 }
 
-export interface VersionHandler<TParams extends AnyBuiltVersionHandlerParams> {
+export interface VersionedSourceTransformer<TParams extends AnyBuiltVersionedSourceTransformerParams> {
   globalContext: TParams["globalContext"];
   fetchOptions: TParams["fetchOptions"];
   cacheOptions: TParams["cacheOptions"];
@@ -265,4 +265,4 @@ export interface VersionHandler<TParams extends AnyBuiltVersionHandlerParams> {
   outputSchema: TParams["outputSchema"];
 }
 
-export type AnyVersionHandler = VersionHandler<any>;
+export type AnyVersionedSourceTransformer = VersionedSourceTransformer<any>;

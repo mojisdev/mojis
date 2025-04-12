@@ -1,13 +1,13 @@
 import type { GenericParseResult } from "@mojis/parsers";
 import type { AdapterContext } from "../../src/global-types";
 import { describe, expect, it } from "vitest";
-import { createVersionHandlerBuilder } from "../../src/builders/version-builder/builder";
+import { createVersionedSourceTransformerBuilder } from "../../src/builders/version-builder/builder";
 
 describe("version handler builder", () => {
   const emptyContext = {} as AdapterContext;
 
   it("creates basic handler", () => {
-    const handler = createVersionHandlerBuilder()
+    const handler = createVersionedSourceTransformerBuilder()
       .urls(() => "https://example.com")
       .parser("generic")
       .output((_, data) => data);
@@ -17,7 +17,7 @@ describe("version handler builder", () => {
   });
 
   it("sets urls with cache options", () => {
-    const handler = createVersionHandlerBuilder()
+    const handler = createVersionedSourceTransformerBuilder()
       .urls(() => ({
         url: "https://example.com",
         cacheKey: "test",
@@ -33,7 +33,7 @@ describe("version handler builder", () => {
   });
 
   it("sets parser with options", () => {
-    const handler = createVersionHandlerBuilder()
+    const handler = createVersionedSourceTransformerBuilder()
       .urls(() => "https://example.com")
       .parser("generic", { separator: ";" })
       .output((_, data) => data);
@@ -43,7 +43,7 @@ describe("version handler builder", () => {
   });
 
   it("transforms data", () => {
-    const handler = createVersionHandlerBuilder()
+    const handler = createVersionedSourceTransformerBuilder()
       .urls(() => "https://example.com")
       .parser("generic")
       .transform((_, data) => ({ ...data, transformed: true }))
@@ -55,7 +55,7 @@ describe("version handler builder", () => {
   });
 
   it("aggregates data", () => {
-    const handler = createVersionHandlerBuilder()
+    const handler = createVersionedSourceTransformerBuilder()
       .urls(() => "https://example.com")
       .parser("generic")
       .transform((_, data) => data)
@@ -71,7 +71,7 @@ describe("version handler builder", () => {
   });
 
   it("sets cache options", () => {
-    const handler = createVersionHandlerBuilder()
+    const handler = createVersionedSourceTransformerBuilder()
       .urls(() => "https://example.com")
       .parser("generic")
       .cacheOptions({ ttl: 3600 })
@@ -81,7 +81,7 @@ describe("version handler builder", () => {
   });
 
   it("sets fetch options", () => {
-    const handler = createVersionHandlerBuilder()
+    const handler = createVersionedSourceTransformerBuilder()
       .urls(() => "https://example.com")
       .parser("generic")
       .fetchOptions({ method: "GET" })
@@ -91,7 +91,7 @@ describe("version handler builder", () => {
   });
 
   it("chains all options", () => {
-    const handler = createVersionHandlerBuilder()
+    const handler = createVersionedSourceTransformerBuilder()
       .urls(() => ({
         url: "https://example.com",
         cacheKey: "test",
@@ -124,7 +124,7 @@ describe("version handler builder", () => {
   });
 
   it("maintains order of operations", () => {
-    const handler = createVersionHandlerBuilder()
+    const handler = createVersionedSourceTransformerBuilder()
       .urls(() => "https://example.com")
       .parser("generic")
       .transform((_, data) => ({ ...data, step1: true, step2: true }))
@@ -151,7 +151,7 @@ describe("version handler builder", () => {
   });
 
   it("validates data", () => {
-    const handler = createVersionHandlerBuilder<{
+    const handler = createVersionedSourceTransformerBuilder<{
       id: string;
     }>()
       .urls(() => "https://example.com")

@@ -3,7 +3,7 @@ import type { AnySourceAdapter, InferHandlerOutput } from "../builders/source-bu
 import type { AdapterContext } from "../global-types";
 import { arktypeParse } from "@mojis/internal-utils";
 import { AdapterError } from "../errors";
-import { runVersionHandler } from "./version-runner";
+import { runVersionedSourceTransformer } from "./version-runner";
 
 export interface RunSourceAdapterOverrides {
   cacheKey?: string;
@@ -22,13 +22,13 @@ export async function runSourceAdapter<
 
   let output = (typeof handler.fallback == "function" && handler.fallback != null) ? handler.fallback() : undefined;
 
-  for (const [predicate, versionHandler] of handler.handlers) {
+  for (const [predicate, sourceTransformer] of handler.handlers) {
     if (!predicate(ctx.emoji_version)) {
       console.error(`skipping handler ${handler.adapterType} because predicate returned false`);
       continue;
     }
 
-    promises.push(runVersionHandler(ctx, versionHandler, handler.adapterType, __overrides));
+    promises.push(runVersionedSourceTransformer(ctx, sourceTransformer, handler.adapterType, __overrides));
   }
 
   const result = await Promise.all(promises);

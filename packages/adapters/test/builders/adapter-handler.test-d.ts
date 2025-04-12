@@ -1,14 +1,14 @@
 import type {
   InferHandlerOutput,
 } from "../../src/builders/source-builder/types";
-import type { CreateAdapterVersionHandler, CreateAnySourceAdapter } from "../__utils";
+import type { CreateAnySourceAdapter, CreateVersionedSourceTransformer } from "../__utils";
 import { describe, expectTypeOf, it } from "vitest";
 
 describe("InferHandlerOutput", () => {
   it("should infer the output of an adapter handler", () => {
     type Result = InferHandlerOutput<CreateAnySourceAdapter<"test", {
       handlers: [
-        CreateAdapterVersionHandler<{ output: string }>,
+        CreateVersionedSourceTransformer<{ output: string }>,
       ];
     }>>;
 
@@ -19,7 +19,7 @@ describe("InferHandlerOutput", () => {
     type Result = InferHandlerOutput<CreateAnySourceAdapter<"test", {
       fallback: () => string;
       handlers: [
-        CreateAdapterVersionHandler<{ output: string }>,
+        CreateVersionedSourceTransformer<{ output: string }>,
       ];
     }>>;
 

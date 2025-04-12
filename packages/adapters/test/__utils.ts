@@ -10,7 +10,7 @@ import type {
   PredicateFn,
   SourceAdapter,
 } from "../src/builders/source-builder/types";
-import type { AnyVersionHandler, VersionHandler } from "../src/builders/version-builder/types";
+import type { AnyVersionedSourceTransformer, VersionedSourceTransformer } from "../src/builders/version-builder/types";
 import type {
   AdapterContext,
   BuiltinParser,
@@ -72,10 +72,10 @@ export function createFakeSourceAdapter<TParams extends AnyBuiltSourceAdapterPar
   };
 }
 
-export type CreateAdapterVersionHandler<TConfig extends {
+export type CreateVersionedSourceTransformer<TConfig extends {
   output: unknown;
   params?: Record<string, any>;
-}> = VersionHandler<{
+}> = VersionedSourceTransformer<{
   globalContext: AdapterContext;
   fetchOptions: RequestInit;
   cacheOptions: CacheOptions;
@@ -91,7 +91,7 @@ export type CreateAdapterVersionHandler<TConfig extends {
 
 export interface TestBuiltSourceAdapterParams {
   adapterType: string;
-  handlers: [PredicateFn, AnyVersionHandler][];
+  handlers: [PredicateFn, AnyVersionedSourceTransformer][];
   outputSchema?: type.Any;
   fallback?: FallbackFn<any>;
 }
@@ -110,7 +110,7 @@ export interface TestSourceAdapter<TParams extends TestBuiltSourceAdapterParams>
 export type CreateAnySourceAdapter<
   TType extends string,
   TConfig extends {
-    handlers: CreateAdapterVersionHandler<any>[];
+    handlers: CreateVersionedSourceTransformer<any>[];
     outputSchema?: type.Any;
     fallback?: any;
   },
