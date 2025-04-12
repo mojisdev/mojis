@@ -45,26 +45,22 @@ async function getAdapterSources(
   ctx: AdapterContext,
   __overrides?: RunCompositeHandlerOverrides,
 ): Promise<Record<string, unknown>> {
-  if (typeof handler.adapterSources !== "object" || handler.adapterSources === null || !Array.isArray(handler.adapterSources)) {
-    throw new TypeError("handler.adapterSources must be an object");
+  if (!Array.isArray(handler.adapterSources)) {
+    throw new TypeError("handler.adapterSources must be an array");
   }
 
   const adapterSourcesValues: Record<string, unknown> = {};
 
-  const adapterSourcesPromises = handler.adapterSources.map((adapterSource) => {
-    return [
-      adapterSource.adapterType,
-      runAdapterHandler(adapterSource, ctx, __overrides),
-    ];
-  });
+  // run all adapter handlers in parallel and process results directly
+  const results = await Promise.all(
+    handler.adapterSources.map(async (adapterSource) => {
+      const value = await runAdapterHandler(adapterSource, ctx, __overrides);
+      return [adapterSource.adapterType, value] as const;
+    }),
+  );
 
-  const _adapterSourcesValues = await Promise.all(adapterSourcesPromises.map(([key, value]) => {
-    return value.then((resolvedValue) => {
-      return [key, resolvedValue];
-    });
-  }));
-
-  for (const [key, value] of _adapterSourcesValues) {
+  // populate the results object
+  for (const [key, value] of results) {
     adapterSourcesValues[key] = value;
   }
 
@@ -81,24 +77,25 @@ async function getHandlerSources(
   }
 
   const sourcesValues: Record<string, unknown> = {};
-  const sourcesPromises = [];
+  const sourcesPromises: Array<Promise<[string, unknown]>> = [];
 
+  // process all sources, separating immediate values from promises
   for (const [key, value] of Object.entries(handler.sources)) {
     if (typeof value === "function") {
-      sourcesPromises.push([key, value(ctx)]);
+      sourcesPromises.push(
+        Promise.resolve(value(ctx)).then((resolvedValue) => [key, resolvedValue]),
+      );
     } else {
       sourcesValues[key] = value;
     }
   }
 
-  const _sourcesValues = await Promise.all(sourcesPromises.map(([key, value]) => {
-    return value.then((resolvedValue) => {
-      return [key, resolvedValue];
-    });
-  }));
-
-  for (const [key, value] of _sourcesValues) {
-    sourcesValues[key] = value;
+  // resolve all promises in parallel
+  if (sourcesPromises.length > 0) {
+    const resolvedEntries = await Promise.all(sourcesPromises);
+    for (const [key, value] of resolvedEntries) {
+      sourcesValues[key] = value;
+    }
   }
 
   return sourcesValues;
