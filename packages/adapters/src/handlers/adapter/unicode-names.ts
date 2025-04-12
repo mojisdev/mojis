@@ -1,5 +1,5 @@
 import { type } from "arktype";
-import { createAdapterHandlerBuilder } from "../../builders/adapter-builder/builder";
+import { createSourceAdapter } from "../../builders/adapter-builder/builder";
 
 const MAPPINGS = {
   "1.0": "https://unicode-proxy.mojis.dev/proxy/1.1-Update/UnicodeData-1.1.5.txt",
@@ -9,7 +9,7 @@ const MAPPINGS = {
   "13.1": "https://unicode-proxy.mojis.dev/proxy/13.0.0/ucd/UnicodeData.txt",
 } as Record<string, string>;
 
-const builder = createAdapterHandlerBuilder({
+const builder = createSourceAdapter({
   type: "unicode-names",
   outputSchema: type({
     "[string]": "string",

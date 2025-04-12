@@ -1,25 +1,25 @@
 import type { AdapterContext } from "../../src/global-types";
 import { type } from "arktype";
 import { describe, expect, it } from "vitest";
-import { createAdapterHandlerBuilder } from "../../src/builders/adapter-builder/builder";
+import { createSourceAdapter } from "../../src/builders/adapter-builder/builder";
 
 describe("adapter handler builder", () => {
   const emptyContext = {} as AdapterContext;
 
   it("creates with type", () => {
-    const builder = createAdapterHandlerBuilder({ type: "metadata" });
+    const builder = createSourceAdapter({ type: "metadata" });
     const handler = builder.build();
     expect(handler.adapterType).toBe("metadata");
   });
 
   it("creates with empty handlers", () => {
-    const builder = createAdapterHandlerBuilder({ type: "metadata" });
+    const builder = createSourceAdapter({ type: "metadata" });
     const handler = builder.build();
     expect(handler.handlers).toHaveLength(0);
   });
 
   it("adds version handler", () => {
-    const builder = createAdapterHandlerBuilder({ type: "metadata" });
+    const builder = createSourceAdapter({ type: "metadata" });
     const handler = builder
       .onVersion(
         (version) => version === "15.0",
@@ -35,7 +35,7 @@ describe("adapter handler builder", () => {
   });
 
   it("adds multiple version handlers", () => {
-    const builder = createAdapterHandlerBuilder({ type: "metadata" });
+    const builder = createSourceAdapter({ type: "metadata" });
     const handler = builder
       .onVersion(
         (version) => version === "15.0",
@@ -59,7 +59,7 @@ describe("adapter handler builder", () => {
   });
 
   it("maintains handler order", () => {
-    const builder = createAdapterHandlerBuilder({ type: "metadata" });
+    const builder = createSourceAdapter({ type: "metadata" });
     const handler = builder
       .onVersion(
         (version) => version === "15.0",
@@ -87,7 +87,7 @@ describe("adapter handler builder", () => {
   });
 
   it("preserves adapter type across chain", () => {
-    const builder = createAdapterHandlerBuilder({ type: "metadata" });
+    const builder = createSourceAdapter({ type: "metadata" });
     const handler = builder
       .onVersion(
         (version) => version === "15.0",
@@ -109,7 +109,7 @@ describe("adapter handler builder", () => {
   });
 
   it("allows chaining multiple onVersion calls", () => {
-    const builder = createAdapterHandlerBuilder({ type: "metadata" });
+    const builder = createSourceAdapter({ type: "metadata" });
     const handler = builder
       .onVersion(
         (version) => version === "15.0",
@@ -142,7 +142,7 @@ describe("adapter handler builder", () => {
 
   it("allows setting fallback data", () => {
     const fallbackData = { defaultValue: true };
-    const builder = createAdapterHandlerBuilder({ type: "metadata" });
+    const builder = createSourceAdapter({ type: "metadata" });
     const handler = builder
       .fallback(() => fallbackData)
       .build();
@@ -155,7 +155,7 @@ describe("adapter handler builder", () => {
     const testSchema = type({
       name: "string",
     });
-    const builder = createAdapterHandlerBuilder({
+    const builder = createSourceAdapter({
       type: "metadata",
       outputSchema: testSchema,
     });

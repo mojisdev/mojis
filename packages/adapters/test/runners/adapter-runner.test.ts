@@ -1,4 +1,4 @@
-import type { AnyAdapterHandler } from "../../src/builders/adapter-builder/types";
+import type { AnySourceAdapter } from "../../src/builders/adapter-builder/types";
 import type { AdapterContext } from "../../src/global-types";
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { type } from "arktype";
@@ -17,7 +17,7 @@ describe("runAdapterHandler", () => {
     const { runAdapterHandler } = await setupAdapterTest();
 
     await expect(
-      runAdapterHandler({} as AnyAdapterHandler, mockContext),
+      runAdapterHandler({} as AnySourceAdapter, mockContext),
     ).rejects.toThrow();
   });
 

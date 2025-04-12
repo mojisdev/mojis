@@ -1,4 +1,4 @@
-import type { AnyAdapterHandler } from "./builders/adapter-builder/types";
+import type { AnySourceAdapter } from "./builders/adapter-builder/types";
 import type { BUILTIN_PARSERS } from "./utils";
 
 /**
@@ -14,7 +14,7 @@ export type MaybePromise<T> = T | Promise<T>;
 /**
  * The type of the adapter handler.
  */
-export type AdapterHandlerType =
+export type SourceAdapterType =
   | "metadata"
   | "variations"
   | "unicode-names"
@@ -82,9 +82,9 @@ export type MergeTuple<
  */
 export type GetAdapterHandlerFromType<
   TAdapterType extends string,
-  TAdapterHandlers extends AnyAdapterHandler[],
+  TAdapterHandlers extends AnySourceAdapter[],
 > = TAdapterHandlers extends Array<infer THandler>
-  ? THandler extends AnyAdapterHandler
+  ? THandler extends AnySourceAdapter
     ? THandler["adapterType"] extends TAdapterType
       ? THandler
       : never

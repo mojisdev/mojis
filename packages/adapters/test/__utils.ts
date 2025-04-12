@@ -3,9 +3,9 @@ import type { Cache, CacheOptions } from "@mojis/internal-utils";
 import type { GenericParseOptions } from "@mojis/parsers";
 import type { type } from "arktype";
 import type {
-  AdapterHandler,
-  AnyAdapterHandler,
-  AnyBuiltAdapterHandlerParams,
+  SourceAdapter,
+  AnySourceAdapter,
+  AnyBuiltSourceAdapterParams,
   FallbackFn,
   PredicateFn,
 } from "../src/builders/adapter-builder/types";
@@ -30,7 +30,7 @@ export async function setupAdapterTest(options?: SetupAdapterTestOptions) {
   const { runAdapterHandler: runAdapterHandlerOriginal } = await import("../src/runners/adapter-runner");
   const { runCompositeHandler: runCompositeHandlerOriginal } = await import("../src/runners/composite-runner");
 
-  function runAdapterHandler<THandler extends AnyAdapterHandler>(
+  function runAdapterHandler<THandler extends AnySourceAdapter>(
     ...args: Parameters<typeof runAdapterHandlerOriginal<THandler>>
   ) {
     const [type, ctx, opts] = args;
@@ -56,9 +56,9 @@ export async function setupAdapterTest(options?: SetupAdapterTestOptions) {
   };
 }
 
-export function createFakeAdapterHandler<TParams extends AnyBuiltAdapterHandlerParams>(
+export function createFakeAdapterHandler<TParams extends AnyBuiltSourceAdapterParams>(
   opts: TParams,
-): AdapterHandler<{
+): SourceAdapter<{
     adapterType: TParams["adapterType"];
     handlers: TParams["handlers"];
     outputSchema: TParams["outputSchema"];
