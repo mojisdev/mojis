@@ -1,5 +1,16 @@
 # @mojis/cli
 
+## 0.0.18
+
+### Patch Changes
+
+- [#90](https://github.com/mojisdev/mojis/pull/90) [`6287d96`](https://github.com/mojisdev/mojis/commit/6287d967a5363d596c42bf4d4de5e038bb2c09d8) Thanks [@luxass](https://github.com/luxass)! - refactor!: change schemas to use arktype
+
+- Updated dependencies [[`6287d96`](https://github.com/mojisdev/mojis/commit/6287d967a5363d596c42bf4d4de5e038bb2c09d8), [`ed996aa`](https://github.com/mojisdev/mojis/commit/ed996aaa3c52fd56e3e053b8d2010a7073a59ea9)]:
+  - @mojis/internal-utils@0.0.9
+  - @mojis/adapters@0.1.0
+  - @mojis/schemas@0.0.3
+
 ## 0.0.17
 
 ### Patch Changes
