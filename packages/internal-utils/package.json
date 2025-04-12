@@ -40,9 +40,9 @@
   },
   "dependencies": {
     "@mojis/schemas": "workspace:*",
+    "arktype": "catalog:prod",
     "fs-extra": "catalog:prod",
-    "semver": "catalog:prod",
-    "zod": "catalog:prod"
+    "semver": "catalog:prod"
   },
   "devDependencies": {
     "@luxass/eslint-config": "catalog:dev",

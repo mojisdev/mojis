@@ -1,7 +1,6 @@
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import process from "node:process";
 import { EMOJI_GROUPS_SCHEMA, GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA } from "@mojis/schemas/emojis";
-import { zodToJsonSchema } from "zod-to-json-schema";
 
 const root = new URL("../", import.meta.url);
 
@@ -10,8 +9,8 @@ async function run() {
   await rm(`${root.pathname}/schemas`, { recursive: true, force: true });
 
   console.log("writing schemas...");
-  const groups = zodToJsonSchema(EMOJI_GROUPS_SCHEMA);
-  const transformedEmojis = zodToJsonSchema(GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA);
+  const groups = EMOJI_GROUPS_SCHEMA.toJsonSchema();
+  const transformedEmojis = GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA.toJsonSchema();
 
   await mkdir(`${root.pathname}/schemas`, { recursive: true });
   await writeFile(`${root.pathname}/schemas/groups.json`, JSON.stringify(groups, null, 2));

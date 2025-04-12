@@ -1,7 +1,7 @@
 import type { CacheOptions } from "@mojis/internal-utils";
 import type { GenericParseOptions, GenericParseResult } from "@mojis/parsers";
-import type { z } from "zod";
-import type { AdapterContext, BuiltinParser, ErrorMessage, PossibleUrls, UnsetMarker } from "../global-types";
+import type { type } from "arktype";
+import type { AdapterContext, BuiltinParser, ErrorMessage, PossibleUrls, UnsetMarker } from "../../global-types";
 
 export type UrlFn<TOut extends PossibleUrls> = (ctx: AdapterContext) => TOut;
 
@@ -234,7 +234,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     transform: TParams["_transform"]["out"];
     aggregate: TParams["_aggregate"]["out"];
     outputSchema: TParams["_outputSchema"];
-    output: TParams["_outputType"];
+    output: TOut;
   }>;
 }
 
@@ -245,7 +245,7 @@ export interface AnyBuiltVersionHandlerParams {
   parser: any;
   parserOptions: GetParseOptionsFromParser<any>;
   parserOutput: any;
-  outputSchema: z.ZodType;
+  outputSchema: type.Any;
   urls: PossibleUrls;
   transform: any;
   aggregate: any;

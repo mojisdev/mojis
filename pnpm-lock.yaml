@@ -9,6 +9,9 @@ catalogs:
     '@luxass/eslint-config':
       specifier: ^4.18.1
       version: 4.18.1
+    '@mojis/loomicode':
+      specifier: 0.2.0-beta.7
+      version: 0.2.0-beta.7
     '@types/fs-extra':
       specifier: ^11.0.4
       version: 11.0.4
@@ -39,9 +42,6 @@ catalogs:
     vitest-testdirs:
       specifier: ^3.0.1
       version: 3.0.1
-    zod-to-json-schema:
-      specifier: ^3.24.5
-      version: 3.24.5
   monorepo:
     '@changesets/changelog-github':
       specifier: ^0.5.1
@@ -62,6 +62,9 @@ catalogs:
       specifier: ^2.4.4
       version: 2.4.4
   prod:
+    arktype:
+      specifier: ^2.1.17
+      version: 2.1.17
     defu:
       specifier: ^6.1.4
       version: 6.1.4
@@ -77,9 +80,6 @@ catalogs:
     yargs-parser:
       specifier: ^21.1.1
       version: 21.1.1
-    zod:
-      specifier: ^3.24.2
-      version: 3.24.2
 
 importers:
 
@@ -127,19 +127,22 @@ importers:
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
+      arktype:
+        specifier: catalog:prod
+        version: 2.1.17
       defu:
         specifier: catalog:prod
         version: 6.1.4
       semver:
         specifier: catalog:prod
         version: 7.7.1
-      zod:
-        specifier: catalog:prod
-        version: 3.24.2
     devDependencies:
       '@luxass/eslint-config':
         specifier: catalog:dev
         version: 4.18.1(@typescript-eslint/utils@8.28.0(eslint@9.23.0)(typescript@5.8.2))(@vue/compiler-sfc@3.5.13)(eslint@9.23.0)(typescript@5.8.2)(vitest@3.0.9)
+      '@mojis/loomicode':
+        specifier: catalog:dev
+        version: 0.2.0-beta.7
       '@types/semver':
         specifier: catalog:dev
         version: 7.7.0
@@ -167,6 +170,9 @@ importers:
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
+      arktype:
+        specifier: catalog:prod
+        version: 2.1.17
       farver:
         specifier: catalog:prod
         version: 0.4.2
@@ -179,9 +185,6 @@ importers:
       yargs-parser:
         specifier: catalog:prod
         version: 21.1.1
-      zod:
-        specifier: catalog:prod
-        version: 3.24.2
     devDependencies:
       '@luxass/eslint-config':
         specifier: catalog:dev
@@ -213,15 +216,15 @@ importers:
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
+      arktype:
+        specifier: catalog:prod
+        version: 2.1.17
       fs-extra:
         specifier: catalog:prod
         version: 11.3.0
       semver:
         specifier: catalog:prod
         version: 7.7.1
-      zod:
-        specifier: catalog:prod
-        version: 3.24.2
     devDependencies:
       '@luxass/eslint-config':
         specifier: catalog:dev
@@ -265,9 +268,6 @@ importers:
       vitest-testdirs:
         specifier: catalog:dev
         version: 3.0.1(vitest@3.0.9)
-      zod-to-json-schema:
-        specifier: catalog:dev
-        version: 3.24.5(zod@3.24.2)
 
   packages/parsers:
     devDependencies:
@@ -289,9 +289,9 @@ importers:
 
   packages/schemas:
     dependencies:
-      zod:
+      arktype:
         specifier: catalog:prod
-        version: 3.24.2
+        version: 2.1.17
     devDependencies:
       '@luxass/eslint-config':
         specifier: catalog:dev
@@ -317,6 +317,12 @@ packages:
 
   '@antfu/install-pkg@1.0.0':
     resolution: {integrity: sha512-xvX6P/lo1B3ej0OsaErAjqgFYzYVcJpamjLAFLYh9vRJngBrMoUG7aVnrGTeqM7yxbyTD5p3F2+0/QUEh8Vzhw==}
+
+  '@ark/schema@0.45.7':
+    resolution: {integrity: sha512-TS8jHOkAwRLviu84a7PQGebQ8PzGfxeAznJX3AzaXbb9bOYrtCiqo52/BWBwptc7pZJxL0ejN4Yufgb9YsNALw==}
+
+  '@ark/util@0.45.7':
+    resolution: {integrity: sha512-ymzzU8C8W+tQzkOIcaLWx4lLXSe5AnF3lpmAtc2FqkxLEVwRnyeKCYPOVXuttLjMwv8R4S/0D0E2cwmUUzim2Q==}
 
   '@babel/code-frame@7.26.2':
     resolution: {integrity: sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ==}
@@ -770,6 +776,9 @@ packages:
   '@manypkg/get-packages@1.1.3':
     resolution: {integrity: sha512-fo+QhuU3qE/2TQMQmbVMqaQ6EWbMhi4ABWP+O4AM1NqPBuy0OrApV5LO6BrrgnhtAHS2NH6RrVk9OL181tTi8A==}
 
+  '@mojis/loomicode@0.2.0-beta.7':
+    resolution: {integrity: sha512-F3bGbLCJfw1oBz+53DqEN0K5N1iK1QaAr4GoXxqB+G1TO2qcq0VAwNgS5N5+EqFNfa6ru1uEFwB01Py6eYZXdA==}
+
   '@mswjs/interceptors@0.37.6':
     resolution: {integrity: sha512-wK+5pLK5XFmgtH3aQ2YVvA3HohS3xqV/OxuVOdNx9Wpnz7VE/fnC+e1A7ln6LFYeck7gOJ/dsZV6OLplOtAJ2w==}
     engines: {node: '>=18'}
@@ -1207,6 +1216,9 @@ packages:
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
 
+  arktype@2.1.17:
+    resolution: {integrity: sha512-w1uDYt+5riOWhjLV7mho7UgofiXLyVWXpHC/Y6xkqVTi9ickuF8aNmEOne7fPN5eTT4Ub4HBfDD7JKJMSa4Htw==}
+
   array-union@2.1.0:
     resolution: {integrity: sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==}
     engines: {node: '>=8'}
@@ -1320,6 +1332,9 @@ packages:
   comment-parser@1.4.1:
     resolution: {integrity: sha512-buhp5kePrmda3vhc5B9t7pUQXAb2Tnd0qgpkIhPhkHXxJpiPJ11H0ZEU0oBpJ2QztSbzG/ZxMj/CHsYJqRHmyg==}
     engines: {node: '>= 12.0.0'}
+
+  compare-versions@6.1.1:
+    resolution: {integrity: sha512-4hm4VPpIecmlg59CHXnRDnqGplJFrbLG4aFEl5vl6cK1u76ws3LLvX7ikFnTDl5vo39sjWD6AaDPYodJp/NNHg==}
 
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
@@ -2964,14 +2979,6 @@ packages:
     resolution: {integrity: sha512-cYVsTjKl8b+FrnidjibDWskAv7UKOfcwaVZdp/it9n1s9fU3IkgDbhdIRKCW4JDsAlECJY0ytoVPT3sK6kideA==}
     engines: {node: '>=18'}
 
-  zod-to-json-schema@3.24.5:
-    resolution: {integrity: sha512-/AuWwMP+YqiPbsJx5D6TfgRTc4kTLjsh5SOcd4bLsfUg2RcEXrFMJl1DGgdHy2aCfsIA/cr/1JM0xcB2GZji8g==}
-    peerDependencies:
-      zod: ^3.24.1
-
-  zod@3.24.2:
-    resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
-
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
@@ -2986,6 +2993,12 @@ snapshots:
     dependencies:
       package-manager-detector: 0.2.11
       tinyexec: 0.3.2
+
+  '@ark/schema@0.45.7':
+    dependencies:
+      '@ark/util': 0.45.7
+
+  '@ark/util@0.45.7': {}
 
   '@babel/code-frame@7.26.2':
     dependencies:
@@ -3489,6 +3502,11 @@ snapshots:
       globby: 11.1.0
       read-yaml-file: 1.1.0
 
+  '@mojis/loomicode@0.2.0-beta.7':
+    dependencies:
+      arktype: 2.1.17
+      compare-versions: 6.1.1
+
   '@mswjs/interceptors@0.37.6':
     dependencies:
       '@open-draft/deferred-promise': 2.2.0
@@ -3925,6 +3943,11 @@ snapshots:
 
   argparse@2.0.1: {}
 
+  arktype@2.1.17:
+    dependencies:
+      '@ark/schema': 0.45.7
+      '@ark/util': 0.45.7
+
   array-union@2.1.0: {}
 
   assertion-error@2.0.1: {}
@@ -4020,6 +4043,8 @@ snapshots:
   commander@4.1.1: {}
 
   comment-parser@1.4.1: {}
+
+  compare-versions@6.1.1: {}
 
   concat-map@0.0.1: {}
 
@@ -5873,11 +5898,5 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   yoctocolors-cjs@2.1.2: {}
-
-  zod-to-json-schema@3.24.5(zod@3.24.2):
-    dependencies:
-      zod: 3.24.2
-
-  zod@3.24.2: {}
 
   zwitch@2.0.4: {}

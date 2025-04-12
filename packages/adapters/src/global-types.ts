@@ -1,9 +1,15 @@
+import type { AnyAdapterHandler } from "./builders/adapter-builder/types";
 import type { BUILTIN_PARSERS } from "./utils";
 
 /**
  * A type that can be an array or a single value.
  */
 export type MaybeArray<T> = T | T[];
+
+/**
+ * A type that can be a value or a promise.
+ */
+export type MaybePromise<T> = T | Promise<T>;
 
 /**
  * The type of the adapter handler.
@@ -65,15 +71,24 @@ export type UnsetMarker = "unsetMarker" & {
 
 export type ErrorMessage<TError extends string> = TError;
 
-export type JoinTuples<
-  T extends readonly unknown[],
-  U extends readonly unknown[],
-> = T extends []
-  ? U
-  : U extends []
-    ? T
-    : T extends readonly [infer THead, ...infer TRest]
-      ? U extends readonly [infer UHead, ...infer URest]
-        ? [THead, UHead, ...JoinTuples<TRest, URest>]
-        : T
-      : U;
+export type MergeTuple<
+  A extends unknown[],
+  B extends unknown[],
+> = B extends [infer H, ...infer T] ? MergeTuple<[...A, H], T> : A;
+
+/**
+ * Get the correct adapter handler based
+ * on the adapter type.
+ */
+export type GetAdapterHandlerFromType<
+  TAdapterType extends string,
+  TAdapterHandlers extends AnyAdapterHandler[],
+> = TAdapterHandlers extends Array<infer THandler>
+  ? THandler extends AnyAdapterHandler
+    ? THandler["adapterType"] extends TAdapterType
+      ? THandler
+      : never
+    : never
+  : never;
+
+export type Id<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;

@@ -1,7 +1,7 @@
 import type {
   AdapterContext,
   UnsetMarker,
-} from "../global-types";
+} from "../../global-types";
 import type { AnyVersionHandler, HandleVersionBuilder } from "./types";
 
 function internalCreateVersionHandlerBuilder<

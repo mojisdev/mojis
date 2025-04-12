@@ -3,54 +3,64 @@
   "additionalProperties": {
     "type": "object",
     "properties": {
-      "group": {
-        "type": "string"
-      },
-      "subgroup": {
-        "type": "string"
-      },
-      "qualifier": {
-        "type": "string"
-      },
-      "unicodeVersion": {
-        "type": [
-          "string",
-          "null"
-        ]
-      },
-      "emojiVersion": {
-        "type": [
-          "string",
-          "null"
-        ]
-      },
       "description": {
         "type": "string"
       },
       "emoji": {
-        "type": [
-          "string",
-          "null"
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "const": null
+          }
         ]
+      },
+      "emojiVersion": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "const": null
+          }
+        ]
+      },
+      "group": {
+        "type": "string"
       },
       "hexcodes": {
         "type": "array",
         "items": {
           "type": "string"
         }
+      },
+      "qualifier": {
+        "type": "string"
+      },
+      "subgroup": {
+        "type": "string"
+      },
+      "unicodeVersion": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "const": null
+          }
+        ]
       }
     },
     "required": [
-      "group",
-      "subgroup",
-      "qualifier",
-      "unicodeVersion",
-      "emojiVersion",
       "description",
       "emoji",
-      "hexcodes"
-    ],
-    "additionalProperties": false
-  },
-  "$schema": "http://json-schema.org/draft-07/schema#"
+      "emojiVersion",
+      "group",
+      "hexcodes",
+      "qualifier",
+      "subgroup",
+      "unicodeVersion"
+    ]
+  }
 }
