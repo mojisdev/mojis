@@ -34,8 +34,8 @@ const DEFAULT_PROPERTY_MAP = {
 const builder = createSourceAdapter({
   type: "sequences",
   outputSchema: type({
-    "sequences?": EMOJI_SEQUENCE_SCHEMA.array(),
-    "zwj?": EMOJI_SEQUENCE_SCHEMA.array(),
+    sequences: EMOJI_SEQUENCE_SCHEMA.array(),
+    zwj: EMOJI_SEQUENCE_SCHEMA.array(),
   }),
 });
 
@@ -113,8 +113,8 @@ export const handler = builder
       .aggregate((_, data) => {
         //           ^?
         return {
-          sequences: data[0],
-          zwj: data[1],
+          sequences: data[0]!,
+          zwj: data[1]!,
         };
       })
       .output((_, sequences) => {
