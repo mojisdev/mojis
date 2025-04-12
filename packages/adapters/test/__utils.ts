@@ -27,14 +27,14 @@ export async function setupAdapterTest(options?: SetupAdapterTestOptions) {
 
   // use dynamic imports since we can't import from a file
   // since those imports are hoisted to the top of the file
-  const { runSourceAdapter: runAdapterHandlerOriginal } = await import("../src/runners/source-runner");
+  const { runSourceAdapter: runSourceAdapterOriginal } = await import("../src/runners/source-runner");
   const { runCompositeHandler: runCompositeHandlerOriginal } = await import("../src/runners/composite-runner");
 
-  function runAdapterHandler<THandler extends AnySourceAdapter>(
-    ...args: Parameters<typeof runAdapterHandlerOriginal<THandler>>
+  function runSourceAdapter<THandler extends AnySourceAdapter>(
+    ...args: Parameters<typeof runSourceAdapterOriginal<THandler>>
   ) {
     const [type, ctx, opts] = args;
-    return runAdapterHandlerOriginal(type, ctx, {
+    return runSourceAdapterOriginal(type, ctx, {
       ...opts,
       cache: cache as Cache<string>,
     });
@@ -51,7 +51,7 @@ export async function setupAdapterTest(options?: SetupAdapterTestOptions) {
   }
 
   return {
-    runAdapterHandler,
+    runSourceAdapter,
     runCompositeHandler,
   };
 }

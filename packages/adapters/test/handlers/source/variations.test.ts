@@ -13,7 +13,7 @@ describe("variations adapter handler", () => {
   };
 
   it("should handle basic emoji variations", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     const mockVariations = variations.commonSymbols({
       separator: ";",
@@ -25,7 +25,7 @@ describe("variations adapter handler", () => {
       ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => HttpResponse.text(mockVariations)],
     ]);
 
-    const result = await runAdapterHandler(variationsHandler, mockContext);
+    const result = await runSourceAdapter(variationsHandler, mockContext);
     expect(result).toEqual([
       {
         emoji: null,
@@ -59,7 +59,7 @@ describe("variations adapter handler", () => {
   });
 
   it("should handle older emoji versions", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     const mockVariations = `
 FE0E ; text style     # VS-15
@@ -69,7 +69,7 @@ FE0E ; text style     # VS-15
       ["GET https://unicode-proxy.mojis.dev/proxy/emoji/12.1/emoji-variation-sequences.txt", () => HttpResponse.text(mockVariations)],
     ]);
 
-    const result = await runAdapterHandler(variationsHandler, {
+    const result = await runSourceAdapter(variationsHandler, {
       ...mockContext,
       emoji_version: "12.1",
       unicode_version: "12.1",
@@ -85,9 +85,9 @@ FE0E ; text style     # VS-15
   });
 
   it("should handle unsupported versions", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
-    const result = await runAdapterHandler(variationsHandler, {
+    const result = await runSourceAdapter(variationsHandler, {
       ...mockContext,
       emoji_version: "1.0",
       unicode_version: "1.0",
@@ -97,31 +97,31 @@ FE0E ; text style     # VS-15
   });
 
   it("should handle empty response", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     mockFetch([
       ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => HttpResponse.text("")],
     ]);
 
-    const result = await runAdapterHandler(variationsHandler, mockContext);
+    const result = await runSourceAdapter(variationsHandler, mockContext);
     expect(result).toEqual([]);
   });
 
   it("should handle network errors", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     mockFetch(`GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt`, () => {
       return HttpResponse.error();
     });
 
-    await expect(() => runAdapterHandler(variationsHandler, mockContext))
+    await expect(() => runSourceAdapter(variationsHandler, mockContext))
       .rejects
       .toThrow("Failed to fetch");
   });
 
   it("should handle force mode", async () => {
     const cache = createCache<string>({ store: "memory" });
-    const { runAdapterHandler } = await setupAdapterTest({ cache });
+    const { runSourceAdapter } = await setupAdapterTest({ cache });
 
     let fetchCount = 0;
     mockFetch([
@@ -132,16 +132,16 @@ FE0E ; text style     # VS-15
     ]);
 
     // first request
-    await runAdapterHandler(variationsHandler, mockContext);
+    await runSourceAdapter(variationsHandler, mockContext);
 
     // second request with force=true should bypass cache
-    await runAdapterHandler(variationsHandler, { ...mockContext, force: true });
+    await runSourceAdapter(variationsHandler, { ...mockContext, force: true });
 
     expect(fetchCount).toBe(2);
   });
 
   it("should handle invalid line format", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     const mockVariations = `
 invalid-line
@@ -151,13 +151,13 @@ invalid-line
       ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => HttpResponse.text(mockVariations)],
     ]);
 
-    await expect(runAdapterHandler(variationsHandler, mockContext))
+    await expect(runSourceAdapter(variationsHandler, mockContext))
       .rejects
       .toThrow("invalid line");
   });
 
   it("should handle invalid style", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     const mockVariations = variations.invalid({
       separator: ";",
@@ -169,7 +169,7 @@ invalid-line
       ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => HttpResponse.text(mockVariations)],
     ]);
 
-    await expect(runAdapterHandler(variationsHandler, mockContext))
+    await expect(runSourceAdapter(variationsHandler, mockContext))
       .rejects
       .toThrow("invalid style");
   });

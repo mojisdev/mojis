@@ -12,33 +12,33 @@ describe("unicode-names adapter handler", () => {
   };
 
   it("should handle known version mappings", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     mockFetch([
       ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/UnicodeData.txt", () => HttpResponse.text("1F600;GRINNING FACE")],
     ]);
 
-    const result = await runAdapterHandler(unicodeNamesHandler, mockContext);
+    const result = await runSourceAdapter(unicodeNamesHandler, mockContext);
     expect(result).toEqual({
       "1F600": "GRINNING FACE",
     });
   });
 
   it("should handle legacy version mappings", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     mockFetch([
       ["GET https://unicode-proxy.mojis.dev/proxy/1.1-Update/UnicodeData-1.1.5.txt", () => HttpResponse.text("1F600;GRINNING FACE")],
     ]);
 
-    const result = await runAdapterHandler(unicodeNamesHandler, { ...mockContext, emoji_version: "1.0" });
+    const result = await runSourceAdapter(unicodeNamesHandler, { ...mockContext, emoji_version: "1.0" });
     expect(result).toEqual({
       "1F600": "GRINNING FACE",
     });
   });
 
   it("should handle multiple entries", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     mockFetch([
       ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/UnicodeData.txt", () => HttpResponse.text(
@@ -48,7 +48,7 @@ describe("unicode-names adapter handler", () => {
       )],
     ]);
 
-    const result = await runAdapterHandler(unicodeNamesHandler, mockContext);
+    const result = await runSourceAdapter(unicodeNamesHandler, mockContext);
     expect(result).toEqual({
       "1F600": "GRINNING FACE",
       "1F601": "GRINNING FACE WITH SMILING EYES",
@@ -57,43 +57,43 @@ describe("unicode-names adapter handler", () => {
   });
 
   it("should throw error for invalid line format", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     mockFetch([
       ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/UnicodeData.txt", () => HttpResponse.text("1F600")],
     ]);
 
-    await expect(runAdapterHandler(unicodeNamesHandler, mockContext))
+    await expect(runSourceAdapter(unicodeNamesHandler, mockContext))
       .rejects
       .toThrow("Invalid line");
   });
 
   it("should handle empty response", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     mockFetch([
       ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/UnicodeData.txt", () => HttpResponse.text("")],
     ]);
 
-    const result = await runAdapterHandler(unicodeNamesHandler, mockContext);
+    const result = await runSourceAdapter(unicodeNamesHandler, mockContext);
     expect(result).toEqual({});
   });
 
   it("should handle network errors", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     mockFetch(`GET https://unicode-proxy.mojis.dev/proxy/${mockContext.emoji_version}.0/ucd/UnicodeData.txt`, () => {
       return HttpResponse.error();
     });
 
-    await expect(() => runAdapterHandler(unicodeNamesHandler, mockContext))
+    await expect(() => runSourceAdapter(unicodeNamesHandler, mockContext))
       .rejects
       .toThrow("Failed to fetch");
   });
 
   it("should handle force mode", async () => {
     const cache = createCache<string>({ store: "memory" });
-    const { runAdapterHandler } = await setupAdapterTest({ cache });
+    const { runSourceAdapter } = await setupAdapterTest({ cache });
 
     let fetchCount = 0;
     mockFetch([
@@ -104,10 +104,10 @@ describe("unicode-names adapter handler", () => {
     ]);
 
     // first request
-    await runAdapterHandler(unicodeNamesHandler, mockContext);
+    await runSourceAdapter(unicodeNamesHandler, mockContext);
 
     // second request with force=true should bypass cache
-    await runAdapterHandler(unicodeNamesHandler, { ...mockContext, force: true });
+    await runSourceAdapter(unicodeNamesHandler, { ...mockContext, force: true });
 
     expect(fetchCount).toBe(2);
   });

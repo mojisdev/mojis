@@ -12,7 +12,7 @@ describe("sequences adapter handler", () => {
   };
 
   it("should handle sequences only", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     const mockedSequences = sequences({
       version: "15.0",
@@ -57,7 +57,7 @@ describe("sequences adapter handler", () => {
       ],
     ]);
 
-    const result = await runAdapterHandler(sequencesHandler, mockContext);
+    const result = await runSourceAdapter(sequencesHandler, mockContext);
 
     expect(result.zwj).toBeDefined();
     expect(result.zwj).toHaveLength(0);
@@ -92,7 +92,7 @@ describe("sequences adapter handler", () => {
 
   // TODO: fix this test
   it("should handle zwj sequences only", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     const mockedSequences = sequences({
       version: "15.0",
@@ -137,7 +137,7 @@ describe("sequences adapter handler", () => {
       ],
     ]);
 
-    const result = await runAdapterHandler(sequencesHandler, mockContext);
+    const result = await runSourceAdapter(sequencesHandler, mockContext);
 
     expect(result.sequences).toBeDefined();
     expect(result.sequences).toHaveLength(0);
