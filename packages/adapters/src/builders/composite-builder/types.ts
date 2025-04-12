@@ -107,17 +107,6 @@ export interface AnyBuiltCompositeHandlerParams {
   output: any;
 }
 
-export type GetLastTransformInput<
-  TTransforms extends any[],
-  TSources extends Record<string, CompositeSource> | UnsetMarker,
-  TAdapterSources extends AnyAdapterHandler[] | UnsetMarker,
-> =
-  TTransforms extends any[]
-    ? TTransforms["length"] extends 0
-      ? MergeSources<TSources, TAdapterSources>
-      : GetLastTransformOutput<TTransforms>
-    : never;
-
 export type TransformChain<
   TInitialSources,
   TTransforms extends any[],
@@ -147,7 +136,7 @@ export type GetLastTransformOutput<TTransforms extends any[]> = TTransforms exte
   infer Last,
 ]
   ? Last
-  : never;
+  : ErrorMessage<"no transforms defined">;
 
 export interface CompositeHandlerBuilder<
   TParams extends AnyCompositeHandlerParams,
@@ -163,7 +152,7 @@ export interface CompositeHandlerBuilder<
                 Record<TParams["_adapterSources"][number]["adapterType"], any>
               > extends false
                 ? TSources[K]
-                : ErrorMessage<`Key ${K} is already in sources`>
+                : ErrorMessage<`Key ${K} is already in adapter sources`>
               : TSources[K];
           }
       : ErrorMessage<"sources is already set">,
@@ -229,15 +218,7 @@ export interface CompositeHandlerBuilder<
     output: TParams["_output"] extends UnsetMarker
       ? (ctx: AdapterContext, data: TIn) => TOut
       : ErrorMessage<"output is already set">
-  ) => CompositeHandlerBuilder<{
-    _outputSchema: TParams["_outputSchema"];
-    _adapterSources: TParams["_adapterSources"];
-    _sources: TParams["_sources"];
-    _transforms: TParams["_transforms"];
-    _output: TOut;
-  }>;
-
-  build: () => CompositeHandler<{
+  ) => CompositeHandler<{
     outputSchema: TParams["_outputSchema"];
     sources: TParams["_sources"];
     adapterSources: TParams["_adapterSources"];
@@ -245,6 +226,6 @@ export interface CompositeHandlerBuilder<
       MergeSources<TParams["_sources"], TParams["_adapterSources"]>,
       TParams["_transforms"]
     >;
-    output: TParams["_output"];
+    output: TOut;
   }>;
 }

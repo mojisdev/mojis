@@ -13,7 +13,7 @@ describe("runAdapterHandler", () => {
     force: false,
   };
 
-  it("should throw error for invalid handler type", async () => {
+  it("should throw error for invalid handler", async () => {
     const { runAdapterHandler } = await setupAdapterTest();
 
     await expect(

@@ -53,5 +53,4 @@ export const compositeHandler = builder
     //           ^?
     console.error("transformed", transformed);
     return transformed;
-  })
-  .build();
+  });

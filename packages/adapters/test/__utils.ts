@@ -2,7 +2,14 @@
 import type { Cache, CacheOptions } from "@mojis/internal-utils";
 import type { GenericParseOptions } from "@mojis/parsers";
 import type { type } from "arktype";
-import type { AdapterHandler, AnyAdapterHandler, AnyBuiltAdapterHandlerParams, FallbackFn, PredicateFn } from "../src/builders/adapter-builder/types";
+import type {
+  AdapterHandler,
+  AnyAdapterHandler,
+  AnyBuiltAdapterHandlerParams,
+  FallbackFn,
+  PredicateFn,
+} from "../src/builders/adapter-builder/types";
+import type { AnyCompositeHandler } from "../src/builders/composite-builder/types";
 import type { AnyVersionHandler, VersionHandler } from "../src/builders/version-builder/types";
 import type {
   AdapterContext,
@@ -21,6 +28,7 @@ export async function setupAdapterTest(options?: SetupAdapterTestOptions) {
   // use dynamic imports since we can't import from a file
   // since those imports are hoisted to the top of the file
   const { runAdapterHandler: runAdapterHandlerOriginal } = await import("../src/runners/adapter-runner");
+  const { runCompositeHandler: runCompositeHandlerOriginal } = await import("../src/runners/composite-runner");
 
   function runAdapterHandler<THandler extends AnyAdapterHandler>(
     ...args: Parameters<typeof runAdapterHandlerOriginal<THandler>>
@@ -32,8 +40,19 @@ export async function setupAdapterTest(options?: SetupAdapterTestOptions) {
     });
   }
 
+  function runCompositeHandler<THandler extends AnyCompositeHandler>(
+    ...args: Parameters<typeof runCompositeHandlerOriginal<THandler>>
+  ) {
+    const [type, ctx, opts] = args;
+    return runCompositeHandlerOriginal(type, ctx, {
+      ...opts,
+      cache: cache as Cache<string>,
+    });
+  }
+
   return {
     runAdapterHandler,
+    runCompositeHandler,
   };
 }
 

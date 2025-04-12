@@ -42,13 +42,10 @@ function internalCreateCompositeHandlerBuilder<TOutputSchema extends type.Any>(
       }) as CompositeHandlerBuilder<any>;
     },
     output(userOutput) {
-      return internalCreateCompositeHandlerBuilder({
+      return {
         ..._def,
         output: userOutput,
-      }) as CompositeHandlerBuilder<any>;
-    },
-    build() {
-      return _def;
+      } as AnyCompositeHandler;
     },
   };
 }
