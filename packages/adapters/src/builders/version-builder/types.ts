@@ -234,7 +234,7 @@ export interface HandleVersionBuilder<TParams extends AnyHandleVersionParams> {
     transform: TParams["_transform"]["out"];
     aggregate: TParams["_aggregate"]["out"];
     outputSchema: TParams["_outputSchema"];
-    output: TParams["_outputType"];
+    output: TOut;
   }>;
 }
 

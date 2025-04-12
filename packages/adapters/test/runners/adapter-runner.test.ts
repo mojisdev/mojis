@@ -1,8 +1,8 @@
-import type { AnyAdapterHandler } from "../../src/builders/adapter-builder/types";
+import type { AnyAdapterHandler, InferHandlerOutput } from "../../src/builders/adapter-builder/types";
 import type { AdapterContext } from "../../src/global-types";
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { type } from "arktype";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { createVersionHandlerBuilder } from "../../src/builders/version-builder/builder";
 import { metadataHandler } from "../../src/handlers/adapter";
 import { createFakeAdapterHandler, setupAdapterTest } from "../__utils";
@@ -152,6 +152,7 @@ describe("runAdapterHandler", () => {
       ])
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler1" }))
+      .aggregate((_, data) => data)
       .output((_, data) => ({ processedBy: data[0]?.processed }));
 
     const mockHandler2 = createVersionHandlerBuilder()
@@ -169,6 +170,11 @@ describe("runAdapterHandler", () => {
     });
 
     const result = await runAdapterHandler(handler, mockContext);
+    expectTypeOf(result).toEqualTypeOf<{
+      processedBy: string;
+    } | {
+      processedBy: string | undefined;
+    }>();
     expect(result).toBeDefined();
     expect(result).toEqual({ processedBy: "handler1" });
   });
