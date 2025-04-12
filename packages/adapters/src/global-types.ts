@@ -82,11 +82,11 @@ export type MergeTuple<
  */
 export type GetSourceAdapterFromType<
   TAdapterType extends string,
-  TAdapterHandlers extends AnySourceAdapter[],
-> = TAdapterHandlers extends Array<infer THandler>
-  ? THandler extends AnySourceAdapter
-    ? THandler["adapterType"] extends TAdapterType
-      ? THandler
+  TSourceAdapters extends AnySourceAdapter[],
+> = TSourceAdapters extends Array<infer TSourceAdapter>
+  ? TSourceAdapter extends AnySourceAdapter
+    ? TSourceAdapter["adapterType"] extends TAdapterType
+      ? TSourceAdapter
       : never
     : never
   : never;
