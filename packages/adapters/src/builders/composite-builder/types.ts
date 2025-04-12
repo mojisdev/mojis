@@ -2,7 +2,7 @@ import type { type } from "arktype";
 import type {
   AdapterContext,
   ErrorMessage,
-  GetAdapterHandlerFromType,
+  GetSourceAdapterFromType,
   Id,
   MaybePromise,
   MergeTuple,
@@ -24,11 +24,11 @@ export type CompositeSource = PrimitiveSource | CompositeSourceFn;
 export type GetObjectFromAdapterSources<
   TAdapterSources extends AnySourceAdapter[],
 > = Id<{
-  [K in TAdapterSources[number]["adapterType"]]: GetAdapterHandlerFromType<
+  [K in TAdapterSources[number]["adapterType"]]: GetSourceAdapterFromType<
     K,
     TAdapterSources
   > extends AnySourceAdapter
-    ? InferHandlerOutput<GetAdapterHandlerFromType<K, TAdapterSources>>
+    ? InferHandlerOutput<GetSourceAdapterFromType<K, TAdapterSources>>
     : never;
 }>;
 

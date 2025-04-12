@@ -80,7 +80,7 @@ export type MergeTuple<
  * Get the correct adapter handler based
  * on the adapter type.
  */
-export type GetAdapterHandlerFromType<
+export type GetSourceAdapterFromType<
   TAdapterType extends string,
   TAdapterHandlers extends AnySourceAdapter[],
 > = TAdapterHandlers extends Array<infer THandler>
