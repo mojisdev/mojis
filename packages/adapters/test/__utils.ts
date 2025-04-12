@@ -97,16 +97,17 @@ export async function setupAdapterTest<TOutputSchema extends type.Any>(options?:
     opts: AddHandlerToMockOptions<TOutputSchema>,
   ) {
     const _type = normalizeHandlerName(type);
+    const handlerKey = _type as keyof typeof mockHandlers;
 
     if (opts.outputSchema != null) {
-      mockHandlers[_type as keyof typeof mockHandlers].outputSchema = opts.outputSchema as any;
+      mockHandlers[handlerKey].outputSchema = opts.outputSchema as any;
     }
 
     if (opts.fallback != null) {
-      mockHandlers[_type as keyof typeof mockHandlers].fallback = opts.fallback;
+      mockHandlers[handlerKey].fallback = opts.fallback;
     }
 
-    mockHandlers[_type as keyof typeof mockHandlers].handlers.push([
+    mockHandlers[handlerKey].handlers.push([
       // @ts-expect-error - types are not matching, will fix later
       opts.predicate,
       // @ts-expect-error - types are not matching, will fix later
@@ -137,7 +138,7 @@ export function cleanupAdapterTest(): void {
 }
 
 export type CreateAdapterVersionHandler<TConfig extends {
-  output: any;
+  output: unknown;
   params?: Record<string, any>;
 }> = VersionHandler<{
   globalContext: AdapterContext;
