@@ -1,5 +1,16 @@
 # @mojis/cli
 
+## 0.1.0
+
+### Minor Changes
+
+- [#94](https://github.com/mojisdev/mojis/pull/94) [`3d72bf2`](https://github.com/mojisdev/mojis/commit/3d72bf2cdd02f79e3316fadb881fad9b981033af) Thanks [@luxass](https://github.com/luxass)! - refactor: rename adapter handlers to source adapters
+
+### Patch Changes
+
+- Updated dependencies [[`3d72bf2`](https://github.com/mojisdev/mojis/commit/3d72bf2cdd02f79e3316fadb881fad9b981033af), [`859d5ad`](https://github.com/mojisdev/mojis/commit/859d5ade56d6622e1654aa7fd066c3ed4d34b6bd)]:
+  - @mojis/adapters@0.2.0
+
 ## 0.0.18
 
 ### Patch Changes
