@@ -1,7 +1,9 @@
 import type { Cache, CacheOptions } from "@mojis/internal-utils";
 import type { AnyCompositeHandler } from "../builders/composite-builder/types";
 import type { AdapterContext } from "../global-types";
+import { arktypeParse } from "@mojis/internal-utils";
 import defu from "defu";
+import { AdapterError } from "../errors";
 import { runAdapterHandler } from "./adapter-runner";
 
 export interface RunCompositeHandlerOverrides {
@@ -36,6 +38,12 @@ export async function runCompositeHandler<THandler extends AnyCompositeHandler>(
 
   // run the output with the final transformed value
   const outputValue = await handler.output(ctx, currentValue);
+
+  const validationResult = arktypeParse(outputValue, handler.outputSchema);
+
+  if (!validationResult.success) {
+    throw new AdapterError(`output from composite handler doesn't match output schema, ${validationResult.errors}`);
+  }
 
   return outputValue;
 }
