@@ -1,7 +1,7 @@
 import type { type } from "arktype";
 import type {
   AdapterHandlerType,
-  JoinTuples,
+  MergeTuple,
 } from "../../global-types";
 import type { AnyHandleVersionParams, AnyVersionHandler, HandleVersionBuilder } from "../version-builder/types";
 
@@ -28,10 +28,10 @@ export interface AdapterHandlerBuilder<
   ) => AdapterHandlerBuilder<{
     _adapterType: TParams["_adapterType"];
     _outputSchema: TParams["_outputSchema"];
-    _handlers: JoinTuples<[
-      TParams["_handlers"],
+    _handlers: MergeTuple<
       [[TPredicate, THandler]],
-    ]>;
+      TParams["_handlers"]
+    >;
     _fallback: TParams["_fallback"];
   }>;
 

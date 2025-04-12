@@ -66,17 +66,7 @@ export type UnsetMarker = "unsetMarker" & {
 
 export type ErrorMessage<TError extends string> = TError;
 
-export type JoinTuples<Fragments extends any[][]> =
-   Fragments extends
-   [
-     infer CurrentTupleFragment extends any[],
-     ...infer RemainingTupleFragments extends any[][],
-   ] ?
-       [
-         ...CurrentTupleFragment,
-         ...JoinTuples<RemainingTupleFragments>,
-       ] :
-       [];
+export type MergeTuple<A extends unknown[], B extends unknown[]> = B extends [infer H, ...infer T] ? MergeTuple<[...A, H], T> : A;
 
 /**
  * Get the correct adapter handler based
