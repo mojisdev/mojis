@@ -3,12 +3,12 @@ import type {
   MergeTuple,
   SourceAdapterType,
 } from "../../global-types";
-import type { AnyVersionedSourceTransformerParams, AnyVersionedSourceTransformer, VersionedSourceTransformerBuilder } from "../version-builder/types";
+import type { AnyVersionedSourceTransformer, AnyVersionedSourceTransformerParams, VersionedSourceTransformerBuilder } from "../version-builder/types";
 
 export type InferHandlerOutput<TSourceAdapter extends AnySourceAdapter> =
-  TSourceAdapter extends { handlers: Array<[any, infer TVersionHandler]> }
-    ? TVersionHandler extends AnyVersionedSourceTransformer
-      ? TVersionHandler["output"]
+  TSourceAdapter extends { handlers: Array<[any, infer TSourceTransformer]> }
+    ? TSourceTransformer extends AnyVersionedSourceTransformer
+      ? TSourceTransformer["output"]
       : never
     : never;
 

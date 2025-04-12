@@ -31,12 +31,12 @@ function internalCreateSourceAdapterBuilder<TAdapterType extends SourceAdapterTy
 
   return {
     onVersion(userPredicate, userBuilder) {
-      const versionHandler = userBuilder(createVersionedSourceTransformerBuilder<TOutputSchema["infer"]>() as any);
+      const sourceTransformer = userBuilder(createVersionedSourceTransformerBuilder<TOutputSchema["infer"]>() as any);
       return internalCreateSourceAdapterBuilder({
         ..._def,
         handlers: [
           ..._def.handlers,
-          [userPredicate, versionHandler],
+          [userPredicate, sourceTransformer],
         ],
       }) as SourceAdapterBuilder<any>;
     },

@@ -7,7 +7,7 @@ import defu from "defu";
 import { AdapterError } from "../errors";
 import { buildContext, getHandlerUrls, isBuiltinParser } from "../utils";
 
-export interface RunVersionHandlerOverrides {
+export interface RunVersionedSourceTransformerOverrides {
   cacheKey?: string;
   cacheOptions?: CacheOptions;
   cache?: Cache<string>;
@@ -20,7 +20,7 @@ export async function runVersionedSourceTransformer<THandler extends AnyVersione
   ctx: AdapterContext,
   handler: THandler,
   adapterHandlerType: SourceAdapterType,
-  __overrides?: RunVersionHandlerOverrides,
+  __overrides?: RunVersionedSourceTransformerOverrides,
 ): Promise<THandler["output"]> {
   const urls = await getHandlerUrls(handler.urls, ctx);
 

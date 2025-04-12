@@ -72,7 +72,7 @@ export function createFakeSourceAdapter<TParams extends AnyBuiltSourceAdapterPar
   };
 }
 
-export type CreateAdapterVersionHandler<TConfig extends {
+export type CreateVersionedSourceTransformer<TConfig extends {
   output: unknown;
   params?: Record<string, any>;
 }> = VersionedSourceTransformer<{
@@ -110,7 +110,7 @@ export interface TestSourceAdapter<TParams extends TestBuiltSourceAdapterParams>
 export type CreateAnySourceAdapter<
   TType extends string,
   TConfig extends {
-    handlers: CreateAdapterVersionHandler<any>[];
+    handlers: CreateVersionedSourceTransformer<any>[];
     outputSchema?: type.Any;
     fallback?: any;
   },
