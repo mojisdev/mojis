@@ -49,4 +49,9 @@ export const compositeHandler = builder
       version: sources.value2,
     };
   })
+  .output((_, transformed) => {
+    //           ^?
+    console.error("transformed", transformed);
+    return transformed;
+  })
   .build();

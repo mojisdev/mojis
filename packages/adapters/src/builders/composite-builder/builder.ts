@@ -9,12 +9,14 @@ function internalCreateCompositeHandlerBuilder<TOutputSchema extends type.Any>(
     _sources: UnsetMarker;
     _adapterSources: UnsetMarker;
     _transforms: [];
+    _output: UnsetMarker;
   }> {
   const _def: AnyCompositeHandler = {
     outputSchema: initDef.outputSchema,
     sources: initDef.sources ?? [],
     adapterSources: initDef.adapterSources ?? [],
     transforms: initDef.transforms ?? [],
+    output: initDef.output,
   };
 
   return {
@@ -39,6 +41,12 @@ function internalCreateCompositeHandlerBuilder<TOutputSchema extends type.Any>(
         ],
       }) as CompositeHandlerBuilder<any>;
     },
+    output(userOutput) {
+      return internalCreateCompositeHandlerBuilder({
+        ..._def,
+        output: userOutput,
+      }) as CompositeHandlerBuilder<any>;
+    },
     build() {
       return _def;
     },
@@ -56,6 +64,7 @@ export function createCompositeHandlerBuilder<TOutputSchema extends type.Any>(
     _sources: UnsetMarker;
     _adapterSources: UnsetMarker;
     _transforms: [];
+    _output: UnsetMarker;
   }> {
   return internalCreateCompositeHandlerBuilder<TOutputSchema>({
     outputSchema: opts.outputSchema,

@@ -96,6 +96,7 @@ export interface AnyCompositeHandlerParams {
   _sources: any;
   _adapterSources: any;
   _transforms: any[];
+  _output: any;
 }
 
 export interface AnyBuiltCompositeHandlerParams {
@@ -103,7 +104,19 @@ export interface AnyBuiltCompositeHandlerParams {
   sources: Record<string, CompositeSource>;
   adapterSources: AnyAdapterHandler[];
   transforms: any[];
+  output: any;
 }
+
+export type GetLastTransformInput<
+  TTransforms extends any[],
+  TSources extends Record<string, CompositeSource> | UnsetMarker,
+  TAdapterSources extends AnyAdapterHandler[] | UnsetMarker,
+> =
+  TTransforms extends any[]
+    ? TTransforms["length"] extends 0
+      ? MergeSources<TSources, TAdapterSources>
+      : GetLastTransformOutput<TTransforms>
+    : never;
 
 export type TransformChain<
   TInitialSources,
@@ -124,6 +137,7 @@ export interface CompositeHandler<
   sources: TParams["sources"];
   adapterSources: TParams["adapterSources"];
   transforms: TParams["transforms"];
+  output: TParams["output"];
 }
 
 export type AnyCompositeHandler = CompositeHandler<any>;
@@ -158,6 +172,7 @@ export interface CompositeHandlerBuilder<
     _adapterSources: TParams["_adapterSources"];
     _sources: TSources;
     _transforms: TParams["_transforms"];
+    _output: TParams["_output"];
   }>;
 
   adapterSources: <TSources extends AnyAdapterHandler[]>(
@@ -180,6 +195,7 @@ export interface CompositeHandlerBuilder<
     _adapterSources: TSources;
     _outputSchema: TParams["_outputSchema"];
     _transforms: TParams["_transforms"];
+    _output: TParams["_output"];
   }>;
 
   transform: <
@@ -188,23 +204,37 @@ export interface CompositeHandlerBuilder<
         ? MergeSources<TParams["_sources"], TParams["_adapterSources"]>
         : GetLastTransformOutput<TParams["_transforms"]>
       : never,
-    // TODO: make output required to match output schema, but only for the last
     TOut,
-
-  // TOut extends TParams["_transforms"] extends any[]
-  // ? TParams["_transforms"]["length"] extends 0
-  //   ? any
-  //   : TParams["_outputSchema"] extends type.Any
-  //     ? TParams["_outputSchema"]["infer"]
-  //     : never
-  // : never,
   >(
     fn: CompositeTransformFn<TIn, TOut>,
   ) => CompositeHandlerBuilder<{
     _outputSchema: TParams["_outputSchema"];
     _adapterSources: TParams["_adapterSources"];
     _sources: TParams["_sources"];
-    _transforms: JoinTuples<TParams["_transforms"], [TOut]>;
+    _transforms: JoinTuples<[
+      TParams["_transforms"],
+      [TOut],
+    ]>;
+    _output: TParams["_output"];
+  }>;
+
+  output: <
+    TIn extends TParams["_transforms"] extends any[]
+      ? GetLastTransformOutput<TParams["_transforms"]>
+      : never,
+    TOut extends TParams["_outputSchema"] extends UnsetMarker
+      ? any
+      : TParams["_outputSchema"]["infer"],
+  >(
+    output: TParams["_output"] extends UnsetMarker
+      ? (ctx: AdapterContext, data: TIn) => TOut
+      : ErrorMessage<"output is already set">
+  ) => CompositeHandlerBuilder<{
+    _outputSchema: TParams["_outputSchema"];
+    _adapterSources: TParams["_adapterSources"];
+    _sources: TParams["_sources"];
+    _transforms: TParams["_transforms"];
+    _output: TOut;
   }>;
 
   build: () => CompositeHandler<{
@@ -215,5 +245,6 @@ export interface CompositeHandlerBuilder<
       MergeSources<TParams["_sources"], TParams["_adapterSources"]>,
       TParams["_transforms"]
     >;
+    output: TParams["_output"];
   }>;
 }

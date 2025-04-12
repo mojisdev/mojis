@@ -66,18 +66,17 @@ export type UnsetMarker = "unsetMarker" & {
 
 export type ErrorMessage<TError extends string> = TError;
 
-export type JoinTuples<
-  T extends readonly unknown[],
-  U extends readonly unknown[],
-> = T extends []
-  ? U
-  : U extends []
-    ? T
-    : T extends readonly [infer THead, ...infer TRest]
-      ? U extends readonly [infer UHead, ...infer URest]
-        ? [THead, UHead, ...JoinTuples<TRest, URest>]
-        : T
-      : U;
+export type JoinTuples<Fragments extends any[][]> =
+   Fragments extends
+   [
+     infer CurrentTupleFragment extends any[],
+     ...infer RemainingTupleFragments extends any[][],
+   ] ?
+       [
+         ...CurrentTupleFragment,
+         ...JoinTuples<RemainingTupleFragments>,
+       ] :
+       [];
 
 /**
  * Get the correct adapter handler based
