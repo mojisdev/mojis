@@ -2,7 +2,7 @@ import type { EmojiGroup, GroupedEmojiMetadata } from "@mojis/schemas/emojis";
 import { extractEmojiVersion, extractUnicodeVersion, isBefore } from "@mojis/internal-utils";
 import { EMOJI_GROUPS_SCHEMA, GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA } from "@mojis/schemas/emojis";
 import { type } from "arktype";
-import { createAdapterHandlerBuilder } from "../../builders/adapter-builder/builder";
+import { createSourceAdapter } from "../../builders/source-builder/builder";
 
 function slugify(val: string): string {
   return val.normalize("NFD")
@@ -20,7 +20,7 @@ function slugify(val: string): string {
 // We will probably just have to "generate" them from a html page.
 const DISALLOWED_EMOJI_VERSIONS = ["1.0", "2.0", "3.0"];
 
-const builder = createAdapterHandlerBuilder({
+const builder = createSourceAdapter({
   type: "metadata",
   outputSchema: type({
     groups: EMOJI_GROUPS_SCHEMA,

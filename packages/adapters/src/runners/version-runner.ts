@@ -1,6 +1,6 @@
 import type { Cache, CacheOptions } from "@mojis/internal-utils";
 import type { AnyVersionHandler } from "../builders/version-builder/types";
-import type { AdapterContext, AdapterHandlerType } from "../global-types";
+import type { AdapterContext, SourceAdapterType } from "../global-types";
 import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
 import defu from "defu";
@@ -19,7 +19,7 @@ export interface RunVersionHandlerOverrides {
 export async function runVersionHandler<THandler extends AnyVersionHandler>(
   ctx: AdapterContext,
   handler: THandler,
-  adapterHandlerType: AdapterHandlerType,
+  adapterHandlerType: SourceAdapterType,
   __overrides?: RunVersionHandlerOverrides,
 ): Promise<THandler["output"]> {
   const urls = await getHandlerUrls(handler.urls, ctx);

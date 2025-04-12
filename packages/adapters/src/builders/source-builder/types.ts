@@ -1,19 +1,19 @@
 import type { type } from "arktype";
 import type {
-  AdapterHandlerType,
   MergeTuple,
+  SourceAdapterType,
 } from "../../global-types";
 import type { AnyHandleVersionParams, AnyVersionHandler, HandleVersionBuilder } from "../version-builder/types";
 
-export type InferHandlerOutput<TAdapterHandler extends AnyAdapterHandler> =
-  TAdapterHandler extends { handlers: Array<[any, infer THandler]> }
-    ? THandler extends AnyVersionHandler
-      ? THandler["output"]
+export type InferHandlerOutput<TSourceAdapter extends AnySourceAdapter> =
+  TSourceAdapter extends { handlers: Array<[any, infer TVersionHandler]> }
+    ? TVersionHandler extends AnyVersionHandler
+      ? TVersionHandler["output"]
       : never
     : never;
 
-export interface AdapterHandlerBuilder<
-  TParams extends AnyAdapterHandlerParams,
+export interface SourceAdapterBuilder<
+  TParams extends AnySourceAdapterParams,
 > {
   onVersion: <
     TPredicate extends PredicateFn,
@@ -25,7 +25,7 @@ export interface AdapterHandlerBuilder<
   >(
     predicate: TPredicate,
     builder: (builder: TBuilder) => THandler,
-  ) => AdapterHandlerBuilder<{
+  ) => SourceAdapterBuilder<{
     _adapterType: TParams["_adapterType"];
     _outputSchema: TParams["_outputSchema"];
     _handlers: MergeTuple<
@@ -37,14 +37,14 @@ export interface AdapterHandlerBuilder<
 
   fallback: <TOut extends TParams["_outputSchema"] extends type.Any ? TParams["_outputSchema"]["infer"] : any>(
     fn: FallbackFn<TOut>
-  ) => AdapterHandlerBuilder<{
+  ) => SourceAdapterBuilder<{
     _fallback: TOut;
     _handlers: TParams["_handlers"];
     _outputSchema: TParams["_outputSchema"];
     _adapterType: TParams["_adapterType"];
   }>;
 
-  build: () => AdapterHandler<{
+  build: () => SourceAdapter<{
     fallback: TParams["_fallback"];
     handlers: TParams["_handlers"];
     outputSchema: TParams["_outputSchema"];
@@ -52,8 +52,8 @@ export interface AdapterHandlerBuilder<
   }>;
 }
 
-export interface AnyAdapterHandlerParams {
-  _adapterType: AdapterHandlerType;
+export interface AnySourceAdapterParams {
+  _adapterType: SourceAdapterType;
   _outputSchema?: type.Any;
   _handlers: [PredicateFn, AnyVersionHandler][];
   _fallback?: any;
@@ -61,8 +61,8 @@ export interface AnyAdapterHandlerParams {
 
 export type PredicateFn = (version: string) => boolean;
 
-export interface AnyBuiltAdapterHandlerParams {
-  adapterType: AdapterHandlerType;
+export interface AnyBuiltSourceAdapterParams {
+  adapterType: SourceAdapterType;
   handlers: [PredicateFn, AnyVersionHandler][];
   outputSchema?: type.Any;
   fallback?: FallbackFn<any>;
@@ -70,7 +70,7 @@ export interface AnyBuiltAdapterHandlerParams {
 
 export type FallbackFn<TOut> = () => TOut;
 
-export interface AdapterHandler<TParams extends AnyBuiltAdapterHandlerParams> {
+export interface SourceAdapter<TParams extends AnyBuiltSourceAdapterParams> {
   adapterType: TParams["adapterType"];
   handlers: TParams["handlers"];
   outputSchema?: TParams["outputSchema"];
@@ -81,4 +81,4 @@ export interface AdapterHandler<TParams extends AnyBuiltAdapterHandlerParams> {
   >;
 }
 
-export type AnyAdapterHandler = AdapterHandler<any>;
+export type AnySourceAdapter = SourceAdapter<any>;

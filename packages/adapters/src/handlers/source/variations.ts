@@ -1,11 +1,11 @@
 import type { EmojiVariation } from "@mojis/schemas/emojis";
 import { EMOJI_VARIATION_SCHEMA } from "@mojis/schemas/emojis";
 import semver from "semver";
-import { createAdapterHandlerBuilder } from "../../builders/adapter-builder/builder";
+import { createSourceAdapter } from "../../builders/source-builder/builder";
 
 const UNSUPPORTED_VARIATION_VERSIONS = ["1.0", "2.0", "3.0", "4.0"];
 
-const builder = createAdapterHandlerBuilder({
+const builder = createSourceAdapter({
   type: "variations",
   outputSchema: EMOJI_VARIATION_SCHEMA.array(),
 });

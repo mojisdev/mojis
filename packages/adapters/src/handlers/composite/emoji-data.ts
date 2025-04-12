@@ -1,7 +1,7 @@
 import { type } from "arktype";
 import { createCompositeHandlerBuilder } from "../../builders/composite-builder/builder";
 
-import * as handlers from "../adapter";
+import * as handlers from "../source";
 
 const builder = createCompositeHandlerBuilder({
   outputSchema: type({

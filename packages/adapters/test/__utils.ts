@@ -2,14 +2,14 @@
 import type { Cache, CacheOptions } from "@mojis/internal-utils";
 import type { GenericParseOptions } from "@mojis/parsers";
 import type { type } from "arktype";
+import type { AnyCompositeHandler } from "../src/builders/composite-builder/types";
 import type {
-  AdapterHandler,
-  AnyAdapterHandler,
-  AnyBuiltAdapterHandlerParams,
+  AnyBuiltSourceAdapterParams,
+  AnySourceAdapter,
   FallbackFn,
   PredicateFn,
-} from "../src/builders/adapter-builder/types";
-import type { AnyCompositeHandler } from "../src/builders/composite-builder/types";
+  SourceAdapter,
+} from "../src/builders/source-builder/types";
 import type { AnyVersionHandler, VersionHandler } from "../src/builders/version-builder/types";
 import type {
   AdapterContext,
@@ -27,14 +27,14 @@ export async function setupAdapterTest(options?: SetupAdapterTestOptions) {
 
   // use dynamic imports since we can't import from a file
   // since those imports are hoisted to the top of the file
-  const { runAdapterHandler: runAdapterHandlerOriginal } = await import("../src/runners/adapter-runner");
+  const { runSourceAdapter: runSourceAdapterOriginal } = await import("../src/runners/source-runner");
   const { runCompositeHandler: runCompositeHandlerOriginal } = await import("../src/runners/composite-runner");
 
-  function runAdapterHandler<THandler extends AnyAdapterHandler>(
-    ...args: Parameters<typeof runAdapterHandlerOriginal<THandler>>
+  function runSourceAdapter<THandler extends AnySourceAdapter>(
+    ...args: Parameters<typeof runSourceAdapterOriginal<THandler>>
   ) {
     const [type, ctx, opts] = args;
-    return runAdapterHandlerOriginal(type, ctx, {
+    return runSourceAdapterOriginal(type, ctx, {
       ...opts,
       cache: cache as Cache<string>,
     });
@@ -51,14 +51,14 @@ export async function setupAdapterTest(options?: SetupAdapterTestOptions) {
   }
 
   return {
-    runAdapterHandler,
+    runSourceAdapter,
     runCompositeHandler,
   };
 }
 
-export function createFakeAdapterHandler<TParams extends AnyBuiltAdapterHandlerParams>(
+export function createFakeSourceAdapter<TParams extends AnyBuiltSourceAdapterParams>(
   opts: TParams,
-): AdapterHandler<{
+): SourceAdapter<{
     adapterType: TParams["adapterType"];
     handlers: TParams["handlers"];
     outputSchema: TParams["outputSchema"];
@@ -89,14 +89,14 @@ export type CreateAdapterVersionHandler<TConfig extends {
   output: TConfig["output"];
 }>;
 
-export interface TestBuiltAdapterHandlerParams {
+export interface TestBuiltSourceAdapterParams {
   adapterType: string;
   handlers: [PredicateFn, AnyVersionHandler][];
   outputSchema?: type.Any;
   fallback?: FallbackFn<any>;
 }
 
-export interface TestAdapterHandler<TParams extends TestBuiltAdapterHandlerParams> {
+export interface TestSourceAdapter<TParams extends TestBuiltSourceAdapterParams> {
   adapterType: TParams["adapterType"];
   handlers: TParams["handlers"];
   outputSchema?: TParams["outputSchema"];
@@ -107,14 +107,14 @@ export interface TestAdapterHandler<TParams extends TestBuiltAdapterHandlerParam
   >;
 }
 
-export type CreateAnyAdapterHandler<
+export type CreateAnySourceAdapter<
   TType extends string,
   TConfig extends {
     handlers: CreateAdapterVersionHandler<any>[];
     outputSchema?: type.Any;
     fallback?: any;
   },
-> = TestAdapterHandler<{
+> = TestSourceAdapter<{
   adapterType: TType;
   handlers: Array<[PredicateFn, TConfig["handlers"][number]]>;
   outputSchema?: TConfig["outputSchema"];

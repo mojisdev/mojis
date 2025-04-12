@@ -1,7 +1,7 @@
-export type { AdapterHandlerType } from "./global-types";
+export type { SourceAdapterType } from "./global-types";
 
-export * as adapterHandlers from "./handlers/adapter";
 export * as compositeHandlers from "./handlers/composite";
+export * as sourceHandlers from "./handlers/source";
 
-export { runAdapterHandler } from "./runners/adapter-runner";
 export { runCompositeHandler } from "./runners/composite-runner";
+export { runSourceAdapter } from "./runners/source-runner";

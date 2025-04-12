@@ -2,16 +2,16 @@ import type { type } from "arktype";
 import type {
   AdapterContext,
   ErrorMessage,
-  GetAdapterHandlerFromType,
+  GetSourceAdapterFromType,
   Id,
   MaybePromise,
   MergeTuple,
   UnsetMarker,
 } from "../../global-types";
 import type {
-  AnyAdapterHandler,
+  AnySourceAdapter,
   InferHandlerOutput,
-} from "../adapter-builder/types";
+} from "../source-builder/types";
 
 export type PrimitiveSource = string | number | boolean;
 
@@ -22,13 +22,13 @@ export type CompositeSourceFn = (
 export type CompositeSource = PrimitiveSource | CompositeSourceFn;
 
 export type GetObjectFromAdapterSources<
-  TAdapterSources extends AnyAdapterHandler[],
+  TAdapterSources extends AnySourceAdapter[],
 > = Id<{
-  [K in TAdapterSources[number]["adapterType"]]: GetAdapterHandlerFromType<
+  [K in TAdapterSources[number]["adapterType"]]: GetSourceAdapterFromType<
     K,
     TAdapterSources
-  > extends AnyAdapterHandler
-    ? InferHandlerOutput<GetAdapterHandlerFromType<K, TAdapterSources>>
+  > extends AnySourceAdapter
+    ? InferHandlerOutput<GetSourceAdapterFromType<K, TAdapterSources>>
     : never;
 }>;
 
@@ -43,10 +43,10 @@ export type GetObjectFromCompositeSources<
 }>;
 
 export type GetSourcesFromAdapters<
-  TAdapterSources extends AnyAdapterHandler[] | UnsetMarker,
+  TAdapterSources extends AnySourceAdapter[] | UnsetMarker,
 > = TAdapterSources extends UnsetMarker
   ? never
-  : TAdapterSources extends AnyAdapterHandler[]
+  : TAdapterSources extends AnySourceAdapter[]
     ? GetObjectFromAdapterSources<TAdapterSources>
     : never;
 
@@ -60,7 +60,7 @@ export type GetSourcesFromComposites<
 
 export type MergeCompositeAndAdapterSources<
   TSources extends Record<string, CompositeSource>,
-  TAdapterSources extends AnyAdapterHandler[],
+  TAdapterSources extends AnySourceAdapter[],
 > = Omit<
   GetObjectFromCompositeSources<TSources>,
   TAdapterSources[number]["adapterType"]
@@ -68,14 +68,14 @@ export type MergeCompositeAndAdapterSources<
 
 export type MergeSources<
   TSources extends Record<string, CompositeSource> | UnsetMarker,
-  TAdapterSources extends AnyAdapterHandler[] | UnsetMarker,
+  TAdapterSources extends AnySourceAdapter[] | UnsetMarker,
 > = Id<
   TSources extends UnsetMarker
     ? GetSourcesFromAdapters<TAdapterSources>
     : TAdapterSources extends UnsetMarker
       ? GetSourcesFromComposites<TSources>
       : TSources extends Record<string, CompositeSource>
-        ? TAdapterSources extends AnyAdapterHandler[]
+        ? TAdapterSources extends AnySourceAdapter[]
           ? MergeCompositeAndAdapterSources<TSources, TAdapterSources>
           : never
         : never
@@ -102,7 +102,7 @@ export interface AnyCompositeHandlerParams {
 export interface AnyBuiltCompositeHandlerParams {
   outputSchema: type.Any;
   sources: Record<string, CompositeSource>;
-  adapterSources: AnyAdapterHandler[];
+  adapterSources: AnySourceAdapter[];
   transforms: any[];
   output: any;
 }
@@ -164,12 +164,12 @@ export interface CompositeHandlerBuilder<
     _output: TParams["_output"];
   }>;
 
-  adapterSources: <TSources extends AnyAdapterHandler[]>(
+  adapterSources: <TSources extends AnySourceAdapter[]>(
     sources: TParams["_adapterSources"] extends UnsetMarker
       ? TParams["_sources"] extends UnsetMarker
         ? TSources
         : {
-            [K in keyof TSources]: TSources[K] extends AnyAdapterHandler
+            [K in keyof TSources]: TSources[K] extends AnySourceAdapter
               ? IsKeyInSources<
                 TSources[K]["adapterType"],
                 TParams["_sources"]

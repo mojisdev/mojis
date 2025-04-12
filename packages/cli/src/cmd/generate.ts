@@ -1,7 +1,7 @@
 import type { EmojiSpecRecord } from "@mojis/schemas/emojis";
 import type { CLIArguments } from "../cli-utils";
 import { join } from "node:path";
-import { adapterHandlers, runAdapterHandler } from "@mojis/adapters";
+import { runSourceAdapter, sourceHandlers } from "@mojis/adapters";
 import {
   getAllEmojiVersions,
   getLatestEmojiVersion,
@@ -140,7 +140,7 @@ export async function buildEmojiGenerateRequest(
   await fs.ensureDir(baseDir);
 
   if (isGeneratorEnabled("metadata", generators)) {
-    const { groups, emojis } = await runAdapterHandler(adapterHandlers.metadataHandler, {
+    const { groups, emojis } = await runSourceAdapter(sourceHandlers.metadataHandler, {
       force,
       emoji_version: version.emoji_version,
       unicode_version: version.unicode_version,
@@ -162,7 +162,7 @@ export async function buildEmojiGenerateRequest(
   }
 
   if (isGeneratorEnabled("sequences", generators)) {
-    const { sequences, zwj } = await runAdapterHandler(adapterHandlers.sequencesHandler, {
+    const { sequences, zwj } = await runSourceAdapter(sourceHandlers.sequencesHandler, {
       force,
       emoji_version: version.emoji_version,
       unicode_version: version.unicode_version,
@@ -182,7 +182,7 @@ export async function buildEmojiGenerateRequest(
   }
 
   if (isGeneratorEnabled("variations", generators)) {
-    const variations = await runAdapterHandler(adapterHandlers.variationsHandler, {
+    const variations = await runSourceAdapter(sourceHandlers.variationsHandler, {
       force,
       emoji_version: version.emoji_version,
       unicode_version: version.unicode_version,
@@ -196,7 +196,7 @@ export async function buildEmojiGenerateRequest(
   }
 
   if (isGeneratorEnabled("unicode-names", generators)) {
-    const unicodeNames = await runAdapterHandler(adapterHandlers.unicodeNamesHandler, {
+    const unicodeNames = await runSourceAdapter(sourceHandlers.unicodeNamesHandler, {
       force,
       emoji_version: version.emoji_version,
       unicode_version: version.unicode_version,

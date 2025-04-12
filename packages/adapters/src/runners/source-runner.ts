@@ -1,22 +1,22 @@
 import type { Cache, CacheOptions } from "@mojis/internal-utils";
-import type { AnyAdapterHandler, InferHandlerOutput } from "../builders/adapter-builder/types";
+import type { AnySourceAdapter, InferHandlerOutput } from "../builders/source-builder/types";
 import type { AdapterContext } from "../global-types";
 import { arktypeParse } from "@mojis/internal-utils";
 import { AdapterError } from "../errors";
 import { runVersionHandler } from "./version-runner";
 
-export interface RunAdapterHandlerOverrides {
+export interface RunSourceAdapterOverrides {
   cacheKey?: string;
   cacheOptions?: CacheOptions;
   cache?: Cache<string>;
 }
 
-export async function runAdapterHandler<
-  THandler extends AnyAdapterHandler,
+export async function runSourceAdapter<
+  THandler extends AnySourceAdapter,
 >(
   handler: THandler,
   ctx: AdapterContext,
-  __overrides?: RunAdapterHandlerOverrides,
+  __overrides?: RunSourceAdapterOverrides,
 ): Promise<InferHandlerOutput<THandler>> {
   const promises = [];
 

@@ -1,4 +1,4 @@
-import type { AdapterHandlerType } from "@mojis/adapters";
+import type { SourceAdapterType } from "@mojis/adapters";
 
 export const DEFAULT_GENERATORS = [
   "metadata",
@@ -7,7 +7,7 @@ export const DEFAULT_GENERATORS = [
   "unicode-names",
   // "shortcodes",
   // "emojis",
-] satisfies AdapterHandlerType[];
+] satisfies SourceAdapterType[];
 
 export const DEFAULT_SHORTCODE_PROVIDERS = [
   "github",

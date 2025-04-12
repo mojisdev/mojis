@@ -1,12 +1,12 @@
-import type { AnyAdapterHandler } from "../../src/builders/adapter-builder/types";
+import type { AnySourceAdapter } from "../../src/builders/source-builder/types";
 import type { AdapterContext } from "../../src/global-types";
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { type } from "arktype";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import { createVersionHandlerBuilder } from "../../src/builders/version-builder/builder";
-import { createFakeAdapterHandler, setupAdapterTest } from "../__utils";
+import { createFakeSourceAdapter, setupAdapterTest } from "../__utils";
 
-describe("runAdapterHandler", () => {
+describe("runSourceAdapter", () => {
   const mockContext: AdapterContext = {
     emoji_version: "15.0",
     unicode_version: "15.0",
@@ -14,23 +14,23 @@ describe("runAdapterHandler", () => {
   };
 
   it("should throw error for invalid handler", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     await expect(
-      runAdapterHandler({} as AnyAdapterHandler, mockContext),
+      runSourceAdapter({} as AnySourceAdapter, mockContext),
     ).rejects.toThrow();
   });
 
   it("should return undefined when no handlers match version", async () => {
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
       ],
     });
 
-    const result = await runAdapterHandler(handler, mockContext);
+    const result = await runSourceAdapter(handler, mockContext);
     expect(result).toBeUndefined();
   });
 
@@ -46,7 +46,7 @@ describe("runAdapterHandler", () => {
       ],
     ]);
 
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     const mockHandler = createVersionHandlerBuilder()
       .urls(() => "https://mojis.dev/run-matching-version-handler/1")
@@ -60,7 +60,7 @@ describe("runAdapterHandler", () => {
       .transform((_, data) => ({ ...data, processed: "handler2" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [(version: string) => version === "15.0", mockHandler],
@@ -68,7 +68,7 @@ describe("runAdapterHandler", () => {
       ],
     });
 
-    const result = await runAdapterHandler(handler, mockContext);
+    const result = await runSourceAdapter(handler, mockContext);
     expect(result).toBeDefined();
     expect(result).toEqual({ processedBy: "handler1" });
   });
@@ -92,7 +92,7 @@ describe("runAdapterHandler", () => {
       ],
     ]);
 
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     const mockHandler1 = createVersionHandlerBuilder()
       .urls(() => "https://mojis.dev/run-first-matching-version-handler/1")
@@ -112,7 +112,7 @@ describe("runAdapterHandler", () => {
       .transform((_, data) => ({ ...data, processed: "handler3" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [(version: string) => version === "15.0", mockHandler1],
@@ -121,7 +121,7 @@ describe("runAdapterHandler", () => {
       ],
     });
 
-    const result = await runAdapterHandler(handler, mockContext);
+    const result = await runSourceAdapter(handler, mockContext);
     expect(result).toBeDefined();
     expect(result).toEqual({ processedBy: "handler1" });
   });
@@ -142,7 +142,7 @@ describe("runAdapterHandler", () => {
       ],
     ]);
 
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     const mockHandler = createVersionHandlerBuilder()
       .urls(() => [
@@ -160,7 +160,7 @@ describe("runAdapterHandler", () => {
       .transform((_, data) => ({ ...data, processed: "handler2" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [(version: string) => version === "15.0", mockHandler],
@@ -168,7 +168,7 @@ describe("runAdapterHandler", () => {
       ],
     });
 
-    const result = await runAdapterHandler(handler, mockContext);
+    const result = await runSourceAdapter(handler, mockContext);
     expectTypeOf(result).toEqualTypeOf<{
       processedBy: string;
     } | {
@@ -192,7 +192,7 @@ describe("runAdapterHandler", () => {
       ],
     ]);
 
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     const mockHandler = createVersionHandlerBuilder()
       .urls(() => "https://mojis.dev/run-transformation-and-aggregation/1")
@@ -208,7 +208,7 @@ describe("runAdapterHandler", () => {
       .aggregate((_, data) => ({ ...data[0], aggregated: true }))
       .output((_, data) => data);
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [(version: string) => version === "15.0", mockHandler],
@@ -216,7 +216,7 @@ describe("runAdapterHandler", () => {
       ],
     });
 
-    const result = await runAdapterHandler(handler, mockContext);
+    const result = await runSourceAdapter(handler, mockContext);
 
     expect(result).toBeDefined();
     expect(result).toEqual({
@@ -239,7 +239,7 @@ describe("runAdapterHandler", () => {
       ],
     ]);
 
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     const mockHandler = createVersionHandlerBuilder()
       .urls(() => "https://mojis.dev/run-cache-and-fetch-options/1")
@@ -255,7 +255,7 @@ describe("runAdapterHandler", () => {
       .transform((_, data) => ({ ...data, processed: "handler2" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [(version: string) => version === "15.0", mockHandler],
@@ -263,7 +263,7 @@ describe("runAdapterHandler", () => {
       ],
     });
 
-    const result = await runAdapterHandler(handler, mockContext);
+    const result = await runSourceAdapter(handler, mockContext);
 
     expect(result).toBeDefined();
     expect(result).toEqual({ processedBy: "handler1" });
@@ -281,7 +281,7 @@ describe("runAdapterHandler", () => {
       ],
     ]);
 
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     const mockHandler1 = createVersionHandlerBuilder()
       .urls(() => "https://mojis.dev/run-force-mode/1")
@@ -295,7 +295,7 @@ describe("runAdapterHandler", () => {
       .transform((_, data) => ({ ...data, processed: "handler2" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         // add two handlers for different versions
@@ -306,14 +306,14 @@ describe("runAdapterHandler", () => {
     });
 
     // test normal behavior (without force)
-    const normalResult = await runAdapterHandler(handler, mockContext);
+    const normalResult = await runSourceAdapter(handler, mockContext);
     expect(normalResult).toBeDefined();
     expect(normalResult).toEqual({ processedBy: "handler1" });
 
     // test with force - this should still use handler1 as it's the first match for our version,
     // but we need to check that it's actually hit the network instead of using cache
     // we can't test the cache bypassing directly in this test, but we can verify the right handler was used
-    const forceResult = await runAdapterHandler(handler, {
+    const forceResult = await runSourceAdapter(handler, {
       ...mockContext,
       force: true,
     });
@@ -330,7 +330,7 @@ describe("runAdapterHandler", () => {
       return HttpResponse.text(`Response ${fetchCounter}`);
     });
 
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     const mockHandler = createVersionHandlerBuilder()
       .urls(() => "https://mojis.dev/test")
@@ -339,7 +339,7 @@ describe("runAdapterHandler", () => {
       .transform((_, data) => data.lines[0]?.fields[0])
       .output((_, data) => data);
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [(version: string) => version === "15.0", mockHandler],
@@ -347,17 +347,17 @@ describe("runAdapterHandler", () => {
     });
 
     // first request should get "Response 1"
-    const result1 = await runAdapterHandler(handler, mockContext);
+    const result1 = await runSourceAdapter(handler, mockContext);
     expect(result1).toBeDefined();
     expect(result1).toContain("Response 1");
 
     // second request with normal context should get cached "Response 1"
-    const result2 = await runAdapterHandler(handler, mockContext);
+    const result2 = await runSourceAdapter(handler, mockContext);
     expect(result2).toBeDefined();
     expect(result2).toContain("Response 1");
 
     // request with force=true should bypass cache and get "Response 2"
-    const forceResult = await runAdapterHandler(handler, {
+    const forceResult = await runSourceAdapter(handler, {
       ...mockContext,
       force: true,
     });
@@ -372,7 +372,7 @@ describe("runAdapterHandler", () => {
     mockFetch("GET https://mojis.dev/handle-validation", () =>
       HttpResponse.text("mojis.dev/handle-validation"));
 
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     const mockHandler = createVersionHandlerBuilder<{
       page?: string;
@@ -386,14 +386,14 @@ describe("runAdapterHandler", () => {
 
     const predicate = (version: string) => version === "15.0";
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [predicate, mockHandler],
       ],
     });
 
-    const result = await runAdapterHandler(handler, mockContext);
+    const result = await runSourceAdapter(handler, mockContext);
     expect(result).toBeDefined();
     expect(result).toEqual({ page: "mojis.dev/handle-validation" });
   });
@@ -401,7 +401,7 @@ describe("runAdapterHandler", () => {
   it("should throw if validation fails", async () => {
     mockFetch("GET https://mojis.dev/handle-validation-fail", () =>
       HttpResponse.text("mojis.dev/handle-validation-fail"));
-    const { runAdapterHandler } = await setupAdapterTest();
+    const { runSourceAdapter } = await setupAdapterTest();
 
     const mockHandler = createVersionHandlerBuilder<{
       page1: string;
@@ -416,7 +416,7 @@ describe("runAdapterHandler", () => {
 
     const predicate = (version: string) => version === "15.0";
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [predicate, mockHandler],
@@ -426,7 +426,7 @@ describe("runAdapterHandler", () => {
       }),
     });
 
-    await expect(runAdapterHandler(handler, mockContext)).rejects.toThrow(
+    await expect(runSourceAdapter(handler, mockContext)).rejects.toThrow(
       "Invalid output for handler: metadata",
     );
   });

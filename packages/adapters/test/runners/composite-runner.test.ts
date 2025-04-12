@@ -5,7 +5,7 @@ import { type } from "arktype";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import { createCompositeHandlerBuilder } from "../../src/builders/composite-builder/builder";
 import { createVersionHandlerBuilder } from "../../src/builders/version-builder/builder";
-import { createFakeAdapterHandler, setupAdapterTest } from "../__utils";
+import { createFakeSourceAdapter, setupAdapterTest } from "../__utils";
 
 describe("run composite handler", () => {
   const mockContext: AdapterContext = {
@@ -84,7 +84,7 @@ describe("run composite handler", () => {
       }),
     })
       .adapterSources([
-        createFakeAdapterHandler({
+        createFakeSourceAdapter({
           adapterType: "metadata",
           handlers: [
             [() => true, mockHandler],
@@ -141,7 +141,7 @@ describe("run composite handler", () => {
         },
       })
       .adapterSources([
-        createFakeAdapterHandler({
+        createFakeSourceAdapter({
           adapterType: "metadata",
           handlers: [
             [() => true, mockHandler],
@@ -201,7 +201,7 @@ describe("run composite handler", () => {
           },
         })
         .adapterSources([
-          createFakeAdapterHandler({
+          createFakeSourceAdapter({
             adapterType: "metadata",
             handlers: [
               [() => true, nameHandler],
