@@ -1,10 +1,10 @@
 import type { type } from "arktype";
-import type { MaybePromise } from "node_modules/msw/lib/core/typeUtils";
 import type {
   AdapterContext,
   ErrorMessage,
   GetAdapterHandlerFromType,
   Id,
+  MaybePromise,
   MergeTuple,
   UnsetMarker,
 } from "../../global-types";

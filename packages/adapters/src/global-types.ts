@@ -7,6 +7,11 @@ import type { BUILTIN_PARSERS } from "./utils";
 export type MaybeArray<T> = T | T[];
 
 /**
+ * A type that can be a value or a promise.
+ */
+export type MaybePromise<T> = T | Promise<T>;
+
+/**
  * The type of the adapter handler.
  */
 export type AdapterHandlerType =
