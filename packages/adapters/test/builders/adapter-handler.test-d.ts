@@ -1,7 +1,7 @@
 import type {
   InferHandlerOutput,
 } from "../../src/builders/source-builder/types";
-import type { CreateVersionedSourceTransformer, CreateAnySourceAdapter } from "../__utils";
+import type { CreateAnySourceAdapter, CreateVersionedSourceTransformer } from "../__utils";
 import { describe, expectTypeOf, it } from "vitest";
 
 describe("InferHandlerOutput", () => {

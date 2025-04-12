@@ -7,7 +7,7 @@ import type {
   TransformChain,
 } from "../../src/builders/composite-builder/types";
 import type { UnsetMarker } from "../../src/global-types";
-import type { CreateVersionedSourceTransformer, CreateAnySourceAdapter } from "../__utils";
+import type { CreateAnySourceAdapter, CreateVersionedSourceTransformer } from "../__utils";
 import { describe, expectTypeOf, it } from "vitest";
 
 type LengthOf<T extends any[]> = T["length"] extends infer L
