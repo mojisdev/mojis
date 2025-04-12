@@ -3,11 +3,11 @@ import type {
   MergeTuple,
   SourceAdapterType,
 } from "../../global-types";
-import type { AnyHandleVersionParams, AnyVersionHandler, HandleVersionBuilder } from "../version-builder/types";
+import type { AnyVersionedSourceTransformerParams, AnyVersionedSourceTransformer, VersionedSourceTransformerBuilder } from "../version-builder/types";
 
 export type InferHandlerOutput<TSourceAdapter extends AnySourceAdapter> =
   TSourceAdapter extends { handlers: Array<[any, infer TVersionHandler]> }
-    ? TVersionHandler extends AnyVersionHandler
+    ? TVersionHandler extends AnyVersionedSourceTransformer
       ? TVersionHandler["output"]
       : never
     : never;
@@ -17,11 +17,11 @@ export interface SourceAdapterBuilder<
 > {
   onVersion: <
     TPredicate extends PredicateFn,
-    TBuilderParams extends Omit<AnyHandleVersionParams, "_outputSchema"> & {
+    TBuilderParams extends Omit<AnyVersionedSourceTransformerParams, "_outputSchema"> & {
       _outputSchema: TParams["_outputSchema"] extends type.Any ? TParams["_outputSchema"]["infer"] : any;
     },
-    TBuilder extends HandleVersionBuilder<TBuilderParams>,
-    THandler extends AnyVersionHandler,
+    TBuilder extends VersionedSourceTransformerBuilder<TBuilderParams>,
+    THandler extends AnyVersionedSourceTransformer,
   >(
     predicate: TPredicate,
     builder: (builder: TBuilder) => THandler,
@@ -55,7 +55,7 @@ export interface SourceAdapterBuilder<
 export interface AnySourceAdapterParams {
   _adapterType: SourceAdapterType;
   _outputSchema?: type.Any;
-  _handlers: [PredicateFn, AnyVersionHandler][];
+  _handlers: [PredicateFn, AnyVersionedSourceTransformer][];
   _fallback?: any;
 }
 
@@ -63,7 +63,7 @@ export type PredicateFn = (version: string) => boolean;
 
 export interface AnyBuiltSourceAdapterParams {
   adapterType: SourceAdapterType;
-  handlers: [PredicateFn, AnyVersionHandler][];
+  handlers: [PredicateFn, AnyVersionedSourceTransformer][];
   outputSchema?: type.Any;
   fallback?: FallbackFn<any>;
 }

@@ -2,20 +2,20 @@ import type { type } from "arktype";
 import type {
   SourceAdapterType,
 } from "../../global-types";
-import type { AnyVersionHandler } from "../version-builder/types";
+import type { AnyVersionedSourceTransformer } from "../version-builder/types";
 import type {
   AnySourceAdapter,
   FallbackFn,
   PredicateFn,
   SourceAdapterBuilder,
 } from "./types";
-import { createVersionHandlerBuilder } from "../version-builder/builder";
+import { createVersionedSourceTransformerBuilder } from "../version-builder/builder";
 
 function internalCreateSourceAdapterBuilder<TAdapterType extends SourceAdapterType, TOutputSchema extends type.Any>(
   initDef: Partial<AnySourceAdapter> = {},
 ): SourceAdapterBuilder<{
     _adapterType: TAdapterType;
-    _handlers: [PredicateFn, AnyVersionHandler][];
+    _handlers: [PredicateFn, AnyVersionedSourceTransformer][];
     _outputSchema: TOutputSchema;
     _fallback: FallbackFn<TOutputSchema["infer"]>;
   }> {
@@ -31,7 +31,7 @@ function internalCreateSourceAdapterBuilder<TAdapterType extends SourceAdapterTy
 
   return {
     onVersion(userPredicate, userBuilder) {
-      const versionHandler = userBuilder(createVersionHandlerBuilder<TOutputSchema["infer"]>() as any);
+      const versionHandler = userBuilder(createVersionedSourceTransformerBuilder<TOutputSchema["infer"]>() as any);
       return internalCreateSourceAdapterBuilder({
         ..._def,
         handlers: [
@@ -61,7 +61,7 @@ export function createSourceAdapter<TAdapterType extends SourceAdapterType, TOut
   opts: CreateBuilderOptions<TAdapterType, TOutputSchema>,
 ): SourceAdapterBuilder<{
     _adapterType: TAdapterType;
-    _handlers: [PredicateFn, AnyVersionHandler][];
+    _handlers: [PredicateFn, AnyVersionedSourceTransformer][];
     _outputSchema: TOutputSchema;
   }> {
   return internalCreateSourceAdapterBuilder<TAdapterType, TOutputSchema>({

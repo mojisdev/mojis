@@ -4,7 +4,7 @@ import { HttpResponse, mockFetch } from "#msw-utils";
 import { type } from "arktype";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import { createCompositeHandlerBuilder } from "../../src/builders/composite-builder/builder";
-import { createVersionHandlerBuilder } from "../../src/builders/version-builder/builder";
+import { createVersionedSourceTransformerBuilder } from "../../src/builders/version-builder/builder";
 import { createFakeSourceAdapter, setupAdapterTest } from "../__utils";
 
 describe("run composite handler", () => {
@@ -72,7 +72,7 @@ describe("run composite handler", () => {
       }],
     ]);
 
-    const mockHandler = createVersionHandlerBuilder()
+    const mockHandler = createVersionedSourceTransformerBuilder()
       .urls(() => "https://mojis.dev/test")
       .parser((_, data) => data)
       .transform((_, data) => data)
@@ -123,7 +123,7 @@ describe("run composite handler", () => {
       }],
     ]);
 
-    const mockHandler = createVersionHandlerBuilder()
+    const mockHandler = createVersionedSourceTransformerBuilder()
       .urls(() => "https://mojis.dev/test")
       .parser((_, data) => data)
       .transform((_, data) => data)
@@ -185,7 +185,7 @@ describe("run composite handler", () => {
         }],
       ]);
 
-      const nameHandler = createVersionHandlerBuilder()
+      const nameHandler = createVersionedSourceTransformerBuilder()
         .urls(() => "https://mojis.dev/random-name")
         .parser((_, data) => data)
         .transform((_, data) => data)

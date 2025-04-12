@@ -1,5 +1,5 @@
 import type { Cache, CacheOptions } from "@mojis/internal-utils";
-import type { AnyVersionHandler } from "../builders/version-builder/types";
+import type { AnyVersionedSourceTransformer } from "../builders/version-builder/types";
 import type { AdapterContext, SourceAdapterType } from "../global-types";
 import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
@@ -16,7 +16,7 @@ export interface RunVersionHandlerOverrides {
 /**
  * @internal
  */
-export async function runVersionHandler<THandler extends AnyVersionHandler>(
+export async function runVersionedSourceTransformer<THandler extends AnyVersionedSourceTransformer>(
   ctx: AdapterContext,
   handler: THandler,
   adapterHandlerType: SourceAdapterType,

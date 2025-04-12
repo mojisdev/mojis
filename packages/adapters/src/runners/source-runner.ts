@@ -3,7 +3,7 @@ import type { AnySourceAdapter, InferHandlerOutput } from "../builders/source-bu
 import type { AdapterContext } from "../global-types";
 import { arktypeParse } from "@mojis/internal-utils";
 import { AdapterError } from "../errors";
-import { runVersionHandler } from "./version-runner";
+import { runVersionedSourceTransformer } from "./version-runner";
 
 export interface RunSourceAdapterOverrides {
   cacheKey?: string;
@@ -28,7 +28,7 @@ export async function runSourceAdapter<
       continue;
     }
 
-    promises.push(runVersionHandler(ctx, versionHandler, handler.adapterType, __overrides));
+    promises.push(runVersionedSourceTransformer(ctx, versionHandler, handler.adapterType, __overrides));
   }
 
   const result = await Promise.all(promises);
