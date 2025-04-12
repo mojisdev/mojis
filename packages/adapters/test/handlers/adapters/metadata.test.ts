@@ -1,9 +1,9 @@
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { createCache } from "@mojis/internal-utils";
 import { emojiTest } from "@mojis/loomicode";
-import { afterEach, describe, expect, it } from "vitest";
-import { handler } from "../../../src/handlers/adapter/metadata";
-import { cleanupAdapterTest, setupAdapterTest } from "../../__utils";
+import { metadataHandler } from "packages/adapters/src/handlers/adapter";
+import { describe, expect, it } from "vitest";
+import { setupAdapterTest } from "../../__utils";
 
 describe("metadata adapter handler", () => {
   const mockContext = {
@@ -12,16 +12,8 @@ describe("metadata adapter handler", () => {
     force: true,
   };
 
-  afterEach(() => {
-    cleanupAdapterTest();
-  });
-
   it("should handle basic emoji metadata", async () => {
-    const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
-    addHandlerToMock("metadata", {
-      predicate: () => true,
-      handler: handler.handlers[0][1],
-    });
+    const { runAdapterHandler } = await setupAdapterTest();
 
     const mockEmojiTest = emojiTest.smileys({
       separator: ";",
@@ -33,7 +25,7 @@ describe("metadata adapter handler", () => {
       ["GET https://unicode-proxy.mojis.dev/proxy/emoji/15.0/emoji-test.txt", () => HttpResponse.text(mockEmojiTest)],
     ]);
 
-    const result = await runAdapterHandler("metadata", mockContext);
+    const result = await runAdapterHandler(metadataHandler, mockContext);
     expect(result).toEqual({
       groups: [
         {
@@ -142,11 +134,7 @@ describe("metadata adapter handler", () => {
   });
 
   it("should handle emoji versions", async () => {
-    const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
-    addHandlerToMock("metadata", {
-      predicate: () => true,
-      handler: handler.handlers[0][1],
-    });
+    const { runAdapterHandler } = await setupAdapterTest();
 
     const mockEmojiTest = `
 # group: Smileys & Emotion
@@ -158,21 +146,15 @@ describe("metadata adapter handler", () => {
       ["GET https://unicode-proxy.mojis.dev/proxy/emoji/15.0/emoji-test.txt", () => HttpResponse.text(mockEmojiTest)],
     ]);
 
-    const result = await runAdapterHandler("metadata", mockContext);
+    const result = await runAdapterHandler(metadataHandler, mockContext);
     // @ts-expect-error - types are not matching, will fix later
     expect(result.emojis["smileys-emotion-face-smiling"]["1F600"].emojiVersion).toBe("6.0");
   });
 
   it("should handle disallowed emoji versions", async () => {
-    const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
-    addHandlerToMock("metadata", {
-      predicate: handler.handlers[0][0],
-      handler: handler.handlers[0][1],
-      fallback: handler.fallback,
-      outputSchema: handler.outputSchema,
-    });
+    const { runAdapterHandler } = await setupAdapterTest();
 
-    const result = await runAdapterHandler("metadata", { ...mockContext, emoji_version: "1.0" });
+    const result = await runAdapterHandler(metadataHandler, { ...mockContext, emoji_version: "1.0" });
 
     expect(result).toEqual({
       emojis: {},
@@ -181,17 +163,13 @@ describe("metadata adapter handler", () => {
   });
 
   it("should handle empty response", async () => {
-    const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
-    addHandlerToMock("metadata", {
-      predicate: () => true,
-      handler: handler.handlers[0][1],
-    });
+    const { runAdapterHandler } = await setupAdapterTest();
 
     mockFetch([
       ["GET https://unicode-proxy.mojis.dev/proxy/emoji/15.0/emoji-test.txt", () => HttpResponse.text("")],
     ]);
 
-    const result = await runAdapterHandler("metadata", mockContext);
+    const result = await runAdapterHandler(metadataHandler, mockContext);
     expect(result).toEqual({
       emojis: {},
       groups: [],
@@ -199,28 +177,20 @@ describe("metadata adapter handler", () => {
   });
 
   it("should handle network errors", async () => {
-    const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
-    addHandlerToMock("metadata", {
-      predicate: () => true,
-      handler: handler.handlers[0][1],
-    });
+    const { runAdapterHandler } = await setupAdapterTest();
 
     mockFetch(`GET https://unicode-proxy.mojis.dev/proxy/emoji/${mockContext.emoji_version}/emoji-test.txt`, () => {
       return HttpResponse.error();
     });
 
-    await expect(() => runAdapterHandler("metadata", mockContext))
+    await expect(() => runAdapterHandler(metadataHandler, mockContext))
       .rejects
       .toThrow("Failed to fetch");
   });
 
   it("should handle force mode", async () => {
     const cache = createCache<string>({ store: "memory" });
-    const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest({ cache });
-    addHandlerToMock("metadata", {
-      predicate: () => true,
-      handler: handler.handlers[0][1],
-    });
+    const { runAdapterHandler } = await setupAdapterTest({ cache });
 
     const mockEmojiTest = emojiTest.smileys({
       commentPrefix: "#",
@@ -237,20 +207,16 @@ describe("metadata adapter handler", () => {
     ]);
 
     // first request
-    await runAdapterHandler("metadata", mockContext);
+    await runAdapterHandler(metadataHandler, mockContext);
 
     // second request with force=true should bypass cache
-    await runAdapterHandler("metadata", { ...mockContext, force: true });
+    await runAdapterHandler(metadataHandler, { ...mockContext, force: true });
 
     expect(fetchCount).toBe(2);
   });
 
   it("should handle invalid line format", async () => {
-    const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
-    addHandlerToMock("metadata", {
-      predicate: () => true,
-      handler: handler.handlers[0][1],
-    });
+    const { runAdapterHandler } = await setupAdapterTest();
 
     const mockEmojiTest = emojiTest.invalid({
       commentPrefix: "#",
@@ -262,17 +228,13 @@ describe("metadata adapter handler", () => {
       ["GET https://unicode-proxy.mojis.dev/proxy/emoji/15.0/emoji-test.txt", () => HttpResponse.text(mockEmojiTest)],
     ]);
 
-    await expect(runAdapterHandler("metadata", mockContext))
+    await expect(runAdapterHandler(metadataHandler, mockContext))
       .rejects
       .toThrow("invalid line");
   });
 
   it("should handle subgroup without group", async () => {
-    const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
-    addHandlerToMock("metadata", {
-      predicate: () => true,
-      handler: handler.handlers[0][1],
-    });
+    const { runAdapterHandler } = await setupAdapterTest();
 
     const mockEmojiTest = `
 # subgroup: face-smiling
@@ -283,7 +245,7 @@ describe("metadata adapter handler", () => {
       ["GET https://unicode-proxy.mojis.dev/proxy/emoji/15.0/emoji-test.txt", () => HttpResponse.text(mockEmojiTest)],
     ]);
 
-    await expect(runAdapterHandler("metadata", mockContext))
+    await expect(runAdapterHandler(metadataHandler, mockContext))
       .rejects
       .toThrow("subgroup face-smiling without group");
   });

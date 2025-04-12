@@ -1,8 +1,8 @@
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { sequences } from "@mojis/loomicode";
-import { afterEach, describe, expect, it } from "vitest";
-import { handler } from "../../../src/handlers/adapter/sequences";
-import { cleanupAdapterTest, setupAdapterTest } from "../../__utils";
+import { describe, expect, it } from "vitest";
+import { sequencesHandler } from "../../../src/handlers/adapter";
+import { setupAdapterTest } from "../../__utils";
 
 describe("sequences adapter handler", () => {
   const mockContext = {
@@ -11,16 +11,8 @@ describe("sequences adapter handler", () => {
     force: false,
   };
 
-  afterEach(() => {
-    cleanupAdapterTest();
-  });
-
   it("should handle sequences only", async () => {
-    const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
-    addHandlerToMock("sequences", {
-      predicate: () => true,
-      handler: handler.handlers[0][1],
-    });
+    const { runAdapterHandler } = await setupAdapterTest();
 
     const mockedSequences = sequences({
       version: "15.0",
@@ -65,7 +57,7 @@ describe("sequences adapter handler", () => {
       ],
     ]);
 
-    const result = await runAdapterHandler("sequences", mockContext);
+    const result = await runAdapterHandler(sequencesHandler, mockContext);
 
     expect(result.zwj).toBeDefined();
     expect(result.zwj).toHaveLength(0);
@@ -100,11 +92,7 @@ describe("sequences adapter handler", () => {
 
   // TODO: fix this test
   it("should handle zwj sequences only", async () => {
-    const { runAdapterHandler, addHandlerToMock } = await setupAdapterTest();
-    addHandlerToMock("sequences", {
-      predicate: () => true,
-      handler: handler.handlers[0][1],
-    });
+    const { runAdapterHandler } = await setupAdapterTest();
 
     const mockedSequences = sequences({
       version: "15.0",
@@ -149,7 +137,7 @@ describe("sequences adapter handler", () => {
       ],
     ]);
 
-    const result = await runAdapterHandler("sequences", mockContext);
+    const result = await runAdapterHandler(sequencesHandler, mockContext);
 
     expect(result.sequences).toBeDefined();
     expect(result.sequences).toHaveLength(0);
