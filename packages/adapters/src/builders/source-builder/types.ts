@@ -5,10 +5,10 @@ import type {
 } from "../../global-types";
 import type { AnyHandleVersionParams, AnyVersionHandler, HandleVersionBuilder } from "../version-builder/types";
 
-export type InferHandlerOutput<TAdapterHandler extends AnySourceAdapter> =
-  TAdapterHandler extends { handlers: Array<[any, infer THandler]> }
-    ? THandler extends AnyVersionHandler
-      ? THandler["output"]
+export type InferHandlerOutput<TSourceAdapter extends AnySourceAdapter> =
+  TSourceAdapter extends { handlers: Array<[any, infer TVersionHandler]> }
+    ? TVersionHandler extends AnyVersionHandler
+      ? TVersionHandler["output"]
       : never
     : never;
 

@@ -7,7 +7,7 @@ import type {
   TransformChain,
 } from "../../src/builders/composite-builder/types";
 import type { UnsetMarker } from "../../src/global-types";
-import type { CreateAdapterVersionHandler, CreateAnyAdapterHandler } from "../__utils";
+import type { CreateAdapterVersionHandler, CreateAnySourceAdapter } from "../__utils";
 import { describe, expectTypeOf, it } from "vitest";
 
 type LengthOf<T extends any[]> = T["length"] extends infer L
@@ -33,14 +33,14 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      CreateAnyAdapterHandler<"version", {
+      CreateAnySourceAdapter<"version", {
         handlers: [
           CreateAdapterVersionHandler<{
             output: number;
           }>,
         ];
       }>,
-      CreateAnyAdapterHandler<"world", {
+      CreateAnySourceAdapter<"world", {
         handlers: [
           CreateAdapterVersionHandler<{
             output: string;
@@ -63,14 +63,14 @@ describe("MergeSources", () => {
     type Source1 = {};
 
     type Source2 = [
-      CreateAnyAdapterHandler<"version", {
+      CreateAnySourceAdapter<"version", {
         handlers: [
           CreateAdapterVersionHandler<{
             output: string;
           }>,
         ];
       }>,
-      CreateAnyAdapterHandler<"hello", {
+      CreateAnySourceAdapter<"hello", {
         handlers: [
           CreateAdapterVersionHandler<{
             output: number;
@@ -95,14 +95,14 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      CreateAnyAdapterHandler<"array", {
+      CreateAnySourceAdapter<"array", {
         handlers: [
           CreateAdapterVersionHandler<{
             output: string[];
           }>,
         ];
       }>,
-      CreateAnyAdapterHandler<"object", {
+      CreateAnySourceAdapter<"object", {
         handlers: [
           CreateAdapterVersionHandler<{
             output: { key: string };
@@ -129,7 +129,7 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      CreateAnyAdapterHandler<"version", {
+      CreateAnySourceAdapter<"version", {
         handlers: [
           CreateAdapterVersionHandler<{
             output: string;
@@ -152,7 +152,7 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      CreateAnyAdapterHandler<"complex", {
+      CreateAnySourceAdapter<"complex", {
         handlers: [
           CreateAdapterVersionHandler<{
             output: {
@@ -187,7 +187,7 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      CreateAnyAdapterHandler<"dynamic", {
+      CreateAnySourceAdapter<"dynamic", {
         handlers: [
           CreateAdapterVersionHandler<{
             output: string;
@@ -210,14 +210,14 @@ describe("MergeSources", () => {
     type Source1 = {};
 
     type Source2 = [
-      CreateAnyAdapterHandler<"same", {
+      CreateAnySourceAdapter<"same", {
         handlers: [
           CreateAdapterVersionHandler<{
             output: string;
           }>,
         ];
       }>,
-      CreateAnyAdapterHandler<"same", {
+      CreateAnySourceAdapter<"same", {
         handlers: [
           CreateAdapterVersionHandler<{
             output: number;
@@ -252,7 +252,7 @@ describe("MergeSources", () => {
       type Source1 = UnsetMarker;
 
       type Source2 = [
-        CreateAnyAdapterHandler<"version", {
+        CreateAnySourceAdapter<"version", {
           handlers: [
             CreateAdapterVersionHandler<{
               output: string;

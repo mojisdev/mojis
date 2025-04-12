@@ -4,7 +4,7 @@ import { HttpResponse, mockFetch } from "#msw-utils";
 import { type } from "arktype";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import { createVersionHandlerBuilder } from "../../src/builders/version-builder/builder";
-import { createFakeAdapterHandler, setupAdapterTest } from "../__utils";
+import { createFakeSourceAdapter, setupAdapterTest } from "../__utils";
 
 describe("runSourceAdapter", () => {
   const mockContext: AdapterContext = {
@@ -24,7 +24,7 @@ describe("runSourceAdapter", () => {
   it("should return undefined when no handlers match version", async () => {
     const { runSourceAdapter } = await setupAdapterTest();
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
       ],
@@ -60,7 +60,7 @@ describe("runSourceAdapter", () => {
       .transform((_, data) => ({ ...data, processed: "handler2" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [(version: string) => version === "15.0", mockHandler],
@@ -112,7 +112,7 @@ describe("runSourceAdapter", () => {
       .transform((_, data) => ({ ...data, processed: "handler3" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [(version: string) => version === "15.0", mockHandler1],
@@ -160,7 +160,7 @@ describe("runSourceAdapter", () => {
       .transform((_, data) => ({ ...data, processed: "handler2" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [(version: string) => version === "15.0", mockHandler],
@@ -208,7 +208,7 @@ describe("runSourceAdapter", () => {
       .aggregate((_, data) => ({ ...data[0], aggregated: true }))
       .output((_, data) => data);
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [(version: string) => version === "15.0", mockHandler],
@@ -255,7 +255,7 @@ describe("runSourceAdapter", () => {
       .transform((_, data) => ({ ...data, processed: "handler2" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [(version: string) => version === "15.0", mockHandler],
@@ -295,7 +295,7 @@ describe("runSourceAdapter", () => {
       .transform((_, data) => ({ ...data, processed: "handler2" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         // add two handlers for different versions
@@ -339,7 +339,7 @@ describe("runSourceAdapter", () => {
       .transform((_, data) => data.lines[0]?.fields[0])
       .output((_, data) => data);
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [(version: string) => version === "15.0", mockHandler],
@@ -386,7 +386,7 @@ describe("runSourceAdapter", () => {
 
     const predicate = (version: string) => version === "15.0";
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [predicate, mockHandler],
@@ -416,7 +416,7 @@ describe("runSourceAdapter", () => {
 
     const predicate = (version: string) => version === "15.0";
 
-    const handler = createFakeAdapterHandler({
+    const handler = createFakeSourceAdapter({
       adapterType: "metadata",
       handlers: [
         [predicate, mockHandler],

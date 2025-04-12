@@ -56,7 +56,7 @@ export async function setupAdapterTest(options?: SetupAdapterTestOptions) {
   };
 }
 
-export function createFakeAdapterHandler<TParams extends AnyBuiltSourceAdapterParams>(
+export function createFakeSourceAdapter<TParams extends AnyBuiltSourceAdapterParams>(
   opts: TParams,
 ): SourceAdapter<{
     adapterType: TParams["adapterType"];
@@ -89,14 +89,14 @@ export type CreateAdapterVersionHandler<TConfig extends {
   output: TConfig["output"];
 }>;
 
-export interface TestBuiltAdapterHandlerParams {
+export interface TestBuiltSourceAdapterParams {
   adapterType: string;
   handlers: [PredicateFn, AnyVersionHandler][];
   outputSchema?: type.Any;
   fallback?: FallbackFn<any>;
 }
 
-export interface TestAdapterHandler<TParams extends TestBuiltAdapterHandlerParams> {
+export interface TestSourceAdapter<TParams extends TestBuiltSourceAdapterParams> {
   adapterType: TParams["adapterType"];
   handlers: TParams["handlers"];
   outputSchema?: TParams["outputSchema"];
@@ -107,14 +107,14 @@ export interface TestAdapterHandler<TParams extends TestBuiltAdapterHandlerParam
   >;
 }
 
-export type CreateAnyAdapterHandler<
+export type CreateAnySourceAdapter<
   TType extends string,
   TConfig extends {
     handlers: CreateAdapterVersionHandler<any>[];
     outputSchema?: type.Any;
     fallback?: any;
   },
-> = TestAdapterHandler<{
+> = TestSourceAdapter<{
   adapterType: TType;
   handlers: Array<[PredicateFn, TConfig["handlers"][number]]>;
   outputSchema?: TConfig["outputSchema"];

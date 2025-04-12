@@ -1,4 +1,4 @@
-export type { SourceAdapterType as AdapterHandlerType } from "./global-types";
+export type { SourceAdapterType } from "./global-types";
 
 export * as compositeHandlers from "./handlers/composite";
 export * as sourceHandlers from "./handlers/source";
