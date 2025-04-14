@@ -26,8 +26,7 @@ describe("runSourceAdapter", () => {
 
     const handler = createFakeSourceAdapter({
       adapterType: "metadata",
-      handlers: [
-      ],
+      handlers: [],
     });
 
     const result = await runSourceAdapter(handler, mockContext);
@@ -119,6 +118,9 @@ describe("runSourceAdapter", () => {
         [(version: string) => version === "15.0", mockHandler2],
         [(version: string) => version === "14.0", mockHandler3],
       ],
+      transformerSchema: type({
+        processedBy: "string",
+      }),
     });
 
     const result = await runSourceAdapter(handler, mockContext);

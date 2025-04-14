@@ -20,7 +20,7 @@ export interface SourceAdapterBuilder<
 > {
   onVersion: <
     TPredicate extends PredicateFn,
-    TBuilderParams extends Omit<AnyVersionedSourceTransformerParams, "_transformerSchema"> & {
+    TBuilderParams extends Omit<AnyVersionedSourceTransformerParams, "_outputSchema"> & {
       _outputSchema: TParams["_transformerSchema"] extends type.Any ? TParams["_transformerSchema"]["infer"] : any;
     },
     TBuilder extends VersionedSourceTransformerBuilder<TBuilderParams>,
@@ -205,11 +205,11 @@ export type PredicateFn = (version: string) => boolean;
 export interface AnyBuiltSourceAdapterParams {
   adapterType: SourceAdapterType;
   handlers: [PredicateFn, AnyVersionedSourceTransformer][];
-  transformerSchema: type.Any;
-  outputSchema: type.Any;
+  transformerSchema?: type.Any;
+  outputSchema?: type.Any;
   fallback?: FallbackFn<any>;
   persistence?: PersistenceFn<any, any>;
-  persistenceOptions: Omit<PersistenceOptions, "version">;
+  persistenceOptions?: Omit<PersistenceOptions, "version">;
 }
 
 export type FallbackFn<TOut> = () => TOut;
@@ -232,7 +232,7 @@ export interface SourceAdapter<TParams extends AnyBuiltSourceAdapterParams> {
       ? TParams["outputSchema"]["infer"]
       : any
   >;
-  persistenceOptions: TParams["persistenceOptions"];
+  persistenceOptions?: TParams["persistenceOptions"];
 }
 
 export type AnySourceAdapter = SourceAdapter<any>;

@@ -7,6 +7,7 @@ import type {
   AnyBuiltSourceAdapterParams,
   AnySourceAdapter,
   FallbackFn,
+  PersistenceFn,
   PredicateFn,
   SourceAdapter,
 } from "../src/builders/source-builder/types";
@@ -15,6 +16,7 @@ import type {
   AdapterContext,
   BuiltinParser,
   PossibleUrls,
+  SourceAdapterType,
 } from "../src/global-types";
 import { createCache } from "@mojis/internal-utils";
 
@@ -31,12 +33,15 @@ export async function setupAdapterTest(options?: SetupAdapterTestOptions) {
   const { runCompositeHandler: runCompositeHandlerOriginal } = await import("../src/runners/composite-runner");
 
   function runSourceAdapter<THandler extends AnySourceAdapter>(
-    ...args: Parameters<typeof runSourceAdapterOriginal<THandler>>
+    ...args: Parameters<typeof runSourceAdapterOriginal<THandler, {
+      write: false;
+    }>>
   ) {
     const [type, ctx, opts] = args;
     return runSourceAdapterOriginal(type, ctx, {
       ...opts,
       cache: cache as Cache<string>,
+      write: false,
     });
   }
 
@@ -60,17 +65,45 @@ export function createFakeSourceAdapter<TParams extends AnyBuiltSourceAdapterPar
   opts: TParams,
 ): SourceAdapter<{
     adapterType: TParams["adapterType"];
-    handlers: TParams["handlers"];
+    handlers: [PredicateFn, AnyVersionedSourceTransformer][];
+    transformerSchema: TParams["transformerSchema"];
     outputSchema: TParams["outputSchema"];
-    fallback: TParams["fallback"];
+    fallback: FallbackFn<TParams["transformerSchema"]>;
+    persistence?: PersistenceFn<
+      TParams["transformerSchema"] extends type.Any
+        ? TParams["transformerSchema"]["infer"]
+        : any,
+      TParams["outputSchema"] extends type.Any
+        ? TParams["outputSchema"]["infer"]
+        : any
+    >;
+    persistenceOptions?: TParams["persistenceOptions"];
   }> {
   return {
     adapterType: opts.adapterType,
     handlers: opts.handlers,
     outputSchema: opts.outputSchema,
+    transformerSchema: opts.transformerSchema,
     fallback: opts.fallback,
+    persistenceOptions: opts.persistenceOptions,
+    persistence: opts.persistence,
   };
 }
+
+export type CreateAnySourceAdapter<
+  TAdapterType extends SourceAdapterType,
+  TConfig extends Omit<AnyBuiltSourceAdapterParams, "adapterType" | "handlers"> & {
+    handlers: AnyVersionedSourceTransformer[];
+  },
+> = SourceAdapter<{
+  adapterType: TAdapterType;
+  handlers: [PredicateFn, TConfig["handlers"][number]][];
+  transformerSchema: TConfig["transformerSchema"];
+  outputSchema: TConfig["outputSchema"];
+  fallback: TConfig["fallback"];
+  persistence: TConfig["persistence"];
+  persistenceOptions: TConfig["persistenceOptions"];
+}>;
 
 export type CreateVersionedSourceTransformer<TConfig extends {
   output: unknown;
@@ -87,36 +120,4 @@ export type CreateVersionedSourceTransformer<TConfig extends {
   transform: unknown;
   aggregate: unknown;
   output: TConfig["output"];
-}>;
-
-export interface TestBuiltSourceAdapterParams {
-  adapterType: string;
-  handlers: [PredicateFn, AnyVersionedSourceTransformer][];
-  outputSchema?: type.Any;
-  fallback?: FallbackFn<any>;
-}
-
-export interface TestSourceAdapter<TParams extends TestBuiltSourceAdapterParams> {
-  adapterType: TParams["adapterType"];
-  handlers: TParams["handlers"];
-  outputSchema?: TParams["outputSchema"];
-  fallback?: FallbackFn<
-    TParams["outputSchema"] extends type.Any
-      ? TParams["outputSchema"]["infer"]
-      : any
-  >;
-}
-
-export type CreateAnySourceAdapter<
-  TType extends string,
-  TConfig extends {
-    handlers: CreateVersionedSourceTransformer<any>[];
-    outputSchema?: type.Any;
-    fallback?: any;
-  },
-> = TestSourceAdapter<{
-  adapterType: TType;
-  handlers: Array<[PredicateFn, TConfig["handlers"][number]]>;
-  outputSchema?: TConfig["outputSchema"];
-  fallback?: FallbackFn<TConfig["handlers"][number]["output"]>;
 }>;

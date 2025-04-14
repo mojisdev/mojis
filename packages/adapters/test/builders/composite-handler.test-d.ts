@@ -33,20 +33,28 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      CreateAnySourceAdapter<"version", {
-        handlers: [
-          CreateVersionedSourceTransformer<{
-            output: number;
-          }>,
-        ];
-      }>,
-      CreateAnySourceAdapter<"world", {
-        handlers: [
-          CreateVersionedSourceTransformer<{
-            output: string;
-          }>,
-        ];
-      }>,
+      CreateAnySourceAdapter<
+        // @ts-expect-error `version` is not a valid adapterType
+        "version",
+        {
+          handlers: [
+            CreateVersionedSourceTransformer<{
+              output: number;
+            }>,
+          ];
+        }
+      >,
+      CreateAnySourceAdapter<
+        // @ts-expect-error `world` is not a valid adapterType
+        "world",
+        {
+          handlers: [
+            CreateVersionedSourceTransformer<{
+              output: string;
+            }>,
+          ];
+        }
+      >,
     ];
 
     type Result = MergeSources<Source1, Source2>;
@@ -63,20 +71,28 @@ describe("MergeSources", () => {
     type Source1 = {};
 
     type Source2 = [
-      CreateAnySourceAdapter<"version", {
-        handlers: [
-          CreateVersionedSourceTransformer<{
-            output: string;
-          }>,
-        ];
-      }>,
-      CreateAnySourceAdapter<"hello", {
-        handlers: [
-          CreateVersionedSourceTransformer<{
-            output: number;
-          }>,
-        ];
-      }>,
+      CreateAnySourceAdapter<
+        // @ts-expect-error `version` is not a valid adapterType
+        "version",
+        {
+          handlers: [
+            CreateVersionedSourceTransformer<{
+              output: string;
+            }>,
+          ];
+        }
+      >,
+      CreateAnySourceAdapter<
+        // @ts-expect-error `hello` is not a valid adapterType
+        "hello",
+        {
+          handlers: [
+            CreateVersionedSourceTransformer<{
+              output: number;
+            }>,
+          ];
+        }
+      >,
     ];
 
     type Result = MergeSources<Source1, Source2>;
@@ -95,20 +111,28 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      CreateAnySourceAdapter<"array", {
-        handlers: [
-          CreateVersionedSourceTransformer<{
-            output: string[];
-          }>,
-        ];
-      }>,
-      CreateAnySourceAdapter<"object", {
-        handlers: [
-          CreateVersionedSourceTransformer<{
-            output: { key: string };
-          }>,
-        ];
-      }>,
+      CreateAnySourceAdapter<
+        // @ts-expect-error `array` is not a valid adapterType
+        "array",
+        {
+          handlers: [
+            CreateVersionedSourceTransformer<{
+              output: string[];
+            }>,
+          ];
+        }
+      >,
+      CreateAnySourceAdapter<
+        // @ts-expect-error `object` is not a valid adapterType
+        "object",
+        {
+          handlers: [
+            CreateVersionedSourceTransformer<{
+              output: { key: string };
+            }>,
+          ];
+        }
+      >,
     ];
 
     type Result = MergeSources<Source1, Source2>;
@@ -129,13 +153,17 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      CreateAnySourceAdapter<"version", {
-        handlers: [
-          CreateVersionedSourceTransformer<{
-            output: string;
-          }>,
-        ];
-      }>,
+      CreateAnySourceAdapter<
+        // @ts-expect-error `version` is not a valid adapterType
+        "version",
+        {
+          handlers: [
+            CreateVersionedSourceTransformer<{
+              output: string;
+            }>,
+          ];
+        }
+      >,
     ];
 
     type Result = MergeSources<Source1, Source2>;
@@ -152,18 +180,22 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      CreateAnySourceAdapter<"complex", {
-        handlers: [
-          CreateVersionedSourceTransformer<{
-            output: {
-              nested: {
-                value: number;
-                array: string[];
+      CreateAnySourceAdapter<
+        // @ts-expect-error `complex` is not a valid adapterType
+        "complex",
+        {
+          handlers: [
+            CreateVersionedSourceTransformer<{
+              output: {
+                nested: {
+                  value: number;
+                  array: string[];
+                };
               };
-            };
-          }>,
-        ];
-      }>,
+            }>,
+          ];
+        }
+      >,
     ];
 
     type Result = MergeSources<Source1, Source2>;
@@ -187,13 +219,17 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      CreateAnySourceAdapter<"dynamic", {
-        handlers: [
-          CreateVersionedSourceTransformer<{
-            output: string;
-          }>,
-        ];
-      }>,
+      CreateAnySourceAdapter<
+        // @ts-expect-error `dynamic` is not a valid adapterType
+        "dynamic",
+        {
+          handlers: [
+            CreateVersionedSourceTransformer<{
+              output: string;
+            }>,
+          ];
+        }
+      >,
     ];
 
     type Result = MergeSources<Source1, Source2>;
@@ -210,20 +246,28 @@ describe("MergeSources", () => {
     type Source1 = {};
 
     type Source2 = [
-      CreateAnySourceAdapter<"same", {
-        handlers: [
-          CreateVersionedSourceTransformer<{
-            output: string;
-          }>,
-        ];
-      }>,
-      CreateAnySourceAdapter<"same", {
-        handlers: [
-          CreateVersionedSourceTransformer<{
-            output: number;
-          }>,
-        ];
-      }>,
+      CreateAnySourceAdapter<
+        // @ts-expect-error `same` is not a valid adapterType
+        "same",
+        {
+          handlers: [
+            CreateVersionedSourceTransformer<{
+              output: string;
+            }>,
+          ];
+        }
+      >,
+      CreateAnySourceAdapter<
+        // @ts-expect-error `same` is not a valid adapterType
+        "same",
+        {
+          handlers: [
+            CreateVersionedSourceTransformer<{
+              output: number;
+            }>,
+          ];
+        }
+      >,
     ];
 
     type Result = MergeSources<Source1, Source2>;
@@ -252,13 +296,17 @@ describe("MergeSources", () => {
       type Source1 = UnsetMarker;
 
       type Source2 = [
-        CreateAnySourceAdapter<"version", {
-          handlers: [
-            CreateVersionedSourceTransformer<{
-              output: string;
-            }>,
-          ];
-        }>,
+        CreateAnySourceAdapter<
+          // @ts-expect-error `version` is not a valid adapterType
+          "version",
+          {
+            handlers: [
+              CreateVersionedSourceTransformer<{
+                output: string;
+              }>,
+            ];
+          }
+        >,
       ];
 
       type Result = MergeSources<Source1, Source2>;

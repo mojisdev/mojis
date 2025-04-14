@@ -92,6 +92,9 @@ describe("run composite handler", () => {
           outputSchema: type({
             version: "string",
           }),
+          transformerSchema: type({
+            version: "string",
+          }),
         }),
       ])
       .output(() => {
@@ -149,6 +152,9 @@ describe("run composite handler", () => {
           outputSchema: type({
             version: "string",
           }),
+          transformerSchema: type({
+            version: "string",
+          }),
         }),
       ])
       .output(() => {
@@ -185,7 +191,11 @@ describe("run composite handler", () => {
         }],
       ]);
 
-      const nameHandler = createVersionedSourceTransformerBuilder()
+      const outputSchema = type({
+        name: "string",
+      });
+
+      const nameHandler = createVersionedSourceTransformerBuilder<typeof outputSchema["infer"]>()
         .urls(() => "https://mojis.dev/random-name")
         .parser((_, data) => data)
         .transform((_, data) => data)
@@ -203,12 +213,10 @@ describe("run composite handler", () => {
         .adapterSources([
           createFakeSourceAdapter({
             adapterType: "metadata",
+            transformerSchema: outputSchema,
             handlers: [
               [() => true, nameHandler],
             ],
-            outputSchema: type({
-              name: "string",
-            }),
           }),
         ])
         .transform((_, data) => {
@@ -218,6 +226,7 @@ describe("run composite handler", () => {
             },
             amount: 2,
           });
+          expectTypeOf(data.metadata).not.toBeAny();
 
           let val = "";
           for (let i = 0; i < data.amount; i++) {

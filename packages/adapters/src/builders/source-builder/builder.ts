@@ -6,8 +6,6 @@ import type {
 import type { AnyVersionedSourceTransformer } from "../version-builder/types";
 import type {
   AnySourceAdapter,
-  FallbackFn,
-  PersistenceFn,
   PredicateFn,
   SourceAdapterBuilder,
 } from "./types";
@@ -82,8 +80,8 @@ export interface CreateBuilderOptions<
   TOutputSchema extends type.Any,
 > {
   type: TAdapterType;
-  outputSchema: TOutputSchema;
   transformerSchema: TTransformerSchema;
+  outputSchema: TOutputSchema;
 }
 
 export function createSourceAdapter<
