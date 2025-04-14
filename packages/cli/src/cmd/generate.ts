@@ -1,7 +1,7 @@
 import type { EmojiSpecRecord } from "@mojis/schemas/emojis";
 import type { CLIArguments } from "../cli-utils";
 import { join } from "node:path";
-import { runSourceAdapter, sourceHandlers } from "@mojis/adapters";
+import { buildContext, runSourceAdapter, sourceHandlers } from "@mojis/adapters";
 import {
   getAllEmojiVersions,
   getLatestEmojiVersion,
@@ -139,40 +139,19 @@ export async function buildEmojiGenerateRequest(
   const baseDir = `./data/v${version.emoji_version}`;
   await fs.ensureDir(baseDir);
 
+  const baseContext = buildContext({
+    emoji_version: version.emoji_version,
+    unicode_version: version.unicode_version,
+    force,
+  });
+
   if (isGeneratorEnabled("metadata", generators)) {
-    const { groups, emojis } = await runSourceAdapter(sourceHandlers.metadataHandler, {
-      force,
-      emoji_version: version.emoji_version,
-      unicode_version: version.unicode_version,
-    });
-
-    await fs.ensureDir(join(baseDir, "metadata"));
-
-    await fs.writeFile(
-      join(baseDir, "groups.json"),
-      JSON.stringify(groups, null, 2),
-      "utf-8",
-    );
-
-    const groupData = await Promise.all(Object.entries(emojis).map(async ([group, metadata]) => {
-      return {
-        group,
-        data: metadata,
-      };
-    }));
-
-    await Promise.all(Object.entries(emojis).map(async ([group, metadata]) => fs.writeFile(
-      join(baseDir, "metadata", `${group}.json`),
-      JSON.stringify(metadata, null, 2),
-      "utf-8",
-    )));
+    await runSourceAdapter(sourceHandlers.metadataHandler, baseContext);
   }
 
   if (isGeneratorEnabled("sequences", generators)) {
-    const { sequences, zwj } = await runSourceAdapter(sourceHandlers.sequencesHandler, {
-      force,
-      emoji_version: version.emoji_version,
-      unicode_version: version.unicode_version,
+    const { sequences, zwj } = await runSourceAdapter(sourceHandlers.sequencesHandler, baseContext, {
+      write: false,
     });
 
     await fs.writeFile(
@@ -189,10 +168,8 @@ export async function buildEmojiGenerateRequest(
   }
 
   if (isGeneratorEnabled("variations", generators)) {
-    const variations = await runSourceAdapter(sourceHandlers.variationsHandler, {
-      force,
-      emoji_version: version.emoji_version,
-      unicode_version: version.unicode_version,
+    const variations = await runSourceAdapter(sourceHandlers.variationsHandler, baseContext, {
+      write: false,
     });
 
     await fs.writeFile(
@@ -203,10 +180,8 @@ export async function buildEmojiGenerateRequest(
   }
 
   if (isGeneratorEnabled("unicode-names", generators)) {
-    const unicodeNames = await runSourceAdapter(sourceHandlers.unicodeNamesHandler, {
-      force,
-      emoji_version: version.emoji_version,
-      unicode_version: version.unicode_version,
+    const unicodeNames = await runSourceAdapter(sourceHandlers.unicodeNamesHandler, baseContext, {
+      write: false,
     });
 
     await fs.writeFile(
