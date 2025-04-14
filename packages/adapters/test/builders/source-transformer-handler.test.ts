@@ -1,7 +1,7 @@
 import type { GenericParseResult } from "@mojis/parsers";
 import type { AdapterContext } from "../../src/global-types";
 import { describe, expect, it } from "vitest";
-import { createSourceTransformerBuilder } from "../../src/builders/version-builder/builder";
+import { createSourceTransformerBuilder } from "../../src/builders/source-transformer-builder/builder";
 
 describe("version handler builder", () => {
   const emptyContext = {} as AdapterContext;

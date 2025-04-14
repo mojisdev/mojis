@@ -10,7 +10,7 @@ import type {
   AnySourceTransformer,
   AnySourceTransformerParams,
   SourceTransformerBuilder,
-} from "../version-builder/types";
+} from "../source-transformer-builder/types";
 
 export interface PersistenceOptions {
   /**

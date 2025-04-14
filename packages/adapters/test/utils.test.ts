@@ -1,4 +1,4 @@
-import type { UrlFn } from "../src/builders/version-builder/types";
+import type { UrlFn } from "../src/builders/source-transformer-builder/types";
 import type { AdapterContext, PossibleUrls } from "../src/global-types";
 import { createCacheKeyFromUrl } from "@mojis/internal-utils";
 import { describe, expect, it } from "vitest";

@@ -3,14 +3,14 @@ import type {
   SourceAdapterType,
   UnsetMarker,
 } from "../../global-types";
-import type { AnySourceTransformer } from "../version-builder/types";
+import type { AnySourceTransformer } from "../source-transformer-builder/types";
 import type {
   AnySourceAdapter,
   FallbackFn,
   PredicateFn,
   SourceAdapterBuilder,
 } from "./types";
-import { createSourceTransformerBuilder } from "../version-builder/builder";
+import { createSourceTransformerBuilder } from "../source-transformer-builder/builder";
 
 function internalCreateSourceAdapterBuilder<
   TAdapterType extends SourceAdapterType,

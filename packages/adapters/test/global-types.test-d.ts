@@ -1,6 +1,6 @@
 import type { GenericParseOptions } from "@mojis/parsers";
 import type { PredicateFn } from "../src/builders/source-builder/types";
-import type { AnySourceTransformer, GetParseOptionsFromParser } from "../src/builders/version-builder/types";
+import type { AnySourceTransformer, GetParseOptionsFromParser } from "../src/builders/source-transformer-builder/types";
 import type { MergeTuple } from "../src/global-types";
 import { describe, expectTypeOf, it } from "vitest";
 

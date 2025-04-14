@@ -10,7 +10,7 @@ import type {
   PredicateFn,
   SourceAdapter,
 } from "../src/builders/source-builder/types";
-import type { AnySourceTransformer, SourceTransformer } from "../src/builders/version-builder/types";
+import type { AnySourceTransformer, SourceTransformer } from "../src/builders/source-transformer-builder/types";
 import type {
   AdapterContext,
   BuiltinParser,

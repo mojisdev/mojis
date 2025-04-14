@@ -3,7 +3,7 @@ import type { AdapterContext } from "../../src/global-types";
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { type } from "arktype";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { createSourceTransformerBuilder } from "../../src/builders/version-builder/builder";
+import { createSourceTransformerBuilder } from "../../src/builders/source-transformer-builder/builder";
 import { createFakeSourceAdapter, setupAdapterTest } from "../__utils";
 
 describe("runSourceAdapter", () => {
