@@ -31,6 +31,24 @@ catalogs:
     vitest: ^3.0.9
     vitest-testdirs: ^3.0.1
     tsx: ^4.19.3
+  conflicts_prod_:
+    fs-extra: ""
+  conflicts_prod_11_3_0:
+    fs-extra: 11.3.0
+  conflicts_prod_c:
+    fs-extra: c
+  conflicts_prod_ca:
+    fs-extra: ca
+  conflicts_prod_cat:
+    fs-extra: cat
+  conflicts_prod_cata:
+    fs-extra: cata
+  conflicts_prod_catal:
+    fs-extra: catal
+  conflicts_prod_catalo:
+    fs-extra: catalo
+  conflicts_prod_catalog:
+    fs-extra: catalog
 
 onlyBuiltDependencies:
   - esbuild
