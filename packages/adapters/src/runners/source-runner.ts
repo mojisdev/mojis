@@ -38,11 +38,13 @@ export async function runSourceAdapter<
     output = result[0];
   }
 
-  if (handler.outputSchema == null) {
+  // TODO: make transformerOutputSchema required
+
+  if (handler.transformerOutputSchema == null) {
     return output as InferHandlerOutput<THandler>;
   }
 
-  const validationResult = arktypeParse(output, handler.outputSchema);
+  const validationResult = arktypeParse(output, handler.transformerOutputSchema);
 
   if (!validationResult.success) {
     throw new AdapterError(`Invalid output for handler: ${handler.adapterType}`);

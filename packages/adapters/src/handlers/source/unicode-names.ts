@@ -11,7 +11,7 @@ const MAPPINGS = {
 
 const builder = createSourceAdapter({
   type: "unicode-names",
-  outputSchema: type({
+  transformerOutputSchema: type({
     "[string]": "string",
   }),
 });

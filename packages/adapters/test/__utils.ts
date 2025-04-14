@@ -61,13 +61,13 @@ export function createFakeSourceAdapter<TParams extends AnyBuiltSourceAdapterPar
 ): SourceAdapter<{
     adapterType: TParams["adapterType"];
     handlers: TParams["handlers"];
-    outputSchema: TParams["outputSchema"];
+    outputSchema: TParams["transformerOutputSchema"];
     fallback: TParams["fallback"];
   }> {
   return {
     adapterType: opts.adapterType,
     handlers: opts.handlers,
-    outputSchema: opts.outputSchema,
+    transformerOutputSchema: opts.transformerOutputSchema,
     fallback: opts.fallback,
   };
 }

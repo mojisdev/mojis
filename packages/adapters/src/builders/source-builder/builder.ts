@@ -11,17 +11,20 @@ import type {
 } from "./types";
 import { createSourceTransformerBuilder } from "../version-builder/builder";
 
-function internalCreateSourceAdapterBuilder<TAdapterType extends SourceAdapterType, TOutputSchema extends type.Any>(
+function internalCreateSourceAdapterBuilder<
+  TAdapterType extends SourceAdapterType,
+  TTransformerOutputSchema extends type.Any,
+>(
   initDef: Partial<AnySourceAdapter> = {},
 ): SourceAdapterBuilder<{
     _adapterType: TAdapterType;
     _handlers: [PredicateFn, AnySourceTransformer][];
-    _outputSchema: TOutputSchema;
-    _fallback: FallbackFn<TOutputSchema["infer"]>;
+    _transformerOutputSchema: TTransformerOutputSchema;
+    _fallback: FallbackFn<TTransformerOutputSchema["infer"]>;
   }> {
   const _def: AnySourceAdapter = {
     adapterType: initDef.adapterType,
-    outputSchema: initDef.outputSchema,
+    transformerOutputSchema: initDef.transformerOutputSchema,
     handlers: [],
     fallback: () => {},
 
@@ -31,7 +34,9 @@ function internalCreateSourceAdapterBuilder<TAdapterType extends SourceAdapterTy
 
   return {
     withTransform(userPredicate, userBuilder) {
-      const sourceTransformer = userBuilder(createSourceTransformerBuilder<TOutputSchema["infer"]>() as any);
+      const sourceTransformer = userBuilder(
+        createSourceTransformerBuilder<TTransformerOutputSchema["infer"]>() as any,
+      );
       return internalCreateSourceAdapterBuilder({
         ..._def,
         handlers: [
@@ -52,20 +57,29 @@ function internalCreateSourceAdapterBuilder<TAdapterType extends SourceAdapterTy
   };
 }
 
-export interface CreateBuilderOptions<TAdapterType extends SourceAdapterType, TOutputSchema extends type.Any> {
+export interface CreateSourceAdapterBuilderOptions<
+  TAdapterType extends SourceAdapterType,
+  TTransformerOutputSchema extends type.Any,
+> {
   type: TAdapterType;
-  outputSchema?: TOutputSchema;
+  transformerOutputSchema?: TTransformerOutputSchema;
 }
 
-export function createSourceAdapter<TAdapterType extends SourceAdapterType, TOutputSchema extends type.Any>(
-  opts: CreateBuilderOptions<TAdapterType, TOutputSchema>,
+export function createSourceAdapter<
+  TAdapterType extends SourceAdapterType,
+  TTransformerOutputSchema extends type.Any,
+>(
+  opts: CreateSourceAdapterBuilderOptions<
+    TAdapterType,
+    TTransformerOutputSchema
+  >,
 ): SourceAdapterBuilder<{
     _adapterType: TAdapterType;
     _handlers: [PredicateFn, AnySourceTransformer][];
-    _outputSchema: TOutputSchema;
+    _transformerOutputSchema: TTransformerOutputSchema;
   }> {
-  return internalCreateSourceAdapterBuilder<TAdapterType, TOutputSchema>({
+  return internalCreateSourceAdapterBuilder<TAdapterType, TTransformerOutputSchema>({
     adapterType: opts.type,
-    outputSchema: opts.outputSchema,
+    transformerOutputSchema: opts.transformerOutputSchema,
   });
 }

@@ -157,10 +157,10 @@ describe("adapter handler builder", () => {
     });
     const builder = createSourceAdapter({
       type: "metadata",
-      outputSchema: testSchema,
+      transformerOutputSchema: testSchema,
     });
     const handler = builder.build();
 
-    expect(handler.outputSchema).toBe(testSchema);
+    expect(handler.transformerOutputSchema).toBe(testSchema);
   });
 });

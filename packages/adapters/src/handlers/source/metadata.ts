@@ -22,7 +22,7 @@ const DISALLOWED_EMOJI_VERSIONS = ["1.0", "2.0", "3.0"];
 
 const builder = createSourceAdapter({
   type: "metadata",
-  outputSchema: type({
+  transformerOutputSchema: type({
     groups: EMOJI_GROUPS_SCHEMA,
     emojis: GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA,
   }),

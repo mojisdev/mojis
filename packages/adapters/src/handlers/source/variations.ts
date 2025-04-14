@@ -7,7 +7,7 @@ const UNSUPPORTED_VARIATION_VERSIONS = ["1.0", "2.0", "3.0", "4.0"];
 
 const builder = createSourceAdapter({
   type: "variations",
-  outputSchema: EMOJI_VARIATION_SCHEMA.array(),
+  transformerOutputSchema: EMOJI_VARIATION_SCHEMA.array(),
 });
 
 export const handler = builder

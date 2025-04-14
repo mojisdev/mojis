@@ -33,7 +33,7 @@ const DEFAULT_PROPERTY_MAP = {
 
 const builder = createSourceAdapter({
   type: "sequences",
-  outputSchema: type({
+  transformerOutputSchema: type({
     sequences: EMOJI_SEQUENCE_SCHEMA.array(),
     zwj: EMOJI_SEQUENCE_SCHEMA.array(),
   }),
