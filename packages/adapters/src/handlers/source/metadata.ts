@@ -1,6 +1,7 @@
 import type { EmojiGroup, GroupedEmojiMetadata } from "@mojis/schemas/emojis";
+import { join } from "node:path";
 import { extractEmojiVersion, extractUnicodeVersion, isBefore } from "@mojis/internal-utils";
-import { EMOJI_GROUPS_SCHEMA, GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA } from "@mojis/schemas/emojis";
+import { EMOJI_GROUPS_SCHEMA, GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA, GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA } from "@mojis/schemas/emojis";
 import { type } from "arktype";
 import { createSourceAdapter } from "../../builders/source-builder/builder";
 
@@ -25,6 +26,10 @@ const builder = createSourceAdapter({
   transformerOutputSchema: type({
     groups: EMOJI_GROUPS_SCHEMA,
     emojis: GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA,
+  }),
+  persistenceOutputSchema: type({
+    groups: EMOJI_GROUPS_SCHEMA,
+    emojis: GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA,
   }),
 });
 
@@ -153,7 +158,18 @@ export const handler = builder
       groups: [],
     };
   })
-  // .onError((err) => {
-  //   console.error(err);
-  // })
+  .persistence((data, opts) => {
+    return [
+      {
+        filePath: join(opts.basePath, "groups.json"),
+        data: data.groups,
+        type: "json" as const,
+      },
+      ...Object.entries(data.emojis).map(([group, metadata]) => ({
+        filePath: join(opts.basePath, "metadata", `${group}.json`),
+        data: metadata,
+        type: "json" as const,
+      })),
+    ];
+  })
   .build();
