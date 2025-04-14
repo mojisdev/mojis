@@ -21,7 +21,7 @@ describe("adapter handler builder", () => {
   it("adds version handler", () => {
     const builder = createSourceAdapter({ type: "metadata" });
     const handler = builder
-      .onVersion(
+      .withTransform(
         (version) => version === "15.0",
         (builder) => builder
           .urls(() => "https://example.com")
@@ -37,14 +37,14 @@ describe("adapter handler builder", () => {
   it("adds multiple version handlers", () => {
     const builder = createSourceAdapter({ type: "metadata" });
     const handler = builder
-      .onVersion(
+      .withTransform(
         (version) => version === "15.0",
         (builder) => builder
           .urls(() => "v15")
           .parser("generic")
           .output((_, data) => data),
       )
-      .onVersion(
+      .withTransform(
         (version) => version === "14.0",
         (builder) => builder
           .urls(() => "v14")
@@ -61,14 +61,14 @@ describe("adapter handler builder", () => {
   it("maintains handler order", () => {
     const builder = createSourceAdapter({ type: "metadata" });
     const handler = builder
-      .onVersion(
+      .withTransform(
         (version) => version === "15.0",
         (builder) => builder
           .urls(() => "v15")
           .parser("generic")
           .output((_, data) => data),
       )
-      .onVersion(
+      .withTransform(
         (version) => version === "14.0",
         (builder) => builder
           .urls(() => "v14")
@@ -89,14 +89,14 @@ describe("adapter handler builder", () => {
   it("preserves adapter type across chain", () => {
     const builder = createSourceAdapter({ type: "metadata" });
     const handler = builder
-      .onVersion(
+      .withTransform(
         (version) => version === "15.0",
         (builder) => builder
           .urls(() => "v15")
           .parser("generic")
           .output((_, data) => data),
       )
-      .onVersion(
+      .withTransform(
         (version) => version === "14.0",
         (builder) => builder
           .urls(() => "v14")
@@ -111,21 +111,21 @@ describe("adapter handler builder", () => {
   it("allows chaining multiple onVersion calls", () => {
     const builder = createSourceAdapter({ type: "metadata" });
     const handler = builder
-      .onVersion(
+      .withTransform(
         (version) => version === "15.0",
         (builder) => builder
           .urls(() => "v15")
           .parser("generic")
           .output((_, data) => data),
       )
-      .onVersion(
+      .withTransform(
         (version) => version === "14.0",
         (builder) => builder
           .urls(() => "v14")
           .parser("generic")
           .output((_, data) => data),
       )
-      .onVersion(
+      .withTransform(
         (version) => version === "13.0",
         (builder) => builder
           .urls(() => "v13")

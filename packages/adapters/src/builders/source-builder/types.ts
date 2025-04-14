@@ -15,7 +15,7 @@ export type InferHandlerOutput<TSourceAdapter extends AnySourceAdapter> =
 export interface SourceAdapterBuilder<
   TParams extends AnySourceAdapterParams,
 > {
-  onVersion: <
+  withTransform: <
     TPredicate extends PredicateFn,
     TBuilderParams extends Omit<AnySourceTransformerParams, "_outputSchema"> & {
       _outputSchema: TParams["_outputSchema"] extends type.Any ? TParams["_outputSchema"]["infer"] : any;

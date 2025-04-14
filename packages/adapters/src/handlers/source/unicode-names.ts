@@ -17,7 +17,7 @@ const builder = createSourceAdapter({
 });
 
 export const handler = builder
-  .onVersion(
+  .withTransform(
     () => true,
     (builder) => builder
       .urls((ctx) => {

@@ -29,7 +29,7 @@ const builder = createSourceAdapter({
 });
 
 export const handler = builder
-  .onVersion(
+  .withTransform(
     (emoji_version) => !DISALLOWED_EMOJI_VERSIONS.includes(emoji_version),
     (builder) => {
       return builder

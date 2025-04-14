@@ -30,7 +30,7 @@ function internalCreateSourceAdapterBuilder<TAdapterType extends SourceAdapterTy
   };
 
   return {
-    onVersion(userPredicate, userBuilder) {
+    withTransform(userPredicate, userBuilder) {
       const sourceTransformer = userBuilder(createSourceTransformerBuilder<TOutputSchema["infer"]>() as any);
       return internalCreateSourceAdapterBuilder({
         ..._def,
