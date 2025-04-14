@@ -1,6 +1,6 @@
 import type { GenericParseOptions } from "@mojis/parsers";
 import type { PredicateFn } from "../src/builders/source-builder/types";
-import type { AnyVersionedSourceTransformer, GetParseOptionsFromParser } from "../src/builders/version-builder/types";
+import type { AnySourceTransformer, GetParseOptionsFromParser } from "../src/builders/version-builder/types";
 import type { MergeTuple } from "../src/global-types";
 import { describe, expectTypeOf, it } from "vitest";
 
@@ -47,19 +47,19 @@ describe("JoinTuples", () => {
 
   it("merge adapter handlers", () => {
     type Handlers = [
-      [PredicateFn, AnyVersionedSourceTransformer],
-      [PredicateFn, AnyVersionedSourceTransformer],
+      [PredicateFn, AnySourceTransformer],
+      [PredicateFn, AnySourceTransformer],
     ];
 
     type Result = MergeTuple<
       Handlers,
-      [[PredicateFn, AnyVersionedSourceTransformer]]
+      [[PredicateFn, AnySourceTransformer]]
     >;
 
     expectTypeOf<Result>().toExtend<[
-      [PredicateFn, AnyVersionedSourceTransformer],
-      [PredicateFn, AnyVersionedSourceTransformer],
-      [PredicateFn, AnyVersionedSourceTransformer],
+      [PredicateFn, AnySourceTransformer],
+      [PredicateFn, AnySourceTransformer],
+      [PredicateFn, AnySourceTransformer],
     ]>();
   });
 });

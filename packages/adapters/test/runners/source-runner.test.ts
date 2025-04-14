@@ -3,7 +3,7 @@ import type { AdapterContext } from "../../src/global-types";
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { type } from "arktype";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { createVersionedSourceTransformerBuilder } from "../../src/builders/version-builder/builder";
+import { createSourceTransformerBuilder } from "../../src/builders/version-builder/builder";
 import { createFakeSourceAdapter, setupAdapterTest } from "../__utils";
 
 describe("runSourceAdapter", () => {
@@ -48,13 +48,13 @@ describe("runSourceAdapter", () => {
 
     const { runSourceAdapter } = await setupAdapterTest();
 
-    const mockHandler = createVersionedSourceTransformerBuilder()
+    const mockHandler = createSourceTransformerBuilder()
       .urls(() => "https://mojis.dev/run-matching-version-handler/1")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler1" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    const mockHandler2 = createVersionedSourceTransformerBuilder()
+    const mockHandler2 = createSourceTransformerBuilder()
       .urls(() => "https://mojis.dev/run-matching-version-handler/2")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler2" }))
@@ -94,19 +94,19 @@ describe("runSourceAdapter", () => {
 
     const { runSourceAdapter } = await setupAdapterTest();
 
-    const mockHandler1 = createVersionedSourceTransformerBuilder()
+    const mockHandler1 = createSourceTransformerBuilder()
       .urls(() => "https://mojis.dev/run-first-matching-version-handler/1")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler1" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    const mockHandler2 = createVersionedSourceTransformerBuilder()
+    const mockHandler2 = createSourceTransformerBuilder()
       .urls(() => "https://mojis.dev/run-first-matching-version-handler/2")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler2" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    const mockHandler3 = createVersionedSourceTransformerBuilder()
+    const mockHandler3 = createSourceTransformerBuilder()
       .urls(() => "https://mojis.dev/run-first-matching-version-handler/3")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler3" }))
@@ -144,7 +144,7 @@ describe("runSourceAdapter", () => {
 
     const { runSourceAdapter } = await setupAdapterTest();
 
-    const mockHandler = createVersionedSourceTransformerBuilder()
+    const mockHandler = createSourceTransformerBuilder()
       .urls(() => [
         "https://mojis.dev/run-multiple-urls/1",
         "https://mojis.dev/run-multiple-urls/2",
@@ -154,7 +154,7 @@ describe("runSourceAdapter", () => {
       .aggregate((_, data) => data)
       .output((_, data) => ({ processedBy: data[0]?.processed }));
 
-    const mockHandler2 = createVersionedSourceTransformerBuilder()
+    const mockHandler2 = createSourceTransformerBuilder()
       .urls(() => "https://mojis.dev/run-multiple-urls/3")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler2" }))
@@ -194,14 +194,14 @@ describe("runSourceAdapter", () => {
 
     const { runSourceAdapter } = await setupAdapterTest();
 
-    const mockHandler = createVersionedSourceTransformerBuilder()
+    const mockHandler = createSourceTransformerBuilder()
       .urls(() => "https://mojis.dev/run-transformation-and-aggregation/1")
       .parser("generic")
       .transform((_, data) => ({ ...data, transformed: true }))
       .aggregate((_, data) => ({ ...data[0], aggregated: true }))
       .output((_, data) => data);
 
-    const mockHandler2 = createVersionedSourceTransformerBuilder()
+    const mockHandler2 = createSourceTransformerBuilder()
       .urls(() => "https://mojis.dev/run-transformation-and-aggregation/2")
       .parser("generic")
       .transform((_, data) => ({ ...data, transformed: true }))
@@ -241,7 +241,7 @@ describe("runSourceAdapter", () => {
 
     const { runSourceAdapter } = await setupAdapterTest();
 
-    const mockHandler = createVersionedSourceTransformerBuilder()
+    const mockHandler = createSourceTransformerBuilder()
       .urls(() => "https://mojis.dev/run-cache-and-fetch-options/1")
       .parser("generic")
       .cacheOptions({ ttl: 3600 })
@@ -249,7 +249,7 @@ describe("runSourceAdapter", () => {
       .transform((_, data) => ({ ...data, processed: "handler1" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    const mockHandler2 = createVersionedSourceTransformerBuilder()
+    const mockHandler2 = createSourceTransformerBuilder()
       .urls(() => "https://mojis.dev/run-cache-and-fetch-options/2")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler2" }))
@@ -283,13 +283,13 @@ describe("runSourceAdapter", () => {
 
     const { runSourceAdapter } = await setupAdapterTest();
 
-    const mockHandler1 = createVersionedSourceTransformerBuilder()
+    const mockHandler1 = createSourceTransformerBuilder()
       .urls(() => "https://mojis.dev/run-force-mode/1")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler1" }))
       .output((_, data) => ({ processedBy: data.processed }));
 
-    const mockHandler2 = createVersionedSourceTransformerBuilder()
+    const mockHandler2 = createSourceTransformerBuilder()
       .urls(() => "https://mojis.dev/run-force-mode/2")
       .parser("generic")
       .transform((_, data) => ({ ...data, processed: "handler2" }))
@@ -332,7 +332,7 @@ describe("runSourceAdapter", () => {
 
     const { runSourceAdapter } = await setupAdapterTest();
 
-    const mockHandler = createVersionedSourceTransformerBuilder()
+    const mockHandler = createSourceTransformerBuilder()
       .urls(() => "https://mojis.dev/test")
       .parser("generic")
       .cacheOptions({ ttl: 3600 })
@@ -374,7 +374,7 @@ describe("runSourceAdapter", () => {
 
     const { runSourceAdapter } = await setupAdapterTest();
 
-    const mockHandler = createVersionedSourceTransformerBuilder<{
+    const mockHandler = createSourceTransformerBuilder<{
       page?: string;
     }>()
       .urls(() => "https://mojis.dev/handle-validation")
@@ -403,7 +403,7 @@ describe("runSourceAdapter", () => {
       HttpResponse.text("mojis.dev/handle-validation-fail"));
     const { runSourceAdapter } = await setupAdapterTest();
 
-    const mockHandler = createVersionedSourceTransformerBuilder<{
+    const mockHandler = createSourceTransformerBuilder<{
       page1: string;
     }>()
       .urls(() => "https://mojis.dev/handle-validation-fail")

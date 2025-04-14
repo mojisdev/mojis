@@ -7,7 +7,7 @@ import type {
   TransformChain,
 } from "../../src/builders/composite-builder/types";
 import type { UnsetMarker } from "../../src/global-types";
-import type { CreateAnySourceAdapter, CreateVersionedSourceTransformer } from "../__utils";
+import type { CreateAnySourceAdapter, CreateSourceTransformer } from "../__utils";
 import { describe, expectTypeOf, it } from "vitest";
 
 type LengthOf<T extends any[]> = T["length"] extends infer L
@@ -35,14 +35,14 @@ describe("MergeSources", () => {
     type Source2 = [
       CreateAnySourceAdapter<"version", {
         handlers: [
-          CreateVersionedSourceTransformer<{
+          CreateSourceTransformer<{
             output: number;
           }>,
         ];
       }>,
       CreateAnySourceAdapter<"world", {
         handlers: [
-          CreateVersionedSourceTransformer<{
+          CreateSourceTransformer<{
             output: string;
           }>,
         ];
@@ -65,14 +65,14 @@ describe("MergeSources", () => {
     type Source2 = [
       CreateAnySourceAdapter<"version", {
         handlers: [
-          CreateVersionedSourceTransformer<{
+          CreateSourceTransformer<{
             output: string;
           }>,
         ];
       }>,
       CreateAnySourceAdapter<"hello", {
         handlers: [
-          CreateVersionedSourceTransformer<{
+          CreateSourceTransformer<{
             output: number;
           }>,
         ];
@@ -97,14 +97,14 @@ describe("MergeSources", () => {
     type Source2 = [
       CreateAnySourceAdapter<"array", {
         handlers: [
-          CreateVersionedSourceTransformer<{
+          CreateSourceTransformer<{
             output: string[];
           }>,
         ];
       }>,
       CreateAnySourceAdapter<"object", {
         handlers: [
-          CreateVersionedSourceTransformer<{
+          CreateSourceTransformer<{
             output: { key: string };
           }>,
         ];
@@ -131,7 +131,7 @@ describe("MergeSources", () => {
     type Source2 = [
       CreateAnySourceAdapter<"version", {
         handlers: [
-          CreateVersionedSourceTransformer<{
+          CreateSourceTransformer<{
             output: string;
           }>,
         ];
@@ -154,7 +154,7 @@ describe("MergeSources", () => {
     type Source2 = [
       CreateAnySourceAdapter<"complex", {
         handlers: [
-          CreateVersionedSourceTransformer<{
+          CreateSourceTransformer<{
             output: {
               nested: {
                 value: number;
@@ -189,7 +189,7 @@ describe("MergeSources", () => {
     type Source2 = [
       CreateAnySourceAdapter<"dynamic", {
         handlers: [
-          CreateVersionedSourceTransformer<{
+          CreateSourceTransformer<{
             output: string;
           }>,
         ];
@@ -212,14 +212,14 @@ describe("MergeSources", () => {
     type Source2 = [
       CreateAnySourceAdapter<"same", {
         handlers: [
-          CreateVersionedSourceTransformer<{
+          CreateSourceTransformer<{
             output: string;
           }>,
         ];
       }>,
       CreateAnySourceAdapter<"same", {
         handlers: [
-          CreateVersionedSourceTransformer<{
+          CreateSourceTransformer<{
             output: number;
           }>,
         ];
@@ -254,7 +254,7 @@ describe("MergeSources", () => {
       type Source2 = [
         CreateAnySourceAdapter<"version", {
           handlers: [
-            CreateVersionedSourceTransformer<{
+            CreateSourceTransformer<{
               output: string;
             }>,
           ];

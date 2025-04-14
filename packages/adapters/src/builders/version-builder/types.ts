@@ -25,7 +25,7 @@ export type InferParseOutput<
     ? TOutput
     : never;
 
-export interface AnyVersionedSourceTransformerParams {
+export interface AnySourceTransformerParams {
   _context: AdapterContext;
   _urls: any;
   _aggregate: {
@@ -81,12 +81,12 @@ export type WrapContextFn<
   TReturn,
 > = ((ctx: TContext & TExtraContext) => TReturn) | TReturn;
 
-export interface VersionedSourceTransformerBuilder<TParams extends AnyVersionedSourceTransformerParams> {
+export interface SourceTransformerBuilder<TParams extends AnySourceTransformerParams> {
   urls: <TUrls extends PossibleUrls>(
     urls: TParams["_urls"] extends UnsetMarker
       ? UrlFn<TUrls>
       : ErrorMessage<"urls is already set">,
-  ) => VersionedSourceTransformerBuilder<{
+  ) => SourceTransformerBuilder<{
     _context: TParams["_context"];
     _urls: TUrls;
     _aggregate: TParams["_aggregate"];
@@ -112,7 +112,7 @@ export interface VersionedSourceTransformerBuilder<TParams extends AnyVersionedS
         GetParseOptionsFromParser<TParser>
       >
       : never,
-  ) => VersionedSourceTransformerBuilder<{
+  ) => SourceTransformerBuilder<{
     _context: TParams["_context"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
@@ -138,7 +138,7 @@ export interface VersionedSourceTransformerBuilder<TParams extends AnyVersionedS
     transform: TParams["_transform"]["in"] extends UnsetMarker
       ? TransformFn<AdapterContext, TIn, TOut>
       : ErrorMessage<"transform is already set">,
-  ) => VersionedSourceTransformerBuilder<{
+  ) => SourceTransformerBuilder<{
     _context: TParams["_context"];
     _urls: TParams["_urls"];
     _aggregate: TParams["_aggregate"];
@@ -161,7 +161,7 @@ export interface VersionedSourceTransformerBuilder<TParams extends AnyVersionedS
     aggregate: TParams["_aggregate"]["in"] extends UnsetMarker
       ? AggregateFn<AdapterContext, TIn, TOut>
       : ErrorMessage<"aggregate is already set">,
-  ) => VersionedSourceTransformerBuilder<{
+  ) => SourceTransformerBuilder<{
     _context: TParams["_context"];
     _outputSchema: TParams["_outputSchema"];
     _aggregate: {
@@ -183,7 +183,7 @@ export interface VersionedSourceTransformerBuilder<TParams extends AnyVersionedS
     cacheOptions: TParams["_options"]["cacheOptions"] extends UnsetMarker
       ? TOptions
       : ErrorMessage<"cacheOptions is already set">,
-  ) => VersionedSourceTransformerBuilder<{
+  ) => SourceTransformerBuilder<{
     _context: TParams["_context"];
     _outputSchema: TParams["_outputSchema"];
     _urls: TParams["_urls"];
@@ -203,7 +203,7 @@ export interface VersionedSourceTransformerBuilder<TParams extends AnyVersionedS
     fetchOptions: TParams["_options"]["fetchOptions"] extends UnsetMarker
       ? TOptions
       : ErrorMessage<"fetchOptions is already set">,
-  ) => VersionedSourceTransformerBuilder<{
+  ) => SourceTransformerBuilder<{
     _context: TParams["_context"];
     _outputSchema: TParams["_outputSchema"];
     _urls: TParams["_urls"];
@@ -223,7 +223,7 @@ export interface VersionedSourceTransformerBuilder<TParams extends AnyVersionedS
     output: TParams["_output"] extends UnsetMarker
       ? OutputFn<AdapterContext, TIn, TOut>
       : ErrorMessage<"output is already set">,
-  ) => VersionedSourceTransformer<{
+  ) => SourceTransformer<{
     globalContext: TParams["_context"];
     cacheOptions: TParams["_options"]["cacheOptions"];
     fetchOptions: TParams["_options"]["fetchOptions"];
@@ -238,7 +238,7 @@ export interface VersionedSourceTransformerBuilder<TParams extends AnyVersionedS
   }>;
 }
 
-export interface AnyBuiltVersionedSourceTransformerParams {
+export interface AnyBuiltSourceTransformerParams {
   globalContext: AdapterContext;
   fetchOptions: RequestInit;
   cacheOptions: CacheOptions;
@@ -252,7 +252,7 @@ export interface AnyBuiltVersionedSourceTransformerParams {
   output: any;
 }
 
-export interface VersionedSourceTransformer<TParams extends AnyBuiltVersionedSourceTransformerParams> {
+export interface SourceTransformer<TParams extends AnyBuiltSourceTransformerParams> {
   globalContext: TParams["globalContext"];
   fetchOptions: TParams["fetchOptions"];
   cacheOptions: TParams["cacheOptions"];
@@ -265,4 +265,4 @@ export interface VersionedSourceTransformer<TParams extends AnyBuiltVersionedSou
   outputSchema: TParams["outputSchema"];
 }
 
-export type AnyVersionedSourceTransformer = VersionedSourceTransformer<any>;
+export type AnySourceTransformer = SourceTransformer<any>;
