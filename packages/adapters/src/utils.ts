@@ -122,7 +122,7 @@ export async function getHandlerUrls<TContext extends AdapterContext>(
  */
 export function buildContext<TContext extends AdapterContext, TExtraContext extends Record<string, unknown>>(
   ctx: TContext,
-  extraContext: TExtraContext,
+  extraContext: TExtraContext = {} as TExtraContext,
 ): TContext & TExtraContext {
   return Object.assign({}, ctx, extraContext);
 }
