@@ -421,7 +421,7 @@ describe("runSourceAdapter", () => {
       handlers: [
         [predicate, mockHandler],
       ],
-      outputSchema: type({
+      transformerOutputSchema: type({
         page1: "string",
       }),
     });

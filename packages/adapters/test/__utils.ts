@@ -61,7 +61,7 @@ export function createFakeSourceAdapter<TParams extends AnyBuiltSourceAdapterPar
 ): SourceAdapter<{
     adapterType: TParams["adapterType"];
     handlers: TParams["handlers"];
-    outputSchema: TParams["transformerOutputSchema"];
+    transformerOutputSchema: TParams["transformerOutputSchema"];
     fallback: TParams["fallback"];
   }> {
   return {
@@ -92,17 +92,17 @@ export type CreateSourceTransformer<TConfig extends {
 export interface TestBuiltSourceAdapterParams {
   adapterType: string;
   handlers: [PredicateFn, AnySourceTransformer][];
-  outputSchema?: type.Any;
+  transformerOutputSchema?: type.Any;
   fallback?: FallbackFn<any>;
 }
 
 export interface TestSourceAdapter<TParams extends TestBuiltSourceAdapterParams> {
   adapterType: TParams["adapterType"];
   handlers: TParams["handlers"];
-  outputSchema?: TParams["outputSchema"];
+  transformerOutputSchema?: TParams["transformerOutputSchema"];
   fallback?: FallbackFn<
-    TParams["outputSchema"] extends type.Any
-      ? TParams["outputSchema"]["infer"]
+    TParams["transformerOutputSchema"] extends type.Any
+      ? TParams["transformerOutputSchema"]["infer"]
       : any
   >;
 }
@@ -111,12 +111,12 @@ export type CreateAnySourceAdapter<
   TType extends string,
   TConfig extends {
     handlers: CreateSourceTransformer<any>[];
-    outputSchema?: type.Any;
+    transformerOutputSchema?: type.Any;
     fallback?: any;
   },
 > = TestSourceAdapter<{
   adapterType: TType;
   handlers: Array<[PredicateFn, TConfig["handlers"][number]]>;
-  outputSchema?: TConfig["outputSchema"];
+  transformerOutputSchema?: TConfig["transformerOutputSchema"];
   fallback?: FallbackFn<TConfig["handlers"][number]["output"]>;
 }>;
