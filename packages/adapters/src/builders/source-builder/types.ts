@@ -1,5 +1,6 @@
 import type { type } from "arktype";
 import type {
+  MaybePromise,
   MergeTuple,
   SourceAdapterType,
 } from "../../global-types";
@@ -48,8 +49,11 @@ export interface SourceAdapterBuilder<
     _persistence: TParams["_persistence"];
   }>;
 
-  persistence: <TOut extends TParams["_outputSchema"] extends type.Any ? TParams["_outputSchema"]["infer"] : any>(
-    fn: FallbackFn<TOut>
+  persistence: <
+    TIn extends TParams["_transformerSchema"] extends type.Any ? TParams["_transformerSchema"]["infer"] : any,
+    TOut extends TParams["_outputSchema"] extends type.Any ? TParams["_outputSchema"]["infer"] : any,
+  >(
+    fn: PersistenceFn<TIn, TOut>
   ) => SourceAdapterBuilder<{
     _fallback: TOut;
     _handlers: TParams["_handlers"];
@@ -69,6 +73,12 @@ export interface SourceAdapterBuilder<
 }
 
 export interface PersistenceOptions {
+  /**
+   * The base path to use for the output files.
+   * @default "./data/v<emoji-version>"
+   */
+  basePath: string;
+
   /**
    * Whether to force overwrite of existing files.
    * @default false
@@ -109,7 +119,49 @@ export interface PersistenceOptions {
   encoding?: BufferEncoding;
 }
 
-export type PersistenceFn<TIn, TOut> = (data: TIn, options: PersistenceOptions) => Promise<TOut>;
+export interface PersistenceFileOperation<TData = string | Uint8Array> {
+  /**
+   * The file path to write to.
+   */
+  filePath: string;
+
+  /**
+   * The data to write to the file.
+   */
+  data: TData;
+
+  /**
+   * The type of data being written.
+   */
+  type: "json" | "text";
+
+  /**
+   * The options for the file operation.
+   */
+  options?: {
+    /**
+     * For JSON, whether to pretty-print.
+     * @default false
+     */
+    pretty?: boolean;
+
+    /**
+     * The encoding to use for the file.
+     * @default "utf-8"
+     */
+    encoding?: BufferEncoding;
+
+    /**
+     * Whether to overwrite existing files.
+     */
+    force?: boolean;
+  };
+}
+
+export type PersistenceFn<TIn, TOut> = (
+  data: TIn,
+  options: PersistenceOptions
+) => MaybePromise<Array<PersistenceFileOperation<keyof TOut extends never ? unknown : TOut[keyof TOut]>>>;
 
 export interface AnySourceAdapterParams {
   _adapterType: SourceAdapterType;

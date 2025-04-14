@@ -23,8 +23,8 @@ function internalCreateSourceAdapterBuilder<
     _handlers: [PredicateFn, AnyVersionedSourceTransformer][];
     _outputSchema: TOutputSchema;
     _transformerSchema: TTransformerSchema;
-    _persistence: PersistenceFn<TTransformerSchema["infer"], TOutputSchema["infer"]>;
     _fallback: FallbackFn<TOutputSchema["infer"]>;
+    _persistence: PersistenceFn<TTransformerSchema["infer"], TOutputSchema["infer"]>;
   }> {
   const _def: AnySourceAdapter = {
     adapterType: initDef.adapterType,
@@ -66,9 +66,14 @@ function internalCreateSourceAdapterBuilder<
   };
 }
 
-export interface CreateBuilderOptions<TAdapterType extends SourceAdapterType, TOutputSchema extends type.Any> {
+export interface CreateBuilderOptions<
+  TAdapterType extends SourceAdapterType,
+  TTransformerSchema extends type.Any,
+  TOutputSchema extends type.Any,
+> {
   type: TAdapterType;
-  outputSchema?: TOutputSchema;
+  outputSchema: TOutputSchema;
+  transformerSchema: TTransformerSchema;
 }
 
 export function createSourceAdapter<
@@ -76,14 +81,23 @@ export function createSourceAdapter<
   TTransformerSchema extends type.Any,
   TOutputSchema extends type.Any,
 >(
-  opts: CreateBuilderOptions<TAdapterType, TOutputSchema>,
+  opts: CreateBuilderOptions<
+    TAdapterType,
+    TTransformerSchema,
+    TOutputSchema
+  >,
 ): SourceAdapterBuilder<{
     _adapterType: TAdapterType;
     _handlers: [PredicateFn, AnyVersionedSourceTransformer][];
     _transformerSchema: TTransformerSchema;
     _outputSchema: TOutputSchema;
-    _fallback: FallbackFn<TTransformerSchema["infer"]>;
-    _persistence: PersistenceFn<TTransformerSchema["infer"], TOutputSchema["infer"]>;
+    _fallback: FallbackFn<
+      TTransformerSchema["infer"]
+    >;
+    _persistence: PersistenceFn<
+      TTransformerSchema["infer"],
+      TOutputSchema["infer"]
+    >;
   }> {
   return internalCreateSourceAdapterBuilder<TAdapterType, TTransformerSchema, TOutputSchema>({
     adapterType: opts.type,

@@ -154,6 +154,13 @@ export async function buildEmojiGenerateRequest(
       "utf-8",
     );
 
+    const groupData = await Promise.all(Object.entries(emojis).map(async ([group, metadata]) => {
+      return {
+        group,
+        data: metadata,
+      };
+    }));
+
     await Promise.all(Object.entries(emojis).map(async ([group, metadata]) => fs.writeFile(
       join(baseDir, "metadata", `${group}.json`),
       JSON.stringify(metadata, null, 2),
