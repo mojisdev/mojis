@@ -29,6 +29,8 @@ export async function runSourceAdapter<
 ): Promise<TOptions["write"] extends false ? InferHandlerOutput<THandler> : void> {
   const promises = [];
 
+  const shouldWrite = options?.write ?? true;
+
   let output = (typeof handler.fallback == "function" && handler.fallback != null) ? handler.fallback() : undefined;
 
   for (const [predicate, sourceTransformer] of handler.handlers) {
@@ -61,7 +63,7 @@ export async function runSourceAdapter<
     throw new AdapterError(`invalid output for handler: ${handler.adapterType}`);
   }
 
-  if (!options?.write) {
+  if (!shouldWrite) {
     return validationResult.data as InferHandlerOutput<THandler>;
   }
 
@@ -90,17 +92,17 @@ export async function runSourceAdapter<
         force = ctx.force ?? false,
       } = fileOptions;
 
-      // Create directory if it doesn't exist
+      // create directory if it doesn't exist
       const dir = path.dirname(filePath);
       await fs.ensureDir(dir);
 
-      // Skip if file exists and force is false
+      // skip if file exists and force is false
       if (!force && await fs.pathExists(filePath)) {
         console.warn(`File exists and force is false, skipping: ${filePath}`);
         return;
       }
 
-      // Write the file
+      // write the file
       if (type === "json") {
         await fs.writeFile(
           filePath,

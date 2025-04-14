@@ -1,8 +1,10 @@
 import type { type } from "arktype";
 import type {
+  ErrorMessage,
   MaybePromise,
   MergeTuple,
   SourceAdapterType,
+  UnsetMarker,
 } from "../../global-types";
 import type { AnyVersionedSourceTransformer, AnyVersionedSourceTransformerParams, VersionedSourceTransformerBuilder } from "../version-builder/types";
 
@@ -36,10 +38,13 @@ export interface SourceAdapterBuilder<
     >;
     _fallback: TParams["_fallback"];
     _persistence: TParams["_persistence"];
+    _persistenceOptions: TParams["_persistenceOptions"];
   }>;
 
   fallback: <TOut extends TParams["_transformerSchema"] extends type.Any ? TParams["_transformerSchema"]["infer"] : any>(
-    fn: FallbackFn<TOut>
+    fn: TParams["_fallback"] extends UnsetMarker
+      ? FallbackFn<TOut>
+      : ErrorMessage<"fallback is already set">
   ) => SourceAdapterBuilder<{
     _fallback: TOut;
     _handlers: TParams["_handlers"];
@@ -47,13 +52,16 @@ export interface SourceAdapterBuilder<
     _outputSchema: TParams["_outputSchema"];
     _adapterType: TParams["_adapterType"];
     _persistence: TParams["_persistence"];
+    _persistenceOptions: TParams["_persistenceOptions"];
   }>;
 
   persistence: <
     TIn extends TParams["_transformerSchema"] extends type.Any ? TParams["_transformerSchema"]["infer"] : any,
     TOut extends TParams["_outputSchema"] extends type.Any ? TParams["_outputSchema"]["infer"] : any,
   >(
-    fn: PersistenceFn<TIn, TOut>
+    fn: TParams["_persistence"] extends UnsetMarker
+      ? PersistenceFn<TIn, TOut>
+      : ErrorMessage<"persistence is already set">,
   ) => SourceAdapterBuilder<{
     _fallback: TOut;
     _handlers: TParams["_handlers"];
@@ -61,6 +69,19 @@ export interface SourceAdapterBuilder<
     _transformerSchema: TParams["_transformerSchema"];
     _adapterType: TParams["_adapterType"];
     _persistence: TOut;
+    _persistenceOptions: TParams["_persistenceOptions"];
+  }>;
+
+  persistenceOptions: <TOptions extends Omit<PersistenceOptions, "version">>(
+    options: TOptions extends UnsetMarker ? TOptions : ErrorMessage<"persistenceOptions is already set">
+  ) => SourceAdapterBuilder<{
+    _fallback: TParams["_fallback"];
+    _handlers: TParams["_handlers"];
+    _outputSchema: TParams["_outputSchema"];
+    _transformerSchema: TParams["_transformerSchema"];
+    _adapterType: TParams["_adapterType"];
+    _persistence: TParams["_persistence"];
+    _persistenceOptions: TOptions;
   }>;
 
   build: () => SourceAdapter<{
@@ -69,6 +90,8 @@ export interface SourceAdapterBuilder<
     outputSchema: TParams["_outputSchema"];
     transformerSchema: TParams["_transformerSchema"];
     adapterType: TParams["_adapterType"];
+    persistenceOptions: TParams["_persistenceOptions"];
+    persistence: TParams["_persistence"];
   }>;
 }
 
@@ -165,11 +188,16 @@ export type PersistenceFn<TIn, TOut> = (
 
 export interface AnySourceAdapterParams {
   _adapterType: SourceAdapterType;
-  _outputSchema: type.Any;
-  _transformerSchema: type.Any;
   _handlers: [PredicateFn, AnyVersionedSourceTransformer][];
   _fallback: any;
   _persistence: any;
+  _persistenceOptions: any;
+
+  // schema for persistence output
+  _outputSchema: any;
+
+  // schema for the different transformer outputs
+  _transformerSchema: any;
 }
 
 export type PredicateFn = (version: string) => boolean;
@@ -181,6 +209,7 @@ export interface AnyBuiltSourceAdapterParams {
   outputSchema: type.Any;
   fallback?: FallbackFn<any>;
   persistence?: PersistenceFn<any, any>;
+  persistenceOptions: Omit<PersistenceOptions, "version">;
 }
 
 export type FallbackFn<TOut> = () => TOut;
@@ -203,6 +232,7 @@ export interface SourceAdapter<TParams extends AnyBuiltSourceAdapterParams> {
       ? TParams["outputSchema"]["infer"]
       : any
   >;
+  persistenceOptions: TParams["persistenceOptions"];
 }
 
 export type AnySourceAdapter = SourceAdapter<any>;

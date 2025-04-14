@@ -1,6 +1,7 @@
 import type { type } from "arktype";
 import type {
   SourceAdapterType,
+  UnsetMarker,
 } from "../../global-types";
 import type { AnyVersionedSourceTransformer } from "../version-builder/types";
 import type {
@@ -23,8 +24,9 @@ function internalCreateSourceAdapterBuilder<
     _handlers: [PredicateFn, AnyVersionedSourceTransformer][];
     _outputSchema: TOutputSchema;
     _transformerSchema: TTransformerSchema;
-    _fallback: FallbackFn<TOutputSchema["infer"]>;
-    _persistence: PersistenceFn<TTransformerSchema["infer"], TOutputSchema["infer"]>;
+    _fallback: UnsetMarker;
+    _persistence: UnsetMarker;
+    _persistenceOptions: UnsetMarker;
   }> {
   const _def: AnySourceAdapter = {
     adapterType: initDef.adapterType,
@@ -32,6 +34,8 @@ function internalCreateSourceAdapterBuilder<
     transformerSchema: initDef.transformerSchema,
     handlers: [],
     fallback: () => {},
+    persistence: undefined,
+    persistenceOptions: {} as any,
 
     // overload with properties passed in
     ...initDef,
@@ -58,6 +62,12 @@ function internalCreateSourceAdapterBuilder<
       return internalCreateSourceAdapterBuilder({
         ..._def,
         persistence: userFn,
+      }) as SourceAdapterBuilder<any>;
+    },
+    persistenceOptions(userOptions) {
+      return internalCreateSourceAdapterBuilder({
+        ..._def,
+        persistenceOptions: userOptions,
       }) as SourceAdapterBuilder<any>;
     },
     build() {
@@ -91,16 +101,13 @@ export function createSourceAdapter<
     _handlers: [PredicateFn, AnyVersionedSourceTransformer][];
     _transformerSchema: TTransformerSchema;
     _outputSchema: TOutputSchema;
-    _fallback: FallbackFn<
-      TTransformerSchema["infer"]
-    >;
-    _persistence: PersistenceFn<
-      TTransformerSchema["infer"],
-      TOutputSchema["infer"]
-    >;
+    _fallback: UnsetMarker;
+    _persistence: UnsetMarker;
+    _persistenceOptions: UnsetMarker;
   }> {
   return internalCreateSourceAdapterBuilder<TAdapterType, TTransformerSchema, TOutputSchema>({
     adapterType: opts.type,
+    transformerSchema: opts.transformerSchema,
     outputSchema: opts.outputSchema,
   });
 }
