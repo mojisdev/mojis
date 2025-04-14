@@ -2,13 +2,13 @@ import type {
   AdapterContext,
   UnsetMarker,
 } from "../../global-types";
-import type { AnyVersionedSourceTransformer, VersionedSourceTransformerBuilder } from "./types";
+import type { AnySourceTransformer, SourceTransformerBuilder } from "./types";
 
-function internalCreateVersionedSourceTransformerBuilder<
+function internalCreateSourceTransformerBuilder<
   TOutputSchema,
 >(
-  initDef: Partial<AnyVersionedSourceTransformer> = {},
-): VersionedSourceTransformerBuilder<{
+  initDef: Partial<AnySourceTransformer> = {},
+): SourceTransformerBuilder<{
     _context: AdapterContext;
     _urls: UnsetMarker;
     _aggregate: {
@@ -33,59 +33,59 @@ function internalCreateVersionedSourceTransformerBuilder<
     _validation: UnsetMarker;
     _outputSchema: TOutputSchema;
   }> {
-  const _def: Partial<AnyVersionedSourceTransformer> = {
+  const _def: Partial<AnySourceTransformer> = {
     outputSchema: initDef.outputSchema,
     ...initDef,
   };
 
   return {
     urls(userUrls) {
-      return internalCreateVersionedSourceTransformerBuilder({
+      return internalCreateSourceTransformerBuilder({
         ..._def,
         urls: userUrls,
-      }) as VersionedSourceTransformerBuilder<any>;
+      }) as SourceTransformerBuilder<any>;
     },
     parser(userParser, userParserOptions) {
-      return internalCreateVersionedSourceTransformerBuilder({
+      return internalCreateSourceTransformerBuilder({
         ..._def,
         parser: userParser,
         parserOptions: userParserOptions,
-      }) as VersionedSourceTransformerBuilder<any>;
+      }) as SourceTransformerBuilder<any>;
     },
     transform(userTransform) {
-      return internalCreateVersionedSourceTransformerBuilder({
+      return internalCreateSourceTransformerBuilder({
         ..._def,
         transform: userTransform,
-      }) as VersionedSourceTransformerBuilder<any>;
+      }) as SourceTransformerBuilder<any>;
     },
     aggregate(userAggregate) {
-      return internalCreateVersionedSourceTransformerBuilder({
+      return internalCreateSourceTransformerBuilder({
         ..._def,
         aggregate: userAggregate,
-      }) as VersionedSourceTransformerBuilder<any>;
+      }) as SourceTransformerBuilder<any>;
     },
     cacheOptions(userCacheOptions) {
-      return internalCreateVersionedSourceTransformerBuilder({
+      return internalCreateSourceTransformerBuilder({
         ..._def,
         cacheOptions: userCacheOptions,
-      }) as VersionedSourceTransformerBuilder<any>;
+      }) as SourceTransformerBuilder<any>;
     },
     fetchOptions(userFetchOptions) {
-      return internalCreateVersionedSourceTransformerBuilder({
+      return internalCreateSourceTransformerBuilder({
         ..._def,
         fetchOptions: userFetchOptions,
-      }) as VersionedSourceTransformerBuilder<any>;
+      }) as SourceTransformerBuilder<any>;
     },
     output(userOutput) {
       return {
         ..._def,
         output: userOutput,
-      } as AnyVersionedSourceTransformer;
+      } as AnySourceTransformer;
     },
   };
 }
 
-export function createVersionedSourceTransformerBuilder<TOutputSchema>(): VersionedSourceTransformerBuilder<{
+export function createSourceTransformerBuilder<TOutputSchema>(): SourceTransformerBuilder<{
   _aggregate: {
     in: UnsetMarker;
     out: UnsetMarker;
@@ -110,5 +110,5 @@ export function createVersionedSourceTransformerBuilder<TOutputSchema>(): Versio
   _validation: UnsetMarker;
   _outputSchema: TOutputSchema;
 }> {
-  return internalCreateVersionedSourceTransformerBuilder<TOutputSchema>();
+  return internalCreateSourceTransformerBuilder<TOutputSchema>();
 }

@@ -11,7 +11,7 @@ const builder = createSourceAdapter({
 });
 
 export const handler = builder
-  .onVersion(
+  .withTransform(
     (version) => !UNSUPPORTED_VARIATION_VERSIONS.includes(version),
     (builder) => builder
       .urls((ctx) => {

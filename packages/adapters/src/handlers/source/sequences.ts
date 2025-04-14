@@ -40,7 +40,7 @@ const builder = createSourceAdapter({
 });
 
 export const handler = builder
-  .onVersion(
+  .withTransform(
     (version) => !NOT_AVAILABLE_SEQUENCES.includes(version),
     (builder) => builder
       .urls(({ emoji_version }) => {

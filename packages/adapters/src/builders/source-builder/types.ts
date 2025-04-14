@@ -3,11 +3,11 @@ import type {
   MergeTuple,
   SourceAdapterType,
 } from "../../global-types";
-import type { AnyVersionedSourceTransformer, AnyVersionedSourceTransformerParams, VersionedSourceTransformerBuilder } from "../version-builder/types";
+import type { AnySourceTransformer, AnySourceTransformerParams, SourceTransformerBuilder } from "../version-builder/types";
 
 export type InferHandlerOutput<TSourceAdapter extends AnySourceAdapter> =
   TSourceAdapter extends { handlers: Array<[any, infer TSourceTransformer]> }
-    ? TSourceTransformer extends AnyVersionedSourceTransformer
+    ? TSourceTransformer extends AnySourceTransformer
       ? TSourceTransformer["output"]
       : never
     : never;
@@ -15,13 +15,13 @@ export type InferHandlerOutput<TSourceAdapter extends AnySourceAdapter> =
 export interface SourceAdapterBuilder<
   TParams extends AnySourceAdapterParams,
 > {
-  onVersion: <
+  withTransform: <
     TPredicate extends PredicateFn,
-    TBuilderParams extends Omit<AnyVersionedSourceTransformerParams, "_outputSchema"> & {
+    TBuilderParams extends Omit<AnySourceTransformerParams, "_outputSchema"> & {
       _outputSchema: TParams["_outputSchema"] extends type.Any ? TParams["_outputSchema"]["infer"] : any;
     },
-    TBuilder extends VersionedSourceTransformerBuilder<TBuilderParams>,
-    THandler extends AnyVersionedSourceTransformer,
+    TBuilder extends SourceTransformerBuilder<TBuilderParams>,
+    THandler extends AnySourceTransformer,
   >(
     predicate: TPredicate,
     builder: (builder: TBuilder) => THandler,
@@ -55,7 +55,7 @@ export interface SourceAdapterBuilder<
 export interface AnySourceAdapterParams {
   _adapterType: SourceAdapterType;
   _outputSchema?: type.Any;
-  _handlers: [PredicateFn, AnyVersionedSourceTransformer][];
+  _handlers: [PredicateFn, AnySourceTransformer][];
   _fallback?: any;
 }
 
@@ -63,7 +63,7 @@ export type PredicateFn = (version: string) => boolean;
 
 export interface AnyBuiltSourceAdapterParams {
   adapterType: SourceAdapterType;
-  handlers: [PredicateFn, AnyVersionedSourceTransformer][];
+  handlers: [PredicateFn, AnySourceTransformer][];
   outputSchema?: type.Any;
   fallback?: FallbackFn<any>;
 }
