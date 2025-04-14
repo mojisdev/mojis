@@ -182,7 +182,10 @@ export interface SourceAdapterBuilder<
   build: () => SourceAdapter<{
     fallback: TParams["_fallback"];
     handlers: TParams["_handlers"];
-    outputSchema: TParams["_transformerOutputSchema"];
+    transformerOutputSchema: TParams["_transformerOutputSchema"];
+    persistenceOutputSchema: TParams["_persistenceOutputSchema"];
+    persistence: TParams["_persistence"];
+    persistenceOptions: TParams["_persistenceOptions"];
     adapterType: TParams["_adapterType"];
   }>;
 }
@@ -198,7 +201,7 @@ export interface AnySourceAdapterParams {
   _persistenceOutputSchema?: type.Any;
 
   // schema for transformer output
-  _transformerOutputSchema?: type.Any;
+  _transformerOutputSchema: type.Any;
 }
 
 export type PredicateFn = (version: string) => boolean;
@@ -206,11 +209,12 @@ export type PredicateFn = (version: string) => boolean;
 export interface AnyBuiltSourceAdapterParams {
   adapterType: SourceAdapterType;
   handlers: [PredicateFn, AnySourceTransformer][];
-  transformerOutputSchema?: type.Any;
   fallback?: FallbackFn<any>;
-  persistenceOutputSchema?: type.Any;
-  persistence?: PersistenceFn<any, any>;
   persistenceOptions?: PersistenceOptions;
+  persistence?: PersistenceFn<any, any>;
+
+  persistenceOutputSchema?: type.Any;
+  transformerOutputSchema: type.Any;
 }
 
 export type FallbackFn<TOut> = () => TOut;
@@ -218,6 +222,7 @@ export type FallbackFn<TOut> = () => TOut;
 export interface SourceAdapter<TParams extends AnyBuiltSourceAdapterParams> {
   adapterType: TParams["adapterType"];
   handlers: TParams["handlers"];
+  // TODO: this break everything
   transformerOutputSchema?: TParams["transformerOutputSchema"];
   persistenceOutputSchema?: TParams["persistenceOutputSchema"];
   fallback?: FallbackFn<

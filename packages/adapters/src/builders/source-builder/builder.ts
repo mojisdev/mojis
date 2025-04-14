@@ -6,7 +6,6 @@ import type {
 import type { AnySourceTransformer } from "../source-transformer-builder/types";
 import type {
   AnySourceAdapter,
-  FallbackFn,
   PredicateFn,
   SourceAdapterBuilder,
 } from "./types";
@@ -30,6 +29,7 @@ function internalCreateSourceAdapterBuilder<
   const _def: AnySourceAdapter = {
     adapterType: initDef.adapterType,
     transformerOutputSchema: initDef.transformerOutputSchema,
+    persistenceOutputSchema: initDef.persistenceOutputSchema,
     handlers: [],
     fallback: () => {},
 
@@ -80,7 +80,7 @@ export interface CreateSourceAdapterBuilderOptions<
   TPersistenceOutputSchema extends type.Any,
 > {
   type: TAdapterType;
-  transformerOutputSchema?: TTransformerOutputSchema;
+  transformerOutputSchema: TTransformerOutputSchema;
   persistenceOutputSchema?: TPersistenceOutputSchema;
 }
 
@@ -106,5 +106,6 @@ export function createSourceAdapter<
   return internalCreateSourceAdapterBuilder<TAdapterType, TTransformerOutputSchema, TPersistenceOutputSchema>({
     adapterType: opts.type,
     transformerOutputSchema: opts.transformerOutputSchema,
+    persistenceOutputSchema: opts.persistenceOutputSchema,
   });
 }
