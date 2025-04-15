@@ -140,72 +140,34 @@ export async function buildEmojiGenerateRequest(
   await fs.ensureDir(baseDir);
 
   if (isGeneratorEnabled("metadata", generators)) {
-    const { groups, emojis } = await runSourceAdapter(sourceHandlers.metadataHandler, {
+    await runSourceAdapter(sourceHandlers.metadataHandler, {
       force,
       emoji_version: version.emoji_version,
       unicode_version: version.unicode_version,
     });
-
-    await fs.ensureDir(join(baseDir, "metadata"));
-
-    await fs.writeFile(
-      join(baseDir, "groups.json"),
-      JSON.stringify(groups, null, 2),
-      "utf-8",
-    );
-
-    await Promise.all(Object.entries(emojis).map(async ([group, metadata]) => fs.writeFile(
-      join(baseDir, "metadata", `${group}.json`),
-      JSON.stringify(metadata, null, 2),
-      "utf-8",
-    )));
   }
 
   if (isGeneratorEnabled("sequences", generators)) {
-    const { sequences, zwj } = await runSourceAdapter(sourceHandlers.sequencesHandler, {
+    await runSourceAdapter(sourceHandlers.sequencesHandler, {
       force,
       emoji_version: version.emoji_version,
       unicode_version: version.unicode_version,
     });
-
-    await fs.writeFile(
-      join(baseDir, "zwj-sequences.json"),
-      JSON.stringify(zwj, null, 2),
-      "utf-8",
-    );
-
-    await fs.writeFile(
-      join(baseDir, "sequences.json"),
-      JSON.stringify(sequences, null, 2),
-      "utf-8",
-    );
   }
 
   if (isGeneratorEnabled("variations", generators)) {
-    const variations = await runSourceAdapter(sourceHandlers.variationsHandler, {
+    await runSourceAdapter(sourceHandlers.variationsHandler, {
       force,
       emoji_version: version.emoji_version,
       unicode_version: version.unicode_version,
     });
-
-    await fs.writeFile(
-      join(baseDir, "variations.json"),
-      JSON.stringify(variations, null, 2),
-      "utf-8",
-    );
   }
 
   if (isGeneratorEnabled("unicode-names", generators)) {
-    const unicodeNames = await runSourceAdapter(sourceHandlers.unicodeNamesHandler, {
+    await runSourceAdapter(sourceHandlers.unicodeNamesHandler, {
       force,
       emoji_version: version.emoji_version,
       unicode_version: version.unicode_version,
     });
-
-    await fs.writeFile(
-      join(baseDir, "unicode-names.json"),
-      JSON.stringify(unicodeNames, null, 2),
-      "utf-8",
-    );
   }
 }

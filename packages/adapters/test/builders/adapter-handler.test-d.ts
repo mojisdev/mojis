@@ -1,14 +1,25 @@
+import type { type } from "arktype";
 import type {
   InferHandlerOutput,
+  PredicateFn,
 } from "../../src/builders/source-builder/types";
-import type { CreateAnySourceAdapter, CreateSourceTransformer } from "../__utils";
+import type {
+  CreateSourceAdapter,
+  CreateSourceTransformer,
+} from "../__utils";
 import { describe, expectTypeOf, it } from "vitest";
 
 describe("InferHandlerOutput", () => {
   it("should infer the output of an adapter handler", () => {
-    type Result = InferHandlerOutput<CreateAnySourceAdapter<"test", {
+    type Result = InferHandlerOutput<CreateSourceAdapter<"metadata", {
+      transformerOutputSchema: type.Any;
       handlers: [
-        CreateSourceTransformer<{ output: string }>,
+        [
+          PredicateFn,
+          CreateSourceTransformer<{
+            output: string;
+          }>,
+        ],
       ];
     }>>;
 
@@ -16,10 +27,13 @@ describe("InferHandlerOutput", () => {
   });
 
   it("should infer the output of an adapter handler with multiple handlers", () => {
-    type Result = InferHandlerOutput<CreateAnySourceAdapter<"test", {
+    type Result = InferHandlerOutput<CreateSourceAdapter<"metadata", {
       fallback: () => string;
       handlers: [
-        CreateSourceTransformer<{ output: string }>,
+        [
+          PredicateFn,
+          CreateSourceTransformer<{ output: string }>,
+        ],
       ];
     }>>;
 

@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { type } from "arktype";
 import { createSourceAdapter } from "../../builders/source-builder/builder";
 
@@ -12,6 +13,9 @@ const MAPPINGS = {
 const builder = createSourceAdapter({
   type: "unicode-names",
   transformerOutputSchema: type({
+    "[string]": "string",
+  }),
+  persistenceOutputSchema: type({
     "[string]": "string",
   }),
 });
@@ -51,5 +55,14 @@ export const handler = builder
   )
   .fallback(() => {
     return {};
+  })
+  .persistence((data, opts) => {
+    return [
+      {
+        filePath: join(opts.basePath, "unicode-names.json"),
+        data,
+        type: "json" as const,
+      },
+    ];
   })
   .build();

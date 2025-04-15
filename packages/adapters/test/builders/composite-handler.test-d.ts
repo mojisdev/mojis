@@ -6,8 +6,9 @@ import type {
   MergeSources,
   TransformChain,
 } from "../../src/builders/composite-builder/types";
+import type { PredicateFn } from "../../src/builders/source-builder/types";
 import type { UnsetMarker } from "../../src/global-types";
-import type { CreateAnySourceAdapter, CreateSourceTransformer } from "../__utils";
+import type { CreateSourceAdapter, CreateSourceTransformer } from "../__utils";
 import { describe, expectTypeOf, it } from "vitest";
 
 type LengthOf<T extends any[]> = T["length"] extends infer L
@@ -33,18 +34,24 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      CreateAnySourceAdapter<"version", {
+      CreateSourceAdapter<"version", {
         handlers: [
-          CreateSourceTransformer<{
-            output: number;
-          }>,
+          [
+            PredicateFn,
+            CreateSourceTransformer<{
+              output: number;
+            }>,
+          ],
         ];
       }>,
-      CreateAnySourceAdapter<"world", {
+      CreateSourceAdapter<"world", {
         handlers: [
-          CreateSourceTransformer<{
-            output: string;
-          }>,
+          [
+            PredicateFn,
+            CreateSourceTransformer<{
+              output: string;
+            }>,
+          ],
         ];
       }>,
     ];
@@ -63,18 +70,24 @@ describe("MergeSources", () => {
     type Source1 = {};
 
     type Source2 = [
-      CreateAnySourceAdapter<"version", {
+      CreateSourceAdapter<"version", {
         handlers: [
-          CreateSourceTransformer<{
-            output: string;
-          }>,
+          [
+            PredicateFn,
+            CreateSourceTransformer<{
+              output: string;
+            }>,
+          ],
         ];
       }>,
-      CreateAnySourceAdapter<"hello", {
+      CreateSourceAdapter<"hello", {
         handlers: [
-          CreateSourceTransformer<{
-            output: number;
-          }>,
+          [
+            PredicateFn,
+            CreateSourceTransformer<{
+              output: number;
+            }>,
+          ],
         ];
       }>,
     ];
@@ -95,18 +108,24 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      CreateAnySourceAdapter<"array", {
+      CreateSourceAdapter<"array", {
         handlers: [
-          CreateSourceTransformer<{
-            output: string[];
-          }>,
+          [
+            PredicateFn,
+            CreateSourceTransformer<{
+              output: string[];
+            }>,
+          ],
         ];
       }>,
-      CreateAnySourceAdapter<"object", {
+      CreateSourceAdapter<"object", {
         handlers: [
-          CreateSourceTransformer<{
-            output: { key: string };
-          }>,
+          [
+            PredicateFn,
+            CreateSourceTransformer<{
+              output: { key: string };
+            }>,
+          ],
         ];
       }>,
     ];
@@ -129,11 +148,14 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      CreateAnySourceAdapter<"version", {
+      CreateSourceAdapter<"version", {
         handlers: [
-          CreateSourceTransformer<{
-            output: string;
-          }>,
+          [
+            PredicateFn,
+            CreateSourceTransformer<{
+              output: string;
+            }>,
+          ],
         ];
       }>,
     ];
@@ -152,16 +174,19 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      CreateAnySourceAdapter<"complex", {
+      CreateSourceAdapter<"complex", {
         handlers: [
-          CreateSourceTransformer<{
-            output: {
-              nested: {
-                value: number;
-                array: string[];
+          [
+            PredicateFn,
+            CreateSourceTransformer<{
+              output: {
+                nested: {
+                  value: number;
+                  array: string[];
+                };
               };
-            };
-          }>,
+            }>,
+          ],
         ];
       }>,
     ];
@@ -187,11 +212,14 @@ describe("MergeSources", () => {
     };
 
     type Source2 = [
-      CreateAnySourceAdapter<"dynamic", {
+      CreateSourceAdapter<"dynamic", {
         handlers: [
-          CreateSourceTransformer<{
-            output: string;
-          }>,
+          [
+            PredicateFn,
+            CreateSourceTransformer<{
+              output: string;
+            }>,
+          ],
         ];
       }>,
     ];
@@ -210,18 +238,24 @@ describe("MergeSources", () => {
     type Source1 = {};
 
     type Source2 = [
-      CreateAnySourceAdapter<"same", {
+      CreateSourceAdapter<"same", {
         handlers: [
-          CreateSourceTransformer<{
-            output: string;
-          }>,
+          [
+            PredicateFn,
+            CreateSourceTransformer<{
+              output: string;
+            }>,
+          ],
         ];
       }>,
-      CreateAnySourceAdapter<"same", {
+      CreateSourceAdapter<"same", {
         handlers: [
-          CreateSourceTransformer<{
-            output: number;
-          }>,
+          [
+            PredicateFn,
+            CreateSourceTransformer<{
+              output: number;
+            }>,
+          ],
         ];
       }>,
     ];
@@ -252,11 +286,14 @@ describe("MergeSources", () => {
       type Source1 = UnsetMarker;
 
       type Source2 = [
-        CreateAnySourceAdapter<"version", {
+        CreateSourceAdapter<"version", {
           handlers: [
-            CreateSourceTransformer<{
-              output: string;
-            }>,
+            [
+              PredicateFn,
+              CreateSourceTransformer<{
+                output: string;
+              }>,
+            ],
           ];
         }>,
       ];

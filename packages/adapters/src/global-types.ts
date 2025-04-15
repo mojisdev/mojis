@@ -12,13 +12,15 @@ export type MaybeArray<T> = T | T[];
 export type MaybePromise<T> = T | Promise<T>;
 
 /**
- * The type of the adapter handler.
+ * The type of the source adapter.
  */
-export type SourceAdapterType =
+export type BuiltinSourceAdapterType =
   | "metadata"
   | "variations"
   | "unicode-names"
   | "sequences";
+
+export type SourceAdapterType = BuiltinSourceAdapterType | (string & {});
 
 export interface AdapterContext {
   /**

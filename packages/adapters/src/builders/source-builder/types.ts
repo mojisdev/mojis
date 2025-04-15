@@ -101,7 +101,14 @@ export interface PersistenceFileOperation<TData = string | Uint8Array> {
 export type PersistenceFn<TIn, TOut> = (
   data: TIn,
   options: PersistenceOptions
-) => MaybePromise<Array<PersistenceFileOperation<keyof TOut extends never ? unknown : TOut[keyof TOut]>>>;
+) => MaybePromise<
+  Array<
+    PersistenceFileOperation<
+      TOut extends (infer ArrayType)[] ? ArrayType[] :
+        keyof TOut extends never ? unknown : TOut[keyof TOut]
+    >
+  >
+>;
 
 export type InferHandlerOutput<TSourceAdapter extends AnySourceAdapter> =
   TSourceAdapter extends { handlers: Array<[any, infer TSourceTransformer]> }
@@ -222,8 +229,7 @@ export type FallbackFn<TOut> = () => TOut;
 export interface SourceAdapter<TParams extends AnyBuiltSourceAdapterParams> {
   adapterType: TParams["adapterType"];
   handlers: TParams["handlers"];
-  // TODO: this break everything
-  transformerOutputSchema?: TParams["transformerOutputSchema"];
+  transformerOutputSchema: TParams["transformerOutputSchema"];
   persistenceOutputSchema?: TParams["persistenceOutputSchema"];
   fallback?: FallbackFn<
     TParams["transformerOutputSchema"] extends type.Any

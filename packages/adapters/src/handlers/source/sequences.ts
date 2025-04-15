@@ -1,4 +1,5 @@
 import type { EmojiSequence } from "@mojis/schemas/emojis";
+import { join } from "node:path";
 import { expandHexRange, FEMALE_SIGN, MALE_SIGN } from "@mojis/internal-utils";
 import { EMOJI_SEQUENCE_SCHEMA } from "@mojis/schemas/emojis";
 import { type } from "arktype";
@@ -34,6 +35,10 @@ const DEFAULT_PROPERTY_MAP = {
 const builder = createSourceAdapter({
   type: "sequences",
   transformerOutputSchema: type({
+    sequences: EMOJI_SEQUENCE_SCHEMA.array(),
+    zwj: EMOJI_SEQUENCE_SCHEMA.array(),
+  }),
+  persistenceOutputSchema: type({
     sequences: EMOJI_SEQUENCE_SCHEMA.array(),
     zwj: EMOJI_SEQUENCE_SCHEMA.array(),
   }),
@@ -128,5 +133,18 @@ export const handler = builder
       zwj: [],
     };
   })
-
+  .persistence((data, opts) => {
+    return [
+      {
+        filePath: join(opts.basePath, "sequences.json"),
+        data: data.sequences,
+        type: "json" as const,
+      },
+      {
+        filePath: join(opts.basePath, "zwj-sequences.json"),
+        data: data.zwj,
+        type: "json" as const,
+      },
+    ];
+  })
   .build();

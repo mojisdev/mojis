@@ -1,4 +1,5 @@
 import type { EmojiVariation } from "@mojis/schemas/emojis";
+import { join } from "node:path";
 import { EMOJI_VARIATION_SCHEMA } from "@mojis/schemas/emojis";
 import semver from "semver";
 import { createSourceAdapter } from "../../builders/source-builder/builder";
@@ -8,6 +9,7 @@ const UNSUPPORTED_VARIATION_VERSIONS = ["1.0", "2.0", "3.0", "4.0"];
 const builder = createSourceAdapter({
   type: "variations",
   transformerOutputSchema: EMOJI_VARIATION_SCHEMA.array(),
+  persistenceOutputSchema: EMOJI_VARIATION_SCHEMA.array(),
 });
 
 export const handler = builder
@@ -58,6 +60,17 @@ export const handler = builder
         //          ^?
         return transformed;
       }),
-  ).fallback(() => {
+  )
+  .fallback(() => {
     return [];
-  }).build();
+  })
+  .persistence((data, opts) => {
+    return [
+      {
+        filePath: join(opts.basePath, "variations.json"),
+        data,
+        type: "json" as const,
+      },
+    ];
+  })
+  .build();

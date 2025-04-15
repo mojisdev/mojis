@@ -27,11 +27,13 @@ export async function runSourceAdapter<
   ctx: AdapterContext,
   options?: TOptions,
   // TODO: dynamic infer return type based on `write`
-): Promise<InferHandlerOutput<THandler>> {
+): Promise<TOptions["write"] extends true ? void : InferHandlerOutput<THandler>> {
   const promises = [];
 
+  assertValidHandler(handler);
+
   // TODO: make this default to true
-  const shouldWrite = options?.write ?? false;
+  const shouldWrite = options?.write ?? true;
 
   let output = (typeof handler.fallback == "function" && handler.fallback != null) ? handler.fallback() : undefined;
 
@@ -55,10 +57,8 @@ export async function runSourceAdapter<
     output = result[0];
   }
 
-  // TODO: make this required
   if (handler.transformerOutputSchema == null) {
-    return output as InferHandlerOutput<THandler>;
-    // throw new Error(`no transformer schema defined for adapter ${handler.adapterType}`);
+    throw new Error(`no transformer schema defined for adapter ${handler.adapterType}`);
   }
 
   const validationResult = arktypeParse(output, handler.transformerOutputSchema);
@@ -80,7 +80,7 @@ export async function runSourceAdapter<
   const fileOperations = await handler.persistence(validationResult.data, {
     basePath,
     force: ctx.force,
-    pretty: handler.persistenceOptions.pretty,
+    pretty: handler.persistenceOptions?.pretty,
     version: {
       emoji_version: ctx.emoji_version,
       unicode_version: ctx.unicode_version,
@@ -90,9 +90,10 @@ export async function runSourceAdapter<
   await Promise.all(
     fileOperations.map(async (operation) => {
       const { filePath, data, type, options: fileOptions = {} } = operation;
+
       const {
         encoding = "utf-8",
-        pretty = handler.persistenceOptions.pretty ?? false,
+        pretty = handler.persistenceOptions?.pretty ?? false,
         force = ctx.force ?? false,
       } = fileOptions;
 
@@ -123,5 +124,24 @@ export async function runSourceAdapter<
     }),
   );
 
-  return validationResult.data as InferHandlerOutput<THandler>;
+  return undefined as any;
+}
+
+function assertValidHandler(handler: unknown): asserts handler is AnySourceAdapter {
+  if (typeof handler !== "object" || handler === null) {
+    throw new TypeError("handler must be an object");
+  }
+
+  const {
+    adapterType,
+    transformerOutputSchema,
+  } = handler as AnySourceAdapter;
+
+  if (typeof adapterType !== "string") {
+    throw new TypeError("handler.adapterType must be a string");
+  }
+
+  if (transformerOutputSchema == null) {
+    throw new TypeError("handler.transformerOutputSchema must be an object");
+  }
 }
