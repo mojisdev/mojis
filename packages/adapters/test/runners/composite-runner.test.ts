@@ -5,7 +5,6 @@ import { type } from "arktype";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import { createCompositeHandlerBuilder } from "../../src/builders/composite-builder/builder";
 import { createSourceAdapter } from "../../src/builders/source-builder/builder";
-import { createSourceTransformerBuilder } from "../../src/builders/source-transformer-builder/builder";
 import { setupAdapterTest } from "../__utils";
 
 describe("run composite handler", () => {
