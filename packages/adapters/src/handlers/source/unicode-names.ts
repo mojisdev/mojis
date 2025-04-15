@@ -60,7 +60,8 @@ export const handler = builder
     return [
       {
         filePath: join(opts.basePath, "unicode-names.json"),
-        data,
+        // TODO: not correct since double stringify
+        data: JSON.stringify(data),
         type: "json" as const,
       },
     ];
