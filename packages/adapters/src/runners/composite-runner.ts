@@ -62,7 +62,12 @@ async function getAdapterSources(
   // run all adapter handlers in parallel and process results directly
   const results = await Promise.all(
     handler.adapterSources.map(async (adapterSource) => {
-      const value = await runSourceAdapter(adapterSource, ctx, __overrides);
+      const value = await runSourceAdapter(adapterSource, ctx, {
+        write: false,
+        cacheKey: __overrides?.cacheKey,
+        cacheOptions: __overrides?.cacheOptions,
+        cache: __overrides?.cache,
+      });
       return [adapterSource.adapterType, value] as const;
     }),
   );

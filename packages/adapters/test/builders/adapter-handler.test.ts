@@ -3,23 +3,37 @@ import { type } from "arktype";
 import { describe, expect, it } from "vitest";
 import { createSourceAdapter } from "../../src/builders/source-builder/builder";
 
+const DUMMY_ARKTYPE_SCHEMA = type({
+  name: "string",
+});
+
 describe("adapter handler builder", () => {
   const emptyContext = {} as AdapterContext;
 
   it("creates with type", () => {
-    const builder = createSourceAdapter({ type: "metadata" });
+    const builder = createSourceAdapter({
+      type: "metadata",
+      transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA,
+    });
     const handler = builder.build();
     expect(handler.adapterType).toBe("metadata");
   });
 
   it("creates with empty handlers", () => {
-    const builder = createSourceAdapter({ type: "metadata" });
+    const builder = createSourceAdapter({
+      type: "metadata",
+      transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA,
+    });
     const handler = builder.build();
     expect(handler.handlers).toHaveLength(0);
   });
 
   it("adds version handler", () => {
-    const builder = createSourceAdapter({ type: "metadata" });
+    const builder = createSourceAdapter({
+      type: "metadata",
+      transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA,
+    });
+
     const handler = builder
       .withTransform(
         (version) => version === "15.0",
@@ -35,7 +49,11 @@ describe("adapter handler builder", () => {
   });
 
   it("adds multiple version handlers", () => {
-    const builder = createSourceAdapter({ type: "metadata" });
+    const builder = createSourceAdapter({
+      type: "metadata",
+      transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA,
+    });
+
     const handler = builder
       .withTransform(
         (version) => version === "15.0",
@@ -59,7 +77,7 @@ describe("adapter handler builder", () => {
   });
 
   it("maintains handler order", () => {
-    const builder = createSourceAdapter({ type: "metadata" });
+    const builder = createSourceAdapter({ type: "metadata", transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA });
     const handler = builder
       .withTransform(
         (version) => version === "15.0",
@@ -87,7 +105,7 @@ describe("adapter handler builder", () => {
   });
 
   it("preserves adapter type across chain", () => {
-    const builder = createSourceAdapter({ type: "metadata" });
+    const builder = createSourceAdapter({ type: "metadata", transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA });
     const handler = builder
       .withTransform(
         (version) => version === "15.0",
@@ -109,7 +127,7 @@ describe("adapter handler builder", () => {
   });
 
   it("allows chaining multiple onVersion calls", () => {
-    const builder = createSourceAdapter({ type: "metadata" });
+    const builder = createSourceAdapter({ type: "metadata", transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA });
     const handler = builder
       .withTransform(
         (version) => version === "15.0",
@@ -142,7 +160,13 @@ describe("adapter handler builder", () => {
 
   it("allows setting fallback data", () => {
     const fallbackData = { defaultValue: true };
-    const builder = createSourceAdapter({ type: "metadata" });
+    const builder = createSourceAdapter({
+      type: "metadata",
+      transformerOutputSchema: type({
+        defaultValue: "boolean",
+      }),
+    });
+
     const handler = builder
       .fallback(() => fallbackData)
       .build();
@@ -157,10 +181,10 @@ describe("adapter handler builder", () => {
     });
     const builder = createSourceAdapter({
       type: "metadata",
-      outputSchema: testSchema,
+      transformerOutputSchema: testSchema,
     });
     const handler = builder.build();
 
-    expect(handler.outputSchema).toBe(testSchema);
+    expect(handler.transformerOutputSchema).toBe(testSchema);
   });
 });

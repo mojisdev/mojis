@@ -4,8 +4,8 @@ import { HttpResponse, mockFetch } from "#msw-utils";
 import { type } from "arktype";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import { createCompositeHandlerBuilder } from "../../src/builders/composite-builder/builder";
-import { createSourceTransformerBuilder } from "../../src/builders/version-builder/builder";
-import { createFakeSourceAdapter, setupAdapterTest } from "../__utils";
+import { createSourceAdapter } from "../../src/builders/source-builder/builder";
+import { setupAdapterTest } from "../__utils";
 
 describe("run composite handler", () => {
   const mockContext: AdapterContext = {
@@ -72,11 +72,21 @@ describe("run composite handler", () => {
       }],
     ]);
 
-    const mockHandler = createSourceTransformerBuilder()
-      .urls(() => "https://mojis.dev/test")
-      .parser((_, data) => data)
-      .transform((_, data) => data)
-      .output((_, data) => ({ version: data }));
+    const sourceAdapter = createSourceAdapter({
+      type: "metadata",
+      transformerOutputSchema: type({
+        version: "string",
+      }),
+    })
+      .withTransform(
+        () => true,
+        (builder) => builder
+          .urls(() => "https://mojis.dev/test")
+          .parser((_, data) => data)
+          .transform((_, data) => data)
+          .output((_, data) => ({ version: data })),
+      )
+      .build();
 
     const handler = createCompositeHandlerBuilder({
       outputSchema: type({
@@ -84,15 +94,7 @@ describe("run composite handler", () => {
       }),
     })
       .adapterSources([
-        createFakeSourceAdapter({
-          adapterType: "metadata",
-          handlers: [
-            [() => true, mockHandler],
-          ],
-          outputSchema: type({
-            version: "string",
-          }),
-        }),
+        sourceAdapter,
       ])
       .output(() => {
         return {
@@ -123,11 +125,21 @@ describe("run composite handler", () => {
       }],
     ]);
 
-    const mockHandler = createSourceTransformerBuilder()
-      .urls(() => "https://mojis.dev/test")
-      .parser((_, data) => data)
-      .transform((_, data) => data)
-      .output((_, data) => ({ version: data }));
+    const sourceAdapter = createSourceAdapter({
+      type: "metadata",
+      transformerOutputSchema: type({
+        version: "string",
+      }),
+    })
+      .withTransform(
+        () => true,
+        (builder) => builder
+          .urls(() => "https://mojis.dev/test")
+          .parser((_, data) => data)
+          .transform((_, data) => data)
+          .output((_, data) => ({ version: data })),
+      )
+      .build();
 
     const handler = createCompositeHandlerBuilder({
       outputSchema: type({
@@ -141,15 +153,7 @@ describe("run composite handler", () => {
         },
       })
       .adapterSources([
-        createFakeSourceAdapter({
-          adapterType: "metadata",
-          handlers: [
-            [() => true, mockHandler],
-          ],
-          outputSchema: type({
-            version: "string",
-          }),
-        }),
+        sourceAdapter,
       ])
       .output(() => {
         return {
@@ -185,11 +189,21 @@ describe("run composite handler", () => {
         }],
       ]);
 
-      const nameHandler = createSourceTransformerBuilder()
-        .urls(() => "https://mojis.dev/random-name")
-        .parser((_, data) => data)
-        .transform((_, data) => data)
-        .output((_, data) => ({ name: data }));
+      const nameAdapter = createSourceAdapter({
+        type: "metadata",
+        transformerOutputSchema: type({
+          name: "string",
+        }),
+      })
+        .withTransform(
+          () => true,
+          (builder) => builder
+            .urls(() => "https://mojis.dev/random-name")
+            .parser((_, data) => data)
+            .transform((_, data) => data)
+            .output((_, data) => ({ name: data })),
+        )
+        .build();
 
       const handler = createCompositeHandlerBuilder({
         outputSchema: type("string"),
@@ -201,15 +215,7 @@ describe("run composite handler", () => {
           },
         })
         .adapterSources([
-          createFakeSourceAdapter({
-            adapterType: "metadata",
-            handlers: [
-              [() => true, nameHandler],
-            ],
-            outputSchema: type({
-              name: "string",
-            }),
-          }),
+          nameAdapter,
         ])
         .transform((_, data) => {
           expect(data).toEqual({

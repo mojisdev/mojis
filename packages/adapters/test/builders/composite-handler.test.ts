@@ -71,7 +71,7 @@ describe("composite handler builder", () => {
         handlers: expect.arrayContaining([
           expect.any(Array),
         ]),
-        outputSchema: type({
+        transformerOutputSchema: type({
           groups: EMOJI_GROUPS_SCHEMA,
           emojis: GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA,
         }),

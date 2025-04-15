@@ -85,7 +85,9 @@ function internalCreateSourceTransformerBuilder<
   };
 }
 
-export function createSourceTransformerBuilder<TOutputSchema>(): SourceTransformerBuilder<{
+export function createSourceTransformerBuilder<
+  TOutputSchema,
+>(): SourceTransformerBuilder<{
   _aggregate: {
     in: UnsetMarker;
     out: UnsetMarker;
