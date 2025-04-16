@@ -26,7 +26,7 @@ export function onlyGreaterThan(version: string): PredicateFn {
  * @returns {PredicateFn} A predicate function that takes an emoji version and returns true if the emoji version is less than the specified version
  */
 export function onlyLessThan(version: string): PredicateFn {
-  return (emoji_version) => mojiCompare.lt(version, emoji_version);
+  return (emoji_version) => mojiCompare.lt(emoji_version, version);
 }
 
 /**

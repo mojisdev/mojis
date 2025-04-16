@@ -69,17 +69,24 @@ describe("predicates", () => {
       expect(predicate("2.0")).toBe(true);
       expect(predicate("3.0")).toBe(true);
     });
-  });
 
-  describe("or() with multiple predicates", () => {
-    it("or()", () => {
-      const predicate = or(
-        onlyGreaterThan("1.0"),
-        onlyLessThan("3.0"),
-      );
+    it("and() with alwaysTrue predicate", () => {
+      const predicate = and(alwaysTrue, onlyLessThan("3.0"));
       expect(predicate("1.0")).toBe(true);
       expect(predicate("2.0")).toBe(true);
       expect(predicate("3.0")).toBe(false);
+    });
+  });
+
+  describe("or() with multiple predicates", () => {
+    it("or() should pass if any predicate is true", () => {
+      const predicate = or(
+        onlyLessThan("2.0"),
+        onlyGreaterThan("2.0"),
+      );
+      expect(predicate("1.0")).toBe(true);
+      expect(predicate("3.0")).toBe(true);
+      expect(predicate("2.0")).toBe(false);
     });
 
     it("or() with empty predicates", () => {
