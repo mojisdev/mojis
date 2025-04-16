@@ -1,5 +1,5 @@
 import type { PredicateFn } from "./builders/source-builder/types";
-import { gt, lt } from "semver";
+import mojiCompare from "@mojis/moji-compare";
 
 /**
  * A predicate function that takes a version string and returns a boolean.
@@ -17,7 +17,7 @@ export const alwaysFalse: PredicateFn = () => false;
  * @returns {PredicateFn} A predicate function that takes an emoji version and returns true if the emoji version is greater than the specified version
  */
 export function onlyGreaterThan(version: string): PredicateFn {
-  return (emoji_version) => gt(emoji_version, version);
+  return (emoji_version) => mojiCompare.gt(emoji_version, version);
 }
 
 /**
@@ -26,7 +26,7 @@ export function onlyGreaterThan(version: string): PredicateFn {
  * @returns {PredicateFn} A predicate function that takes an emoji version and returns true if the emoji version is less than the specified version
  */
 export function onlyLessThan(version: string): PredicateFn {
-  return (emoji_version) => lt(version, emoji_version);
+  return (emoji_version) => mojiCompare.lt(version, emoji_version);
 }
 
 /**
@@ -46,8 +46,8 @@ export function onlyVersions(allowedVersions: string[]): PredicateFn {
  */
 export function versionRange(minVersion: string, maxVersion: string): PredicateFn {
   return (version) =>
-    (version === minVersion || gt(version, minVersion))
-    && (version === maxVersion || gt(maxVersion, version));
+    (version === minVersion || mojiCompare.gt(version, minVersion))
+    && (version === maxVersion || mojiCompare.gt(maxVersion, version));
 }
 
 /**
