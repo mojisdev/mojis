@@ -1,4 +1,4 @@
-import semver from "semver";
+import mojiCompare from "@mojis/moji-compare";
 
 /**
  * Checks if a version is less than "11.0.0".
@@ -11,12 +11,12 @@ export function isBeforeAlignment(version: string): boolean {
     return false;
   }
 
-  const coerced = semver.coerce(version);
+  const coerced = mojiCompare.coerce(version);
   if (coerced == null) {
     return false;
   }
 
-  return coerced.major < 11;
+  return mojiCompare.major(coerced) < 11;
 }
 
 /**
@@ -46,15 +46,15 @@ export function isBefore(version: string, target: string): boolean {
     return false;
   }
 
-  const coercedVersion = semver.coerce(version);
+  const coercedVersion = mojiCompare.coerce(version);
   if (coercedVersion == null) {
     return false;
   }
 
-  const coercedTarget = semver.coerce(target);
+  const coercedTarget = mojiCompare.coerce(target);
   if (coercedTarget == null) {
     return false;
   }
 
-  return semver.lt(coercedVersion, coercedTarget);
+  return mojiCompare.lt(coercedVersion, coercedTarget);
 }
