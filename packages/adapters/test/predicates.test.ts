@@ -1,113 +1,121 @@
 import { describe, expect, it } from "vitest";
 import {
-  alwaysFalse,
-  alwaysTrue,
-  and,
-  onlyGreaterThan,
-  onlyLessThan,
-  onlyVersions,
-  or,
-  versionRange,
+  all,
+  always,
+  any,
+  between,
+  excludeVersions,
+  greaterThan,
+  lessThan,
+  matchVersions,
+  never,
 } from "../src/predicates";
 
 describe("predicates", () => {
-  it("alwaysTrue()", () => {
-    expect(alwaysTrue("1.0")).toBe(true);
-    expect(alwaysTrue("2.0")).toBe(true);
-    expect(alwaysTrue("3.0")).toBe(true);
+  it("always()", () => {
+    expect(always("1.0")).toBe(true);
+    expect(always("2.0")).toBe(true);
+    expect(always("3.0")).toBe(true);
   });
 
-  it("alwaysFalse()", () => {
-    expect(alwaysFalse("1.0")).toBe(false);
-    expect(alwaysFalse("2.0")).toBe(false);
-    expect(alwaysFalse("3.0")).toBe(false);
+  it("never()", () => {
+    expect(never("1.0")).toBe(false);
+    expect(never("2.0")).toBe(false);
+    expect(never("3.0")).toBe(false);
   });
 
-  it("onlyGreaterThan()", () => {
-    const predicate = onlyGreaterThan("2.0");
+  it("greaterThan()", () => {
+    const predicate = greaterThan("2.0");
     expect(predicate("1.0")).toBe(false);
     expect(predicate("2.0")).toBe(false);
     expect(predicate("3.0")).toBe(true);
   });
 
-  it("onlyLessThan()", () => {
-    const predicate = onlyLessThan("2.0");
+  it("lessThan()", () => {
+    const predicate = lessThan("2.0");
     expect(predicate("1.0")).toBe(true);
     expect(predicate("2.0")).toBe(false);
     expect(predicate("3.0")).toBe(false);
   });
 
-  it("onlyVersions()", () => {
-    const predicate = onlyVersions(["1.0", "2.0"]);
+  it("matchVersions()", () => {
+    const predicate = matchVersions(["1.0", "2.0"]);
     expect(predicate("1.0")).toBe(true);
     expect(predicate("2.0")).toBe(true);
     expect(predicate("3.0")).toBe(false);
   });
 
-  it("versionRange()", () => {
-    const predicate = versionRange("1.0", "3.0");
+  it("between()", () => {
+    const predicate = between("1.0", "3.0");
     expect(predicate("1.0")).toBe(true);
     expect(predicate("2.0")).toBe(true);
     expect(predicate("3.0")).toBe(true);
     expect(predicate("4.0")).toBe(false);
   });
 
-  describe("and() with multiple predicates", () => {
-    it("and()", () => {
-      const predicate = and(
-        onlyGreaterThan("1.0"),
-        onlyLessThan("3.0"),
+  describe("all() with multiple predicates", () => {
+    it("all()", () => {
+      const predicate = all(
+        greaterThan("1.0"),
+        lessThan("3.0"),
       );
       expect(predicate("1.0")).toBe(false);
       expect(predicate("2.0")).toBe(true);
       expect(predicate("3.0")).toBe(false);
     });
 
-    it("and() with empty predicates", () => {
-      const predicate = and();
+    it("all() with empty predicates", () => {
+      const predicate = all();
       expect(predicate("1.0")).toBe(true);
       expect(predicate("2.0")).toBe(true);
       expect(predicate("3.0")).toBe(true);
     });
 
-    it("and() with alwaysTrue predicate", () => {
-      const predicate = and(alwaysTrue, onlyLessThan("3.0"));
+    it("all() with alwaysTrue predicate", () => {
+      const predicate = all(always, lessThan("3.0"));
       expect(predicate("1.0")).toBe(true);
       expect(predicate("2.0")).toBe(true);
       expect(predicate("3.0")).toBe(false);
     });
   });
 
-  describe("or() with multiple predicates", () => {
-    it("or() should pass if any predicate is true", () => {
-      const predicate = or(
-        onlyLessThan("2.0"),
-        onlyGreaterThan("2.0"),
+  describe("any() with multiple predicates", () => {
+    it("any() should pass if any predicate is true", () => {
+      const predicate = any(
+        lessThan("2.0"),
+        greaterThan("2.0"),
       );
       expect(predicate("1.0")).toBe(true);
       expect(predicate("3.0")).toBe(true);
       expect(predicate("2.0")).toBe(false);
     });
 
-    it("or() with empty predicates", () => {
-      const predicate = or();
+    it("any() with empty predicates", () => {
+      const predicate = any();
       expect(predicate("1.0")).toBe(false);
       expect(predicate("2.0")).toBe(false);
       expect(predicate("3.0")).toBe(false);
     });
 
-    it("or() with alwaysTrue predicate", () => {
-      const predicate = or(alwaysTrue, onlyLessThan("3.0"));
+    it("any() with always predicate", () => {
+      const predicate = any(always, lessThan("3.0"));
       expect(predicate("1.0")).toBe(true);
       expect(predicate("2.0")).toBe(true);
       expect(predicate("3.0")).toBe(true);
     });
 
-    it("or() with alwaysFalse predicate", () => {
-      const predicate = or(alwaysFalse, onlyLessThan("3.0"));
+    it("any() with never predicate", () => {
+      const predicate = any(never, lessThan("3.0"));
       expect(predicate("1.0")).toBe(true);
       expect(predicate("2.0")).toBe(true);
       expect(predicate("3.0")).toBe(false);
     });
+  });
+
+  it("excludeVersions()", () => {
+    const predicate = excludeVersions(["1.0", "2.0"]);
+    expect(predicate("1.0")).toBe(false);
+    expect(predicate("2.0")).toBe(false);
+    expect(predicate("3.0")).toBe(true);
   });
 });

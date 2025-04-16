@@ -2,68 +2,77 @@ import type { PredicateFn } from "./builders/source-builder/types";
 import mojiCompare from "@mojis/moji-compare";
 
 /**
- * A predicate function that takes a version string and returns a boolean.
+ * A predicate function that always returns true regardless of version.
  */
-export const alwaysTrue: PredicateFn = () => true;
+export const always: PredicateFn = () => true;
 
 /**
- * A predicate function that takes a version string and returns false.
+ * A predicate function that always returns false regardless of version.
  */
-export const alwaysFalse: PredicateFn = () => false;
+export const never: PredicateFn = () => false;
 
 /**
- * Creates a predicate function that returns true only if the emoji version is greater than the specified version.
+ * Creates a predicate that matches versions greater than the specified version.
  * @param {string} version - The version to compare against
- * @returns {PredicateFn} A predicate function that takes an emoji version and returns true if the emoji version is greater than the specified version
+ * @returns {PredicateFn} A predicate function that matches when version > specified
  */
-export function onlyGreaterThan(version: string): PredicateFn {
+export function greaterThan(version: string): PredicateFn {
   return (emoji_version) => mojiCompare.gt(emoji_version, version);
 }
 
 /**
- * Creates a predicate function that returns true only if the emoji version is less than the specified version.
+ * Creates a predicate that matches versions less than the specified version.
  * @param {string} version - The version to compare against
- * @returns {PredicateFn} A predicate function that takes an emoji version and returns true if the emoji version is less than the specified version
+ * @returns {PredicateFn} A predicate function that matches when version < specified
  */
-export function onlyLessThan(version: string): PredicateFn {
+export function lessThan(version: string): PredicateFn {
   return (emoji_version) => mojiCompare.lt(emoji_version, version);
 }
 
 /**
- * Creates a predicate that only includes specific versions
- * @param {string[]} allowedVersions Array of versions to include
- * @returns {PredicateFn} A predicate function that returns true only for versions in the list
+ * Creates a predicate that matches specific versions from a list.
+ * @param {string[]} versions Array of versions to match
+ * @returns {PredicateFn} A predicate function that matches when version is in the list
  */
-export function onlyVersions(allowedVersions: string[]): PredicateFn {
-  return (version) => allowedVersions.includes(version);
+export function matchVersions(versions: string[]): PredicateFn {
+  return (version) => versions.includes(version);
 }
 
 /**
- * Creates a predicate that includes versions within a range (inclusive)
- * @param {string} minVersion Minimum version (inclusive)
- * @param {string} maxVersion Maximum version (inclusive)
- * @returns {PredicateFn} A predicate function that returns true for versions within the range
+ * Creates a predicate that matches versions within a range (inclusive).
+ * @param {string} min Minimum version (inclusive)
+ * @param {string} max Maximum version (inclusive)
+ * @returns {PredicateFn} A predicate function that matches versions between min and max
  */
-export function versionRange(minVersion: string, maxVersion: string): PredicateFn {
+export function between(min: string, max: string): PredicateFn {
   return (version) =>
-    (version === minVersion || mojiCompare.gt(version, minVersion))
-    && (version === maxVersion || mojiCompare.gt(maxVersion, version));
+    (version === min || mojiCompare.gt(version, min))
+    && (version === max || mojiCompare.gt(max, version));
 }
 
 /**
- * Creates a predicate that combines multiple predicates with logical AND
+ * Creates a predicate by combining multiple predicates with logical AND.
  * @param {PredicateFn[]} predicates Array of predicates to combine
- * @returns {PredicateFn} A predicate function that returns true only if all predicates return true
+ * @returns {PredicateFn} A predicate function that matches when all predicates match
  */
-export function and(...predicates: PredicateFn[]): PredicateFn {
+export function all(...predicates: PredicateFn[]): PredicateFn {
   return (version) => predicates.every((predicate) => predicate(version));
 }
 
 /**
- * Creates a predicate that combines multiple predicates with logical OR
+ * Creates a predicate by combining multiple predicates with logical OR.
  * @param {PredicateFn[]} predicates Array of predicates to combine
- * @returns {PredicateFn} A predicate function that returns true if any predicate returns true
+ * @returns {PredicateFn} A predicate function that matches when any predicate matches
  */
-export function or(...predicates: PredicateFn[]): PredicateFn {
+export function any(...predicates: PredicateFn[]): PredicateFn {
   return (version) => predicates.some((predicate) => predicate(version));
+}
+
+/**
+ * Creates a predicate that excludes specific versions.
+ * @param {string[]} versions Array of versions to exclude
+ * @returns {PredicateFn} A predicate function that matches when version is not in the list
+ */
+export function excludeVersions(versions: string[]): PredicateFn {
+  return (version) => !versions.includes(version);
 }
