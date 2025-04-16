@@ -1,7 +1,7 @@
 import type { EmojiVariation } from "@mojis/schemas/emojis";
 import { join } from "node:path";
+import { lte } from "@mojis/moji-compare";
 import { EMOJI_VARIATION_SCHEMA } from "@mojis/schemas/emojis";
-import semver from "semver";
 import { createSourceAdapter } from "../../builders/source-builder/builder";
 
 const UNSUPPORTED_VARIATION_VERSIONS = ["1.0", "2.0", "3.0", "4.0"];
@@ -17,7 +17,7 @@ export const handler = builder
     (version) => !UNSUPPORTED_VARIATION_VERSIONS.includes(version),
     (builder) => builder
       .urls((ctx) => {
-        if (semver.lte(`${ctx.unicode_version}.0`, "12.1.0")) {
+        if (lte(ctx.unicode_version, "12.1")) {
           return {
             url: `https://unicode-proxy.mojis.dev/proxy/emoji/${ctx.emoji_version}/emoji-variation-sequences.txt`,
             cacheKey: `v${ctx.emoji_version}/variations`,

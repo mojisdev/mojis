@@ -18,9 +18,6 @@ catalogs:
     '@types/node':
       specifier: ^22.10.0
       version: 22.13.9
-    '@types/semver':
-      specifier: ^7.7.0
-      version: 7.7.0
     '@types/yargs-parser':
       specifier: ^21.0.3
       version: 21.0.3
@@ -62,6 +59,9 @@ catalogs:
       specifier: ^2.4.4
       version: 2.4.4
   prod:
+    '@mojis/moji-compare':
+      specifier: ^0.4.0
+      version: 0.4.0
     arktype:
       specifier: ^2.1.17
       version: 2.1.17
@@ -74,9 +74,6 @@ catalogs:
     fs-extra:
       specifier: ^11.3.0
       version: 11.3.0
-    semver:
-      specifier: ^7.7.1
-      version: 7.7.1
     yargs-parser:
       specifier: ^21.1.1
       version: 21.1.1
@@ -121,6 +118,9 @@ importers:
       '@mojis/internal-utils':
         specifier: workspace:*
         version: link:../internal-utils
+      '@mojis/moji-compare':
+        specifier: catalog:prod
+        version: 0.4.0
       '@mojis/parsers':
         specifier: workspace:*
         version: link:../parsers
@@ -136,9 +136,6 @@ importers:
       fs-extra:
         specifier: catalog:prod
         version: 11.3.0
-      semver:
-        specifier: catalog:prod
-        version: 7.7.1
     devDependencies:
       '@luxass/eslint-config':
         specifier: catalog:dev
@@ -149,9 +146,6 @@ importers:
       '@types/fs-extra':
         specifier: catalog:dev
         version: 11.0.4
-      '@types/semver':
-        specifier: catalog:dev
-        version: 7.7.0
       eslint:
         specifier: catalog:dev
         version: 9.23.0
@@ -173,6 +167,9 @@ importers:
       '@mojis/internal-utils':
         specifier: workspace:*
         version: link:../internal-utils
+      '@mojis/moji-compare':
+        specifier: catalog:prod
+        version: 0.4.0
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -185,9 +182,6 @@ importers:
       fs-extra:
         specifier: catalog:prod
         version: 11.3.0
-      semver:
-        specifier: catalog:prod
-        version: 7.7.1
       yargs-parser:
         specifier: catalog:prod
         version: 21.1.1
@@ -198,9 +192,6 @@ importers:
       '@types/fs-extra':
         specifier: catalog:dev
         version: 11.0.4
-      '@types/semver':
-        specifier: catalog:dev
-        version: 7.7.0
       '@types/yargs-parser':
         specifier: catalog:dev
         version: 21.0.3
@@ -219,6 +210,9 @@ importers:
 
   packages/internal-utils:
     dependencies:
+      '@mojis/moji-compare':
+        specifier: catalog:prod
+        version: 0.4.0
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -228,9 +222,6 @@ importers:
       fs-extra:
         specifier: catalog:prod
         version: 11.3.0
-      semver:
-        specifier: catalog:prod
-        version: 7.7.1
     devDependencies:
       '@luxass/eslint-config':
         specifier: catalog:dev
@@ -238,9 +229,6 @@ importers:
       '@types/fs-extra':
         specifier: catalog:dev
         version: 11.0.4
-      '@types/semver':
-        specifier: catalog:dev
-        version: 7.7.0
       eslint:
         specifier: catalog:dev
         version: 9.23.0
@@ -785,6 +773,9 @@ packages:
   '@mojis/loomicode@0.2.0-beta.7':
     resolution: {integrity: sha512-F3bGbLCJfw1oBz+53DqEN0K5N1iK1QaAr4GoXxqB+G1TO2qcq0VAwNgS5N5+EqFNfa6ru1uEFwB01Py6eYZXdA==}
 
+  '@mojis/moji-compare@0.4.0':
+    resolution: {integrity: sha512-rJigSisaMzbW2lV3bEcZnpNpX7jtDZYjIlWgAo1E5HwWgHmaSpRTYshTWjRv55BV4GPAdRQoHjKmQuXcMBlGUw==}
+
   '@mswjs/interceptors@0.37.6':
     resolution: {integrity: sha512-wK+5pLK5XFmgtH3aQ2YVvA3HohS3xqV/OxuVOdNx9Wpnz7VE/fnC+e1A7ln6LFYeck7gOJ/dsZV6OLplOtAJ2w==}
     engines: {node: '>=18'}
@@ -963,9 +954,6 @@ packages:
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
-
-  '@types/semver@7.7.0':
-    resolution: {integrity: sha512-k107IF4+Xr7UHjwDc7Cfd6PRQfbdkiRabXGRjo07b4WyPahFBZCZ1sE+BNxYIJPPg73UkfOsVOLwqVc/6ETrIA==}
 
   '@types/statuses@2.0.5':
     resolution: {integrity: sha512-jmIUGWrAiwu3dZpxntxieC+1n/5c3mjrImkmOSQ2NC5uP6cYO4aAZDdSmRcI5C1oiTmqlZGHC+/NmJrKogbP5A==}
@@ -3513,6 +3501,10 @@ snapshots:
       arktype: 2.1.17
       compare-versions: 6.1.1
 
+  '@mojis/moji-compare@0.4.0':
+    dependencies:
+      compare-versions: 6.1.1
+
   '@mswjs/interceptors@0.37.6':
     dependencies:
       '@open-draft/deferred-promise': 2.2.0
@@ -3665,8 +3657,6 @@ snapshots:
       undici-types: 6.20.0
 
   '@types/normalize-package-data@2.4.4': {}
-
-  '@types/semver@7.7.0': {}
 
   '@types/statuses@2.0.5': {}
 

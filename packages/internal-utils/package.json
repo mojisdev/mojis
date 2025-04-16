@@ -39,15 +39,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@mojis/moji-compare": "catalog:prod",
     "@mojis/schemas": "workspace:*",
     "arktype": "catalog:prod",
-    "fs-extra": "catalog:prod",
-    "semver": "catalog:prod"
+    "fs-extra": "catalog:prod"
   },
   "devDependencies": {
     "@luxass/eslint-config": "catalog:dev",
     "@types/fs-extra": "catalog:dev",
-    "@types/semver": "catalog:dev",
     "eslint": "catalog:dev",
     "tsup": "catalog:dev",
     "typescript": "catalog:dev",

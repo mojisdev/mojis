@@ -1,5 +1,5 @@
 import type { EmojiSpecRecord } from "@mojis/schemas/emojis";
-import semver from "semver";
+import mojiCompare from "@mojis/moji-compare";
 import { NON_EXISTING_VERSIONS } from "./constants";
 
 export const MAPPED_EMOJI_VERSIONS: Record<string, string> = {
@@ -24,7 +24,7 @@ export const MAPPED_EMOJI_VERSIONS: Record<string, string> = {
  * Emoji Versions is almost always major.minor format.
  */
 export function toSemverCompatible(version: string): string | null {
-  return semver.coerce(version)?.version || null;
+  return mojiCompare.coerce(version) || null;
 }
 
 export interface DraftVersion {
@@ -68,7 +68,7 @@ export async function getCurrentDraftVersion(): Promise<DraftVersion | null> {
   // the emoji version is only using major.minor format.
   // so, we will need to add the last 0 to the version.
   // if they don't match the major and minor version, we will throw an error.
-  if (semver.major(rootVersion) !== semver.major(`${emojiVersion}.0`) || semver.minor(rootVersion) !== semver.minor(`${emojiVersion}.0`)) {
+  if (mojiCompare.major(rootVersion) !== mojiCompare.major(`${emojiVersion}.0`) || mojiCompare.minor(rootVersion) !== mojiCompare.minor(`${emojiVersion}.0`)) {
     throw new Error("draft versions do not match");
   }
 
@@ -154,7 +154,7 @@ export function extractUnicodeVersion(emojiVersion: string | null, unicodeVersio
     return null;
   }
 
-  const coercedEmojiVersion = semver.coerce(emojiVersion);
+  const coercedEmojiVersion = mojiCompare.coerce(emojiVersion);
 
   // early return if emoji version is invalid
   if (coercedEmojiVersion == null) {
@@ -162,13 +162,13 @@ export function extractUnicodeVersion(emojiVersion: string | null, unicodeVersio
   }
 
   // v11+ aligned emoji and unicode specs (except for minor versions)
-  if (semver.gte(coercedEmojiVersion, "11.0.0")) {
+  if (mojiCompare.gte(coercedEmojiVersion, "11.0.0")) {
     // if Unicode version is not provided, return the emoji version
     if (unicodeVersion == null) {
       return emojiVersion;
     }
 
-    const coercedUnicodeVersion = semver.coerce(unicodeVersion);
+    const coercedUnicodeVersion = mojiCompare.coerce(unicodeVersion);
 
     // if Unicode version is invalid, return emoji version
     if (coercedUnicodeVersion == null) {
@@ -176,7 +176,7 @@ export function extractUnicodeVersion(emojiVersion: string | null, unicodeVersio
     }
 
     // return the smaller version between emoji and unicode version
-    return semver.lt(coercedEmojiVersion, coercedUnicodeVersion) ? emojiVersion : unicodeVersion;
+    return mojiCompare.lt(coercedEmojiVersion, coercedUnicodeVersion) ? emojiVersion : unicodeVersion;
   }
 
   // return mapped version or default to "6.0"
@@ -313,7 +313,7 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
     });
   }
 
-  return versions.sort((a, b) => semver.compare(`${b.emoji_version}.0`, `${a.emoji_version}.0`));
+  return versions.sort((a, b) => mojiCompare.compareSortable(`${b.emoji_version}.0`, `${a.emoji_version}.0`));
 }
 
 /**
@@ -327,22 +327,21 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
  * @returns {boolean} A boolean that resolves true if the version is allowed, false otherwise.
  */
 export function isEmojiVersionAllowed(version: string): boolean {
-  const semverVersion = toSemverCompatible(version);
-
+  const semverVersion = mojiCompare.coerce(version);
   if (semverVersion == null) {
     return false;
   }
 
   // There isn't any Emoji 6.0-10.0. They aligned the emoji version with the unicode version in 2017.
   // Starting from v11.0.
-  if (NON_EXISTING_VERSIONS.find((v) => semver.satisfies(semverVersion, v))) {
+  if (NON_EXISTING_VERSIONS.find((v) => mojiCompare.satisfies(semverVersion, v))) {
     return false;
   }
 
   // from v1 to v5, there was only major releases. So no v1.1, v1.2, etc.
   // only, v1.0, v2.0, v3.0, v4.0, v5.0.
   // if version has any minor or patch, it is invalid.
-  if (semver.major(semverVersion) <= 5 && (semver.minor(semverVersion) !== 0 || semver.patch(semverVersion) !== 0)) {
+  if (mojiCompare.major(semverVersion) <= 5 && (mojiCompare.minor(semverVersion) !== 0 || mojiCompare.patch(semverVersion) !== 0)) {
     return false;
   }
 
@@ -392,7 +391,7 @@ export function getLatestEmojiVersion(versions: EmojiSpecRecord[], includeDrafts
       semver: toSemverCompatible(v.emoji_version),
     }))
     .filter((v): v is { original: EmojiSpecRecord; semver: string } => v.semver !== null)
-    .sort((a, b) => semver.compare(b.semver, a.semver));
+    .sort((a, b) => mojiCompare.compareSortable(b.semver, a.semver));
 
   if (!filtered.length || filtered[0] == null) {
     return null;

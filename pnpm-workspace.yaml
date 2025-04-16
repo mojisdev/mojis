@@ -13,7 +13,7 @@ catalogs:
   prod:
     farver: ^0.4.2
     fs-extra: ^11.3.0
-    semver: ^7.7.1
+    "@mojis/moji-compare": ^0.4.0
     yargs-parser: ^21.1.1
     defu: ^6.1.4
     arktype: ^2.1.17
@@ -22,7 +22,6 @@ catalogs:
     "@luxass/eslint-config": ^4.18.1
     "@types/fs-extra": ^11.0.4
     "@types/node": ^22.10.0
-    "@types/semver": ^7.7.0
     "@mojis/loomicode": 0.2.0-beta.7
     "@types/yargs-parser": ^21.0.3
     eslint: ^9.23.0

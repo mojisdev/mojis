@@ -7,9 +7,9 @@ import {
   mapEmojiVersionToUnicodeVersion,
   OFFICIAL_SUPPORTED_VERSIONS,
 } from "@mojis/internal-utils";
+import mojiCompare from "@mojis/moji-compare";
 import { green, yellow } from "farver/fast";
 import fs from "fs-extra";
-import semver from "semver";
 import { printHelp } from "../cli-utils";
 
 interface GenerateOptions {
@@ -73,8 +73,8 @@ export async function runGenerate({ versions: providedVersions, flags }: Generat
     // Set fallbacks for unsupported versions
     for (const version of notOfficialSupported) {
       const sortedVersions = [...existingEmojiVersions]
-        .filter((v) => semver.lt(`${v.emoji_version}.0`, `${version.emoji_version}.0`))
-        .sort((a, b) => semver.compare(`${b.emoji_version}.0`, `${a.emoji_version}.0`));
+        .filter((v) => mojiCompare.lt(`${v.emoji_version}.0`, `${version.emoji_version}.0`))
+        .sort((a, b) => mojiCompare.compareSortable(`${b.emoji_version}.0`, `${a.emoji_version}.0`));
 
       const previousVersion = sortedVersions[0];
       const found = versions.find((v) => v.emoji_version === version.emoji_version);
