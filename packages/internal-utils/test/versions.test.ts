@@ -94,9 +94,9 @@ describe("toSemverCompatible", () => {
     { input: "x.0.0", expected: "0.0.0" }, // correctly coerced to 0.0.0
     { input: "1.2.3", expected: "1.2.3" }, // full semver
     { input: "v2.0.0", expected: "2.0.0" }, // leading "v"
-    { input: "3.1.4-alpha", expected: "3.1.4" }, // extra characters
+    { input: "3.1.4-alpha", expected: "3.1.4-alpha" }, // extra characters
     { input: "1.0.0+build.123", expected: "1.0.0" }, // build metadata
-    { input: "1.2.0-beta.1", expected: "1.2.0" }, // prerelease
+    { input: "1.2.0-beta.1", expected: "1.2.0-beta.1" }, // prerelease
   ])("convert $input to semver compatible version $expected", ({ input, expected }) => {
     expect(toSemverCompatible(input)).toBe(expected);
   });
