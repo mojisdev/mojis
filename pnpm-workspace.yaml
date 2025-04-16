@@ -13,8 +13,7 @@ catalogs:
   prod:
     farver: ^0.4.2
     fs-extra: ^11.3.0
-    # TODO: switch to correct version
-    "@mojis/moji-compare": latest
+    "@mojis/moji-compare": 0.3.0
     yargs-parser: ^21.1.1
     defu: ^6.1.4
     arktype: ^2.1.17

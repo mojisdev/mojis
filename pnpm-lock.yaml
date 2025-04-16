@@ -60,8 +60,8 @@ catalogs:
       version: 2.4.4
   prod:
     '@mojis/moji-compare':
-      specifier: latest
-      version: 0.1.0
+      specifier: 0.3.0
+      version: 0.3.0
     arktype:
       specifier: ^2.1.17
       version: 2.1.17
@@ -120,7 +120,7 @@ importers:
         version: link:../internal-utils
       '@mojis/moji-compare':
         specifier: catalog:prod
-        version: 0.1.0
+        version: 0.3.0
       '@mojis/parsers':
         specifier: workspace:*
         version: link:../parsers
@@ -169,7 +169,7 @@ importers:
         version: link:../internal-utils
       '@mojis/moji-compare':
         specifier: catalog:prod
-        version: 0.1.0
+        version: 0.3.0
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -212,7 +212,7 @@ importers:
     dependencies:
       '@mojis/moji-compare':
         specifier: catalog:prod
-        version: 0.1.0
+        version: 0.3.0
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -773,8 +773,8 @@ packages:
   '@mojis/loomicode@0.2.0-beta.7':
     resolution: {integrity: sha512-F3bGbLCJfw1oBz+53DqEN0K5N1iK1QaAr4GoXxqB+G1TO2qcq0VAwNgS5N5+EqFNfa6ru1uEFwB01Py6eYZXdA==}
 
-  '@mojis/moji-compare@0.1.0':
-    resolution: {integrity: sha512-x0q7MR4A2cbQZhUKZwUX9ARmVLaZuV2Gasc68J1r7yqap/uSLVkPGFTK+rs9yHxFxcvG0Lc/3hsCQHQcbihMVA==}
+  '@mojis/moji-compare@0.3.0':
+    resolution: {integrity: sha512-8j6uPZwOxC9e6MWIN0TTV0oROTw0D7wHIGdH0MRXzh0HjiUAqVmzN8WU8LTBPjzhaRI6PlhdYPkfgeZFU870+g==}
 
   '@mswjs/interceptors@0.37.6':
     resolution: {integrity: sha512-wK+5pLK5XFmgtH3aQ2YVvA3HohS3xqV/OxuVOdNx9Wpnz7VE/fnC+e1A7ln6LFYeck7gOJ/dsZV6OLplOtAJ2w==}
@@ -3501,7 +3501,7 @@ snapshots:
       arktype: 2.1.17
       compare-versions: 6.1.1
 
-  '@mojis/moji-compare@0.1.0':
+  '@mojis/moji-compare@0.3.0':
     dependencies:
       compare-versions: 6.1.1
 
