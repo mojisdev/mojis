@@ -72,9 +72,6 @@ export default defineConfig({
             tsconfig: "./packages/adapters/tsconfig.test.json"
           }
         },
-        define: {
-          "import.meta.isVitest": "true",
-        },
         esbuild: { target: "es2020" },
         resolve: { alias: aliases },
       },
