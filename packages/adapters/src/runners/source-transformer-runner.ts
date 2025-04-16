@@ -5,6 +5,7 @@ import { fetchCache } from "@mojis/internal-utils";
 import { genericParse } from "@mojis/parsers";
 import defu from "defu";
 import { AdapterError } from "../errors";
+import * as predicates from "../predicates";
 import { buildContext, getHandlerUrls, isBuiltinParser } from "../utils";
 
 export interface RunSourceTransformerOverrides {
@@ -22,7 +23,17 @@ export async function runSourceTransformer<THandler extends AnySourceTransformer
   adapterHandlerType: SourceAdapterType,
   __overrides?: RunSourceTransformerOverrides,
 ): Promise<THandler["output"]> {
-  const urls = await getHandlerUrls(handler.urls, ctx);
+  const urls = await getHandlerUrls(handler.urls, buildContext(ctx, {
+    always: predicates.always,
+    never: predicates.never,
+    between: predicates.between,
+    greaterThan: predicates.greaterThan,
+    lessThan: predicates.lessThan,
+    excludeVersions: predicates.excludeVersions,
+    matchVersions: predicates.matchVersions,
+    any: predicates.any,
+    all: predicates.all,
+  }));
 
   if (urls.length === 0) {
     throw new AdapterError(`no urls found for handler: ${adapterHandlerType}`);
