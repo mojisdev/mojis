@@ -20,12 +20,6 @@ export interface PersistenceOptions {
   basePath: string;
 
   /**
-   * Whether to force overwrite of existing files.
-   * @default false
-   */
-  force?: boolean;
-
-  /**
    * Version information for the emoji data.
    */
   version: {
@@ -45,70 +39,101 @@ export interface PersistenceOptions {
    * @default false
    */
   pretty?: boolean;
-
-  /**
-   * The file extension to use for the output files.
-   * @default "json"
-   */
-  fileExtension?: string;
-
-  /**
-   * The encoding to use when writing files.
-   * @default "utf-8"
-   */
-  encoding?: BufferEncoding;
 }
 
-export interface PersistenceFileOperation<TData = string | Uint8Array> {
+export interface PersistenceOperationSchema<
+  TName extends string,
+  TFilePath extends string,
+  TSchema extends type.Any,
+> {
   /**
-   * The file path to write to.
+   * The name of the schema.
+   * This is used by the `PersistenceOperation["reference"]` property.
    */
-  filePath: string;
+  name: TName;
+
+  /**
+   * The pattern to use for the file path.
+   */
+  pattern: string;
+
+  /**
+   * The file path to use for the output file.
+   */
+  filePath: TFilePath;
+
+  /**
+   * The type of the file.
+   */
+  type: "json" | "text";
+
+  /**
+   * The schema to use for the data.
+   */
+  schema: TSchema;
+}
+
+type ExtractPathParams<T extends string> =
+  T extends `${infer _}{${infer Param}}${infer Rest}`
+    ? Param | ExtractPathParams<Rest>
+    : never;
+
+export type PathParamsToRecord<T extends string> = {
+  [K in ExtractPathParams<T>]: string;
+};
+
+export interface PersistenceOperation<
+  TSchemaNames extends PersistenceSchema<any>[],
+  TData = string | Uint8Array,
+  // eslint-disable-next-line ts/no-empty-object-type
+  TParams extends Record<string, unknown> = {},
+> {
+  /**
+   * The reference to the schema.
+   */
+  reference: TSchemaNames[number]["name"];
+
+  /**
+   * The parameters for the schema.
+   */
+  params?: TParams;
 
   /**
    * The data to write to the file.
    */
   data: TData;
-
-  /**
-   * The type of data being written.
-   */
-  type: "json" | "text";
-
-  /**
-   * The options for the file operation.
-   */
-  options?: {
-    /**
-     * For JSON, whether to pretty-print.
-     * @default false
-     */
-    pretty?: boolean;
-
-    /**
-     * The encoding to use for the file.
-     * @default "utf-8"
-     */
-    encoding?: BufferEncoding;
-
-    /**
-     * Whether to overwrite existing files.
-     */
-    force?: boolean;
-  };
 }
 
-export type PersistenceFn<TIn, TOut> = (
+// Update PersistenceMapFn to properly constrain reference to schema names
+export type PersistenceMapFn<
+  TPersistenceSchemas extends PersistenceSchema<any>[],
+  TIn,
+> = (
   data: TIn,
   options: PersistenceOptions
-) => MaybePromise<
-  Array<
-    PersistenceFileOperation<
-      TOut extends (infer ArrayType)[] ? ArrayType[] :
-        keyof TOut extends never ? unknown : TOut[keyof TOut]
-    >
-  >
->;
+  // eslint-disable-next-line ts/no-empty-object-type
+) => MaybePromise<Array<PersistenceOperation<TPersistenceSchemas, any, {}>>>;
+
+export interface Persistence<
+  TIn,
+  _TOut,
+  TPersistenceSchemas extends PersistenceSchema<string>[],
+> {
+  /**
+   * The schemas to use for the persistence operation.
+   */
+  schema: TPersistenceSchemas;
+
+  /**
+   * The function to map the data to the persistence format.
+   */
+  map: PersistenceMapFn<TPersistenceSchemas, TIn>;
+
+  /**
+   * The options for the persistence operation.
+   */
+  options?: PersistenceOptions;
+}
 
 export type InferHandlerOutput<TSourceAdapter extends AnySourceAdapter> =
   TSourceAdapter extends { handlers: Array<[any, infer TSourceTransformer]> }
@@ -160,9 +185,10 @@ export interface SourceAdapterBuilder<
   persistence: <
     TIn extends TParams["_transformerOutputSchema"] extends type.Any ? TParams["_transformerOutputSchema"]["infer"] : any,
     TOut extends TParams["_persistenceOutputSchema"] extends type.Any ? TParams["_persistenceOutputSchema"]["infer"] : any,
+    TPersistenceSchemas extends PersistenceSchema<any>[],
   >(
     fn: TParams["_persistence"] extends UnsetMarker
-      ? PersistenceFn<TIn, TOut>
+      ? Persistence<TIn, TOut, TPersistenceSchemas>
       : ErrorMessage<"persistence is already set">,
   ) => SourceAdapterBuilder<{
     _fallback: TOut;
@@ -175,7 +201,7 @@ export interface SourceAdapterBuilder<
   }>;
 
   persistenceOptions: <TOptions extends Omit<PersistenceOptions, "version">>(
-    options: TOptions extends UnsetMarker ? TOptions : ErrorMessage<"persistenceOptions is already set">
+    options: TParams["_persistenceOptions"] extends UnsetMarker ? TOptions : ErrorMessage<"persistenceOptions is already set">
   ) => SourceAdapterBuilder<{
     _fallback: TParams["_fallback"];
     _handlers: TParams["_handlers"];
@@ -218,7 +244,7 @@ export interface AnyBuiltSourceAdapterParams {
   handlers: [PredicateFn, AnySourceTransformer][];
   fallback?: FallbackFn<any>;
   persistenceOptions?: PersistenceOptions;
-  persistence?: PersistenceFn<any, any>;
+  persistence?: Persistence<any, any, any>;
 
   persistenceOutputSchema?: type.Any;
   transformerOutputSchema: type.Any;
@@ -236,13 +262,14 @@ export interface SourceAdapter<TParams extends AnyBuiltSourceAdapterParams> {
       ? TParams["transformerOutputSchema"]["infer"]
       : any
   >;
-  persistence?: PersistenceFn<
+  persistence?: Persistence<
     TParams["transformerOutputSchema"] extends type.Any
       ? TParams["transformerOutputSchema"]["infer"]
       : any,
     TParams["persistenceOutputSchema"] extends type.Any
       ? TParams["persistenceOutputSchema"]["infer"]
-      : any
+      : any,
+    any
   >;
   persistenceOptions?: TParams["persistenceOptions"];
 }
