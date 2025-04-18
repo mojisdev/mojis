@@ -19,8 +19,12 @@
     "url": "https://github.com/mojisdev/mojis/issues"
   },
   "exports": {
-    "./groups.json": "./schemas/groups.json",
-    "./emojis.json": "./schemas/emojis.json",
+    "./metadata-groups.json": "./schemas/metadata-groups.json",
+    "./metadata-emojis.json": "./schemas/metadata-emojis.json",
+    "./sequences-sequences.json": "./schemas/sequences-sequences.json",
+    "./sequences-zwj.json": "./schemas/sequences-zwj.json",
+    "./unicode-names-unicodeNames.json": "./schemas/unicode-names-unicodeNames.json",
+    "./variations-variations.json": "./schemas/variations-variations.json",
     "./package.json": "./package.json"
   },
   "files": [
@@ -36,7 +40,6 @@
   },
   "devDependencies": {
     "@luxass/eslint-config": "catalog:dev",
-    "@mojis/schemas": "workspace:*",
     "eslint": "catalog:dev",
     "tsx": "catalog:dev",
     "typescript": "catalog:dev",

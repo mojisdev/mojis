@@ -1,0 +1,86 @@
+name: verify json schema
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+
+      - name: setup node
+        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
+        with:
+          node-version: lts/*
+
+      - name: install dependencies
+        run: pnpm install
+
+      - name: generate schemas
+        run: pnpm run generate:json-schemas
+
+      - name: check for git changes
+        id: check-for-git-changes
+        run: |
+          if [ -n "$(git status --porcelain './packages/json-schemas/schemas')" ]; then
+            echo "JSON Schema files have changed."
+            echo "changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "No changes detected in JSON Schema files."
+            echo "changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: exit if commit to main
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && steps.check-for-git-changes.outputs.changes == 'true'
+        run: |
+          echo "exiting since we can't create a comment on the main branch"
+          exit 0
+
+      - name: find comment
+        uses: peter-evans/find-comment@v3
+        if: steps.check-for-git-changes.outputs.changes == 'true' && github.event_name == 'pull_request'
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: JSON Schema
+
+
+      - name: create pull request comment
+        if: steps.check-for-git-changes.outputs.changes == 'true' && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          edit-mode: replace
+          body: |
+            JSON Schema files have changed. Please run the following command to update the schemas:
+
+            ```bash
+            pnpm run generate:json-schemas
+            ```
+
+            This will update the JSON Schema files in the `packages/json-schemas/schemas` directory.
+            Please commit the changes and push them to the pull request.
+
+      - name: exit 1
+        if: steps.check-for-git-changes.outputs.changes == 'true'
+        run: |
+          echo "exiting since we have changes"
+          exit 1

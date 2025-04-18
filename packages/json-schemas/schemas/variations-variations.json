@@ -1,0 +1,46 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "emoji": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "const": null
+          }
+        ]
+      },
+      "property": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "const": null
+          }
+        ]
+      },
+      "text": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "const": null
+          }
+        ]
+      }
+    },
+    "required": [
+      "emoji",
+      "property",
+      "text"
+    ]
+  }
+}
