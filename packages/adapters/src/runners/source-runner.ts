@@ -87,36 +87,46 @@ export async function runSourceAdapter<
 
   await Promise.all(
     fileOperations.map(async (operation) => {
-      const { filePath, data, type, options: fileOptions = {} } = operation;
+      const { reference, data, params } = operation;
 
-      const {
-        encoding = "utf-8",
-        pretty = handler.persistenceOptions?.pretty ?? false,
-        force = ctx.force ?? false,
-      } = fileOptions;
+      let filePath = reference.filePath.replace("<base-path>", persistenceOptions.basePath);
+      filePath = filePath.replace(/\{.*\}/g, (match: any) => {
+        const param = match.slice(1, -1);
+        if (params == null || !(param in params)) {
+          throw new Error(`Missing parameter ${param} in file path ${filePath}`);
+        }
+        return params[param];
+      });
+
+      // const {
+      //   encoding = "utf-8",
+      //   pretty = handler.persistenceOptions?.pretty ?? false,
+      //   force = ctx.force ?? false,
+      // } = fileOptions;
 
       // create directory if it doesn't exist
       const dir = path.dirname(filePath);
       await fs.ensureDir(dir);
 
+      const force = ctx.force ?? false;
+
       // skip if file exists and force is false
       if (!force && await fs.pathExists(filePath)) {
         console.warn(`File exists and force is false, skipping: ${filePath}`);
-        return;
       }
 
       // write the file
-      if (type === "json") {
+      if (reference.type === "json") {
         await fs.writeFile(
           filePath,
-          pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data),
-          { encoding },
+          persistenceOptions.pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data),
+          { encoding: persistenceOptions.encoding },
         );
       } else {
         await fs.writeFile(
           filePath,
           String(data),
-          { encoding },
+          { encoding: persistenceOptions.encoding },
         );
       }
     }),

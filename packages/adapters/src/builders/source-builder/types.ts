@@ -67,10 +67,11 @@ export interface PersistenceContext<TSchemas extends Record<string, PersistenceS
 export type PersistenceMapFn<
   TContext extends PersistenceContext,
   TIn,
+  TOut extends ValidSchemaOp<TContext>,
 > = (
   references: TContext["schemas"],
   data: TIn
-) => MaybePromise<Array<ValidSchemaOp<TContext>>>;
+) => MaybePromise<Array<TOut>>;
 
 export type InferHandlerOutput<TSourceAdapter extends AnySourceAdapter> =
   TSourceAdapter extends { handlers: Array<[any, infer TSourceTransformer]> }
@@ -119,15 +120,16 @@ export interface SourceAdapterBuilder<
 
   toPersistenceOperations: <
     TIn extends TParams["_transformerOutputSchema"]["infer"],
+    TOut extends ValidSchemaOp<TParams["_persistence"]>,
   >(
-    fn: PersistenceMapFn<TParams["_persistence"], TIn>
+    fn: PersistenceMapFn<TParams["_persistence"], TIn, TOut>
   ) => SourceAdapterBuilder<{
     _adapterType: TParams["_adapterType"];
     _transformerOutputSchema: TParams["_transformerOutputSchema"];
     _handlers: TParams["_handlers"];
     _fallback: TParams["_fallback"];
     _persistence: TParams["_persistence"];
-    _persistenceMapFn: typeof fn;
+    _persistenceMapFn: TOut;
   }>;
 
   build: () => SourceAdapter<{
@@ -160,7 +162,7 @@ export interface AnyBuiltSourceAdapterParams {
   fallback?: FallbackFn<any>;
   transformerOutputSchema: type.Any;
   persistence: PersistenceContext;
-  persistenceMapFn: PersistenceMapFn<any, any>;
+  persistenceMapFn: any;
 }
 
 export type FallbackFn<TOut> = () => TOut;
@@ -175,7 +177,7 @@ export interface SourceAdapter<TParams extends AnyBuiltSourceAdapterParams> {
       : any
   >;
   persistence: TParams["persistence"];
-  persistenceMapFn: PersistenceMapFn<TParams["persistence"], TParams["transformerOutputSchema"]["infer"]>;
+  persistenceMapFn: PersistenceMapFn<TParams["persistence"], TParams["transformerOutputSchema"]["infer"], TParams["persistenceMapFn"]>;
 }
 
 export type AnySourceAdapter = SourceAdapter<any>;
