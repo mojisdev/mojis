@@ -32,7 +32,7 @@ export interface PersistenceOptions {
   encoding?: BufferEncoding;
 }
 
-interface PersistenceSchema {
+export interface PersistenceSchema {
   pattern: string;
   filePath: string;
   type: "json" | "text";
@@ -50,6 +50,15 @@ export interface PersistenceContext {
    */
   options?: PersistenceOptions;
 }
+
+export type PersistenceMapFn<
+  TReferences extends Record<string, PersistenceSchema>,
+  TIn,
+  TOut = any,
+> = (
+  references: TReferences,
+  data: TIn,
+) => TOut[];
 
 export type InferHandlerOutput<TSourceAdapter extends AnySourceAdapter> =
   TSourceAdapter extends { handlers: Array<[any, infer TSourceTransformer]> }
@@ -79,6 +88,8 @@ export interface SourceAdapterBuilder<
       TParams["_handlers"]
     >;
     _fallback: TParams["_fallback"];
+    _persistence: TParams["_persistence"];
+    _persistenceMapFn: TParams["_persistenceMapFn"];
   }>;
 
   fallback: <TOut extends TParams["_transformerOutputSchema"] extends type.Any ? TParams["_transformerOutputSchema"]["infer"] : any>(
@@ -90,6 +101,23 @@ export interface SourceAdapterBuilder<
     _handlers: TParams["_handlers"];
     _transformerOutputSchema: TParams["_transformerOutputSchema"];
     _adapterType: TParams["_adapterType"];
+    _persistence: TParams["_persistence"];
+    _persistenceMapFn: TParams["_persistenceMapFn"];
+  }>;
+
+  toPersistenceOperations: <
+    TReferences extends TParams["_persistence"]["schemas"],
+    TIn extends TParams["_transformerOutputSchema"]["infer"],
+    TOut,
+  >(
+    fn: PersistenceMapFn<TReferences, TIn, TOut>,
+  ) => SourceAdapterBuilder<{
+    _adapterType: TParams["_adapterType"];
+    _transformerOutputSchema: TParams["_transformerOutputSchema"];
+    _handlers: TParams["_handlers"];
+    _fallback: TParams["_fallback"];
+    _persistence: TParams["_persistence"];
+    _persistenceMapFn: TOut;
   }>;
 
   build: () => SourceAdapter<{
@@ -97,6 +125,8 @@ export interface SourceAdapterBuilder<
     handlers: TParams["_handlers"];
     transformerOutputSchema: TParams["_transformerOutputSchema"];
     adapterType: TParams["_adapterType"];
+    persistence: TParams["_persistence"];
+    persistenceMapFn: TParams["_persistenceMapFn"];
   }>;
 }
 
@@ -107,6 +137,9 @@ export interface AnySourceAdapterParams {
 
   // schema for transformer output
   _transformerOutputSchema: type.Any;
+
+  _persistence: PersistenceContext;
+  _persistenceMapFn: any;
 }
 
 export type PredicateFn = (version: string) => boolean;
@@ -116,6 +149,8 @@ export interface AnyBuiltSourceAdapterParams {
   handlers: [PredicateFn, AnySourceTransformer][];
   fallback?: FallbackFn<any>;
   transformerOutputSchema: type.Any;
+  persistence: PersistenceContext;
+  persistenceMapFn: PersistenceMapFn<any, any>;
 }
 
 export type FallbackFn<TOut> = () => TOut;
@@ -129,6 +164,8 @@ export interface SourceAdapter<TParams extends AnyBuiltSourceAdapterParams> {
       ? TParams["transformerOutputSchema"]["infer"]
       : any
   >;
+  persistence: TParams["persistence"];
+  persistenceMapFn: PersistenceMapFn<TParams["persistence"]["schemas"], TParams["transformerOutputSchema"]["infer"]>;
 }
 
 export type AnySourceAdapter = SourceAdapter<any>;

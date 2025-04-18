@@ -174,7 +174,7 @@ export const handler = builder
       groups: [],
     };
   })
-  .map((references, data) => {
+  .toPersistenceOperations((references, data) => {
     return [
       {
         reference: references.groups,
@@ -188,4 +188,5 @@ export const handler = builder
         data: metadata,
       })),
     ];
-  });
+  })
+  .build();

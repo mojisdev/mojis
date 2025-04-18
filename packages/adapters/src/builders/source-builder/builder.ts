@@ -22,12 +22,16 @@ function internalCreateSourceAdapterBuilder<
     _handlers: [PredicateFn, AnySourceTransformer][];
     _transformerOutputSchema: TTransformerOutputSchema;
     _fallback: UnsetMarker;
+    _persistence: PersistenceContext;
+    _persistenceMapFn: any;
   }> {
   const _def: AnySourceAdapter = {
     adapterType: initDef.adapterType,
     transformerOutputSchema: initDef.transformerOutputSchema,
     handlers: [],
     fallback: () => {},
+    persistence: initDef.persistence ?? {} as PersistenceContext,
+    persistenceMapFn: () => { return []; },
 
     // overload with properties passed in
     ...initDef,
@@ -50,6 +54,12 @@ function internalCreateSourceAdapterBuilder<
       return internalCreateSourceAdapterBuilder({
         ..._def,
         fallback: userFn,
+      }) as SourceAdapterBuilder<any>;
+    },
+    toPersistenceOperations(userFn) {
+      return internalCreateSourceAdapterBuilder({
+        ..._def,
+        persistenceMapFn: userFn,
       }) as SourceAdapterBuilder<any>;
     },
     build() {
@@ -80,9 +90,12 @@ export function createSourceAdapter<
     _handlers: [PredicateFn, AnySourceTransformer][];
     _transformerOutputSchema: TTransformerOutputSchema;
     _fallback: UnsetMarker;
+    _persistence: PersistenceContext;
+    _persistenceMapFn: any;
   }> {
   return internalCreateSourceAdapterBuilder<TAdapterType, TTransformerOutputSchema>({
     adapterType: opts.type,
     transformerOutputSchema: opts.transformerOutputSchema,
+    persistence: opts.persistence,
   });
 }
