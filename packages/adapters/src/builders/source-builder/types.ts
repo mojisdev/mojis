@@ -39,11 +39,11 @@ export interface PersistenceSchema {
   schema: type.Any;
 }
 
-export interface PersistenceContext {
+export interface PersistenceContext<TSchemas extends Record<string, PersistenceSchema> = Record<string, PersistenceSchema>> {
   /**
    * Persistence Schemas
    */
-  schemas: Record<string, PersistenceSchema>;
+  schemas: TSchemas;
 
   /**
    * The persistence options to use.
@@ -52,11 +52,11 @@ export interface PersistenceContext {
 }
 
 export type PersistenceMapFn<
-  TReferences extends Record<string, PersistenceSchema>,
+  TContext extends PersistenceContext,
   TIn,
   TOut = any,
 > = (
-  references: TReferences,
+  references: TContext["schemas"],
   data: TIn,
 ) => TOut[];
 
@@ -106,11 +106,10 @@ export interface SourceAdapterBuilder<
   }>;
 
   toPersistenceOperations: <
-    TReferences extends TParams["_persistence"]["schemas"],
     TIn extends TParams["_transformerOutputSchema"]["infer"],
     TOut,
   >(
-    fn: PersistenceMapFn<TReferences, TIn, TOut>,
+    fn: PersistenceMapFn<TParams["_persistence"], TIn, TOut>,
   ) => SourceAdapterBuilder<{
     _adapterType: TParams["_adapterType"];
     _transformerOutputSchema: TParams["_transformerOutputSchema"];
@@ -165,7 +164,7 @@ export interface SourceAdapter<TParams extends AnyBuiltSourceAdapterParams> {
       : any
   >;
   persistence: TParams["persistence"];
-  persistenceMapFn: PersistenceMapFn<TParams["persistence"]["schemas"], TParams["transformerOutputSchema"]["infer"]>;
+  persistenceMapFn: PersistenceMapFn<TParams["persistence"], TParams["transformerOutputSchema"]["infer"]>;
 }
 
 export type AnySourceAdapter = SourceAdapter<any>;

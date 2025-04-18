@@ -15,6 +15,7 @@ import { createSourceTransformerBuilder } from "../source-transformer-builder/bu
 function internalCreateSourceAdapterBuilder<
   TAdapterType extends SourceAdapterType,
   TTransformerOutputSchema extends type.Any,
+  TPersistence extends PersistenceContext,
 >(
   initDef: Partial<AnySourceAdapter> = {},
 ): SourceAdapterBuilder<{
@@ -22,7 +23,7 @@ function internalCreateSourceAdapterBuilder<
     _handlers: [PredicateFn, AnySourceTransformer][];
     _transformerOutputSchema: TTransformerOutputSchema;
     _fallback: UnsetMarker;
-    _persistence: PersistenceContext;
+    _persistence: TPersistence;
     _persistenceMapFn: any;
   }> {
   const _def: AnySourceAdapter = {
@@ -71,29 +72,32 @@ function internalCreateSourceAdapterBuilder<
 export interface CreateSourceAdapterBuilderOptions<
   TAdapterType extends SourceAdapterType,
   TTransformerOutputSchema extends type.Any,
+  TPersistence extends PersistenceContext,
 > {
   type: TAdapterType;
   transformerOutputSchema: TTransformerOutputSchema;
-  persistence: PersistenceContext;
+  persistence: TPersistence;
 }
 
 export function createSourceAdapter<
   TAdapterType extends SourceAdapterType,
   TTransformerOutputSchema extends type.Any,
+  TPersistence extends PersistenceContext,
 >(
   opts: CreateSourceAdapterBuilderOptions<
     TAdapterType,
-    TTransformerOutputSchema
+    TTransformerOutputSchema,
+    TPersistence
   >,
 ): SourceAdapterBuilder<{
     _adapterType: TAdapterType;
     _handlers: [PredicateFn, AnySourceTransformer][];
     _transformerOutputSchema: TTransformerOutputSchema;
     _fallback: UnsetMarker;
-    _persistence: PersistenceContext;
+    _persistence: TPersistence;
     _persistenceMapFn: any;
   }> {
-  return internalCreateSourceAdapterBuilder<TAdapterType, TTransformerOutputSchema>({
+  return internalCreateSourceAdapterBuilder<TAdapterType, TTransformerOutputSchema, TPersistence>({
     adapterType: opts.type,
     transformerOutputSchema: opts.transformerOutputSchema,
     persistence: opts.persistence,

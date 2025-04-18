@@ -58,18 +58,6 @@ const builder = createSourceAdapter({
         schema: EMOJI_SEQUENCE_SCHEMA.array(),
       },
     },
-    map: (data) => {
-      return [
-        {
-          reference: "sequences",
-          data: data.sequences,
-        },
-        {
-          reference: "zwj",
-          data: data.zwj,
-        },
-      ];
-    },
   },
 });
 
@@ -161,5 +149,17 @@ export const handler = builder
       sequences: [],
       zwj: [],
     };
+  })
+  .toPersistenceOperations((references, data) => {
+    return [
+      {
+        reference: references.sequences,
+        data: data.sequences,
+      },
+      {
+        reference: references.zwj,
+        data: data.zwj,
+      },
+    ];
   })
   .build();

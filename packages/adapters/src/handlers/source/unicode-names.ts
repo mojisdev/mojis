@@ -29,14 +29,6 @@ const builder = createSourceAdapter({
         }),
       },
     },
-    map: (data) => {
-      return [
-        {
-          reference: "unicodeNames",
-          data,
-        },
-      ];
-    },
   },
 });
 
@@ -75,5 +67,13 @@ export const handler = builder
   )
   .fallback(() => {
     return {};
+  })
+  .toPersistenceOperations((references, data) => {
+    return [
+      {
+        reference: references.unicodeNames,
+        data,
+      },
+    ];
   })
   .build();

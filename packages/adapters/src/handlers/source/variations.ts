@@ -20,14 +20,6 @@ const builder = createSourceAdapter({
         schema: EMOJI_VARIATION_SCHEMA.array(),
       },
     },
-    map: (data) => {
-      return [
-        {
-          reference: "variations",
-          data,
-        },
-      ];
-    },
   },
 });
 
@@ -82,5 +74,13 @@ export const handler = builder
   )
   .fallback(() => {
     return [];
+  })
+  .toPersistenceOperations((references, data) => {
+    return [
+      {
+        reference: references.variations,
+        data,
+      },
+    ];
   })
   .build();
