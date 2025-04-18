@@ -184,15 +184,15 @@ export const handler = builder
       return [
         {
           reference: "groups",
-          data: data.groups,
+          data,
         },
-        ...Object.entries(data.emojis).map(([group, metadata]) => ({
-          reference: "emojis",
-          params: {
-            group,
-          },
-          data: metadata,
-        })),
+        // ...Object.entries(data.emojis).map(([group, metadata]) => ({
+        //   reference: "emojis",
+        //   params: {
+
+        //   },
+        //   data: metadata,
+        // })),
       ];
     },
     // options: {

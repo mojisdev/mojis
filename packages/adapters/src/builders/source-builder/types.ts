@@ -83,20 +83,20 @@ export type PathParamsToRecord<T extends string> = {
 };
 
 export interface PersistenceOperation<
-  TSchemaNames extends PersistenceSchema<any>[],
-  TData = string | Uint8Array,
+  TSchema extends PersistenceOperationSchema<any, any, type.Any>,
+  TData extends TSchema["schema"]["infer"],
   // eslint-disable-next-line ts/no-empty-object-type
-  TParams extends Record<string, unknown> = {},
+  TPathParams extends Record<string, string> = {},
 > {
   /**
    * The reference to the schema.
    */
-  reference: TSchemaNames[number]["name"];
+  reference: TSchema["name"];
 
   /**
    * The parameters for the schema.
    */
-  params?: TParams;
+  params?: TPathParams;
 
   /**
    * The data to write to the file.
@@ -106,18 +106,15 @@ export interface PersistenceOperation<
 
 // Update PersistenceMapFn to properly constrain reference to schema names
 export type PersistenceMapFn<
-  TPersistenceSchemas extends PersistenceSchema<any>[],
+  TPersistenceSchemas extends PersistenceOperationSchema<any, any, type.Any>[],
   TIn,
 > = (
   data: TIn,
-  options: PersistenceOptions
-  // eslint-disable-next-line ts/no-empty-object-type
-) => MaybePromise<Array<PersistenceOperation<TPersistenceSchemas, any, {}>>>;
+) => MaybePromise<Array<PersistenceOperation<TPersistenceSchemas[number], TIn>>>;
 
 export interface Persistence<
   TIn,
-  _TOut,
-  TPersistenceSchemas extends PersistenceSchema<string>[],
+  TPersistenceSchemas extends PersistenceOperationSchema<any, any, type.Any>[],
 > {
   /**
    * The schemas to use for the persistence operation.
@@ -127,7 +124,9 @@ export interface Persistence<
   /**
    * The function to map the data to the persistence format.
    */
-  map: PersistenceMapFn<TPersistenceSchemas, TIn>;
+  map: (data: TIn) => Array<
+    PersistenceOperation<any, any, PathParamsToRecord<TPersistenceSchemas[number]["pattern"]>>
+  >;
 
   /**
    * The options for the persistence operation.
@@ -184,19 +183,18 @@ export interface SourceAdapterBuilder<
 
   persistence: <
     TIn extends TParams["_transformerOutputSchema"] extends type.Any ? TParams["_transformerOutputSchema"]["infer"] : any,
-    TOut extends TParams["_persistenceOutputSchema"] extends type.Any ? TParams["_persistenceOutputSchema"]["infer"] : any,
-    TPersistenceSchemas extends PersistenceSchema<any>[],
+    TPersistenceSchemas extends PersistenceOperationSchema<any, any, type.Any>[],
   >(
     fn: TParams["_persistence"] extends UnsetMarker
-      ? Persistence<TIn, TOut, TPersistenceSchemas>
+      ? Persistence<TIn, TPersistenceSchemas>
       : ErrorMessage<"persistence is already set">,
   ) => SourceAdapterBuilder<{
-    _fallback: TOut;
+    _fallback: TParams["_fallback"];
     _handlers: TParams["_handlers"];
     _persistenceOutputSchema: TParams["_persistenceOutputSchema"];
     _transformerOutputSchema: TParams["_transformerOutputSchema"];
     _adapterType: TParams["_adapterType"];
-    _persistence: TOut;
+    _persistence: any; // TODO: fix here
     _persistenceOptions: TParams["_persistenceOptions"];
   }>;
 
