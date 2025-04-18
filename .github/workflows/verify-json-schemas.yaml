@@ -68,6 +68,7 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          edit-mode: replace
           body: |
             JSON Schema files have changed. Please run the following command to update the schemas:
 
