@@ -30,6 +30,7 @@ describe("runSourceAdapter", () => {
       persistence: {
         schemas: {},
       },
+      fallback: {},
     }).build();
 
     const result = await runSourceAdapter(handler, mockContext);
@@ -56,6 +57,7 @@ describe("runSourceAdapter", () => {
       persistence: {
         schemas: {},
       },
+      fallback: {},
     })
       .withTransform(
         (version: string) => version === "15.0",
@@ -107,6 +109,7 @@ describe("runSourceAdapter", () => {
       persistence: {
         schemas: {},
       },
+      fallback: {},
     })
       .withTransform(
         (version: string) => version === "15.0",
@@ -163,6 +166,7 @@ describe("runSourceAdapter", () => {
       persistence: {
         schemas: {},
       },
+      fallback: {},
     })
       .withTransform(
         (version: string) => version === "15.0",
@@ -218,6 +222,7 @@ describe("runSourceAdapter", () => {
       persistence: {
         schemas: {},
       },
+      fallback: {},
     })
       .withTransform(
         (version: string) => version === "15.0",
@@ -261,6 +266,7 @@ describe("runSourceAdapter", () => {
       persistence: {
         schemas: {},
       },
+      fallback: {},
     })
       .withTransform(
         (version: string) => version === "15.0",
@@ -308,6 +314,7 @@ describe("runSourceAdapter", () => {
       persistence: {
         schemas: {},
       },
+      fallback: {},
     })
       .withTransform(
         (version: string) => version === "15.0",
@@ -360,6 +367,7 @@ describe("runSourceAdapter", () => {
       persistence: {
         schemas: {},
       },
+      fallback: undefined,
     })
       .withTransform(
         (version: string) => version === "15.0",
@@ -410,6 +418,7 @@ describe("runSourceAdapter", () => {
       persistence: {
         schemas: {},
       },
+      fallback: {},
     })
       .withTransform(
         predicate,
@@ -442,6 +451,9 @@ describe("runSourceAdapter", () => {
       }),
       persistence: {
         schemas: {},
+      },
+      fallback: {
+        page1: "default",
       },
     })
       .withTransform(
