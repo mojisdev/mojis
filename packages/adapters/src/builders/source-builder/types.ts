@@ -1,7 +1,6 @@
 import type { type } from "arktype";
 import type {
   ErrorMessage,
-  Id,
   MaybePromise,
   MergeTuple,
   SourceAdapterType,

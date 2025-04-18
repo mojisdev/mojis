@@ -1,4 +1,3 @@
-import { join } from "node:path";
 import { type } from "arktype";
 import { createSourceAdapter } from "../../builders/source-builder/builder";
 import { joinPath } from "../../utils";

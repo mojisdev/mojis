@@ -1,5 +1,4 @@
 import type { EmojiSequence } from "@mojis/schemas/emojis";
-import { join } from "node:path";
 import { expandHexRange, FEMALE_SIGN, MALE_SIGN } from "@mojis/internal-utils";
 import { EMOJI_SEQUENCE_SCHEMA } from "@mojis/schemas/emojis";
 import { type } from "arktype";

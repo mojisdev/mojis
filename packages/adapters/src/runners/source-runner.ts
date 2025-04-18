@@ -1,5 +1,5 @@
 import type { Cache, CacheOptions } from "@mojis/internal-utils";
-import type { AnySourceAdapter, InferHandlerOutput, PersistenceContext, PersistenceOptions } from "../builders/source-builder/types";
+import type { AnySourceAdapter, InferHandlerOutput, PersistenceOptions } from "../builders/source-builder/types";
 import type { AdapterContext } from "../global-types";
 import path, { join } from "node:path";
 import { arktypeParse } from "@mojis/internal-utils";
