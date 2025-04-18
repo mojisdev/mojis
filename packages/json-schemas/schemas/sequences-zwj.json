@@ -1,0 +1,40 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "description": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "const": null
+          }
+        ]
+      },
+      "gender": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "const": null
+          }
+        ]
+      },
+      "hex": {
+        "type": "string"
+      },
+      "property": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "description",
+      "gender",
+      "hex",
+      "property"
+    ]
+  }
+}
