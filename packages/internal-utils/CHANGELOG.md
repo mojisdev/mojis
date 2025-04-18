@@ -1,5 +1,11 @@
 # @mojis/internal-utils
 
+## 0.1.0
+
+### Minor Changes
+
+- [#111](https://github.com/mojisdev/mojis/pull/111) [`5baa66d`](https://github.com/mojisdev/mojis/commit/5baa66d1760e801a94774ba27fae00b5c6d89347) Thanks [@luxass](https://github.com/luxass)! - replace semver with moji-compare
+
 ## 0.0.9
 
 ### Patch Changes
