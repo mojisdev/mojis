@@ -104,19 +104,6 @@ export interface SourceAdapterBuilder<
     _persistenceMapFn: TParams["_persistenceMapFn"];
   }>;
 
-  fallback: <TOut extends TParams["_transformerOutputSchema"] extends type.Any ? TParams["_transformerOutputSchema"]["infer"] : any>(
-    fn: TParams["_fallback"] extends UnsetMarker
-      ? FallbackFn<TOut>
-      : ErrorMessage<"fallback is already set">,
-  ) => SourceAdapterBuilder<{
-    _fallback: TOut;
-    _handlers: TParams["_handlers"];
-    _transformerOutputSchema: TParams["_transformerOutputSchema"];
-    _adapterType: TParams["_adapterType"];
-    _persistence: TParams["_persistence"];
-    _persistenceMapFn: TParams["_persistenceMapFn"];
-  }>;
-
   toPersistenceOperations: <
     TIn extends TParams["_transformerOutputSchema"]["infer"],
     TOut extends ValidSchemaOp<TParams["_persistence"]>,
