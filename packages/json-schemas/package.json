@@ -32,7 +32,6 @@
   ],
   "scripts": {
     "build": "pnpm run write-schemas",
-    "dev": "pnpm run write-schemas --watch",
     "write-schemas": "tsx ./scripts/write-json-schemas.ts",
     "clean": "git clean -xdf dist node_modules json-schemas",
     "lint": "eslint .",
