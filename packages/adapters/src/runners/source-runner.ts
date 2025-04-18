@@ -33,10 +33,9 @@ export async function runSourceAdapter<
 
   assertValidHandler(handler);
 
-  // TODO: make this default to true
   const shouldWrite = options?.write ?? true;
 
-  let output = (typeof handler.fallback == "function" && handler.fallback != null) ? handler.fallback() : undefined;
+  let output = handler.fallback;
 
   for (const [predicate, sourceTransformer] of handler.handlers) {
     if (!predicate(ctx.emoji_version)) {

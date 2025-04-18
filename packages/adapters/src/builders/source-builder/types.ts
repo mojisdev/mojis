@@ -158,23 +158,17 @@ export type PredicateFn = (version: string) => boolean;
 export interface AnyBuiltSourceAdapterParams {
   adapterType: SourceAdapterType;
   handlers: [PredicateFn, AnySourceTransformer][];
-  fallback?: FallbackFn<any>;
+  fallback: any;
   transformerOutputSchema: type.Any;
   persistence: PersistenceContext;
   persistenceMapFn: any;
 }
 
-export type FallbackFn<TOut> = () => TOut;
-
 export interface SourceAdapter<TParams extends AnyBuiltSourceAdapterParams> {
   adapterType: TParams["adapterType"];
   handlers: TParams["handlers"];
   transformerOutputSchema: TParams["transformerOutputSchema"];
-  fallback?: FallbackFn<
-    TParams["transformerOutputSchema"] extends type.Any
-      ? TParams["transformerOutputSchema"]["infer"]
-      : any
-  >;
+  fallback: TParams["transformerOutputSchema"]["infer"];
   persistence: TParams["persistence"];
   persistenceMapFn: PersistenceMapFn<TParams["persistence"], TParams["transformerOutputSchema"]["infer"], TParams["persistenceMapFn"]>;
 }

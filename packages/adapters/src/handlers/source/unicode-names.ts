@@ -15,6 +15,7 @@ const builder = createSourceAdapter({
   transformerOutputSchema: type({
     "[string]": "string",
   }),
+  fallback: {},
   persistence: {
     schemas: {
       unicodeNames: {
@@ -64,9 +65,6 @@ export const handler = builder
         return transformed;
       }),
   )
-  .fallback(() => {
-    return {};
-  })
   .toPersistenceOperations((references, data) => {
     return [
       {

@@ -38,6 +38,10 @@ const builder = createSourceAdapter({
     sequences: EMOJI_SEQUENCE_SCHEMA.array(),
     zwj: EMOJI_SEQUENCE_SCHEMA.array(),
   }),
+  fallback: {
+    sequences: [],
+    zwj: [],
+  },
   persistence: {
     schemas: {
       sequences: {
@@ -143,12 +147,6 @@ export const handler = builder
         return sequences;
       }),
   )
-  .fallback(() => {
-    return {
-      sequences: [],
-      zwj: [],
-    };
-  })
   .toPersistenceOperations((references, data) => {
     return [
       {

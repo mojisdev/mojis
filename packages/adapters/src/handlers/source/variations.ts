@@ -9,6 +9,7 @@ const UNSUPPORTED_VARIATION_VERSIONS = ["1.0", "2.0", "3.0", "4.0"];
 const builder = createSourceAdapter({
   type: "variations",
   transformerOutputSchema: EMOJI_VARIATION_SCHEMA.array(),
+  fallback: [],
   persistence: {
     schemas: {
       variations: {
@@ -72,9 +73,6 @@ export const handler = builder
         return transformed;
       }),
   )
-  .fallback(() => {
-    return [];
-  })
   .toPersistenceOperations((references, data) => {
     return [
       {

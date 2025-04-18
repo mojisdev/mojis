@@ -27,6 +27,10 @@ const builder = createSourceAdapter({
     groups: EMOJI_GROUPS_SCHEMA,
     emojis: GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA,
   }),
+  fallback: {
+    groups: [],
+    emojis: {},
+  },
   persistence: {
     schemas: {
       groups: {
@@ -168,12 +172,6 @@ export const handler = builder
         });
     },
   )
-  .fallback(() => {
-    return {
-      emojis: {},
-      groups: [],
-    };
-  })
   .toPersistenceOperations((references, data) => {
     return [
       {

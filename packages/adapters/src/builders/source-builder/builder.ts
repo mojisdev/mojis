@@ -1,7 +1,6 @@
 import type { type } from "arktype";
 import type {
   SourceAdapterType,
-  UnsetMarker,
 } from "../../global-types";
 import type { AnySourceTransformer } from "../source-transformer-builder/types";
 import type {
@@ -22,7 +21,7 @@ function internalCreateSourceAdapterBuilder<
     _adapterType: TAdapterType;
     _handlers: [PredicateFn, AnySourceTransformer][];
     _transformerOutputSchema: TTransformerOutputSchema;
-    _fallback: UnsetMarker;
+    _fallback: TTransformerOutputSchema["infer"];
     _persistence: TPersistence;
     _persistenceMapFn: any;
   }> {
@@ -30,7 +29,7 @@ function internalCreateSourceAdapterBuilder<
     adapterType: initDef.adapterType,
     transformerOutputSchema: initDef.transformerOutputSchema,
     handlers: [],
-    fallback: () => {},
+    fallback: initDef.fallback,
     persistence: initDef.persistence ?? {} as PersistenceContext,
     persistenceMapFn: () => { return []; },
 
@@ -49,12 +48,6 @@ function internalCreateSourceAdapterBuilder<
           ..._def.handlers,
           [userPredicate, sourceTransformer],
         ],
-      }) as SourceAdapterBuilder<any>;
-    },
-    fallback(userFn) {
-      return internalCreateSourceAdapterBuilder({
-        ..._def,
-        fallback: userFn,
       }) as SourceAdapterBuilder<any>;
     },
     toPersistenceOperations(userFn) {
@@ -77,6 +70,7 @@ export interface CreateSourceAdapterBuilderOptions<
   type: TAdapterType;
   transformerOutputSchema: TTransformerOutputSchema;
   persistence: TPersistence;
+  fallback: TTransformerOutputSchema["infer"];
 }
 
 export function createSourceAdapter<
@@ -90,16 +84,17 @@ export function createSourceAdapter<
     TPersistence
   >,
 ): SourceAdapterBuilder<{
+    _fallback: TTransformerOutputSchema["infer"];
     _adapterType: TAdapterType;
     _handlers: [PredicateFn, AnySourceTransformer][];
     _transformerOutputSchema: TTransformerOutputSchema;
-    _fallback: UnsetMarker;
     _persistence: TPersistence;
     _persistenceMapFn: any;
   }> {
   return internalCreateSourceAdapterBuilder<TAdapterType, TTransformerOutputSchema, TPersistence>({
     adapterType: opts.type,
     transformerOutputSchema: opts.transformerOutputSchema,
+    fallback: opts.fallback,
     persistence: opts.persistence,
   });
 }
