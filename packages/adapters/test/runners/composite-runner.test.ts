@@ -80,6 +80,9 @@ describe("run composite handler", () => {
       persistence: {
         schemas: {},
       },
+      fallback: {
+        version: "1.0",
+      },
     })
       .withTransform(
         () => true,
@@ -135,6 +138,9 @@ describe("run composite handler", () => {
       }),
       persistence: {
         schemas: {},
+      },
+      fallback: {
+        version: "1.0",
       },
     })
       .withTransform(
@@ -202,6 +208,9 @@ describe("run composite handler", () => {
         }),
         persistence: {
           schemas: {},
+        },
+        fallback: {
+          name: "default",
         },
       })
         .withTransform(
