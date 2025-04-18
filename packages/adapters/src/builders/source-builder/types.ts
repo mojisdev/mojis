@@ -1,10 +1,8 @@
 import type { type } from "arktype";
 import type {
-  ErrorMessage,
   MaybePromise,
   MergeTuple,
   SourceAdapterType,
-  UnsetMarker,
 } from "../../global-types";
 import type {
   AnySourceTransformer,

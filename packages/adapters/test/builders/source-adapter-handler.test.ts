@@ -17,6 +17,9 @@ describe("adapter handler builder", () => {
       persistence: {
         schemas: {},
       },
+      fallback: {
+        name: "default",
+      },
     });
     const handler = builder.build();
     expect(handler.adapterType).toBe("metadata");
@@ -29,6 +32,9 @@ describe("adapter handler builder", () => {
       persistence: {
         schemas: {},
       },
+      fallback: {
+        name: "default",
+      },
     });
     const handler = builder.build();
     expect(handler.handlers).toHaveLength(0);
@@ -40,6 +46,9 @@ describe("adapter handler builder", () => {
       transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA,
       persistence: {
         schemas: {},
+      },
+      fallback: {
+        name: "default",
       },
     });
 
@@ -63,6 +72,9 @@ describe("adapter handler builder", () => {
       transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA,
       persistence: {
         schemas: {},
+      },
+      fallback: {
+        name: "default",
       },
     });
 
@@ -94,6 +106,9 @@ describe("adapter handler builder", () => {
       transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA,
       persistence: {
         schemas: {},
+      },
+      fallback: {
+        name: "default",
       },
     });
 
@@ -130,6 +145,9 @@ describe("adapter handler builder", () => {
       persistence: {
         schemas: {},
       },
+      fallback: {
+        name: "default",
+      },
     });
     const handler = builder
       .withTransform(
@@ -157,6 +175,9 @@ describe("adapter handler builder", () => {
       transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA,
       persistence: {
         schemas: {},
+      },
+      fallback: {
+        name: "default",
       },
     });
 
@@ -200,14 +221,13 @@ describe("adapter handler builder", () => {
       persistence: {
         schemas: {},
       },
+      fallback: fallbackData,
     });
 
     const handler = builder
-      .fallback(() => fallbackData)
       .build();
 
-    expect(handler.fallback).toBeTypeOf("function");
-    expect(handler.fallback?.()).toEqual(fallbackData);
+    expect(handler.fallback).toEqual(fallbackData);
   });
 
   it("adds output schema for validation", () => {
@@ -219,6 +239,9 @@ describe("adapter handler builder", () => {
       transformerOutputSchema: testSchema,
       persistence: {
         schemas: {},
+      },
+      fallback: {
+        name: "default",
       },
     });
     const handler = builder.build();
