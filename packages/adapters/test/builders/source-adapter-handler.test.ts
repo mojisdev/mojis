@@ -14,6 +14,9 @@ describe("adapter handler builder", () => {
     const builder = createSourceAdapter({
       type: "metadata",
       transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA,
+      persistence: {
+        schemas: {},
+      },
     });
     const handler = builder.build();
     expect(handler.adapterType).toBe("metadata");
@@ -23,6 +26,9 @@ describe("adapter handler builder", () => {
     const builder = createSourceAdapter({
       type: "metadata",
       transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA,
+      persistence: {
+        schemas: {},
+      },
     });
     const handler = builder.build();
     expect(handler.handlers).toHaveLength(0);
@@ -32,6 +38,9 @@ describe("adapter handler builder", () => {
     const builder = createSourceAdapter({
       type: "metadata",
       transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA,
+      persistence: {
+        schemas: {},
+      },
     });
 
     const handler = builder
@@ -52,6 +61,9 @@ describe("adapter handler builder", () => {
     const builder = createSourceAdapter({
       type: "metadata",
       transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA,
+      persistence: {
+        schemas: {},
+      },
     });
 
     const handler = builder
@@ -77,7 +89,14 @@ describe("adapter handler builder", () => {
   });
 
   it("maintains handler order", () => {
-    const builder = createSourceAdapter({ type: "metadata", transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA });
+    const builder = createSourceAdapter({
+      type: "metadata",
+      transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA,
+      persistence: {
+        schemas: {},
+      },
+    });
+
     const handler = builder
       .withTransform(
         (version) => version === "15.0",
@@ -105,7 +124,13 @@ describe("adapter handler builder", () => {
   });
 
   it("preserves adapter type across chain", () => {
-    const builder = createSourceAdapter({ type: "metadata", transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA });
+    const builder = createSourceAdapter({
+      type: "metadata",
+      transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA,
+      persistence: {
+        schemas: {},
+      },
+    });
     const handler = builder
       .withTransform(
         (version) => version === "15.0",
@@ -127,7 +152,14 @@ describe("adapter handler builder", () => {
   });
 
   it("allows chaining multiple onVersion calls", () => {
-    const builder = createSourceAdapter({ type: "metadata", transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA });
+    const builder = createSourceAdapter({
+      type: "metadata",
+      transformerOutputSchema: DUMMY_ARKTYPE_SCHEMA,
+      persistence: {
+        schemas: {},
+      },
+    });
+
     const handler = builder
       .withTransform(
         (version) => version === "15.0",
@@ -165,6 +197,9 @@ describe("adapter handler builder", () => {
       transformerOutputSchema: type({
         defaultValue: "boolean",
       }),
+      persistence: {
+        schemas: {},
+      },
     });
 
     const handler = builder
@@ -182,6 +217,9 @@ describe("adapter handler builder", () => {
     const builder = createSourceAdapter({
       type: "metadata",
       transformerOutputSchema: testSchema,
+      persistence: {
+        schemas: {},
+      },
     });
     const handler = builder.build();
 
