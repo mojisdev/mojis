@@ -94,3 +94,14 @@ export type GetSourceAdapterFromType<
   : never;
 
 export type Id<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
+
+export type JoinPaths<Parts extends readonly string[]> = Parts extends [] ? "" :
+  Parts extends [infer First] ?
+    First extends string ? First : string :
+    Parts extends [infer First, ...infer Rest] ?
+      First extends string ?
+        Rest extends readonly string[] ?
+  `${First}${Rest[0] extends string ? "/" : "/"}${JoinPaths<Rest>}` :
+          string :
+        string :
+      string;

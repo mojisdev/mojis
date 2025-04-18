@@ -6,6 +6,7 @@ import type {
 import type { AnySourceTransformer } from "../source-transformer-builder/types";
 import type {
   AnySourceAdapter,
+  PersistenceContext,
   PredicateFn,
   SourceAdapterBuilder,
 } from "./types";
@@ -14,24 +15,24 @@ import { createSourceTransformerBuilder } from "../source-transformer-builder/bu
 function internalCreateSourceAdapterBuilder<
   TAdapterType extends SourceAdapterType,
   TTransformerOutputSchema extends type.Any,
-  TPersistenceOutputSchema extends type.Any,
+  TPersistence extends PersistenceContext,
 >(
   initDef: Partial<AnySourceAdapter> = {},
 ): SourceAdapterBuilder<{
     _adapterType: TAdapterType;
     _handlers: [PredicateFn, AnySourceTransformer][];
     _transformerOutputSchema: TTransformerOutputSchema;
-    _persistenceOutputSchema: TPersistenceOutputSchema;
     _fallback: UnsetMarker;
-    _persistence: UnsetMarker;
-    _persistenceOptions: UnsetMarker;
+    _persistence: TPersistence;
+    _persistenceMapFn: any;
   }> {
   const _def: AnySourceAdapter = {
     adapterType: initDef.adapterType,
     transformerOutputSchema: initDef.transformerOutputSchema,
-    persistenceOutputSchema: initDef.persistenceOutputSchema,
     handlers: [],
     fallback: () => {},
+    persistence: initDef.persistence ?? {} as PersistenceContext,
+    persistenceMapFn: () => { return []; },
 
     // overload with properties passed in
     ...initDef,
@@ -56,16 +57,10 @@ function internalCreateSourceAdapterBuilder<
         fallback: userFn,
       }) as SourceAdapterBuilder<any>;
     },
-    persistence(userFn) {
+    toPersistenceOperations(userFn) {
       return internalCreateSourceAdapterBuilder({
         ..._def,
-        persistence: userFn,
-      }) as SourceAdapterBuilder<any>;
-    },
-    persistenceOptions(userOptions) {
-      return internalCreateSourceAdapterBuilder({
-        ..._def,
-        persistenceOptions: userOptions,
+        persistenceMapFn: userFn,
       }) as SourceAdapterBuilder<any>;
     },
     build() {
@@ -77,35 +72,34 @@ function internalCreateSourceAdapterBuilder<
 export interface CreateSourceAdapterBuilderOptions<
   TAdapterType extends SourceAdapterType,
   TTransformerOutputSchema extends type.Any,
-  TPersistenceOutputSchema extends type.Any,
+  TPersistence extends PersistenceContext,
 > {
   type: TAdapterType;
   transformerOutputSchema: TTransformerOutputSchema;
-  persistenceOutputSchema?: TPersistenceOutputSchema;
+  persistence: TPersistence;
 }
 
 export function createSourceAdapter<
   TAdapterType extends SourceAdapterType,
   TTransformerOutputSchema extends type.Any,
-  TPersistenceOutputSchema extends type.Any,
+  TPersistence extends PersistenceContext,
 >(
   opts: CreateSourceAdapterBuilderOptions<
     TAdapterType,
     TTransformerOutputSchema,
-    TPersistenceOutputSchema
+    TPersistence
   >,
 ): SourceAdapterBuilder<{
     _adapterType: TAdapterType;
     _handlers: [PredicateFn, AnySourceTransformer][];
     _transformerOutputSchema: TTransformerOutputSchema;
-    _persistenceOutputSchema: TPersistenceOutputSchema;
     _fallback: UnsetMarker;
-    _persistence: UnsetMarker;
-    _persistenceOptions: UnsetMarker;
+    _persistence: TPersistence;
+    _persistenceMapFn: any;
   }> {
-  return internalCreateSourceAdapterBuilder<TAdapterType, TTransformerOutputSchema, TPersistenceOutputSchema>({
+  return internalCreateSourceAdapterBuilder<TAdapterType, TTransformerOutputSchema, TPersistence>({
     adapterType: opts.type,
     transformerOutputSchema: opts.transformerOutputSchema,
-    persistenceOutputSchema: opts.persistenceOutputSchema,
+    persistence: opts.persistence,
   });
 }

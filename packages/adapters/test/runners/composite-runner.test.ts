@@ -77,6 +77,9 @@ describe("run composite handler", () => {
       transformerOutputSchema: type({
         version: "string",
       }),
+      persistence: {
+        schemas: {},
+      },
     })
       .withTransform(
         () => true,
@@ -130,6 +133,9 @@ describe("run composite handler", () => {
       transformerOutputSchema: type({
         version: "string",
       }),
+      persistence: {
+        schemas: {},
+      },
     })
       .withTransform(
         () => true,
@@ -194,6 +200,9 @@ describe("run composite handler", () => {
         transformerOutputSchema: type({
           name: "string",
         }),
+        persistence: {
+          schemas: {},
+        },
       })
         .withTransform(
           () => true,
