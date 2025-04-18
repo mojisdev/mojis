@@ -82,16 +82,18 @@ export type PathParamsToRecord<T extends string> = {
   [K in ExtractPathParams<T>]: string;
 };
 
+type ExtractSchemaNames<T extends PersistenceOperationSchema<any, any, type.Any>[]> = T[number]["name"];
+
 export interface PersistenceOperation<
   TSchema extends PersistenceOperationSchema<any, any, type.Any>,
-  TData extends TSchema["schema"]["infer"],
-  // eslint-disable-next-line ts/no-empty-object-type
-  TPathParams extends Record<string, string> = {},
+
+  TPathParams extends Record<string, string> = PathParamsToRecord<TSchema["filePath"]>,
+  TData extends TSchema["schema"]["infer"] = never,
 > {
   /**
    * The reference to the schema.
    */
-  reference: TSchema["name"];
+  reference: ExtractSchemaNames<TSchema[]>;
 
   /**
    * The parameters for the schema.
@@ -103,14 +105,6 @@ export interface PersistenceOperation<
    */
   data: TData;
 }
-
-// Update PersistenceMapFn to properly constrain reference to schema names
-export type PersistenceMapFn<
-  TPersistenceSchemas extends PersistenceOperationSchema<any, any, type.Any>[],
-  TIn,
-> = (
-  data: TIn,
-) => MaybePromise<Array<PersistenceOperation<TPersistenceSchemas[number], TIn>>>;
 
 export interface Persistence<
   TIn,
@@ -124,15 +118,35 @@ export interface Persistence<
   /**
    * The function to map the data to the persistence format.
    */
-  map: (data: TIn) => Array<
-    PersistenceOperation<any, any, PathParamsToRecord<TPersistenceSchemas[number]["pattern"]>>
-  >;
+  // map: (data: TIn) => Array<
+  //   PersistenceOperation<TPersistenceSchemas[number], PathParamsToRecord<TPersistenceSchemas[number]["pattern"]>>
+  // >;
+  map: (data: TIn) => Array<GeneratePersistenceOperations<TPersistenceSchemas>>;
 
   /**
    * The options for the persistence operation.
    */
   options?: PersistenceOptions;
+
+  __debug?: {
+    schemas: TPersistenceSchemas;
+    operations: GeneratePersistenceOperations<TPersistenceSchemas>;
+  };
 }
+
+interface MatchSchemaToOperation<
+  TSchema extends PersistenceOperationSchema<any, any, type.Any>,
+> {
+  reference: TSchema["name"];
+  params?: PathParamsToRecord<TSchema["filePath"]>;
+  data: TSchema["schema"]["infer"];
+};
+
+type GeneratePersistenceOperations<
+  TSchemas extends PersistenceOperationSchema<any, any, type.Any>[],
+> = {
+  [K in keyof TSchemas]: MatchSchemaToOperation<TSchemas[K]>;
+}[number];
 
 export type InferHandlerOutput<TSourceAdapter extends AnySourceAdapter> =
   TSourceAdapter extends { handlers: Array<[any, infer TSourceTransformer]> }
@@ -242,7 +256,7 @@ export interface AnyBuiltSourceAdapterParams {
   handlers: [PredicateFn, AnySourceTransformer][];
   fallback?: FallbackFn<any>;
   persistenceOptions?: PersistenceOptions;
-  persistence?: Persistence<any, any, any>;
+  persistence?: Persistence<any, any>;
 
   persistenceOutputSchema?: type.Any;
   transformerOutputSchema: type.Any;
@@ -260,15 +274,7 @@ export interface SourceAdapter<TParams extends AnyBuiltSourceAdapterParams> {
       ? TParams["transformerOutputSchema"]["infer"]
       : any
   >;
-  persistence?: Persistence<
-    TParams["transformerOutputSchema"] extends type.Any
-      ? TParams["transformerOutputSchema"]["infer"]
-      : any,
-    TParams["persistenceOutputSchema"] extends type.Any
-      ? TParams["persistenceOutputSchema"]["infer"]
-      : any,
-    any
-  >;
+  persistence?: Persistence<any, any>;
   persistenceOptions?: TParams["persistenceOptions"];
 }
 

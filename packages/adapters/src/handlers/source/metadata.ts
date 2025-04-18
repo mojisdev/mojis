@@ -162,7 +162,7 @@ export const handler = builder
   .persistence({
     schema: [
       {
-        name: "groups",
+        name: "groups" as const,
         pattern: "**/groups.json",
         get filePath() {
           return joinPath("<base-path>", "groups.json");
@@ -171,7 +171,7 @@ export const handler = builder
         schema: EMOJI_GROUPS_SCHEMA,
       },
       {
-        name: "emojis",
+        name: "emojis" as const,
         pattern: "**/metadata/*.json",
         get filePath() {
           return joinPath("<base-path>", "metadata", "{group}.json");
@@ -179,24 +179,21 @@ export const handler = builder
         type: "json",
         schema: GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA,
       },
-    ],
+    ] as const,
     map: (data) => {
       return [
         {
-          reference: "groups",
-          data,
+          reference: "groups" as const,
+          data: data.groups,
         },
-        // ...Object.entries(data.emojis).map(([group, metadata]) => ({
-        //   reference: "emojis",
-        //   params: {
-
-        //   },
-        //   data: metadata,
-        // })),
+        ...Object.entries(data.emojis).map(([group, metadata]) => ({
+          reference: "emojis" as const,
+          params: {
+            group,
+          },
+          data: metadata,
+        })),
       ];
     },
-    // options: {
-
-    // },
   })
   .build();
