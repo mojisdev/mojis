@@ -1,15 +1,34 @@
 import type { EmojiVariation } from "@mojis/schemas/emojis";
-import { join } from "node:path";
 import { lte } from "@mojis/moji-compare";
 import { EMOJI_VARIATION_SCHEMA } from "@mojis/schemas/emojis";
 import { createSourceAdapter } from "../../builders/source-builder/builder";
+import { joinPath } from "../../utils";
 
 const UNSUPPORTED_VARIATION_VERSIONS = ["1.0", "2.0", "3.0", "4.0"];
 
 const builder = createSourceAdapter({
   type: "variations",
   transformerOutputSchema: EMOJI_VARIATION_SCHEMA.array(),
-  persistenceOutputSchema: EMOJI_VARIATION_SCHEMA.array(),
+  persistence: {
+    schemas: {
+      variations: {
+        pattern: "**/variations.json",
+        get filePath() {
+          return joinPath("<base-path>", "variations.json");
+        },
+        type: "json",
+        schema: EMOJI_VARIATION_SCHEMA.array(),
+      },
+    },
+    map: (data) => {
+      return [
+        {
+          reference: "variations",
+          data,
+        },
+      ];
+    },
+  },
 });
 
 export const handler = builder
@@ -63,14 +82,5 @@ export const handler = builder
   )
   .fallback(() => {
     return [];
-  })
-  .persistence((data, opts) => {
-    return [
-      {
-        filePath: join(opts.basePath, "variations.json"),
-        data,
-        type: "json" as const,
-      },
-    ];
   })
   .build();

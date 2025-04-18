@@ -1,5 +1,6 @@
 import type { UrlFn } from "./builders/source-transformer-builder/types";
-import type { AdapterContext, BuiltinParser, PossibleUrls, UrlWithCache } from "./global-types";
+import type { AdapterContext, BuiltinParser, JoinPaths, PossibleUrls, UrlWithCache } from "./global-types";
+import path from "node:path";
 import { createCacheKeyFromUrl } from "@mojis/internal-utils";
 
 /**
@@ -125,4 +126,16 @@ export function buildContext<TContext extends AdapterContext, TExtraContext exte
   extraContext: TExtraContext,
 ): TContext & TExtraContext {
   return Object.assign({}, ctx, extraContext);
+}
+
+/**
+ * Type-safe path join function that preserves string literal types in the output
+ * when string literals are provided as input.
+ *
+ * @param segments - Path segments to join
+ * @returns Joined path with preserved literal type information when possible
+ */
+export function joinPath<Parts extends readonly string[]>(...segments: Parts): JoinPaths<Parts> {
+  // The actual implementation uses path.join but the return type is our literal type
+  return path.join(...segments) as JoinPaths<Parts>;
 }

@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import { type } from "arktype";
 import { createSourceAdapter } from "../../builders/source-builder/builder";
+import { joinPath } from "../../utils";
 
 const MAPPINGS = {
   "1.0": "https://unicode-proxy.mojis.dev/proxy/1.1-Update/UnicodeData-1.1.5.txt",
@@ -15,9 +16,28 @@ const builder = createSourceAdapter({
   transformerOutputSchema: type({
     "[string]": "string",
   }),
-  persistenceOutputSchema: type({
-    "[string]": "string",
-  }),
+  persistence: {
+    schemas: {
+      unicodeNames: {
+        pattern: "**/unicode-names.json",
+        get filePath() {
+          return joinPath("<base-path>", "unicode-names.json");
+        },
+        type: "json",
+        schema: type({
+          "[string]": "string",
+        }),
+      },
+    },
+    map: (data) => {
+      return [
+        {
+          reference: "unicodeNames",
+          data,
+        },
+      ];
+    },
+  },
 });
 
 export const handler = builder
@@ -55,15 +75,5 @@ export const handler = builder
   )
   .fallback(() => {
     return {};
-  })
-  .persistence((data, opts) => {
-    return [
-      {
-        filePath: join(opts.basePath, "unicode-names.json"),
-        // TODO: not correct since double stringify
-        data: JSON.stringify(data),
-        type: "json" as const,
-      },
-    ];
   })
   .build();

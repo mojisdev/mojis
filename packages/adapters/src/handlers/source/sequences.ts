@@ -4,6 +4,7 @@ import { expandHexRange, FEMALE_SIGN, MALE_SIGN } from "@mojis/internal-utils";
 import { EMOJI_SEQUENCE_SCHEMA } from "@mojis/schemas/emojis";
 import { type } from "arktype";
 import { createSourceAdapter } from "../../builders/source-builder/builder";
+import { joinPath } from "../../utils";
 
 const NOT_AVAILABLE_SEQUENCES = ["1.0"];
 
@@ -38,10 +39,38 @@ const builder = createSourceAdapter({
     sequences: EMOJI_SEQUENCE_SCHEMA.array(),
     zwj: EMOJI_SEQUENCE_SCHEMA.array(),
   }),
-  persistenceOutputSchema: type({
-    sequences: EMOJI_SEQUENCE_SCHEMA.array(),
-    zwj: EMOJI_SEQUENCE_SCHEMA.array(),
-  }),
+  persistence: {
+    schemas: {
+      sequences: {
+        pattern: "**/sequences.json",
+        get filePath() {
+          return joinPath("<base-path>", "sequences.json");
+        },
+        type: "json",
+        schema: EMOJI_SEQUENCE_SCHEMA.array(),
+      },
+      zwj: {
+        pattern: "**/zwj-sequences.json",
+        get filePath() {
+          return joinPath("<base-path>", "zwj-sequences.json");
+        },
+        type: "json",
+        schema: EMOJI_SEQUENCE_SCHEMA.array(),
+      },
+    },
+    map: (data) => {
+      return [
+        {
+          reference: "sequences",
+          data: data.sequences,
+        },
+        {
+          reference: "zwj",
+          data: data.zwj,
+        },
+      ];
+    },
+  },
 });
 
 export const handler = builder
@@ -132,19 +161,5 @@ export const handler = builder
       sequences: [],
       zwj: [],
     };
-  })
-  .persistence((data, opts) => {
-    return [
-      {
-        filePath: join(opts.basePath, "sequences.json"),
-        data: data.sequences,
-        type: "json" as const,
-      },
-      {
-        filePath: join(opts.basePath, "zwj-sequences.json"),
-        data: data.zwj,
-        type: "json" as const,
-      },
-    ];
   })
   .build();

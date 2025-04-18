@@ -1,9 +1,9 @@
 import type { EmojiGroup, GroupedEmojiMetadata } from "@mojis/schemas/emojis";
-import { join } from "node:path";
 import { extractEmojiVersion, extractUnicodeVersion, isBefore } from "@mojis/internal-utils";
 import { EMOJI_GROUPS_SCHEMA, GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA, GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA } from "@mojis/schemas/emojis";
 import { type } from "arktype";
 import { createSourceAdapter } from "../../builders/source-builder/builder";
+import { joinPath } from "../../utils";
 
 function slugify(val: string): string {
   return val.normalize("NFD")
@@ -27,10 +27,41 @@ const builder = createSourceAdapter({
     groups: EMOJI_GROUPS_SCHEMA,
     emojis: GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA,
   }),
-  persistenceOutputSchema: type({
-    groups: EMOJI_GROUPS_SCHEMA,
-    emojis: GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA,
-  }),
+  persistence: {
+    schemas: {
+      groups: {
+        pattern: "**/groups.json",
+        get filePath() {
+          return joinPath("<base-path>", "groups.json");
+        },
+        type: "json",
+        schema: EMOJI_GROUPS_SCHEMA,
+      },
+      emojis: {
+        pattern: "**/metadata/*.json",
+        get filePath() {
+          return joinPath("<base-path>", "metadata", "{group}.json");
+        },
+        type: "json",
+        schema: GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA,
+      },
+    },
+    map: (data) => {
+      return [
+        {
+          reference: "groups",
+          data: data.groups,
+        },
+        ...Object.entries(data.emojis).map(([group, metadata]) => ({
+          reference: "emojis",
+          params: {
+            group,
+          },
+          data: metadata,
+        })),
+      ];
+    },
+  },
 });
 
 export const handler = builder
@@ -157,19 +188,5 @@ export const handler = builder
       emojis: {},
       groups: [],
     };
-  })
-  .persistence((data, opts) => {
-    return [
-      {
-        filePath: join(opts.basePath, "groups.json"),
-        data: data.groups,
-        type: "json" as const,
-      },
-      ...Object.entries(data.emojis).map(([group, metadata]) => ({
-        filePath: join(opts.basePath, "metadata", `${group}.json`),
-        data: metadata,
-        type: "json" as const,
-      })),
-    ];
   })
   .build();
