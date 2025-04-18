@@ -180,13 +180,14 @@ export const handler = builder
         reference: references.groups,
         data: data.groups,
       },
-      ...Object.entries(data.emojis).map(([group, metadata]) => ({
-        reference: references.emojis,
-        params: {
-          group,
-        },
-        data: metadata,
-      })),
+      {
+        reference: references.groups,
+        data: data.emojis.dsa!,
+      },
+      // ...Object.entries(data.emojis).map(([group, metadata]) => ({
+      //   reference: references.emojis,
+      //   data: metadata,
+      // })),
     ];
   })
   .build();

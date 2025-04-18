@@ -85,44 +85,42 @@ export async function runSourceAdapter<
 
   const fileOperations = await handler.persistenceMapFn(handler.persistence.schemas, validationResult.data);
 
-  console.log(fileOperations);
+  await Promise.all(
+    fileOperations.map(async (operation) => {
+      const { filePath, data, type, options: fileOptions = {} } = operation;
 
-  // await Promise.all(
-  //   fileOperations.map(async (operation) => {
-  //     const { filePath, data, type, options: fileOptions = {} } = operation;
+      const {
+        encoding = "utf-8",
+        pretty = handler.persistenceOptions?.pretty ?? false,
+        force = ctx.force ?? false,
+      } = fileOptions;
 
-  //     const {
-  //       encoding = "utf-8",
-  //       pretty = handler.persistenceOptions?.pretty ?? false,
-  //       force = ctx.force ?? false,
-  //     } = fileOptions;
+      // create directory if it doesn't exist
+      const dir = path.dirname(filePath);
+      await fs.ensureDir(dir);
 
-  //     // create directory if it doesn't exist
-  //     const dir = path.dirname(filePath);
-  //     await fs.ensureDir(dir);
+      // skip if file exists and force is false
+      if (!force && await fs.pathExists(filePath)) {
+        console.warn(`File exists and force is false, skipping: ${filePath}`);
+        return;
+      }
 
-  //     // skip if file exists and force is false
-  //     if (!force && await fs.pathExists(filePath)) {
-  //       console.warn(`File exists and force is false, skipping: ${filePath}`);
-  //       return;
-  //     }
-
-  //     // write the file
-  //     if (type === "json") {
-  //       await fs.writeFile(
-  //         filePath,
-  //         pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data),
-  //         { encoding },
-  //       );
-  //     } else {
-  //       await fs.writeFile(
-  //         filePath,
-  //         String(data),
-  //         { encoding },
-  //       );
-  //     }
-  //   }),
-  // );
+      // write the file
+      if (type === "json") {
+        await fs.writeFile(
+          filePath,
+          pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data),
+          { encoding },
+        );
+      } else {
+        await fs.writeFile(
+          filePath,
+          String(data),
+          { encoding },
+        );
+      }
+    }),
+  );
 
   return undefined as any;
 }

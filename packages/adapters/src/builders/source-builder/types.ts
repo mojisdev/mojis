@@ -1,6 +1,7 @@
 import type { type } from "arktype";
 import type {
   ErrorMessage,
+  Id,
   MaybePromise,
   MergeTuple,
   SourceAdapterType,
@@ -32,6 +33,30 @@ export interface PersistenceOptions {
   encoding?: BufferEncoding;
 }
 
+type ExtractPathParams<T extends string> =
+  T extends `${infer _}{${infer Param}}${infer Rest}`
+    ? Param | ExtractPathParams<Rest>
+    : never;
+
+export type PathParamsToRecord<T extends string> = {
+  [K in ExtractPathParams<T>]: string;
+};
+
+export interface PersistenceOperation<TPersistenceSchema extends PersistenceSchema> {
+  /**
+   * The reference to the persistence schema.
+   */
+  reference: TPersistenceSchema;
+
+  /**
+   * The data to write to the file.
+   */
+  data: TPersistenceSchema["schema"]["infer"];
+
+  // eslint-disable-next-line ts/no-empty-object-type
+  params?: PathParamsToRecord<TPersistenceSchema["filePath"]> extends {} ? TPersistenceSchema["filePath"] : PathParamsToRecord<TPersistenceSchema["filePath"]>;
+}
+
 export interface PersistenceSchema {
   pattern: string;
   filePath: string;
@@ -54,11 +79,11 @@ export interface PersistenceContext<TSchemas extends Record<string, PersistenceS
 export type PersistenceMapFn<
   TContext extends PersistenceContext,
   TIn,
-  TOut = any,
+  TOut extends PersistenceOperation<TContext["schemas"][keyof TContext["schemas"]]>,
 > = (
   references: TContext["schemas"],
   data: TIn,
-) => TOut[];
+) => MaybePromise<Array<TOut>>;
 
 export type InferHandlerOutput<TSourceAdapter extends AnySourceAdapter> =
   TSourceAdapter extends { handlers: Array<[any, infer TSourceTransformer]> }
@@ -107,7 +132,7 @@ export interface SourceAdapterBuilder<
 
   toPersistenceOperations: <
     TIn extends TParams["_transformerOutputSchema"]["infer"],
-    TOut,
+    TOut extends PersistenceOperation<TParams["_persistence"]["schemas"][keyof TParams["_persistence"]["schemas"]]>,
   >(
     fn: PersistenceMapFn<TParams["_persistence"], TIn, TOut>,
   ) => SourceAdapterBuilder<{
@@ -149,7 +174,7 @@ export interface AnyBuiltSourceAdapterParams {
   fallback?: FallbackFn<any>;
   transformerOutputSchema: type.Any;
   persistence: PersistenceContext;
-  persistenceMapFn: PersistenceMapFn<any, any>;
+  persistenceMapFn: PersistenceMapFn<any, any, any>;
 }
 
 export type FallbackFn<TOut> = () => TOut;
@@ -164,7 +189,7 @@ export interface SourceAdapter<TParams extends AnyBuiltSourceAdapterParams> {
       : any
   >;
   persistence: TParams["persistence"];
-  persistenceMapFn: PersistenceMapFn<TParams["persistence"], TParams["transformerOutputSchema"]["infer"]>;
+  persistenceMapFn: PersistenceMapFn<TParams["persistence"], TParams["transformerOutputSchema"]["infer"], any>;
 }
 
 export type AnySourceAdapter = SourceAdapter<any>;
