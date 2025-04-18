@@ -27,6 +27,9 @@ describe("runSourceAdapter", () => {
     const handler = createSourceAdapter({
       type: "metadata",
       transformerOutputSchema: type({}),
+      persistence: {
+        schemas: {},
+      },
     }).build();
 
     const result = await runSourceAdapter(handler, mockContext);
@@ -50,6 +53,9 @@ describe("runSourceAdapter", () => {
     const handler = createSourceAdapter({
       type: "metadata",
       transformerOutputSchema: type({}),
+      persistence: {
+        schemas: {},
+      },
     })
       .withTransform(
         (version: string) => version === "15.0",
@@ -98,6 +104,9 @@ describe("runSourceAdapter", () => {
     const handler = createSourceAdapter({
       type: "metadata",
       transformerOutputSchema: type({}),
+      persistence: {
+        schemas: {},
+      },
     })
       .withTransform(
         (version: string) => version === "15.0",
@@ -151,6 +160,9 @@ describe("runSourceAdapter", () => {
     const handler = createSourceAdapter({
       type: "metadata",
       transformerOutputSchema: type({}),
+      persistence: {
+        schemas: {},
+      },
     })
       .withTransform(
         (version: string) => version === "15.0",
@@ -203,6 +215,9 @@ describe("runSourceAdapter", () => {
     const handler = createSourceAdapter({
       type: "metadata",
       transformerOutputSchema: type({}),
+      persistence: {
+        schemas: {},
+      },
     })
       .withTransform(
         (version: string) => version === "15.0",
@@ -243,6 +258,9 @@ describe("runSourceAdapter", () => {
     const handler = createSourceAdapter({
       type: "metadata",
       transformerOutputSchema: type({}),
+      persistence: {
+        schemas: {},
+      },
     })
       .withTransform(
         (version: string) => version === "15.0",
@@ -287,6 +305,9 @@ describe("runSourceAdapter", () => {
     const handler = createSourceAdapter({
       type: "metadata",
       transformerOutputSchema: type({}),
+      persistence: {
+        schemas: {},
+      },
     })
       .withTransform(
         (version: string) => version === "15.0",
@@ -336,6 +357,9 @@ describe("runSourceAdapter", () => {
     const handler = createSourceAdapter({
       type: "metadata",
       transformerOutputSchema: type("string | undefined"),
+      persistence: {
+        schemas: {},
+      },
     })
       .withTransform(
         (version: string) => version === "15.0",
@@ -383,6 +407,9 @@ describe("runSourceAdapter", () => {
       transformerOutputSchema: type({
         "page?": "string",
       }),
+      persistence: {
+        schemas: {},
+      },
     })
       .withTransform(
         predicate,
@@ -413,6 +440,9 @@ describe("runSourceAdapter", () => {
       transformerOutputSchema: type({
         page1: "string",
       }),
+      persistence: {
+        schemas: {},
+      },
     })
       .withTransform(
         predicate,
