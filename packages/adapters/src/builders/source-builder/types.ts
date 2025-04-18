@@ -33,29 +33,24 @@ export interface PersistenceOptions {
   encoding?: BufferEncoding;
 }
 
-type ExtractPathParams<T extends string> =
-  T extends `${infer _}{${infer Param}}${infer Rest}`
-    ? Param | ExtractPathParams<Rest>
-    : never;
+type ExtractParams<T> = T extends `${string}{${infer P}}${infer R}`
+  ? P | ExtractParams<R>
+  : never;
 
-export type PathParamsToRecord<T extends string> = {
-  [K in ExtractPathParams<T>]: string;
-};
+type GetParams<T extends string> = ExtractParams<T> extends never
+  ? never
+  : { [K in ExtractParams<T>]: string };
 
-export interface PersistenceOperation<TPersistenceSchema extends PersistenceSchema> {
-  /**
-   * The reference to the persistence schema.
-   */
-  reference: TPersistenceSchema;
+type SchemaOperation<T extends PersistenceSchema> = {
+  reference: T;
+  data: T["schema"]["infer"];
+} & (GetParams<T["filePath"]> extends never
+  ? { params?: undefined }
+  : { params: GetParams<T["filePath"]> });
 
-  /**
-   * The data to write to the file.
-   */
-  data: TPersistenceSchema["schema"]["infer"];
-
-  // eslint-disable-next-line ts/no-empty-object-type
-  params?: PathParamsToRecord<TPersistenceSchema["filePath"]> extends {} ? TPersistenceSchema["filePath"] : PathParamsToRecord<TPersistenceSchema["filePath"]>;
-}
+type ValidSchemaOp<TContext extends PersistenceContext> = {
+  [K in keyof TContext["schemas"]]: SchemaOperation<TContext["schemas"][K]>;
+}[keyof TContext["schemas"]];
 
 export interface PersistenceSchema {
   pattern: string;
@@ -65,25 +60,17 @@ export interface PersistenceSchema {
 }
 
 export interface PersistenceContext<TSchemas extends Record<string, PersistenceSchema> = Record<string, PersistenceSchema>> {
-  /**
-   * Persistence Schemas
-   */
   schemas: TSchemas;
-
-  /**
-   * The persistence options to use.
-   */
   options?: PersistenceOptions;
 }
 
 export type PersistenceMapFn<
   TContext extends PersistenceContext,
   TIn,
-  TOut extends PersistenceOperation<TContext["schemas"][keyof TContext["schemas"]]>,
 > = (
   references: TContext["schemas"],
-  data: TIn,
-) => MaybePromise<Array<TOut>>;
+  data: TIn
+) => MaybePromise<Array<ValidSchemaOp<TContext>>>;
 
 export type InferHandlerOutput<TSourceAdapter extends AnySourceAdapter> =
   TSourceAdapter extends { handlers: Array<[any, infer TSourceTransformer]> }
@@ -132,16 +119,15 @@ export interface SourceAdapterBuilder<
 
   toPersistenceOperations: <
     TIn extends TParams["_transformerOutputSchema"]["infer"],
-    TOut extends PersistenceOperation<TParams["_persistence"]["schemas"][keyof TParams["_persistence"]["schemas"]]>,
   >(
-    fn: PersistenceMapFn<TParams["_persistence"], TIn, TOut>,
+    fn: PersistenceMapFn<TParams["_persistence"], TIn>
   ) => SourceAdapterBuilder<{
     _adapterType: TParams["_adapterType"];
     _transformerOutputSchema: TParams["_transformerOutputSchema"];
     _handlers: TParams["_handlers"];
     _fallback: TParams["_fallback"];
     _persistence: TParams["_persistence"];
-    _persistenceMapFn: TOut;
+    _persistenceMapFn: typeof fn;
   }>;
 
   build: () => SourceAdapter<{
@@ -174,7 +160,7 @@ export interface AnyBuiltSourceAdapterParams {
   fallback?: FallbackFn<any>;
   transformerOutputSchema: type.Any;
   persistence: PersistenceContext;
-  persistenceMapFn: PersistenceMapFn<any, any, any>;
+  persistenceMapFn: PersistenceMapFn<any, any>;
 }
 
 export type FallbackFn<TOut> = () => TOut;
@@ -189,7 +175,7 @@ export interface SourceAdapter<TParams extends AnyBuiltSourceAdapterParams> {
       : any
   >;
   persistence: TParams["persistence"];
-  persistenceMapFn: PersistenceMapFn<TParams["persistence"], TParams["transformerOutputSchema"]["infer"], any>;
+  persistenceMapFn: PersistenceMapFn<TParams["persistence"], TParams["transformerOutputSchema"]["infer"]>;
 }
 
 export type AnySourceAdapter = SourceAdapter<any>;
