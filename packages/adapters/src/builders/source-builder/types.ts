@@ -1,6 +1,7 @@
 import type { type } from "arktype";
 import type {
   ErrorMessage,
+  MaybePromise,
   MergeTuple,
   SourceAdapterType,
   UnsetMarker,
@@ -10,6 +11,45 @@ import type {
   AnySourceTransformerParams,
   SourceTransformerBuilder,
 } from "../source-transformer-builder/types";
+
+export interface PersistenceOptions {
+  /**
+   * The base path to use for the output files.
+   * @default "./data/v<emoji-version>"
+   */
+  basePath: string;
+
+  /**
+   * Whether to pretty-print the if `output` is JSON.
+   * @default false
+   */
+  pretty?: boolean;
+
+  /**
+   * The encoding to use when writing files.
+   * @default "utf-8"
+   */
+  encoding?: BufferEncoding;
+}
+
+interface PersistenceSchema {
+  pattern: string;
+  filePath: string;
+  type: "json" | "text";
+  schema: type.Any;
+}
+
+export interface PersistenceContext {
+  /**
+   * Persistence Schemas
+   */
+  schemas: Record<string, PersistenceSchema>;
+
+  /**
+   * The persistence options to use.
+   */
+  options?: PersistenceOptions;
+}
 
 export type InferHandlerOutput<TSourceAdapter extends AnySourceAdapter> =
   TSourceAdapter extends { handlers: Array<[any, infer TSourceTransformer]> }

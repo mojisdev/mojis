@@ -46,21 +46,6 @@ const builder = createSourceAdapter({
         schema: GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA,
       },
     },
-    map: (data) => {
-      return [
-        {
-          reference: "groups",
-          data: data.groups,
-        },
-        ...Object.entries(data.emojis).map(([group, metadata]) => ({
-          reference: "emojis",
-          params: {
-            group,
-          },
-          data: metadata,
-        })),
-      ];
-    },
   },
 });
 
@@ -189,4 +174,18 @@ export const handler = builder
       groups: [],
     };
   })
-  .build();
+  .map((references, data) => {
+    return [
+      {
+        reference: references.groups,
+        data: data.groups,
+      },
+      ...Object.entries(data.emojis).map(([group, metadata]) => ({
+        reference: references.emojis,
+        params: {
+          group,
+        },
+        data: metadata,
+      })),
+    ];
+  });

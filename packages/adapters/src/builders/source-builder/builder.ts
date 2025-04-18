@@ -6,6 +6,7 @@ import type {
 import type { AnySourceTransformer } from "../source-transformer-builder/types";
 import type {
   AnySourceAdapter,
+  PersistenceContext,
   PredicateFn,
   SourceAdapterBuilder,
 } from "./types";
@@ -63,6 +64,7 @@ export interface CreateSourceAdapterBuilderOptions<
 > {
   type: TAdapterType;
   transformerOutputSchema: TTransformerOutputSchema;
+  persistence: PersistenceContext;
 }
 
 export function createSourceAdapter<
