@@ -1,5 +1,19 @@
 # @mojis/cli
 
+## 0.2.0
+
+### Minor Changes
+
+- [#111](https://github.com/mojisdev/mojis/pull/111) [`5baa66d`](https://github.com/mojisdev/mojis/commit/5baa66d1760e801a94774ba27fae00b5c6d89347) Thanks [@luxass](https://github.com/luxass)! - replace semver with moji-compare
+
+### Patch Changes
+
+- [#106](https://github.com/mojisdev/mojis/pull/106) [`040fa62`](https://github.com/mojisdev/mojis/commit/040fa624d01933349f92492a216579449ebf09de) Thanks [@luxass](https://github.com/luxass)! - migrate to writing through source adapter
+
+- Updated dependencies [[`5baa66d`](https://github.com/mojisdev/mojis/commit/5baa66d1760e801a94774ba27fae00b5c6d89347), [`5616bd2`](https://github.com/mojisdev/mojis/commit/5616bd22edbd1778e8e5450b8453280622a636b6), [`f9ce217`](https://github.com/mojisdev/mojis/commit/f9ce217f69e47594c38bc917f5da7cae2e2e625f), [`3d86034`](https://github.com/mojisdev/mojis/commit/3d860342714c781afb14ca7d07fd9e13fd4fe1c5), [`64376ac`](https://github.com/mojisdev/mojis/commit/64376ac6d83652d6661da3589cd023edad653dcb), [`fc86142`](https://github.com/mojisdev/mojis/commit/fc86142f281ed060c8fbd31263b91f68ec3c0674)]:
+  - @mojis/internal-utils@0.1.0
+  - @mojis/adapters@0.3.0
+
 ## 0.1.0
 
 ### Minor Changes

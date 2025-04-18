@@ -1,5 +1,26 @@
 # @mojis/adapters
 
+## 0.3.0
+
+### Minor Changes
+
+- [#111](https://github.com/mojisdev/mojis/pull/111) [`5baa66d`](https://github.com/mojisdev/mojis/commit/5baa66d1760e801a94774ba27fae00b5c6d89347) Thanks [@luxass](https://github.com/luxass)! - replace semver with moji-compare
+
+- [#108](https://github.com/mojisdev/mojis/pull/108) [`5616bd2`](https://github.com/mojisdev/mojis/commit/5616bd22edbd1778e8e5450b8453280622a636b6) Thanks [@luxass](https://github.com/luxass)! - add default predicates: `alwaysTrue`, `alwaysFalse`, `onlyGreaterThan`, `onlyLessThan`, `onlyVersions`, `versionRange`, `and`, and `or`.
+
+- [#119](https://github.com/mojisdev/mojis/pull/119) [`f9ce217`](https://github.com/mojisdev/mojis/commit/f9ce217f69e47594c38bc917f5da7cae2e2e625f) Thanks [@luxass](https://github.com/luxass)! - refactor: migrate to new persistence
+
+- [#106](https://github.com/mojisdev/mojis/pull/106) [`3d86034`](https://github.com/mojisdev/mojis/commit/3d860342714c781afb14ca7d07fd9e13fd4fe1c5) Thanks [@luxass](https://github.com/luxass)! - implement persistence to source adapters
+
+- [#120](https://github.com/mojisdev/mojis/pull/120) [`fc86142`](https://github.com/mojisdev/mojis/commit/fc86142f281ed060c8fbd31263b91f68ec3c0674) Thanks [@luxass](https://github.com/luxass)! - refactor: move fallback to be on creator
+
+### Patch Changes
+
+- [#103](https://github.com/mojisdev/mojis/pull/103) [`64376ac`](https://github.com/mojisdev/mojis/commit/64376ac6d83652d6661da3589cd023edad653dcb) Thanks [@luxass](https://github.com/luxass)! - rename versioned source transformer to source transformer
+
+- Updated dependencies [[`5baa66d`](https://github.com/mojisdev/mojis/commit/5baa66d1760e801a94774ba27fae00b5c6d89347)]:
+  - @mojis/internal-utils@0.1.0
+
 ## 0.2.0
 
 ### Minor Changes

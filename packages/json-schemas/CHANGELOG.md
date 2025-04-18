@@ -1,5 +1,11 @@
 # @mojis/json-schemas
 
+## 0.1.0
+
+### Minor Changes
+
+- [#121](https://github.com/mojisdev/mojis/pull/121) [`9e97523`](https://github.com/mojisdev/mojis/commit/9e975238670f5a68a6ace93932e50c158d3b90d0) Thanks [@luxass](https://github.com/luxass)! - add json schemas for more sources
+
 ## 0.0.5
 
 ### Patch Changes
