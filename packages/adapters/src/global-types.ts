@@ -14,6 +14,9 @@ export type MaybePromise<T> = T | Promise<T>;
 export type HasElements<T extends any[]> = T extends readonly [any, ...any[]] ? true : false;
 export type HasKeys<T extends Record<string, any>> = keyof T extends never ? false : true;
 
+// eslint-disable-next-line ts/consistent-type-definitions, ts/no-empty-object-type
+export type EmptyObject = {};
+
 /**
  * The type of the source adapter.
  */

@@ -1,71 +1,72 @@
+import type { Type } from "arktype";
+import type { CompositeHandler } from "../../src/builders/composite-builder/types";
+import type { AdapterContext, EmptyObject } from "../../src/global-types";
 import { EMOJI_GROUPS_SCHEMA, GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA } from "@mojis/schemas/emojis";
 import { type } from "arktype";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { createCompositeHandlerBuilder } from "../../src/builders/composite-builder/define";
-import { metadataHandler } from "../../src/handlers/source";
+import { defineCompositeHandler, defineCompositeTransformer } from "../../src/builders/composite-builder/define";
+import * as sourceAdapters from "../../src/handlers/source";
+import { DUMMY_ADAPTER_CONTEXT } from "../__utils";
 
 describe("composite handler builder", () => {
-  it("creates with type", () => {
-    const builder = createCompositeHandlerBuilder({
-      outputSchema: type({
-        version: "string",
-      }),
-    });
-    const handler = builder.output(() => ({ version: "1.0" }));
-    expect(handler.outputSchema).toBeDefined();
-    expect(handler.outputSchema).toEqual(
-      type({
-        version: "string",
-      }),
-    );
-  });
-
   it("creates with empty sources", () => {
-    const builder = createCompositeHandlerBuilder({
+    const composite = defineCompositeHandler({
       outputSchema: type({
         version: "string",
       }),
+      transforms: [],
     });
-    const handler = builder.output(() => ({ version: "1.0" }));
-    expect(handler.sources).toHaveLength(0);
-    expect(handler.adapterSources).toHaveLength(0);
+
+    expect(composite).toBeDefined();
+    expectTypeOf(composite).toEqualTypeOf<CompositeHandler<Type<{
+      version: string;
+    }, EmptyObject>, [], EmptyObject, []>>();
+
+    expect(composite.transforms).toHaveLength(0);
   });
 
-  it("adds version source", () => {
-    const builder = createCompositeHandlerBuilder({
+  it("creates with sources", () => {
+    const composite = defineCompositeHandler({
       outputSchema: type({
         version: "string",
       }),
-    });
-
-    const handler = builder
-      .sources({
+      sources: {
         hello: () => "world",
         version: (ctx) => ctx.emoji_version,
-      })
-      .output(() => ({ version: "1.0" }));
+      },
+      transforms: [],
+    });
 
-    expect(handler.sources).toStrictEqual({
+    expect(composite).toBeDefined();
+    expect(Object.keys(composite.sources!)).toHaveLength(2);
+    expectTypeOf(composite.sources).toEqualTypeOf<{
+      readonly hello: () => string;
+      readonly version: (ctx: AdapterContext) => string;
+    } | undefined>();
+
+    expect(composite.sources).toStrictEqual({
       hello: expect.any(Function),
       version: expect.any(Function),
     });
-    expect(handler.sources.hello()).toBe("world");
+    expect(composite.sources?.hello()).toBe("world");
+    expect(composite.sources?.version(DUMMY_ADAPTER_CONTEXT)).toBe("15.0");
   });
 
-  it("adds adapter source", () => {
-    const builder = createCompositeHandlerBuilder({
+  it("create with adapter source", () => {
+    const composite = defineCompositeHandler({
       outputSchema: type({
         version: "string",
       }),
+      adapterSources: [
+        sourceAdapters.metadataHandler,
+      ],
+      transforms: [],
     });
 
-    const handler = builder
-      .adapterSources([
-        metadataHandler,
-      ])
-      .output(() => ({ version: "1.0" }));
+    expect(composite).toBeDefined();
+    expect(composite.adapterSources).toHaveLength(1);
 
-    expect(handler.adapterSources).toStrictEqual(expect.arrayContaining([
+    expect(composite.adapterSources).toStrictEqual(expect.arrayContaining([
       expect.objectContaining({
         adapterType: "metadata",
         handlers: expect.arrayContaining([
@@ -79,58 +80,30 @@ describe("composite handler builder", () => {
     ]));
   });
 
-  it("adds transform", async () => {
-    const builder = createCompositeHandlerBuilder({
+  it("creates with transforms", () => {
+    const composite = defineCompositeHandler({
       outputSchema: type({
-        hello: "string",
+        version: "string",
       }),
+      transforms: [
+        defineCompositeTransformer((_, __) => {
+          //                           ^?
+          return {
+            version: "v1.1.0",
+          };
+        }),
+        defineCompositeTransformer((_, __) => {
+          //                           ^?
+          return {
+            version: "v1.1.0",
+          };
+        }),
+      ],
     });
 
-    const handler = builder
-      .sources({
-        hello: () => "world",
-        world: (ctx) => ctx.emoji_version,
-      })
-      .transform((ctx, data) => {
-        //              ^?
+    expect(composite).toBeDefined();
+    expect(composite.transforms).toHaveLength(2);
 
-        return {
-          hello: data.hello,
-        };
-      })
-      .output((_, data) => ({ hello: data.hello }));
-
-    console.error({
-      sources: handler.sources,
-      adapterSources: handler.adapterSources,
-      transforms: handler.transforms,
-    });
-
-    expect(handler.transforms).toBeDefined();
-    expect(handler.transforms).toHaveLength(1);
-    expect(handler.transforms[0]).toEqual(expect.any(Function));
-
-    const ctx = {
-      emoji_version: "15.0",
-      unicode_version: "15.0",
-      force: true,
-    };
-
-    const sources = Object.entries(handler.sources).reduce((acc, [key, value]) => {
-      acc[key] = value(ctx);
-      return acc;
-    }, {} as {
-      hello: string;
-      world: string;
-      [key: string]: string;
-    });
-
-    const transformed = await handler.transforms[0](ctx, sources);
-    //     ^?
-
-    expectTypeOf(transformed).not.toBeAny();
-    expect(transformed).toEqual({
-      hello: "world",
-    });
+    expect(composite.transforms[0]).toEqual(expect.any(Function));
   });
 });

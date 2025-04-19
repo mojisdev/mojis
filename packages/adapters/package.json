@@ -34,8 +34,9 @@
     "clean": "git clean -xdf dist node_modules",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "bench": "pnpm run bench:source",
-    "bench:source": "tsx ./benches/source-adapter.bench.ts"
+    "bench": "pnpm run bench:source && pnpm run bench:composite",
+    "bench:source": "tsx ./benches/source-adapter.bench.ts",
+    "bench:composite": "tsx ./benches/composite-adapter.bench.ts"
   },
   "dependencies": {
     "@mojis/internal-utils": "workspace:*",

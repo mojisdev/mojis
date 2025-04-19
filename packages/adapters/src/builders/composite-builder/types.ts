@@ -1,6 +1,7 @@
 import type { type } from "arktype";
 import type {
   AdapterContext,
+  EmptyObject,
   ErrorMessage,
   GetSourceAdapterFromType,
   HasElements,
@@ -130,10 +131,9 @@ export type GetLastTransformOutput<TTransforms extends any[]> = TTransforms exte
 
 export interface CompositeHandler<
   TOutputSchema extends type.Any,
-  // eslint-disable-next-line ts/no-empty-object-type
-  TSources extends Record<string, CompositeSource> = {},
+  TTransforms extends CompositeTransformFn<any, any>[],
+  TSources extends Record<string, CompositeSource> = EmptyObject,
   TAdapterSources extends AnySourceAdapter[] = [],
-  TTransforms extends CompositeTransformFn<any, any>[] = [],
 > {
   sources?: TAdapterSources extends AnySourceAdapter[]
     ? HasElements<TAdapterSources> extends true

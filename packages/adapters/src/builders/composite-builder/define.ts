@@ -1,23 +1,23 @@
 import type { type } from "arktype";
+import type { EmptyObject } from "../../global-types";
 import type { AnySourceAdapter } from "../source-builder/types";
 import type { CompositeHandler, CompositeSource, CompositeTransformFn } from "./types";
 
 export function defineCompositeHandler<
   TOutputSchema extends type.Any,
-  // eslint-disable-next-line ts/no-empty-object-type
-  const TSources extends Record<string, CompositeSource> = {},
+  const TTransforms extends CompositeTransformFn<any, any>[],
+  const TSources extends Record<string, CompositeSource> = EmptyObject,
   const TAdapterSources extends AnySourceAdapter[] = [],
-  TTransforms extends CompositeTransformFn<any, any>[] = [],
 >(handler: CompositeHandler<
   TOutputSchema,
+  TTransforms,
   TSources,
-  TAdapterSources,
-  TTransforms
+  TAdapterSources
 >): CompositeHandler<
     TOutputSchema,
+    TTransforms,
     TSources,
-    TAdapterSources,
-    TTransforms
+    TAdapterSources
   > {
   return handler;
 }
