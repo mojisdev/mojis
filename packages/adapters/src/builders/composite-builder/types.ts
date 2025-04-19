@@ -81,7 +81,7 @@ export type MergeSources<
         : never
 >;
 
-type IsKeyInSources<
+export type IsKeyInSources<
   TKey extends string,
   TSources extends Record<string, unknown>,
 > = TKey extends keyof TSources ? true : false;
