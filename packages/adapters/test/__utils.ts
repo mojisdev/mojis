@@ -11,9 +11,16 @@ import type {
   SourceTransformer,
 } from "../src/builders/source-transformer-builder/types";
 import type {
+  AdapterContext,
   SourceAdapterType,
 } from "../src/global-types";
 import { createCache } from "@mojis/internal-utils";
+
+export const DUMMY_ADAPTER_CONTEXT = {
+  emoji_version: "15.0",
+  unicode_version: "15.0",
+  force: false,
+} as const satisfies AdapterContext;
 
 export interface SetupAdapterTestOptions {
   cache?: Cache<string>;
