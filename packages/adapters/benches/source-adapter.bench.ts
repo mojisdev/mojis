@@ -1,6 +1,8 @@
 import { bench } from "@ark/attest";
 import { type } from "arktype";
 import { createSourceAdapter } from "../src/builders/source-builder/builder";
+import { defineSourceAdapter } from "../src/builders/source-builder/define";
+import { defineSourceTransformer } from "../src/builders/source-transformer-builder/define";
 import { handler as metadataHandler } from "../src/handlers/source/metadata";
 import { handler as sequencesHandler } from "../src/handlers/source/sequences";
 import { handler as unicodeNamesHandler } from "../src/handlers/source/unicode-names";
@@ -136,3 +138,85 @@ bench("variationsHandler", () => {
   // eslint-disable-next-line ts/no-unused-expressions
   variationsHandler;
 }).types([27934, "instantiations"]);
+
+bench("testing", () => {
+  return defineSourceAdapter({
+    type: "object",
+    outputSchema: type({
+      hello: "string",
+    }),
+    fallback: {
+      hello: "world",
+    },
+    transformers: [
+      defineSourceTransformer({
+        urls: () => "asda",
+        parser: "generic",
+        parserOptions: {
+          commentPrefix: "//",
+        },
+        transform: (ctx, data) => {
+          return {
+            hello: "world",
+          };
+        },
+        output(ctx, data) {
+          return {
+            hello: data.hello,
+          };
+        },
+      }),
+      defineSourceTransformer({
+        urls: () => "asda",
+        parser: "generic",
+        parserOptions: {
+          commentPrefix: "//",
+        },
+        transform: (ctx, data) => {
+          return {
+            hello: "world",
+          };
+        },
+        output(ctx, data) {
+          return {
+            hello: data.hello,
+          };
+        },
+      }),
+      defineSourceTransformer({
+        urls: () => "asda",
+        parser: "generic",
+        parserOptions: {
+          commentPrefix: "//",
+        },
+        transform: (ctx, data) => {
+          return {
+            hello: "world",
+          };
+        },
+        output(ctx, data) {
+          return {
+            hello: data.hello,
+          };
+        },
+      }),
+      defineSourceTransformer({
+        urls: () => "asda",
+        parser: "generic",
+        parserOptions: {
+          commentPrefix: "//",
+        },
+        transform: (ctx, data) => {
+          return {
+            hello: "world",
+          };
+        },
+        output(ctx, data) {
+          return {
+            hello: data.hello,
+          };
+        },
+      }),
+    ],
+  });
+}).types([20000, "instantiations"]);
