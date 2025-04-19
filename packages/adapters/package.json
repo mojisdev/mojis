@@ -53,6 +53,7 @@
     "@types/fs-extra": "catalog:dev",
     "eslint": "catalog:dev",
     "tsup": "catalog:dev",
+    "tsx": "catalog:dev",
     "typescript": "catalog:dev",
     "vitest-testdirs": "catalog:dev"
   },

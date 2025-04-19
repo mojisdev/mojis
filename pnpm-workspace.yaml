@@ -34,6 +34,10 @@ catalogs:
     vitest-testdirs: ^3.0.1
     tsx: ^4.19.3
     "@ark/attest": ^0.46.0
+  conflicts_dev_:
+    tsx: ""
+  conflicts_dev_4_19_3:
+    tsx: 4.19.3
 
 onlyBuiltDependencies:
   - esbuild
