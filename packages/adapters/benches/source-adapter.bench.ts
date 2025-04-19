@@ -4,6 +4,9 @@ import { bench } from "@ark/attest";
 import { type } from "arktype";
 import { createSourceAdapter } from "../src/builders/source-builder/builder";
 import { handler as metadataHandler } from "../src/handlers/source/metadata";
+import { handler as sequencesHandler } from "../src/handlers/source/sequences";
+import { handler as unicodeNamesHandler } from "../src/handlers/source/unicode-names";
+import { handler as variationsHandler } from "../src/handlers/source/variations";
 
 bench("source adapter builder", () => {
   createSourceAdapter({
@@ -116,7 +119,22 @@ bench("source adapter with multiple transforms", () => {
     .build();
 }).types([25705, "instantiations"]);
 
-bench("source adapter builder type inference", () => {
+bench("metadata handler", () => {
   // eslint-disable-next-line ts/no-unused-expressions
   metadataHandler;
-}).types([44936, "instantiations"]);
+}).types([43929, "instantiations"]);
+
+bench("sequencesHandler", () => {
+  // eslint-disable-next-line ts/no-unused-expressions
+  sequencesHandler;
+}).types([31853, "instantiations"]);
+
+bench("unicodeNamesHandler", () => {
+  // eslint-disable-next-line ts/no-unused-expressions
+  unicodeNamesHandler;
+}).types([25083, "instantiations"]);
+
+bench("variationsHandler", () => {
+  // eslint-disable-next-line ts/no-unused-expressions
+  variationsHandler;
+}).types([27934, "instantiations"]);
