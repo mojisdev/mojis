@@ -3,7 +3,7 @@ import type { AdapterContext } from "../../src/global-types";
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { type } from "arktype";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { createCompositeHandlerBuilder } from "../../src/builders/composite-builder/define";
+import { createCompositeHandlerBuilder, defineCompositeHandler, defineCompositeTransformer } from "../../src/builders/composite-builder/define";
 import { createSourceAdapter } from "../../src/builders/source-builder/builder";
 import { setupAdapterTest } from "../__utils";
 
@@ -32,24 +32,26 @@ describe("run composite handler", () => {
       }],
     ]);
 
-    const handler = createCompositeHandlerBuilder({
+    const composite = defineCompositeHandler({
       outputSchema: type({
         version: "string",
       }),
-    })
-      .sources({
+      sources: {
         test: async () => {
           const response = await fetch("https://mojis.dev/test");
           return response.text();
         },
-      })
-      .output(() => {
-        return {
-          version: "1.0",
-        };
-      });
+      },
+      transforms: [
+        defineCompositeTransformer(() => {
+          return {
+            version: "1.0",
+          };
+        }),
+      ],
+    });
 
-    const result = await runCompositeHandler(handler, mockContext);
+    const result = await runCompositeHandler(composite, mockContext);
 
     expectTypeOf(result).toEqualTypeOf<{
       version: string;

@@ -8,7 +8,6 @@ import type {
   HasKeys,
   Id,
   MaybePromise,
-  MergeTuple,
   UnsetMarker,
 } from "../../global-types";
 import type {
@@ -175,3 +174,5 @@ export interface CompositeHandler<
   //   CompositeTransformFn<GetLastTransformOutput<TTransforms>, any>,
   // ];
 }
+
+export type AnyCompositeHandler = CompositeHandler<any, any, any, any>;
