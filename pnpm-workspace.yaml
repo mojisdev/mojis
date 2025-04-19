@@ -19,6 +19,9 @@ catalogs:
     arktype: ^2.1.17
 
   dev:
+    "@a/attest": ^0.0.0
+    "@ar/attest": ^0.0.0
+    "@arktype/attest": ^0.0.0
     "@luxass/eslint-config": ^4.18.1
     "@types/fs-extra": ^11.0.4
     "@types/node": ^22.10.0
@@ -30,6 +33,11 @@ catalogs:
     vitest: ^3.0.9
     vitest-testdirs: ^3.0.1
     tsx: ^4.19.3
+    "@ark/attest": ^0.46.0
+  conflicts_dev_:
+    tsx: ""
+  conflicts_dev_4_19_3:
+    tsx: 4.19.3
 
 onlyBuiltDependencies:
   - esbuild
