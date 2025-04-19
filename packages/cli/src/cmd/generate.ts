@@ -119,10 +119,6 @@ export async function runGenerate({ versions: providedVersions, flags }: Generat
   console.info(green("done"));
 }
 
-function isGeneratorEnabled(generator: string, generators: string[]): boolean {
-  return generators.includes(generator);
-}
-
 /**
  * Builds a request for the emoji data generation.
  * @param {EmojiSpecRecord} version - The version of the emoji data to generate.
@@ -138,7 +134,7 @@ export async function buildEmojiGenerateRequest(
   const baseDir = `./data/v${version.emoji_version}`;
   await fs.ensureDir(baseDir);
 
-  if (isGeneratorEnabled("metadata", generators)) {
+  if (generators.includes("metadata")) {
     await runSourceAdapter(sourceHandlers.metadataHandler, {
       force,
       emoji_version: version.emoji_version,
@@ -146,7 +142,7 @@ export async function buildEmojiGenerateRequest(
     });
   }
 
-  if (isGeneratorEnabled("sequences", generators)) {
+  if (generators.includes("sequences")) {
     await runSourceAdapter(sourceHandlers.sequencesHandler, {
       force,
       emoji_version: version.emoji_version,
@@ -154,7 +150,7 @@ export async function buildEmojiGenerateRequest(
     });
   }
 
-  if (isGeneratorEnabled("variations", generators)) {
+  if (generators.includes("variations")) {
     await runSourceAdapter(sourceHandlers.variationsHandler, {
       force,
       emoji_version: version.emoji_version,
@@ -162,7 +158,7 @@ export async function buildEmojiGenerateRequest(
     });
   }
 
-  if (isGeneratorEnabled("unicode-names", generators)) {
+  if (generators.includes("unicode-names")) {
     await runSourceAdapter(sourceHandlers.unicodeNamesHandler, {
       force,
       emoji_version: version.emoji_version,

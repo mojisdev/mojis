@@ -1,22 +1,9 @@
-import type { GenericParseOptions } from "@mojis/parsers";
 import type { PredicateFn } from "../src/builders/source-builder/types";
-import type { AnySourceTransformer, GetParseOptionsFromParser } from "../src/builders/source-transformer-builder/types";
+import type { AnySourceTransformer } from "../src/builders/source-transformer-builder/types";
 import type { MergeTuple } from "../src/global-types";
 import { describe, expectTypeOf, it } from "vitest";
 
-describe("GetParseOptionsFromParser", () => {
-  it("should return options if using valid parser", () => {
-    type Result = GetParseOptionsFromParser<"generic">;
-    expectTypeOf<Result>().toEqualTypeOf<GenericParseOptions>();
-  });
-
-  it("invalid parser should return never", () => {
-    type Result = GetParseOptionsFromParser<"unknown">;
-    expectTypeOf<Result>().toEqualTypeOf<never>();
-  });
-});
-
-describe("JoinTuples", () => {
+describe("MergeTuple", () => {
   it("should join tuples", () => {
     type Result = MergeTuple<[1, 2, 3], [4, 5, 6]>;
     expectTypeOf<Result>().toEqualTypeOf<[1, 2, 3, 4, 5, 6]>();
