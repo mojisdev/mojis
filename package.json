@@ -15,6 +15,7 @@
     "clean": "turbo run clean && git clean -xdf node_modules",
     "dev": "turbo watch dev --filter \"./packages/*\"",
     "generate:json-schemas": "pnpm --filter \"@mojis/json-schemas\" run write-schemas",
+    "bench:adapters": "pnpm --filter \"@mojis/adapters\" run bench",
     "lint": "turbo run lint",
     "test": "vitest run",
     "test:watch": "vitest",

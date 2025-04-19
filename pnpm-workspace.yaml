@@ -30,6 +30,7 @@ catalogs:
     vitest: ^3.0.9
     vitest-testdirs: ^3.0.1
     tsx: ^4.19.3
+    "@arktype/attest": ^0.46.0
 
 onlyBuiltDependencies:
   - esbuild
