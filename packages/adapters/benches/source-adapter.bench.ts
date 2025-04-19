@@ -1,4 +1,4 @@
-import { bench } from "@arktype/attest";
+import { bench } from "@ark/attest";
 import { handler } from "../src/handlers/source/metadata";
 
 bench("bench type", () => {

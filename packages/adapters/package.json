@@ -47,7 +47,7 @@
     "fs-extra": "catalog:prod"
   },
   "devDependencies": {
-    "@arktype/attest": "catalog:dev",
+    "@ark/attest": "catalog:dev",
     "@luxass/eslint-config": "catalog:dev",
     "@mojis/loomicode": "catalog:dev",
     "@types/fs-extra": "catalog:dev",

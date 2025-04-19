@@ -6,7 +6,7 @@ settings:
 
 catalogs:
   dev:
-    '@arktype/attest':
+    '@ark/attest':
       specifier: ^0.46.0
       version: 0.46.0
     '@luxass/eslint-config':
@@ -140,7 +140,7 @@ importers:
         specifier: catalog:prod
         version: 11.3.0
     devDependencies:
-      '@arktype/attest':
+      '@ark/attest':
         specifier: catalog:dev
         version: 0.46.0(typescript@5.8.2)
       '@luxass/eslint-config':
@@ -315,6 +315,12 @@ packages:
   '@antfu/install-pkg@1.0.0':
     resolution: {integrity: sha512-xvX6P/lo1B3ej0OsaErAjqgFYzYVcJpamjLAFLYh9vRJngBrMoUG7aVnrGTeqM7yxbyTD5p3F2+0/QUEh8Vzhw==}
 
+  '@ark/attest@0.46.0':
+    resolution: {integrity: sha512-bDo8Mtx94oFkhozao9rjoWf1/MOV4lakpoKtPvIFfHceE3M3jVqIOVY46Xh1TibMhjQ1vMtd55PcfllHYjbm8w==}
+    hasBin: true
+    peerDependencies:
+      typescript: '*'
+
   '@ark/fs@0.46.0':
     resolution: {integrity: sha512-lBW6Vv6dZ74Gcc+zvJP8gjZACMo5o6hEuOvAtX6EJ5xNYBmX7nrXQaDdRfQNGDzgaX5UHGqi/vxk5moK94K7Yw==}
 
@@ -329,12 +335,6 @@ packages:
 
   '@ark/util@0.46.0':
     resolution: {integrity: sha512-JPy/NGWn/lvf1WmGCPw2VGpBg5utZraE84I7wli18EDF3p3zc/e9WolT35tINeZO3l7C77SjqRJeAUoT0CvMRg==}
-
-  '@arktype/attest@0.46.0':
-    resolution: {integrity: sha512-qKuIXbbJ7rdS5wyYMsrGtcQpAyFizAwnB5o2eTAvrLxgDmg12rr+IJRCBPUCbv49yJ3H4l8woV+gYvjom6Wx6w==}
-    hasBin: true
-    peerDependencies:
-      typescript: '*'
 
   '@babel/code-frame@7.26.2':
     resolution: {integrity: sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ==}
@@ -3077,6 +3077,19 @@ snapshots:
       package-manager-detector: 0.2.11
       tinyexec: 0.3.2
 
+  '@ark/attest@0.46.0(typescript@5.8.2)':
+    dependencies:
+      '@ark/fs': 0.46.0
+      '@ark/util': 0.46.0
+      '@prettier/sync': 0.5.5(prettier@3.5.3)
+      '@typescript/analyze-trace': 0.10.1
+      '@typescript/vfs': 1.6.1(typescript@5.8.2)
+      arktype: 2.1.20
+      prettier: 3.5.3
+      typescript: 5.8.2
+    transitivePeerDependencies:
+      - supports-color
+
   '@ark/fs@0.46.0': {}
 
   '@ark/schema@0.45.7':
@@ -3090,19 +3103,6 @@ snapshots:
   '@ark/util@0.45.7': {}
 
   '@ark/util@0.46.0': {}
-
-  '@arktype/attest@0.46.0(typescript@5.8.2)':
-    dependencies:
-      '@ark/fs': 0.46.0
-      '@ark/util': 0.46.0
-      '@prettier/sync': 0.5.5(prettier@3.5.3)
-      '@typescript/analyze-trace': 0.10.1
-      '@typescript/vfs': 1.6.1(typescript@5.8.2)
-      arktype: 2.1.20
-      prettier: 3.5.3
-      typescript: 5.8.2
-    transitivePeerDependencies:
-      - supports-color
 
   '@babel/code-frame@7.26.2':
     dependencies:
