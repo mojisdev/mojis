@@ -86,9 +86,9 @@ export type IsKeyInSources<
   TSources extends Record<string, unknown>,
 > = TKey extends keyof TSources ? true : false;
 
-export type CompositeTransformFn<TSources, TOut> = (
+export type CompositeTransformFn<TIn, TOut> = (
   ctx: AdapterContext,
-  sources: TSources,
+  sources: TIn,
 ) => MaybePromise<TOut>;
 
 export interface AnyCompositeHandlerParams {

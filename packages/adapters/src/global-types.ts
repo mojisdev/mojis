@@ -11,6 +11,9 @@ export type MaybeArray<T> = T | T[];
  */
 export type MaybePromise<T> = T | Promise<T>;
 
+export type HasElements<T extends any[]> = T extends readonly [any, ...any[]] ? true : false;
+export type HasKeys<T extends Record<string, any>> = keyof T extends never ? false : true;
+
 /**
  * The type of the source adapter.
  */

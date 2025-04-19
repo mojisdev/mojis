@@ -1,45 +1,41 @@
 import { type } from "arktype";
 import { createCompositeHandlerBuilder } from "../../builders/composite-builder/builder";
 
+import { chain, defineCompositeHandler, defineCompositeTransformer } from "../../builders/composite-builder/define";
 import * as handlers from "../source";
 
-const builder = createCompositeHandlerBuilder({
+export const emojiCompositor = defineCompositeHandler({
   outputSchema: type({
-    version: "string",
+    hello: "string",
   }),
-});
-
-export const compositeHandler = builder
-  .adapterSources([
+  adapterSources: [
     handlers.metadataHandler,
     handlers.sequencesHandler,
     handlers.unicodeNamesHandler,
-  ])
-  .transform((ctx, sources) => {
-    console.error("ctx", ctx);
-    console.error("sources", sources);
+  ],
+  transforms: chain([
+    defineCompositeTransformer((ctx, sources) => {
+      console.error("ctx", ctx);
+      console.error("sources", sources);
 
-    return {
-      value: "test",
-    };
-  })
-  .transform((ctx, sources) => {
-    console.error("ctx", ctx);
-    console.error("sources", sources);
+      return {
+        value: "test",
+      };
+    }),
+    defineCompositeTransformer((ctx, sources) => {
+      console.error("ctx", ctx);
+      console.error("sources", sources);
 
-    return {
-      value2: "test2",
-    };
-  })
-  .transform((_, sources) => {
-    //           ^?
-    return {
-      hello: "world",
-      version: sources.value2,
-    };
-  })
-  .output((_, transformed) => {
-    //           ^?
-    console.error("transformed", transformed);
-    return transformed;
-  });
+      return {
+        value2: "test2",
+      };
+    }),
+    defineCompositeTransformer((_, sources) => {
+      //           ^?
+      return {
+        hello: "world",
+        version: sources.value2,
+      };
+    }),
+  ]),
+});

@@ -1,19 +1,15 @@
-import type { type } from "arktype";
-import type { ErrorMessage } from "../../global-types";
+import type { ErrorMessage, HasElements, HasKeys } from "../../global-types";
 import type { AnySourceAdapter } from "../source-builder/types";
-import type { CompositeSource, IsKeyInSources } from "./types";
-import { metadataHandler } from "../../handlers/source";
-
-// Helper type to check if an array type has elements
-type HasElements<T extends any[]> = T extends readonly [any, ...any[]] ? true : false;
-type HasKeys<T extends Record<string, any>> = keyof T extends never ? false : true;
+import type { CompositeSource, CompositeTransformFn, IsKeyInSources } from "./types";
+import { type } from "arktype";
+import * as handlers from "../../handlers/source";
 
 interface CompositeHandler<
-  _TOutputSchema extends type.Any,
-  TSources extends Record<string, CompositeSource>,
-  TAdapterSources extends AnySourceAdapter[],
-  TTransforms extends any[],
-  TOutput,
+  TOutputSchema extends type.Any,
+  // eslint-disable-next-line ts/no-empty-object-type
+  TSources extends Record<string, CompositeSource> = {},
+  TAdapterSources extends AnySourceAdapter[] = [],
+  TTransforms extends CompositeTransformFn<any, any>[] = [],
 > {
   sources?: TAdapterSources extends AnySourceAdapter[]
     ? HasElements<TAdapterSources> extends true
@@ -44,55 +40,68 @@ interface CompositeHandler<
       : TAdapterSources
     : TAdapterSources;
 
-  transforms?: TTransforms;
-  output?: TOutput;
+  outputSchema: TOutputSchema;
+
+  transforms: TTransforms;
 }
 
 export function defineCompositeHandler<
   TOutputSchema extends type.Any,
-  const TSources extends Record<string, CompositeSource>,
-  const TAdapterSources extends AnySourceAdapter[],
-  TTransforms extends any[],
-  TOutput,
+  // eslint-disable-next-line ts/no-empty-object-type
+  const TSources extends Record<string, CompositeSource> = {},
+  const TAdapterSources extends AnySourceAdapter[] = [],
+  TTransforms extends CompositeTransformFn<any, any>[] = [],
 >(handler: CompositeHandler<
   TOutputSchema,
   TSources,
   TAdapterSources,
-  TTransforms,
-  TOutput
+  TTransforms
 >): CompositeHandler<
     TOutputSchema,
     TSources,
     TAdapterSources,
-    TTransforms,
-    TOutput
+    TTransforms
   > {
   return handler;
 }
 
-// defineCompositeHandler({
-//   sources: {
-//     key: "aldj",
-//   },
-//   adapterSources: [
-//     metadataHandler,
-//   ],
-//   transforms: [
+export function chain<T>(
+  transforms: CompositeTransformFn<any, any>[],
+): CompositeTransformFn<any, any>[] {
+  return transforms;
+}
 
-//   ],
-// });
+export function defineCompositeTransformer<TInput>(
+  fn: CompositeTransformFn<TInput, any>,
+): CompositeTransformFn<TInput, any> {
+  return fn;
+}
 
-// defineCompositeHandler({
-//   sources: {
-//     key: "aldj",
-//   },
-//   adapterSources: [
-//     metadataHandler,
-//   ],
-//   transforms: chain([
-//     () => {
+export const emojiCompositor = defineCompositeHandler({
+  outputSchema: type({
+    hello: "string",
+  }),
+  adapterSources: [
+    handlers.metadataHandler,
+    handlers.sequencesHandler,
+    handlers.unicodeNamesHandler,
+  ],
+  transforms: chain([
+    defineCompositeTransformer((ctx, sources) => {
+      //                               ^?
+      console.error("ctx", ctx);
+      console.error("sources", sources);
 
-//     },
-
-//   ]),
-// });
+      return {
+        value2: "test2",
+      };
+    }),
+    defineCompositeTransformer((_, sources) => {
+      //                            ^?
+      return {
+        hello: "world",
+        version: sources.value2,
+      };
+    }),
+  ]),
+});
