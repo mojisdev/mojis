@@ -43,6 +43,7 @@ interface CompositeHandler<
         }
       : TAdapterSources
     : TAdapterSources;
+
   transforms?: TTransforms;
   output?: TOutput;
 }
@@ -79,4 +80,19 @@ defineCompositeHandler({
   transforms: [
 
   ],
+});
+
+defineCompositeHandler({
+  sources: {
+    key: "aldj",
+  },
+  adapterSources: [
+    metadataHandler,
+  ],
+  transforms: chain([
+    () => {
+
+    },
+
+  ]),
 });
