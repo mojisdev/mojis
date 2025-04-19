@@ -3,7 +3,7 @@ import type { AdapterContext } from "../../src/global-types";
 import { HttpResponse, mockFetch } from "#msw-utils";
 import { type } from "arktype";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { createCompositeHandlerBuilder } from "../../src/builders/composite-builder/builder";
+import { createCompositeHandlerBuilder } from "../../src/builders/composite-builder/define";
 import { createSourceAdapter } from "../../src/builders/source-builder/builder";
 import { setupAdapterTest } from "../__utils";
 

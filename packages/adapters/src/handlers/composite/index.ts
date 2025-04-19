@@ -1,1 +1,1 @@
-export { compositeHandler as emojiDataCompositeHandler } from "./emoji-data";
+export { emojiCompositor } from "./emoji-data";

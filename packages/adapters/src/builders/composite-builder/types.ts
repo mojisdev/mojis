@@ -3,6 +3,8 @@ import type {
   AdapterContext,
   ErrorMessage,
   GetSourceAdapterFromType,
+  HasElements,
+  HasKeys,
   Id,
   MaybePromise,
   MergeTuple,
@@ -119,18 +121,6 @@ export type TransformChain<
       ]
     : never;
 
-export interface CompositeHandler<
-  TParams extends AnyBuiltCompositeHandlerParams,
-> {
-  outputSchema: TParams["outputSchema"];
-  sources: TParams["sources"];
-  adapterSources: TParams["adapterSources"];
-  transforms: TParams["transforms"];
-  output: TParams["output"];
-}
-
-export type AnyCompositeHandler = CompositeHandler<any>;
-
 export type GetLastTransformOutput<TTransforms extends any[]> = TTransforms extends [
   ...any[],
   infer Last,
@@ -138,94 +128,50 @@ export type GetLastTransformOutput<TTransforms extends any[]> = TTransforms exte
   ? Last
   : ErrorMessage<"no transforms defined">;
 
-export interface CompositeHandlerBuilder<
-  TParams extends AnyCompositeHandlerParams,
+export interface CompositeHandler<
+  TOutputSchema extends type.Any,
+  // eslint-disable-next-line ts/no-empty-object-type
+  TSources extends Record<string, CompositeSource> = {},
+  TAdapterSources extends AnySourceAdapter[] = [],
+  TTransforms extends CompositeTransformFn<any, any>[] = [],
 > {
-  sources: <TSources extends Record<string, CompositeSource>>(
-    sources: TParams["_sources"] extends UnsetMarker
-      ? TParams["_adapterSources"] extends UnsetMarker
-        ? TSources
-        : {
-            [K in keyof TSources]: K extends string
-              ? IsKeyInSources<
-                K,
-                Record<TParams["_adapterSources"][number]["adapterType"], any>
-              > extends false
-                ? TSources[K]
-                : ErrorMessage<`Key ${K} is already in adapter sources`>
-              : TSources[K];
-          }
-      : ErrorMessage<"sources is already set">,
-  ) => CompositeHandlerBuilder<{
-    _outputSchema: TParams["_outputSchema"];
-    _adapterSources: TParams["_adapterSources"];
-    _sources: TSources;
-    _transforms: TParams["_transforms"];
-    _output: TParams["_output"];
-  }>;
+  sources?: TAdapterSources extends AnySourceAdapter[]
+    ? HasElements<TAdapterSources> extends true
+      ? {
+          [K in keyof TSources]: K extends string
+            ? IsKeyInSources<
+              K,
+              Record<TAdapterSources[number]["adapterType"], any>
+            > extends false
+              ? TSources[K]
+              : ErrorMessage<`Key ${K} is already in adapter sources`>
+            : TSources[K];
+        }
+      : TSources
+    : TSources;
+  adapterSources?: TSources extends Record<string, CompositeSource>
+    ? HasKeys<TSources> extends true
+      ? {
+          [K in keyof TAdapterSources]: TAdapterSources[K] extends AnySourceAdapter
+            ? IsKeyInSources<
+              TAdapterSources[K]["adapterType"],
+              TSources
+            > extends false
+              ? TAdapterSources[K]
+              : ErrorMessage<`Key ${TAdapterSources[K]["adapterType"]} is already in sources`>
+            : TAdapterSources[K];
+        }
+      : TAdapterSources
+    : TAdapterSources;
 
-  adapterSources: <TSources extends AnySourceAdapter[]>(
-    sources: TParams["_adapterSources"] extends UnsetMarker
-      ? TParams["_sources"] extends UnsetMarker
-        ? TSources
-        : {
-            [K in keyof TSources]: TSources[K] extends AnySourceAdapter
-              ? IsKeyInSources<
-                TSources[K]["adapterType"],
-                TParams["_sources"]
-              > extends false
-                ? TSources[K]
-                : ErrorMessage<`Key ${TSources[K]["adapterType"]} is already in sources`>
-              : never;
-          }
-      : ErrorMessage<"adapter sources is already set">,
-  ) => CompositeHandlerBuilder<{
-    _sources: TParams["_sources"];
-    _adapterSources: TSources;
-    _outputSchema: TParams["_outputSchema"];
-    _transforms: TParams["_transforms"];
-    _output: TParams["_output"];
-  }>;
+  outputSchema: TOutputSchema;
 
-  transform: <
-    TIn extends TParams["_transforms"] extends any[]
-      ? TParams["_transforms"]["length"] extends 0
-        ? MergeSources<TParams["_sources"], TParams["_adapterSources"]>
-        : GetLastTransformOutput<TParams["_transforms"]>
-      : never,
-    TOut,
-  >(
-    fn: CompositeTransformFn<TIn, TOut>,
-  ) => CompositeHandlerBuilder<{
-    _outputSchema: TParams["_outputSchema"];
-    _adapterSources: TParams["_adapterSources"];
-    _sources: TParams["_sources"];
-    _transforms: MergeTuple<
-      TParams["_transforms"],
-      [TOut]
-    >;
-    _output: TParams["_output"];
-  }>;
-
-  output: <
-    TIn extends TParams["_transforms"] extends any[]
-      ? GetLastTransformOutput<TParams["_transforms"]>
-      : never,
-    TOut extends TParams["_outputSchema"] extends UnsetMarker
-      ? any
-      : TParams["_outputSchema"]["infer"],
-  >(
-    output: TParams["_output"] extends UnsetMarker
-      ? (ctx: AdapterContext, data: TIn) => TOut
-      : ErrorMessage<"output is already set">
-  ) => CompositeHandler<{
-    outputSchema: TParams["_outputSchema"];
-    sources: TParams["_sources"];
-    adapterSources: TParams["_adapterSources"];
-    transforms: TransformChain<
-      MergeSources<TParams["_sources"], TParams["_adapterSources"]>,
-      TParams["_transforms"]
-    >;
-    output: TOut;
-  }>;
+  transforms: TTransforms;
+  // transforms: TTransforms["length"] extends 0 ? [
+  //   CompositeTransformFn<MergeSources<TSources, TAdapterSources>, any>,
+  //   ...TTransforms,
+  // ] : [
+  //   ...TTransforms,
+  //   CompositeTransformFn<GetLastTransformOutput<TTransforms>, any>,
+  // ];
 }

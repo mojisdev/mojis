@@ -1,6 +1,4 @@
 import { type } from "arktype";
-import { createCompositeHandlerBuilder } from "../../builders/composite-builder/builder";
-
 import { chain, defineCompositeHandler, defineCompositeTransformer } from "../../builders/composite-builder/define";
 import * as handlers from "../source";
 
