@@ -1,5 +1,3 @@
-import type { SourceAdapter } from "../src/builders/source-builder/types";
-import type { AdapterContext } from "../src/global-types";
 import { bench } from "@ark/attest";
 import { type } from "arktype";
 import { createSourceAdapter } from "../src/builders/source-builder/builder";
