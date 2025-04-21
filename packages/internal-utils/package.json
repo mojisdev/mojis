@@ -22,7 +22,6 @@
     ".": "./dist/index.js",
     "./shortcodes": "./dist/shortcodes.js",
     "./constants": "./dist/constants.js",
-    "./versions": "./dist/versions.js",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
