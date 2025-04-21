@@ -2,12 +2,14 @@ import type { EmojiSpecRecord } from "@mojis/schemas/emojis";
 import type { CLIArguments } from "../cli-utils";
 import { runSourceAdapter, sourceHandlers } from "@mojis/adapters";
 import {
-  getAllEmojiVersions,
-  getLatestEmojiVersion,
-  mapEmojiVersionToUnicodeVersion,
   OFFICIAL_SUPPORTED_VERSIONS,
 } from "@mojis/internal-utils";
 import mojiCompare from "@mojis/moji-compare";
+import {
+  getAllEmojiVersions,
+  getLatestEmojiVersion,
+  mapEmojiVersionToUnicodeVersion,
+} from "@mojis/versions";
 import { green, yellow } from "farver/fast";
 import fs from "fs-extra";
 import { printHelp } from "../cli-utils";

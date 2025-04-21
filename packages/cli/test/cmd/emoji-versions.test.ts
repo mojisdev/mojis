@@ -2,6 +2,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import * as internalUtils from "@mojis/internal-utils";
+import * as versions from "@mojis/versions";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { testdir } from "vitest-testdirs";
 import * as cliUtils from "../../src/cli-utils";
@@ -9,7 +10,7 @@ import { runEmojiVersions } from "../../src/cmd/emoji-versions";
 import * as files from "../../src/files";
 
 vi.mock("@mojis/internal-utils", async () => {
-  const actual = await vi.importActual("@mojis/internal-utils");
+  const actual = await vi.importActual("@mojis/versions");
   return {
     ...actual,
     getAllEmojiVersions: vi.fn(),
@@ -49,8 +50,8 @@ describe("emoji-versions command", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.mocked(internalUtils.getAllEmojiVersions).mockResolvedValue(mockEmojiVersions);
-    vi.mocked(internalUtils.getLatestEmojiVersion)
+    vi.mocked(versions.getAllEmojiVersions).mockResolvedValue(mockEmojiVersions);
+    vi.mocked(versions.getLatestEmojiVersion)
       .mockImplementation((versions, includeDrafts) =>
         includeDrafts ? mockLatestVersionWithDrafts : mockLatestVersion);
     console.log = vi.fn();
@@ -120,7 +121,7 @@ describe("emoji-versions command", () => {
           force: false,
         },
       });
-      expect(internalUtils.getLatestEmojiVersion).toHaveBeenCalledWith(mockEmojiVersions, true);
+      expect(versions.getLatestEmojiVersion).toHaveBeenCalledWith(mockEmojiVersions, true);
       expect(console.log).toHaveBeenCalled();
       expect(vi.mocked(console.log).mock.calls[0]?.[0]).toContain("15.1");
     });
@@ -141,7 +142,7 @@ describe("emoji-versions command", () => {
     });
 
     it("should handle case when no versions are found", async () => {
-      vi.mocked(internalUtils.getLatestEmojiVersion).mockReturnValue(null);
+      vi.mocked(versions.getLatestEmojiVersion).mockReturnValue(null);
       await runEmojiVersions("latest", {
         flags: {
           _: ["latest"],
@@ -200,7 +201,7 @@ describe("emoji-versions command", () => {
     });
 
     it("should handle empty results after filtering", async () => {
-      vi.mocked(internalUtils.getAllEmojiVersions).mockResolvedValue([
+      vi.mocked(versions.getAllEmojiVersions).mockResolvedValue([
         {
           emoji_version: "15.1",
           unicode_version: "",

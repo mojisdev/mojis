@@ -127,6 +127,9 @@ importers:
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
+      '@mojis/versions':
+        specifier: workspace:*
+        version: link:../versions
       arktype:
         specifier: catalog:prod
         version: 2.1.17
@@ -173,6 +176,9 @@ importers:
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
+      '@mojis/versions':
+        specifier: workspace:*
+        version: link:../versions
       arktype:
         specifier: catalog:prod
         version: 2.1.17
