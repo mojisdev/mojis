@@ -1,0 +1,30 @@
+name: detect new emoji releases
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        type: boolean
+        description: run the workflow without creating a pull request
+        required: false
+        default: false
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    if: github.repository == 'mojisdev/mojis'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+          repository: mojisdev/scripts
+
+      - name: run detect new releases script
+        run: |
+          ./detect-new-releases.sh
