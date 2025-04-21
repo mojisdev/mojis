@@ -42,9 +42,11 @@ jobs:
           mojis_api_base_url: ${{ github.event.inputs.api-base-url }}
 
       - name: try to generate data
-        if: steps.detect-new-releases.outputs.has_new_releases == 'true'
+        # if: steps.detect-new-releases.outputs.has_new_releases == 'true'
         run: |
           echo "There is a new release!"
+          echo "${{ steps.detect-new-releases.outputs.has_new_releases }}"
+          echo "${{ steps.detect-new-releases.outputs.unsupported_versions }}"
 
       # - name: create pull request
       #   id: create-pr
