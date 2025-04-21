@@ -1,4 +1,4 @@
-name: verify json schema
+name: Verify JSON Schemas
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: detect new emoji releases
+name: Detect Emoji Releases
 
 on:
   workflow_dispatch:
