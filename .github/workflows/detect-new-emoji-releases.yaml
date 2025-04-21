@@ -8,6 +8,15 @@ on:
         description: run the workflow without creating a pull request
         required: false
         default: false
+      api-base-url:
+        type: choice
+        description: the base URL of the mojis API
+        required: false
+        default: "https://api.mojis.dev"
+        options:
+          - "https://api.mojis.dev"
+          - "https://api.preview.mojis.dev"
+
   schedule:
     - cron: "0 0 * * *"
 
@@ -29,3 +38,4 @@ jobs:
         uses: mojisdev/scripts@main
         with:
           script: detect-new-releases
+          mojis_api_base_url: ${{ github.event.inputs.api-base-url }}
