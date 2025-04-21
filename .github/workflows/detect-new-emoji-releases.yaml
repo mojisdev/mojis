@@ -35,7 +35,29 @@ jobs:
           repository: mojisdev/scripts
 
       - name: run detect new releases script
+        id: detect-new-releases
         uses: mojisdev/scripts@main
         with:
           script: detect-new-releases
           mojis_api_base_url: ${{ github.event.inputs.api-base-url }}
+
+      - name: try to generate data
+        if: steps.detect-new-releases.outputs.has_new_releases == 'true'
+        run: |
+          echo "There is a new release!"
+
+      # - name: create pull request
+      #   id: create-pr
+      #   uses: peter-evans/create-pull-request@v4
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     commit-message: "chore: detect new emoji releases"
+      #     title: "chore: detect new emoji releases"
+      #     body: |
+      #       This pull request was created automatically by the `detect-new-releases` script.
+      #       It detects new emoji releases from the mojis API and creates a pull request to update the changelog.
+      #     branch: changeset-release/detect-new-releases
+      #     base: main
+      #     draft: false
+      #     delete-branch: true
+      #     labels: detect-new-releases
