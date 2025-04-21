@@ -35,12 +35,15 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@mojis/moji-compare": "catalog:prod",
+    "@mojis/schemas": "workspace:*"
+  },
   "devDependencies": {
     "@luxass/eslint-config": "catalog:dev",
     "eslint": "catalog:dev",
     "tsup": "catalog:dev",
-    "typescript": "catalog:dev",
-    "vitest-testdirs": "catalog:dev"
+    "typescript": "catalog:dev"
   },
   "publishConfig": {
     "access": "public"
