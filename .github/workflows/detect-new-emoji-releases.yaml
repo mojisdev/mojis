@@ -26,5 +26,6 @@ jobs:
           repository: mojisdev/scripts
 
       - name: run detect new releases script
-        run: |
-          ./detect-new-releases.sh
+        uses: mojisdev/scripts@main
+        with:
+          script: detect-new-releases
