@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 import fs from "node:fs/promises";
 import path from "node:path";
-import * as internalUtils from "@mojis/internal-utils";
 import * as versions from "@mojis/versions";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { testdir } from "vitest-testdirs";
@@ -9,7 +8,7 @@ import * as cliUtils from "../../src/cli-utils";
 import { runEmojiVersions } from "../../src/cmd/emoji-versions";
 import * as files from "../../src/files";
 
-vi.mock("@mojis/internal-utils", async () => {
+vi.mock("@mojis/versions", async () => {
   const actual = await vi.importActual("@mojis/versions");
   return {
     ...actual,
