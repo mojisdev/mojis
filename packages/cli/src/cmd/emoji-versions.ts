@@ -1,6 +1,6 @@
 import type { EmojiSpecRecord } from "@mojis/schemas/emojis";
 import type { CLIArguments } from "../cli-utils";
-import { getAllEmojiVersions, getLatestEmojiVersion } from "@mojis/internal-utils";
+import { getAllEmojiVersions, getLatestEmojiVersion } from "@mojis/versions";
 import { green, red, yellow } from "farver/fast";
 import { printHelp } from "../cli-utils";
 import { writeFileSafe } from "../files";

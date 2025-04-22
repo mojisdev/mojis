@@ -127,6 +127,9 @@ importers:
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
+      '@mojis/versions':
+        specifier: workspace:*
+        version: link:../versions
       arktype:
         specifier: catalog:prod
         version: 2.1.17
@@ -173,6 +176,9 @@ importers:
       '@mojis/schemas':
         specifier: workspace:*
         version: link:../schemas
+      '@mojis/versions':
+        specifier: workspace:*
+        version: link:../versions
       arktype:
         specifier: catalog:prod
         version: 2.1.17
@@ -299,6 +305,28 @@ importers:
       vitest-testdirs:
         specifier: catalog:dev
         version: 3.0.1(vitest@3.1.1)
+
+  packages/versions:
+    dependencies:
+      '@mojis/moji-compare':
+        specifier: catalog:prod
+        version: 0.4.0
+      '@mojis/schemas':
+        specifier: workspace:*
+        version: link:../schemas
+    devDependencies:
+      '@luxass/eslint-config':
+        specifier: catalog:dev
+        version: 4.18.1(@typescript-eslint/utils@8.28.0(eslint@9.23.0)(typescript@5.8.2))(@vue/compiler-sfc@3.5.13)(eslint@9.23.0)(typescript@5.8.2)(vitest@3.1.1)
+      eslint:
+        specifier: catalog:dev
+        version: 9.23.0
+      tsup:
+        specifier: catalog:dev
+        version: 8.4.0(postcss@8.5.3)(tsx@4.19.3)(typescript@5.8.2)(yaml@2.7.0)
+      typescript:
+        specifier: catalog:dev
+        version: 5.8.2
 
 packages:
 

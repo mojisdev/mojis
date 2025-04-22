@@ -1,6 +1,7 @@
 import type { EmojiGroup, GroupedEmojiMetadata } from "@mojis/schemas/emojis";
-import { extractEmojiVersion, extractUnicodeVersion, isBefore } from "@mojis/internal-utils";
+import { isBefore } from "@mojis/internal-utils";
 import { EMOJI_GROUPS_SCHEMA, GROUPED_BY_GROUP_EMOJI_METADATA_SCHEMA, GROUPED_BY_HEXCODE_EMOJI_METADATA_SCHEMA } from "@mojis/schemas/emojis";
+import { extractEmojiVersion, extractUnicodeVersion } from "@mojis/versions";
 import { type } from "arktype";
 import { createSourceAdapter } from "../../builders/source-builder/builder";
 import { joinPath } from "../../utils";

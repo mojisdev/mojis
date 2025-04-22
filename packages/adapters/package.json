@@ -40,6 +40,7 @@
     "@mojis/moji-compare": "catalog:prod",
     "@mojis/parsers": "workspace:*",
     "@mojis/schemas": "workspace:*",
+    "@mojis/versions": "workspace:*",
     "arktype": "catalog:prod",
     "defu": "catalog:prod",
     "fs-extra": "catalog:prod"

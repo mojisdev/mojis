@@ -1,31 +1,8 @@
 import type { EmojiSpecRecord } from "@mojis/schemas/emojis";
 import mojiCompare from "@mojis/moji-compare";
-import { NON_EXISTING_VERSIONS } from "./constants";
-
-export const MAPPED_EMOJI_VERSIONS: Record<string, string> = {
-  "0.7": "7.0",
-  "1.0": "8.0",
-  "2.0": "8.0",
-  "3.0": "9.0",
-  "4.0": "9.0",
-  "5.0": "10.0",
-
-  // There doesn't seem to be a Unicode 13.1, so we'll map it to 13.0
-  "13.1": "13.0",
-};
-
-/**
- * Converts a version string to a semver compatible version.
- *
- * @param {string} version - The version string to convert
- * @returns {string | null} The semver compatible version string or null if the version cannot be coerced
- *
- * NOTE:
- * Emoji Versions is almost always major.minor format.
- */
-export function toSemverCompatible(version: string): string | null {
-  return mojiCompare.coerce(version) || null;
-}
+import { toSemverCompatible } from "./conversion";
+import { extractVersionFromReadme } from "./extraction";
+import { isEmojiVersionAllowed } from "./validation";
 
 export interface DraftVersion {
   emoji_version: string;
@@ -76,111 +53,6 @@ export async function getCurrentDraftVersion(): Promise<DraftVersion | null> {
     emoji_version: emojiVersion,
     unicode_version: rootVersion,
   };
-}
-
-/**
- * Extracts the emoji version from a comment string.
- * The version should be in the format "E{major}.{minor}" (e.g. "E14.0").
- *
- * @param {string} comment - The comment string to extract the version from
- * @returns {string | null} The parsed version number, or null if no valid version was found
- *
- * @example
- * ```ts
- * extractEmojiVersion("E14.0") // returns "14.0"
- * extractEmojiVersion("Something else") // returns null
- * ```
- */
-export function extractEmojiVersion(comment: string): string | null {
-  const version = comment.match(/E(\d+\.\d)/);
-
-  if (version != null && version[1] != null) {
-    return version[1].trim();
-  }
-
-  return null;
-}
-
-/**
- * Extracts the Unicode version number from a given text string.
- *
- * @param {string?} text - The text to extract the version number from
- * @returns {string | null} The extracted version number as a string, or null if no version number is found
- *
- * @example
- * ```ts
- * extractVersionFromReadme("Version 15.0.0 of the Unicode Standard") // Returns "15.0.0"
- * extractVersionFromReadme("Unicode15.1") // Returns "15.1"
- * extractVersionFromReadme("No version here") // Returns null
- * ```
- */
-export function extractVersionFromReadme(text?: string): string | null {
-  if (text == null) return null;
-
-  const patterns = [
-    /Version (\d+\.\d+(?:\.\d+)?) of the Unicode Standard/, // Most explicit
-    /Unicode(\d+\.\d+(?:\.\d+)?)/, // From URLs
-    /Version (\d+\.\d+)(?!\.\d)/, // Bare major.minor format
-    /Unicode Emoji, Version (\d+\.\d+(?:\.\d+)?)/, // Emoji-specific version
-  ];
-
-  for (const pattern of patterns) {
-    const match = text.match(pattern);
-
-    if (match == null || match[1] == null) continue;
-
-    return match[1];
-  }
-
-  return null;
-}
-
-/**
- * Extracts and aligns the Unicode version based on the provided emoji version.
- *
- * For emoji versions 11.0.0 and above, it compares the emoji version with the Unicode version (if provided)
- * and returns the smaller of the two. If no Unicode version is provided, it returns the emoji version.
- *
- * For emoji versions prior to 11.0.0, it uses a mapping to determine the corresponding Unicode version.
- *
- * @param {string | null} emojiVersion - The emoji version string (e.g., "1.0", "12.0"). Can be null.
- * @param {string?} unicodeVersion - The Unicode version string (e.g., "8.0", "13.0"). Optional.
- * @returns {string | null} The aligned Unicode version string or null if the emoji version is null or invalid.
- * Returns "6.0" if the emoji version is not found in the version map and is less than 11.0.0.
- */
-export function extractUnicodeVersion(emojiVersion: string | null, unicodeVersion?: string): string | null {
-  // handle null case early
-  if (emojiVersion == null) {
-    return null;
-  }
-
-  const coercedEmojiVersion = mojiCompare.coerce(emojiVersion);
-
-  // early return if emoji version is invalid
-  if (coercedEmojiVersion == null) {
-    return null;
-  }
-
-  // v11+ aligned emoji and unicode specs (except for minor versions)
-  if (mojiCompare.gte(coercedEmojiVersion, "11.0.0")) {
-    // if Unicode version is not provided, return the emoji version
-    if (unicodeVersion == null) {
-      return emojiVersion;
-    }
-
-    const coercedUnicodeVersion = mojiCompare.coerce(unicodeVersion);
-
-    // if Unicode version is invalid, return emoji version
-    if (coercedUnicodeVersion == null) {
-      return emojiVersion;
-    }
-
-    // return the smaller version between emoji and unicode version
-    return mojiCompare.lt(coercedEmojiVersion, coercedUnicodeVersion) ? emojiVersion : unicodeVersion;
-  }
-
-  // return mapped version or default to "6.0"
-  return MAPPED_EMOJI_VERSIONS[emojiVersion] || "6.0";
 }
 
 /**
@@ -314,54 +186,6 @@ export async function getAllEmojiVersions(): Promise<EmojiSpecRecord[]> {
   }
 
   return versions.sort((a, b) => mojiCompare.compareSortable(`${b.emoji_version}.0`, `${a.emoji_version}.0`));
-}
-
-/**
- * Checks if a given emoji version is allowed based on specific criteria.
- *
- * Due to Unicode Consortium's versioning changes in 2017:
- * - Versions 6-10 don't exist (they aligned emoji versions with Unicode versions)
- * - Versions 1-5 only had major releases (no minor or patch versions)
- *
- * @param {string} version - The emoji version string to check.
- * @returns {boolean} A boolean that resolves true if the version is allowed, false otherwise.
- */
-export function isEmojiVersionAllowed(version: string): boolean {
-  const semverVersion = mojiCompare.coerce(version);
-  if (semverVersion == null) {
-    return false;
-  }
-
-  // There isn't any Emoji 6.0-10.0. They aligned the emoji version with the unicode version in 2017.
-  // Starting from v11.0.
-  if (NON_EXISTING_VERSIONS.find((v) => mojiCompare.satisfies(semverVersion, v))) {
-    return false;
-  }
-
-  // from v1 to v5, there was only major releases. So no v1.1, v1.2, etc.
-  // only, v1.0, v2.0, v3.0, v4.0, v5.0.
-  // if version has any minor or patch, it is invalid.
-  if (mojiCompare.major(semverVersion) <= 5 && (mojiCompare.minor(semverVersion) !== 0 || mojiCompare.patch(semverVersion) !== 0)) {
-    return false;
-  }
-
-  return true;
-}
-
-/**
- * Maps an emoji version to its corresponding Unicode version.
- *
- * @param {string} emojiVersion - The emoji version to map to a Unicode version
- * @returns {string} The corresponding Unicode version if found, otherwise returns the input version
- */
-export function mapEmojiVersionToUnicodeVersion(emojiVersion: string): string {
-  const mapped = MAPPED_EMOJI_VERSIONS[emojiVersion];
-
-  if (mapped != null) {
-    return mapped;
-  }
-
-  return emojiVersion;
 }
 
 /**

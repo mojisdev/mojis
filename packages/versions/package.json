@@ -1,6 +1,6 @@
 {
-  "name": "@mojis/internal-utils",
-  "version": "0.1.0",
+  "name": "@mojis/versions",
+  "version": "0.0.0",
   "type": "module",
   "author": {
     "name": "Lucas Nørgård",
@@ -13,15 +13,13 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mojisdev/mojis.git",
-    "directory": "packages/internal-utils"
+    "directory": "packages/versions"
   },
   "bugs": {
     "url": "https://github.com/mojisdev/mojis/issues"
   },
   "exports": {
     ".": "./dist/index.js",
-    "./shortcodes": "./dist/shortcodes.js",
-    "./constants": "./dist/constants.js",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -39,17 +37,13 @@
   },
   "dependencies": {
     "@mojis/moji-compare": "catalog:prod",
-    "@mojis/schemas": "workspace:*",
-    "arktype": "catalog:prod",
-    "fs-extra": "catalog:prod"
+    "@mojis/schemas": "workspace:*"
   },
   "devDependencies": {
     "@luxass/eslint-config": "catalog:dev",
-    "@types/fs-extra": "catalog:dev",
     "eslint": "catalog:dev",
     "tsup": "catalog:dev",
-    "typescript": "catalog:dev",
-    "vitest-testdirs": "catalog:dev"
+    "typescript": "catalog:dev"
   },
   "publishConfig": {
     "access": "public"

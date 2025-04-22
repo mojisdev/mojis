@@ -9,6 +9,7 @@
       "@mojis/internal-utils": ["./packages/internal-utils/src/index.ts"],
       "@mojis/internal-utils/shortcodes": ["./packages/internal-utils/src/shortcodes"],
       "@mojis/internal-utils/constants": ["./packages/internal-utils/src/constants"],
+      "@mojis/versions": ["./packages/versions/src/index.ts"],
       "@mojis/adapters": ["./packages/adapters/src/index.ts"],
       "@mojis/parsers": ["./packages/parsers/src/index.ts"],
       "@mojis/schemas": ["./packages/schemas/src/index.ts"],

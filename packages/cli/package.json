@@ -36,6 +36,7 @@
     "@mojis/internal-utils": "workspace:*",
     "@mojis/moji-compare": "catalog:prod",
     "@mojis/schemas": "workspace:*",
+    "@mojis/versions": "workspace:*",
     "arktype": "catalog:prod",
     "farver": "catalog:prod",
     "fs-extra": "catalog:prod",
