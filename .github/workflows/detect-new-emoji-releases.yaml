@@ -54,10 +54,10 @@ jobs:
             echo "🔍 trying to run mojis cli for release $release"
             echo "----------------------------------------"
             echo "✨ generating files for release $release"
-            if npx @mojis/cli generate --version $release --output-dir ./emoji-data/$release; then
+            if npx @mojis/cli generate $release --output-dir ./emoji-data/$release; then
               echo "----------------------------------------"
               echo "🔎 validating files for release $release"
-              if npx @mojis/cli validate --version $release --input-dir ./emoji-data/$release; then
+              if npx @mojis/cli validate $release --input-dir ./emoji-data/$release; then
                 echo "✅ Successfully validated version $release"
                 SUCCESSFUL_VERSIONS+=("$release")
               else
