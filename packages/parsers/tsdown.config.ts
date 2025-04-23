@@ -1,4 +1,4 @@
-import { defineConfig } from "tsup";
+import { defineConfig } from "tsdown";
 
 export default defineConfig({
   entry: [
@@ -8,5 +8,6 @@ export default defineConfig({
   clean: true,
   dts: true,
   treeshake: true,
-  bundle: true,
+  publint: true,
+  tsconfig: "./tsconfig.build.json",
 });
