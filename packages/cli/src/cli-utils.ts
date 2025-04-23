@@ -1,4 +1,5 @@
 import type { Arguments } from "yargs-parser";
+import type { CLIGenerateCmdOptions } from "./cmd/generate";
 import process from "node:process";
 import {
   bgGreen,
@@ -162,11 +163,7 @@ export async function runCommand(cmd: CLICommand, flags: Arguments): Promise<voi
       const versions = flags._.slice(3) as string[];
       await runGenerate({
         versions,
-        flags: flags as CLIArguments<{
-          generators: string[];
-          shortcodeProviders: string[];
-          force: boolean;
-        }>,
+        flags: flags as CLIGenerateCmdOptions["flags"],
       });
       break;
     }
@@ -180,9 +177,11 @@ export function parseFlags(args: string[]) {
     configuration: {
       "parse-positional-numbers": false,
     },
+    string: ["output-dir"],
     array: ["generators", "shortcode-providers"],
     boolean: ["force", "drafts"],
     default: {
+      "output-dir": "./data",
       "generators": DEFAULT_GENERATORS,
       "shortcode-providers": DEFAULT_SHORTCODE_PROVIDERS,
       "force": false,

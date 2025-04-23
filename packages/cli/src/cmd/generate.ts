@@ -1,5 +1,6 @@
 import type { EmojiSpecRecord } from "@mojis/schemas/emojis";
 import type { CLIArguments } from "../cli-utils";
+import path from "node:path";
 import { runSourceAdapter, sourceHandlers } from "@mojis/adapters";
 import mojiCompare from "@mojis/moji-compare";
 import {
@@ -12,16 +13,17 @@ import { green, yellow } from "farver/fast";
 import fs from "fs-extra";
 import { printHelp } from "../cli-utils";
 
-interface GenerateOptions {
+export interface CLIGenerateCmdOptions {
   flags: CLIArguments<{
     generators: string[];
     force: boolean;
     shortcodeProviders: string[];
+    outputDir: string;
   }>;
   versions: string[];
 }
 
-export async function runGenerate({ versions: providedVersions, flags }: GenerateOptions) {
+export async function runGenerate({ versions: providedVersions, flags }: CLIGenerateCmdOptions) {
   if (flags?.help || flags?.h) {
     printHelp({
       headline: "Generate emoji data for the specified versions.",
@@ -29,6 +31,7 @@ export async function runGenerate({ versions: providedVersions, flags }: Generat
       usage: "<...versions> [...flags]",
       tables: {
         Flags: [
+          ["--output-dir", "Specify the output directory."],
           ["--shortcode-providers [...providers]", `Specify the shortcode providers to use.`],
           ["--generators [...generators]", `Specify the generators to use.`],
           ["--force", "Force the operation to run, even if it's not needed."],
@@ -39,6 +42,8 @@ export async function runGenerate({ versions: providedVersions, flags }: Generat
     return;
   }
 
+  // eslint-disable-next-line node/prefer-global/process
+  const outputDir = flags.outputDir ?? path.join(process.cwd(), "data");
   const force = flags.force ?? false;
   const existingEmojiVersions = await getAllEmojiVersions();
   const generators = (Array.isArray(flags.generators) ? flags.generators : [flags.generators]) as string[];
@@ -105,7 +110,12 @@ export async function runGenerate({ versions: providedVersions, flags }: Generat
   console.info(`using the following generators ${generators.map((g) => yellow(g)).join(", ")}`);
 
   // generate the promises for each version
-  const promises = versions.map((version) => buildEmojiGenerateRequest(version, generators, force));
+  const promises = versions.map((version) => buildEmojiGenerateRequest({
+    version,
+    generators,
+    force,
+    outputDir,
+  }));
 
   const results = await Promise.allSettled(promises);
 
@@ -123,19 +133,40 @@ function isGeneratorEnabled(generator: string, generators: string[]): boolean {
   return generators.includes(generator);
 }
 
+interface EmojiDataGenerateRequest {
+  /**
+   * The version of the emoji data to generate.
+   */
+  version: EmojiSpecRecord;
+
+  /**
+   * The generators to use for the emoji data generation.
+   */
+  generators: string[];
+
+  /**
+   * Whether to force the generation of the emoji data.
+   */
+  force: boolean;
+
+  /**
+   * The output directory for the generated emoji data.
+   */
+  outputDir: string;
+}
+
 /**
  * Builds a request for the emoji data generation.
- * @param {EmojiSpecRecord} version - The version of the emoji data to generate.
- * @param {string[]} generators - The generators to use.
- * @param {boolean} force - Whether to force the generation.
+ * @param {EmojiDataGenerateRequest} options - The options for the emoji data generation.
+ * @param {string} options.version - The version of the emoji data to generate.
+ * @param {string[]} options.generators - The generators to use for the emoji data generation.
+ * @param {boolean} options.force - Whether to force the generation of the emoji data.
+ * @param {string} options.outputDir - The output directory for the generated emoji data.
  * @returns {Promise<void>} A promise that resolves to the emoji data.
  */
-export async function buildEmojiGenerateRequest(
-  version: EmojiSpecRecord,
-  generators: string[],
-  force: boolean,
-): Promise<void> {
-  const baseDir = `./data/v${version.emoji_version}`;
+export async function buildEmojiGenerateRequest(options: EmojiDataGenerateRequest): Promise<void> {
+  const { version, generators, force, outputDir } = options;
+  const baseDir = path.join(`${outputDir}/v${version.emoji_version}`);
   await fs.ensureDir(baseDir);
 
   if (isGeneratorEnabled("metadata", generators)) {
@@ -143,6 +174,8 @@ export async function buildEmojiGenerateRequest(
       force,
       emoji_version: version.emoji_version,
       unicode_version: version.unicode_version,
+    }, {
+      outputDir,
     });
   }
 
@@ -151,6 +184,8 @@ export async function buildEmojiGenerateRequest(
       force,
       emoji_version: version.emoji_version,
       unicode_version: version.unicode_version,
+    }, {
+      outputDir,
     });
   }
 
@@ -159,6 +194,8 @@ export async function buildEmojiGenerateRequest(
       force,
       emoji_version: version.emoji_version,
       unicode_version: version.unicode_version,
+    }, {
+      outputDir,
     });
   }
 
@@ -167,6 +204,8 @@ export async function buildEmojiGenerateRequest(
       force,
       emoji_version: version.emoji_version,
       unicode_version: version.unicode_version,
+    }, {
+      outputDir,
     });
   }
 }
