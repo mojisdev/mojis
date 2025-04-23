@@ -31,8 +31,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup --tsconfig tsconfig.build.json",
-    "dev": "tsup --tsconfig tsconfig.build.json --watch",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
     "clean": "git clean -xdf dist node_modules",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
@@ -47,7 +47,8 @@
     "@luxass/eslint-config": "catalog:dev",
     "@types/fs-extra": "catalog:dev",
     "eslint": "catalog:dev",
-    "tsup": "catalog:dev",
+    "publint": "catalog:dev",
+    "tsdown": "catalog:dev",
     "typescript": "catalog:dev",
     "vitest-testdirs": "catalog:dev"
   },
