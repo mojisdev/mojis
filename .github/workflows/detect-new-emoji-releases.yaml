@@ -36,9 +36,13 @@ jobs:
 
       - name: run detect new releases script
         id: detect-new-releases
-        uses: mojisdev/scripts@main
+        uses: mojisdev/scripts/detect-new-releases@multiple-actions
         with:
-          script: detect-new-releases
+          mojis_api_base_url: ${{ github.event.inputs.api-base-url }}
+
+      - name: test action
+        uses: mojisdev/scripts/test-action@multiple-actions
+        with:
           mojis_api_base_url: ${{ github.event.inputs.api-base-url }}
 
       - name: try to generate data
