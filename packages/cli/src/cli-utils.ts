@@ -1,5 +1,6 @@
 import type { Arguments } from "yargs-parser";
 import type { CLIGenerateCmdOptions } from "./cmd/generate";
+import type { CLIValidateCmdOptions } from "./cmd/validate";
 import process from "node:process";
 import {
   bgGreen,
@@ -17,11 +18,13 @@ type CLICommand =
   | "help"
   | "version"
   | "emoji-versions"
-  | "generate";
+  | "generate"
+  | "validate";
 
 const SUPPORTED_COMMANDS = new Set<CLICommand>([
   "generate",
   "emoji-versions",
+  "validate",
 ]);
 
 export type CLIArguments<T extends Record<string, unknown>> = Arguments & T;
@@ -133,6 +136,7 @@ export async function runCommand(cmd: CLICommand, flags: Arguments): Promise<voi
           "Commands": [
             ["generate", "Generate emoji data for the specified versions."],
             ["emoji-versions", "Print all emoji versions available."],
+            ["validate", "Validate generated emoji data."],
           ],
           "Global Flags": [
             ["--force", "Force the operation to run, even if it's not needed."],
@@ -158,6 +162,15 @@ export async function runCommand(cmd: CLICommand, flags: Arguments): Promise<voi
       });
       break;
     }
+    case "validate": {
+      const { runValidate } = await import("./cmd/validate");
+      const versions = flags._.slice(3) as string[];
+      await runValidate({
+        versions,
+        flags: flags as CLIValidateCmdOptions["flags"],
+      });
+      break;
+    }
     case "generate": {
       const { runGenerate } = await import("./cmd/generate");
       const versions = flags._.slice(3) as string[];
@@ -177,7 +190,7 @@ export function parseFlags(args: string[]) {
     configuration: {
       "parse-positional-numbers": false,
     },
-    string: ["output-dir"],
+    string: ["output-dir", "input-dir"],
     array: ["generators", "shortcode-providers"],
     boolean: ["force", "drafts"],
     default: {
