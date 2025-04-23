@@ -1,5 +1,20 @@
 # @mojis/cli
 
+## 0.4.0
+
+### Minor Changes
+
+- [#137](https://github.com/mojisdev/mojis/pull/137) [`1988d7e`](https://github.com/mojisdev/mojis/commit/1988d7e621524f4a3af9f927b77769347526c49a) Thanks [@luxass](https://github.com/luxass)! - feat: add basic validation function
+
+### Patch Changes
+
+- [#136](https://github.com/mojisdev/mojis/pull/136) [`4da635f`](https://github.com/mojisdev/mojis/commit/4da635f012d847c40872b9d75d9c7e21435ea7cb) Thanks [@luxass](https://github.com/luxass)! - feat: add `outputDir` to generate cmd
+
+- [#139](https://github.com/mojisdev/mojis/pull/139) [`297847b`](https://github.com/mojisdev/mojis/commit/297847bdfce88604ae9f8ea3631d1bba37918fa5) Thanks [@luxass](https://github.com/luxass)! - refactor: update print help
+
+- Updated dependencies [[`4da635f`](https://github.com/mojisdev/mojis/commit/4da635f012d847c40872b9d75d9c7e21435ea7cb)]:
+  - @mojis/adapters@0.4.1
+
 ## 0.3.0
 
 ### Minor Changes
