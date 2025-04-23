@@ -13,7 +13,7 @@ import { green, yellow } from "farver/fast";
 import fs from "fs-extra";
 import { printHelp } from "../cli-utils";
 
-interface GenerateOptions {
+export interface CLIGenerateCmdOptions {
   flags: CLIArguments<{
     generators: string[];
     force: boolean;
@@ -23,7 +23,7 @@ interface GenerateOptions {
   versions: string[];
 }
 
-export async function runGenerate({ versions: providedVersions, flags }: GenerateOptions) {
+export async function runGenerate({ versions: providedVersions, flags }: CLIGenerateCmdOptions) {
   if (flags?.help || flags?.h) {
     printHelp({
       headline: "Generate emoji data for the specified versions.",
