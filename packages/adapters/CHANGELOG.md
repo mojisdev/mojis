@@ -1,5 +1,11 @@
 # @mojis/adapters
 
+## 0.4.1
+
+### Patch Changes
+
+- [#136](https://github.com/mojisdev/mojis/pull/136) [`4da635f`](https://github.com/mojisdev/mojis/commit/4da635f012d847c40872b9d75d9c7e21435ea7cb) Thanks [@luxass](https://github.com/luxass)! - feat: add `outputDir` to generate cmd
+
 ## 0.4.0
 
 ### Minor Changes
