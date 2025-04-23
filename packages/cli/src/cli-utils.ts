@@ -4,7 +4,6 @@ import type { CLIValidateCmdOptions } from "./cmd/validate";
 import process from "node:process";
 import {
   bgGreen,
-  bgWhite,
   black,
   bold,
   dim,
