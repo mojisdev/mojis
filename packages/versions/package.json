@@ -42,6 +42,7 @@
   "devDependencies": {
     "@luxass/eslint-config": "catalog:dev",
     "eslint": "catalog:dev",
+    "publint": "catalog:dev",
     "tsdown": "catalog:dev",
     "typescript": "catalog:dev"
   },
