@@ -65,53 +65,84 @@ export function printHelp({
   tables?: Record<string, [command: string, help: string][]>;
   description?: string;
 }) {
+  const terminalWidth = process.stdout.columns || 80;
+  const isTinyTerminal = terminalWidth < 60;
+
+  // add two spaces before all content
+  const indent = "  ";
+
+  // helper functions
   const linebreak = () => "";
-  const title = (label: string) => `  ${bgWhite(black(` ${label} `))}`;
+
+  // table rendering with improved spacing
   const table = (rows: [string, string][], { padding }: { padding: number }) => {
-    const split = process.stdout.columns < 60;
     let raw = "";
 
-    for (const row of rows) {
-      if (split) {
-        raw += `    ${row[0]}\n    `;
+    for (const [command, help] of rows) {
+      if (isTinyTerminal) {
+        // stack vertically in small terminals
+        raw += `${indent}${indent}${bold(command)}\n${indent}${indent}${indent}${dim(help)}\n`;
       } else {
-        raw += `${`${row[0]}`.padStart(padding)}`;
+        // keep horizontal in normal terminals with better alignment
+        const paddedCommand = command.padEnd(padding);
+        raw += `${indent}${indent}${bold(paddedCommand)}  ${dim(help)}\n`;
       }
-      raw += `  ${dim(row[1])}\n`;
     }
-
     return raw.slice(0, -1); // remove latest \n
   };
 
   const message = [];
 
+  // header section with version
   if (headline) {
     message.push(
-      linebreak(),
-      `  ${bgGreen(black(` ${commandName} `))} ${green(
-        `v${pkg.version ?? "x.y.z"}`,
-      )} ${headline}`,
+      `\n${indent}${bgGreen(black(` ${commandName} `))} ${green(`v${pkg.version ?? "0.0.0"}`)}`,
+      `${indent}${dim(headline)}`,
     );
   }
 
+  // usage section
   if (usage) {
-    message.push(linebreak(), `  ${green(commandName)} ${bold(usage)}`);
-  }
-  if (description) {
-    message.push(linebreak(), `  ${description}`);
+    message.push(
+      linebreak(),
+      `${indent}${bold("USAGE")}`,
+      `${indent}${indent}${green(commandName)} ${usage}`,
+    );
   }
 
+  // description when provided
+  if (description) {
+    message.push(
+      linebreak(),
+      `${indent}${bold("DESCRIPTION")}`,
+      `${indent}${indent}${description}`,
+    );
+  }
+
+  // tables with improved formatting
   if (tables) {
+    // calculate optimal padding but cap it to avoid excessive space
     function calculateTablePadding(rows: [string, string][]) {
-      return rows.reduce((val, [first]) => Math.max(val, first.length), 0) + 2;
+      const maxLength = rows.reduce((val, [first]) => Math.max(val, first.length), 0);
+      return Math.min(maxLength, 30) + 2;
     }
 
     const tableEntries = Object.entries(tables);
-    const padding = Math.max(...tableEntries.map(([, rows]) => calculateTablePadding(rows)));
     for (const [tableTitle, tableRows] of tableEntries) {
-      message.push(linebreak(), title(tableTitle), table(tableRows, { padding }));
+      const padding = calculateTablePadding(tableRows);
+      message.push(
+        linebreak(),
+        `${indent}${bold(tableTitle.toUpperCase())}`,
+        table(tableRows, { padding }),
+      );
     }
   }
+
+  // add footer
+  message.push(
+    linebreak(),
+    `${indent}${dim(`Run with --help for more information on specific commands.`)}`,
+  );
 
   // eslint-disable-next-line no-console
   console.log(`${message.join("\n")}\n`);
