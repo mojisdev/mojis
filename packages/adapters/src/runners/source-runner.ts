@@ -1,7 +1,7 @@
 import type { Cache, CacheOptions } from "@mojis/internal-utils";
 import type { AnySourceAdapter, InferHandlerOutput, PersistenceOptions } from "../builders/source-builder/types";
 import type { AdapterContext } from "../global-types";
-import path, { join } from "node:path";
+import path from "node:path";
 import { arktypeParse } from "@mojis/internal-utils";
 import defu from "defu";
 import fs from "fs-extra";
@@ -15,9 +15,25 @@ export interface RunSourceAdapterOptions {
    */
   write?: boolean;
 
+  /**
+   * The cache key to use for the adapter.
+   */
   cacheKey?: string;
+
+  /**
+   * The cache options to use for the adapter.
+   */
   cacheOptions?: CacheOptions;
+
+  /**
+   * The cache to use for the adapter.
+   */
   cache?: Cache<string>;
+
+  /**
+   * The base output path to use for the adapter.
+   */
+  outputDir?: string;
 }
 
 export async function runSourceAdapter<
@@ -27,13 +43,13 @@ export async function runSourceAdapter<
   handler: THandler,
   ctx: AdapterContext,
   options?: TOptions,
-  // TODO: dynamic infer return type based on `write`
 ): Promise<TOptions["write"] extends true ? void : InferHandlerOutput<THandler>> {
   const promises = [];
 
   assertValidHandler(handler);
 
   const shouldWrite = options?.write ?? true;
+  const outputDir = options?.outputDir ?? "./data";
 
   let output = handler.fallback;
 
@@ -75,7 +91,7 @@ export async function runSourceAdapter<
     throw new Error(`no persistence function defined for adapter ${handler.adapterType}`);
   }
 
-  const basePath = join("./data", `v${ctx.emoji_version}`);
+  const basePath = path.resolve(path.join(outputDir, `v${ctx.emoji_version}`));
   const persistenceOptions = defu(handler.persistence.options, {
     basePath,
     encoding: "utf-8",

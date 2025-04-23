@@ -180,9 +180,11 @@ export function parseFlags(args: string[]) {
     configuration: {
       "parse-positional-numbers": false,
     },
+    string: ["output-dir"],
     array: ["generators", "shortcode-providers"],
     boolean: ["force", "drafts"],
     default: {
+      "output-dir": "./data",
       "generators": DEFAULT_GENERATORS,
       "shortcode-providers": DEFAULT_SHORTCODE_PROVIDERS,
       "force": false,
