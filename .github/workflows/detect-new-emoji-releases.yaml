@@ -42,34 +42,52 @@ jobs:
 
       - name: try to generate data
         if: steps.detect-new-releases.outputs.has_new_releases == 'true'
+        id: generate-data
         env:
           NEW_RELEASES: ${{ steps.detect-new-releases.outputs.unsupported_versions }}
         run: |
-          echo "There is a new release!"
+          # initialize an array to store successful versions
+          SUCCESSFUL_VERSIONS=()
 
           # for each of the new releases, try to run mojis cli.
           for release in $NEW_RELEASES; do
-            echo "trying to run mojis cli for release $release"
-            # try to run mojis cli
-            # if ! npx mojis --version $release; then
-            #   echo "Failed to run mojis cli for release $release"
-            #   echo "Please check the release version and try again."
-            #   exit 1
-            # fi
+            echo "🔍 trying to run mojis cli for release $release"
+            echo "----------------------------------------"
+            echo "✨ generating files for release $release"
+            if npx @mojis/cli generate --version $release --output-dir ./emoji-data/$release; then
+              echo "----------------------------------------"
+              echo "🔎 validating files for release $release"
+              if npx @mojis/cli validate --version $release --input-dir ./emoji-data/$release; then
+                echo "✅ Successfully validated version $release"
+                SUCCESSFUL_VERSIONS+=("$release")
+              else
+                echo "❌ Validation failed for version $release"
+              fi
+            else
+              echo "❌ Generation failed for version $release"
+            fi
+            echo "----------------------------------------"
           done
 
-      # - name: create pull request
-      #   id: create-pr
-      #   uses: peter-evans/create-pull-request@v4
-      #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #     commit-message: "chore: detect new emoji releases"
-      #     title: "chore: detect new emoji releases"
-      #     body: |
-      #       This pull request was created automatically by the `detect-new-releases` script.
-      #       It detects new emoji releases from the mojis API and creates a pull request to update the changelog.
-      #     branch: changeset-release/detect-new-releases
-      #     base: main
-      #     draft: false
-      #     delete-branch: true
-      #     labels: detect-new-releases
+          # save the successful versions as a comma-separated string
+          echo "successful_versions=${SUCCESSFUL_VERSIONS[*]}" >> $GITHUB_OUTPUT
+          echo "✨ Successfully validated versions: ${SUCCESSFUL_VERSIONS[*]}"
+
+      - name: create pull request
+        if: ${{ github.event.inputs.dry-run == 'false' }} && steps.detect-new-releases.outputs.has_new_releases == 'true' && steps.generate-data.outputs.successful_versions != ''
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: detect new emoji releases"
+          title: "chore: detect new emoji releases"
+          body: |
+            This pull request was created automatically by the `detect-new-releases` script.
+
+            ### Successfully Validated Versions
+            ${{ steps.generate-data.outputs.successful_versions }}
+
+            These versions have been successfully generated and validated with the mojis CLI.
+          branch: detect-new-releases
+          base: main
+          draft: true
+          labels: new-release
