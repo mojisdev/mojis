@@ -26,10 +26,13 @@ catalogs:
     "@types/yargs-parser": ^21.0.3
     eslint: ^9.23.0
     tsup: ^8.4.0
+    tsdown: v0.9.3
     typescript: ^5.8.2
     vitest: ^3.0.9
     vitest-testdirs: ^3.0.1
     tsx: ^4.19.3
+    publint: ^0.3.12
 
 onlyBuiltDependencies:
   - esbuild
+  - rolldown
