@@ -61,6 +61,9 @@ catalogs:
     msw:
       specifier: ^2.7.3
       version: 2.7.3
+    tsx:
+      specifier: ^4.19.3
+      version: 4.19.3
     turbo:
       specifier: ^2.4.4
       version: 2.5.0
@@ -112,6 +115,9 @@ importers:
       msw:
         specifier: catalog:monorepo
         version: 2.7.3(@types/node@22.14.1)(typescript@5.8.2)
+      tsx:
+        specifier: catalog:monorepo
+        version: 4.19.3
       turbo:
         specifier: catalog:monorepo
         version: 2.5.0

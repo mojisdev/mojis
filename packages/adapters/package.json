@@ -33,7 +33,8 @@
     "dev": "tsdown --watch",
     "clean": "git clean -xdf dist node_modules",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "bench:types": "tsx ./.ts-benchmarks/index.ts"
   },
   "dependencies": {
     "@mojis/internal-utils": "workspace:*",
