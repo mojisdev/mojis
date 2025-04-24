@@ -40,7 +40,7 @@ jobs:
         run: pnpm typecheck
 
       - name: run benchmarks
-        run: pnpm bench:types
+        run: pnpm bench:types -- --benchErrorOnThresholdExceeded --benchPercentThreshold 10
 
       - name: test
         run: pnpm test --coverage
