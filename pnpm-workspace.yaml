@@ -9,6 +9,7 @@ catalogs:
     msw: ^2.7.3
     "@vitest/coverage-v8": ^3.0.9
     "@vitest/ui": ^3.0.9
+    "@ark/attest": ^0.46.0
 
   prod:
     farver: ^0.4.2

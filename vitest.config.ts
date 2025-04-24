@@ -30,7 +30,8 @@ export default defineConfig({
       include: ["**/src/**"],
     },
     setupFiles: [
-      "./test/setup/msw.ts"
+      "./test/global-setup/msw.ts",
+      "./test/global-setup/attest.ts",
     ],
     onConsoleLog(log, type) {
       if (type === "stderr") {
