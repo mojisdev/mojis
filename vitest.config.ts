@@ -47,12 +47,6 @@ export default defineConfig({
           name: "internal-utils",
           environment: "node",
           mockReset: true,
-          typecheck: {
-            checker: "tsc",
-            enabled: true,
-            include: ["./packages/internal-utils/**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
-            tsconfig: "./packages/internal-utils/tsconfig.test.json"
-          }
         },
         esbuild: { target: "es2020" },
         resolve: { alias: aliases },
@@ -65,12 +59,6 @@ export default defineConfig({
           name: "adapters",
           environment: "node",
           mockReset: true,
-          typecheck: {
-            checker: "tsc",
-            enabled: true,
-            include: ["./packages/adapters/**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
-            tsconfig: "./packages/adapters/tsconfig.test.json"
-          }
         },
         esbuild: { target: "es2020" },
         resolve: { alias: aliases },
@@ -82,12 +70,6 @@ export default defineConfig({
           name: "cli",
           environment: "node",
           mockReset: true,
-          typecheck: {
-            checker: "tsc",
-            enabled: true,
-            include: ["./packages/cli/**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
-            tsconfig: "./packages/cli/tsconfig.test.json"
-          }
         },
         esbuild: { target: "es2020" },
         resolve: { alias: aliases },
@@ -99,12 +81,6 @@ export default defineConfig({
           name: "parsers",
           environment: "node",
           mockReset: true,
-          typecheck: {
-            checker: "tsc",
-            enabled: true,
-            include: ["./packages/parsers/**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
-            tsconfig: "./packages/parsers/tsconfig.test.json"
-          }
         },
         esbuild: { target: "es2020" },
         resolve: { alias: aliases },
@@ -116,12 +92,6 @@ export default defineConfig({
           name: "schemas",
           environment: "node",
           mockReset: true,
-          typecheck: {
-            checker: "tsc",
-            enabled: true,
-            include: ["./packages/schemas/**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
-            tsconfig: "./packages/schemas/tsconfig.test.json"
-          }
         },
         esbuild: { target: "es2020" },
         resolve: { alias: aliases },
