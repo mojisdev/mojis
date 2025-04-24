@@ -17,7 +17,7 @@
     "generate:json-schemas": "pnpm --filter \"@mojis/json-schemas\" run write-schemas",
     "lint": "turbo run lint",
     "test": "vitest run",
-    "test:watch": "vitest",
+    "test:watch": "ATTEST_skipTypes=1 vitest",
     "test:ui": "vitest --ui",
     "typecheck": "turbo run typecheck"
   },

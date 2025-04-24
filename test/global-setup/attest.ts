@@ -1,3 +1,5 @@
-import { setup } from "@ark/attest"
+import { setup, teardown} from "@ark/attest"
 
-export default () => setup({})
+export default () => setup({
+  updateSnapshots: true
+})
