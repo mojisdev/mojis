@@ -39,9 +39,11 @@ jobs:
       - name: typecheck
         run: pnpm typecheck
 
+      - name: run benchmarks
+        run: pnpm bench:types -- --benchErrorOnThresholdExceeded --benchPercentThreshold 10
+
       - name: test
         run: pnpm test --coverage
-
 
       - name: upload coverage reports to codecov
         uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
