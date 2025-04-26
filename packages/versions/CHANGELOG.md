@@ -1,5 +1,11 @@
 # @mojis/versions
 
+## 0.1.1
+
+### Patch Changes
+
+- [`96f2a7a`](https://github.com/mojisdev/mojis/commit/96f2a7ab1513d91e12e9132cca542476cb923e81) Thanks [@luxass](https://github.com/luxass)! - use correct proxy url
+
 ## 0.1.0
 
 ### Minor Changes
