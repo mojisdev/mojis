@@ -48,11 +48,11 @@ describe("sequences adapter handler", () => {
 
     mockFetch([
       [
-        "GET https://unicode-proxy.mojis.dev/proxy/emoji/15.0/emoji-sequences.txt",
+        "GET https://unicode-proxy.ucdjs.dev/proxy/emoji/15.0/emoji-sequences.txt",
         () => HttpResponse.text(mockedSequences),
       ],
       [
-        "GET https://unicode-proxy.mojis.dev/proxy/emoji/15.0/emoji-zwj-sequences.txt",
+        "GET https://unicode-proxy.ucdjs.dev/proxy/emoji/15.0/emoji-zwj-sequences.txt",
         () => HttpResponse.text(),
       ],
     ]);
@@ -128,11 +128,11 @@ describe("sequences adapter handler", () => {
 
     mockFetch([
       [
-        "GET https://unicode-proxy.mojis.dev/proxy/emoji/15.0/emoji-sequences.txt",
+        "GET https://unicode-proxy.ucdjs.dev/proxy/emoji/15.0/emoji-sequences.txt",
         () => HttpResponse.text(),
       ],
       [
-        "GET https://unicode-proxy.mojis.dev/proxy/emoji/15.0/emoji-zwj-sequences.txt",
+        "GET https://unicode-proxy.ucdjs.dev/proxy/emoji/15.0/emoji-zwj-sequences.txt",
         () => HttpResponse.text(mockedSequences),
       ],
     ]);
