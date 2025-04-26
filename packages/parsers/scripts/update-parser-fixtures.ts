@@ -11,7 +11,7 @@ interface Entry {
 }
 
 async function run() {
-  const rootResponse = await fetch("https://unicode-proxy.mojis.dev/proxy/emoji/");
+  const rootResponse = await fetch("https://unicode-proxy.ucdjs.dev/proxy/emoji/");
 
   if (!rootResponse.ok) {
     throw new Error("failed to fetch root entry");
@@ -21,7 +21,7 @@ async function run() {
   await mkdir(root, { recursive: true });
 
   async function processDirectory(entry: Entry, basePath: string) {
-    const dirResponse = await fetch(`https://unicode-proxy.mojis.dev/proxy${entry.path}`);
+    const dirResponse = await fetch(`https://unicode-proxy.ucdjs.dev/proxy${entry.path}`);
     const dirEntries: Entry[] = await dirResponse.json();
 
     const fileEntries = dirEntries.filter(
@@ -41,7 +41,7 @@ async function run() {
 
         await mkdir(new URL(type, root), { recursive: true });
 
-        const content = await fetch(`https://unicode-proxy.mojis.dev/proxy${fullPath}`).then((res) => res.text());
+        const content = await fetch(`https://unicode-proxy.ucdjs.dev/proxy${fullPath}`).then((res) => res.text());
         await writeFile(
           new URL(`${type}/v${version.toString()}${fileExt}`, root),
           content,

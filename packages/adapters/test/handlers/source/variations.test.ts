@@ -22,7 +22,7 @@ describe("variations adapter handler", () => {
     });
 
     mockFetch([
-      ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => HttpResponse.text(mockVariations)],
+      ["GET https://unicode-proxy.ucdjs.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => HttpResponse.text(mockVariations)],
     ]);
 
     const result = await runSourceAdapter(variationsHandler, mockContext);
@@ -66,7 +66,7 @@ FE0E ; text style     # VS-15
 `;
 
     mockFetch([
-      ["GET https://unicode-proxy.mojis.dev/proxy/emoji/12.1/emoji-variation-sequences.txt", () => HttpResponse.text(mockVariations)],
+      ["GET https://unicode-proxy.ucdjs.dev/proxy/emoji/12.1/emoji-variation-sequences.txt", () => HttpResponse.text(mockVariations)],
     ]);
 
     const result = await runSourceAdapter(variationsHandler, {
@@ -100,7 +100,7 @@ FE0E ; text style     # VS-15
     const { runSourceAdapter } = await setupAdapterTest();
 
     mockFetch([
-      ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => HttpResponse.text("")],
+      ["GET https://unicode-proxy.ucdjs.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => HttpResponse.text("")],
     ]);
 
     const result = await runSourceAdapter(variationsHandler, mockContext);
@@ -110,7 +110,7 @@ FE0E ; text style     # VS-15
   it("should handle network errors", async () => {
     const { runSourceAdapter } = await setupAdapterTest();
 
-    mockFetch(`GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt`, () => {
+    mockFetch(`GET https://unicode-proxy.ucdjs.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt`, () => {
       return HttpResponse.error();
     });
 
@@ -125,7 +125,7 @@ FE0E ; text style     # VS-15
 
     let fetchCount = 0;
     mockFetch([
-      ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => {
+      ["GET https://unicode-proxy.ucdjs.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => {
         fetchCount++;
         return HttpResponse.text("FE0E ; text style     # VS-15");
       }],
@@ -148,7 +148,7 @@ invalid-line
 `;
 
     mockFetch([
-      ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => HttpResponse.text(mockVariations)],
+      ["GET https://unicode-proxy.ucdjs.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => HttpResponse.text(mockVariations)],
     ]);
 
     await expect(runSourceAdapter(variationsHandler, mockContext))
@@ -166,7 +166,7 @@ invalid-line
     });
 
     mockFetch([
-      ["GET https://unicode-proxy.mojis.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => HttpResponse.text(mockVariations)],
+      ["GET https://unicode-proxy.ucdjs.dev/proxy/15.0.0/ucd/emoji/emoji-variation-sequences.txt", () => HttpResponse.text(mockVariations)],
     ]);
 
     await expect(runSourceAdapter(variationsHandler, mockContext))
