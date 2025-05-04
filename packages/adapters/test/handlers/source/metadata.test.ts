@@ -22,7 +22,7 @@ describe("metadata adapter handler", () => {
     });
 
     mockFetch([
-      ["GET https://unicode-proxy.ucdjs.dev/proxy/emoji/15.0/emoji-test.txt", () => HttpResponse.text(mockEmojiTest)],
+      ["GET https://unicode-proxy.ucdjs.dev/emoji/15.0/emoji-test.txt", () => HttpResponse.text(mockEmojiTest)],
     ]);
 
     const result = await runSourceAdapter(metadataHandler, mockContext);
@@ -143,7 +143,7 @@ describe("metadata adapter handler", () => {
 `;
 
     mockFetch([
-      ["GET https://unicode-proxy.ucdjs.dev/proxy/emoji/15.0/emoji-test.txt", () => HttpResponse.text(mockEmojiTest)],
+      ["GET https://unicode-proxy.ucdjs.dev/emoji/15.0/emoji-test.txt", () => HttpResponse.text(mockEmojiTest)],
     ]);
 
     const result = await runSourceAdapter(metadataHandler, mockContext);
@@ -166,7 +166,7 @@ describe("metadata adapter handler", () => {
     const { runSourceAdapter } = await setupAdapterTest();
 
     mockFetch([
-      ["GET https://unicode-proxy.ucdjs.dev/proxy/emoji/15.0/emoji-test.txt", () => HttpResponse.text("")],
+      ["GET https://unicode-proxy.ucdjs.dev/emoji/15.0/emoji-test.txt", () => HttpResponse.text("")],
     ]);
 
     const result = await runSourceAdapter(metadataHandler, mockContext);
@@ -179,7 +179,7 @@ describe("metadata adapter handler", () => {
   it("should handle network errors", async () => {
     const { runSourceAdapter } = await setupAdapterTest();
 
-    mockFetch(`GET https://unicode-proxy.ucdjs.dev/proxy/emoji/${mockContext.emoji_version}/emoji-test.txt`, () => {
+    mockFetch(`GET https://unicode-proxy.ucdjs.dev/emoji/${mockContext.emoji_version}/emoji-test.txt`, () => {
       return HttpResponse.error();
     });
 
@@ -200,7 +200,7 @@ describe("metadata adapter handler", () => {
 
     let fetchCount = 0;
     mockFetch([
-      ["GET https://unicode-proxy.ucdjs.dev/proxy/emoji/15.0/emoji-test.txt", () => {
+      ["GET https://unicode-proxy.ucdjs.dev/emoji/15.0/emoji-test.txt", () => {
         fetchCount++;
         return HttpResponse.text(mockEmojiTest);
       }],
@@ -225,7 +225,7 @@ describe("metadata adapter handler", () => {
     });
 
     mockFetch([
-      ["GET https://unicode-proxy.ucdjs.dev/proxy/emoji/15.0/emoji-test.txt", () => HttpResponse.text(mockEmojiTest)],
+      ["GET https://unicode-proxy.ucdjs.dev/emoji/15.0/emoji-test.txt", () => HttpResponse.text(mockEmojiTest)],
     ]);
 
     await expect(runSourceAdapter(metadataHandler, mockContext))
@@ -242,7 +242,7 @@ describe("metadata adapter handler", () => {
 `;
 
     mockFetch([
-      ["GET https://unicode-proxy.ucdjs.dev/proxy/emoji/15.0/emoji-test.txt", () => HttpResponse.text(mockEmojiTest)],
+      ["GET https://unicode-proxy.ucdjs.dev/emoji/15.0/emoji-test.txt", () => HttpResponse.text(mockEmojiTest)],
     ]);
 
     await expect(runSourceAdapter(metadataHandler, mockContext))
