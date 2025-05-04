@@ -15,7 +15,7 @@ describe("unicode-names adapter handler", () => {
     const { runSourceAdapter } = await setupAdapterTest();
 
     mockFetch([
-      ["GET https://unicode-proxy.ucdjs.dev/proxy/15.0.0/ucd/UnicodeData.txt", () => HttpResponse.text("1F600;GRINNING FACE")],
+      ["GET https://unicode-proxy.ucdjs.dev/15.0.0/ucd/UnicodeData.txt", () => HttpResponse.text("1F600;GRINNING FACE")],
     ]);
 
     const result = await runSourceAdapter(unicodeNamesHandler, mockContext);
@@ -28,7 +28,7 @@ describe("unicode-names adapter handler", () => {
     const { runSourceAdapter } = await setupAdapterTest();
 
     mockFetch([
-      ["GET https://unicode-proxy.ucdjs.dev/proxy/1.1-Update/UnicodeData-1.1.5.txt", () => HttpResponse.text("1F600;GRINNING FACE")],
+      ["GET https://unicode-proxy.ucdjs.dev/1.1-Update/UnicodeData-1.1.5.txt", () => HttpResponse.text("1F600;GRINNING FACE")],
     ]);
 
     const result = await runSourceAdapter(unicodeNamesHandler, { ...mockContext, emoji_version: "1.0" });
@@ -41,7 +41,7 @@ describe("unicode-names adapter handler", () => {
     const { runSourceAdapter } = await setupAdapterTest();
 
     mockFetch([
-      ["GET https://unicode-proxy.ucdjs.dev/proxy/15.0.0/ucd/UnicodeData.txt", () => HttpResponse.text(
+      ["GET https://unicode-proxy.ucdjs.dev/15.0.0/ucd/UnicodeData.txt", () => HttpResponse.text(
         "1F600;GRINNING FACE\n"
         + "1F601;GRINNING FACE WITH SMILING EYES\n"
         + "1F602;FACE WITH TEARS OF JOY",
@@ -60,7 +60,7 @@ describe("unicode-names adapter handler", () => {
     const { runSourceAdapter } = await setupAdapterTest();
 
     mockFetch([
-      ["GET https://unicode-proxy.ucdjs.dev/proxy/15.0.0/ucd/UnicodeData.txt", () => HttpResponse.text("1F600")],
+      ["GET https://unicode-proxy.ucdjs.dev/15.0.0/ucd/UnicodeData.txt", () => HttpResponse.text("1F600")],
     ]);
 
     await expect(runSourceAdapter(unicodeNamesHandler, mockContext))
@@ -72,7 +72,7 @@ describe("unicode-names adapter handler", () => {
     const { runSourceAdapter } = await setupAdapterTest();
 
     mockFetch([
-      ["GET https://unicode-proxy.ucdjs.dev/proxy/15.0.0/ucd/UnicodeData.txt", () => HttpResponse.text("")],
+      ["GET https://unicode-proxy.ucdjs.dev/15.0.0/ucd/UnicodeData.txt", () => HttpResponse.text("")],
     ]);
 
     const result = await runSourceAdapter(unicodeNamesHandler, mockContext);
@@ -82,7 +82,7 @@ describe("unicode-names adapter handler", () => {
   it("should handle network errors", async () => {
     const { runSourceAdapter } = await setupAdapterTest();
 
-    mockFetch(`GET https://unicode-proxy.ucdjs.dev/proxy/${mockContext.emoji_version}.0/ucd/UnicodeData.txt`, () => {
+    mockFetch(`GET https://unicode-proxy.ucdjs.dev/${mockContext.emoji_version}.0/ucd/UnicodeData.txt`, () => {
       return HttpResponse.error();
     });
 
@@ -97,7 +97,7 @@ describe("unicode-names adapter handler", () => {
 
     let fetchCount = 0;
     mockFetch([
-      ["GET https://unicode-proxy.ucdjs.dev/proxy/15.0.0/ucd/UnicodeData.txt", () => {
+      ["GET https://unicode-proxy.ucdjs.dev/15.0.0/ucd/UnicodeData.txt", () => {
         fetchCount++;
         return HttpResponse.text("1F600;GRINNING FACE");
       }],

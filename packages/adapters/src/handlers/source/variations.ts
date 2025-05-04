@@ -31,13 +31,13 @@ export const handler = builder
       .urls((ctx) => {
         if (lte(ctx.unicode_version, "12.1")) {
           return {
-            url: `https://unicode-proxy.ucdjs.dev/proxy/emoji/${ctx.emoji_version}/emoji-variation-sequences.txt`,
+            url: `https://unicode-proxy.ucdjs.dev/emoji/${ctx.emoji_version}/emoji-variation-sequences.txt`,
             cacheKey: `v${ctx.emoji_version}/variations`,
           };
         }
 
         return {
-          url: `https://unicode-proxy.ucdjs.dev/proxy/${ctx.unicode_version}.0/ucd/emoji/emoji-variation-sequences.txt`,
+          url: `https://unicode-proxy.ucdjs.dev/${ctx.unicode_version}.0/ucd/emoji/emoji-variation-sequences.txt`,
           cacheKey: `v${ctx.emoji_version}/variations`,
         };
       })
