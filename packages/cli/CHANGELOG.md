@@ -1,5 +1,13 @@
 # @mojis/cli
 
+## 0.4.2
+
+### Patch Changes
+
+- Updated dependencies [[`d9062ba`](https://github.com/mojisdev/mojis/commit/d9062ba51fbba3753af1c5a3798293ad9e474c87)]:
+  - @mojis/adapters@0.4.3
+  - @mojis/versions@0.1.2
+
 ## 0.4.1
 
 ### Patch Changes
