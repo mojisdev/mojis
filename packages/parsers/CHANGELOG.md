@@ -1,5 +1,11 @@
 # @mojis/parsers
 
+## 0.1.2
+
+### Patch Changes
+
+- [#145](https://github.com/mojisdev/mojis/pull/145) [`d9062ba`](https://github.com/mojisdev/mojis/commit/d9062ba51fbba3753af1c5a3798293ad9e474c87) Thanks [@luxass](https://github.com/luxass)! - switch proxy endpoint
+
 ## 0.1.1
 
 ### Patch Changes
