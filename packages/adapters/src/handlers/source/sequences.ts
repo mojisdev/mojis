@@ -72,12 +72,12 @@ export const handler = builder
         return [
           {
             key: "sequences",
-            url: `https://unicode-proxy.ucdjs.dev/proxy/emoji/${emoji_version}/emoji-sequences.txt`,
+            url: `https://unicode-proxy.ucdjs.dev/emoji/${emoji_version}/emoji-sequences.txt`,
             cacheKey: `v${emoji_version}/sequences`,
           },
           {
             key: "zwj",
-            url: `https://unicode-proxy.ucdjs.dev/proxy/emoji/${emoji_version}/emoji-zwj-sequences.txt`,
+            url: `https://unicode-proxy.ucdjs.dev/emoji/${emoji_version}/emoji-zwj-sequences.txt`,
             cacheKey: `v${emoji_version}/zwj-sequences`,
           },
         ];

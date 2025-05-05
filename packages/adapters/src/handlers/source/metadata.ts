@@ -61,7 +61,7 @@ export const handler = builder
       return builder
         .urls((ctx) => {
           return {
-            url: `https://unicode-proxy.ucdjs.dev/proxy/emoji/${ctx.emoji_version}/emoji-test.txt`,
+            url: `https://unicode-proxy.ucdjs.dev/emoji/${ctx.emoji_version}/emoji-test.txt`,
             cacheKey: `v${ctx.emoji_version}/metadata`,
           };
         })
