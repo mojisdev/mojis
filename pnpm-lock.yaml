@@ -40,8 +40,8 @@ catalogs:
       specifier: ^3.0.9
       version: 3.1.1
     vitest-testdirs:
-      specifier: ^3.0.1
-      version: 3.0.1
+      specifier: ^4.0.0
+      version: 4.0.0
   monorepo:
     '@ark/attest':
       specifier: ^0.46.0
@@ -178,7 +178,7 @@ importers:
         version: 5.8.2
       vitest-testdirs:
         specifier: catalog:dev
-        version: 3.0.1(vitest@3.1.1)
+        version: 4.0.0(vitest@3.1.1)
 
   packages/cli:
     dependencies:
@@ -233,7 +233,7 @@ importers:
         version: 5.8.2
       vitest-testdirs:
         specifier: catalog:dev
-        version: 3.0.1(vitest@3.1.1)
+        version: 4.0.0(vitest@3.1.1)
 
   packages/internal-utils:
     dependencies:
@@ -270,7 +270,7 @@ importers:
         version: 5.8.2
       vitest-testdirs:
         specifier: catalog:dev
-        version: 3.0.1(vitest@3.1.1)
+        version: 4.0.0(vitest@3.1.1)
 
   packages/json-schemas:
     devDependencies:
@@ -288,7 +288,7 @@ importers:
         version: 5.8.2
       vitest-testdirs:
         specifier: catalog:dev
-        version: 3.0.1(vitest@3.1.1)
+        version: 4.0.0(vitest@3.1.1)
 
   packages/parsers:
     devDependencies:
@@ -309,7 +309,7 @@ importers:
         version: 5.8.2
       vitest-testdirs:
         specifier: catalog:dev
-        version: 3.0.1(vitest@3.1.1)
+        version: 4.0.0(vitest@3.1.1)
 
   packages/schemas:
     dependencies:
@@ -334,7 +334,7 @@ importers:
         version: 5.8.2
       vitest-testdirs:
         specifier: catalog:dev
-        version: 3.0.1(vitest@3.1.1)
+        version: 4.0.0(vitest@3.1.1)
 
   packages/versions:
     dependencies:
@@ -2997,9 +2997,9 @@ packages:
     resolution: {integrity: sha512-pFYqmTw68LXVjeWJMST4+borgQP2AyMNbg1BpZh9LbyhUeNkeaPF9gzfPGUAnSMV3qPYdWUwDIjjCLiSDOl7vg==}
     engines: {node: '>=18'}
 
-  testdirs@2.0.0:
-    resolution: {integrity: sha512-RkQWhq6sfg1FEnLnNfHQTOd9UKzfW/l4gD1Fq3yWaMVFjy5p+GGoWHqmPweK8sJhuMsCqXhUuq9t5HROSRazdw==}
-    engines: {node: '>=18'}
+  testdirs@3.0.0:
+    resolution: {integrity: sha512-2G7stHEavnUbvsS9LyGieuVyUVNVXAgeMfqiUtebmA63yJSgC6JBv3eTk3rmmDfrjB8wv1z+45Bn/awEI6e/yw==}
+    engines: {node: '>=20'}
 
   through2@4.0.2:
     resolution: {integrity: sha512-iOqSav00cVxEEICeD7TjLB1sueEL+81Wpzp2bY17uZjZN0pWZPuo4suZ/61VujxmqSGFfgOcNuTZ85QJwNZQpw==}
@@ -3245,9 +3245,9 @@ packages:
       yaml:
         optional: true
 
-  vitest-testdirs@3.0.1:
-    resolution: {integrity: sha512-NA7sJ4inGSVX6W3FzmCqEWJUJ4hhLM68ZQBCbrV5VLI3gSRKXrAjAsLwEi9GOz7YLXpQFEgVJgLAK7HHPoHYHA==}
-    engines: {node: '>=18'}
+  vitest-testdirs@4.0.0:
+    resolution: {integrity: sha512-gfX3bh5B3iqPioz0PudaJc/sPT7kuoRKUDK3Dng5k7/4O5usb3jV1/563lxshQUJO56JU1XELQFhHdQbHUqBbg==}
+    engines: {node: '>=20'}
     peerDependencies:
       vitest: '>=2.0.5 <4.0.0'
 
@@ -6218,7 +6218,7 @@ snapshots:
       glob: 10.4.5
       minimatch: 9.0.5
 
-  testdirs@2.0.0: {}
+  testdirs@3.0.0: {}
 
   through2@4.0.2:
     dependencies:
@@ -6455,9 +6455,9 @@ snapshots:
       tsx: 4.19.3
       yaml: 2.7.0
 
-  vitest-testdirs@3.0.1(vitest@3.1.1):
+  vitest-testdirs@4.0.0(vitest@3.1.1):
     dependencies:
-      testdirs: 2.0.0
+      testdirs: 3.0.0
       vitest: 3.1.1(@types/debug@4.1.12)(@types/node@22.14.1)(@vitest/ui@3.1.1)(jiti@2.4.2)(msw@2.7.3(@types/node@22.14.1)(typescript@5.8.2))(tsx@4.19.3)(yaml@2.7.0)
 
   vitest@3.1.1(@types/debug@4.1.12)(@types/node@22.14.1)(@vitest/ui@3.1.1)(jiti@2.4.2)(msw@2.7.3(@types/node@22.14.1)(typescript@5.8.2))(tsx@4.19.3)(yaml@2.7.0):
