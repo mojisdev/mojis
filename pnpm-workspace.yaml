@@ -4,34 +4,34 @@ packages:
 catalogs:
   monorepo:
     "@changesets/changelog-github": ^0.5.1
-    "@changesets/cli": ^2.28.1
-    turbo: ^2.4.4
-    msw: ^2.7.3
-    "@vitest/coverage-v8": ^3.0.9
-    "@vitest/ui": ^3.0.9
-    "@ark/attest": ^0.46.0
-    tsx: ^4.19.3
+    "@changesets/cli": ^2.29.4
+    turbo: ^2.5.4
+    msw: ^2.10.2
+    "@vitest/coverage-v8": ^3.2.3
+    "@vitest/ui": ^3.2.3
+    "@ark/attest": ^0.48.2
+    tsx: ^4.20.3
 
   prod:
     farver: ^0.4.2
     fs-extra: ^11.3.0
-    "@mojis/moji-compare": ^0.4.0
-    yargs-parser: ^21.1.1
+    "@mojis/moji-compare": ^0.5.0
+    yargs-parser: ^22.0.0
     defu: ^6.1.4
-    arktype: ^2.1.17
+    arktype: ^2.1.20
 
   dev:
-    "@luxass/eslint-config": ^4.18.1
+    "@luxass/eslint-config": ^4.19.0
     "@types/fs-extra": ^11.0.4
     "@types/node": ^22.10.0
     "@mojis/loomicode": 0.2.0-beta.7
     "@types/yargs-parser": ^21.0.3
-    eslint: ^9.23.0
-    tsdown: v0.9.3
-    typescript: ^5.8.2
-    vitest: ^3.0.9
+    eslint: ^9.29.0
+    tsdown: 0.11.0
+    typescript: ^5.8.3
+    vitest: ^3.2.3
     vitest-testdirs: ^4.0.0
-    tsx: ^4.19.3
+    tsx: ^4.20.3
     publint: ^0.3.12
 
 onlyBuiltDependencies:
