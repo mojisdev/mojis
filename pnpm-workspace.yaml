@@ -21,7 +21,7 @@ catalogs:
     arktype: ^2.1.20
 
   dev:
-    "@luxass/eslint-config": ^4.19.0
+    "@luxass/eslint-config": ^5.0.0
     "@types/fs-extra": ^11.0.4
     "@types/node": ^22.10.0
     "@mojis/loomicode": 0.2.0-beta.7
