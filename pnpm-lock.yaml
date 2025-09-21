@@ -37,7 +37,7 @@ catalogs:
       specifier: 5.9.2
       version: 5.9.2
     vitest:
-      specifier: ^3.2.4
+      specifier: 3.2.4
       version: 3.2.4
     vitest-testdirs:
       specifier: 4.2.0
@@ -53,10 +53,10 @@ catalogs:
       specifier: 2.29.6
       version: 2.29.6
     '@vitest/coverage-v8':
-      specifier: ^3.2.4
+      specifier: 3.2.4
       version: 3.2.4
     '@vitest/ui':
-      specifier: ^3.2.4
+      specifier: 3.2.4
       version: 3.2.4
     msw:
       specifier: 2.11.0
