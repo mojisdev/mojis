@@ -29,7 +29,7 @@ jobs:
       pull-requests: write
     if: github.repository == 'mojisdev/mojis'
     steps:
-      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
           repository: mojisdev/scripts
@@ -75,7 +75,7 @@ jobs:
 
       - name: create pull request
         if: ${{ github.event.inputs.dry-run == 'false' }} && steps.detect-new-releases.outputs.has_new_releases == 'true' && steps.generate-data.outputs.successful_versions != ''
-        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore: detect new emoji releases"
